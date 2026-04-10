@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Desk - Dettaglio Giornata</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tp: {
+                            bg: '#0B0E14',
+                            panel: '#161920',
+                            panelHover: '#1c1f26',
+                            border: '#252932',
+                            text: '#f8fafc',
+                            muted: '#848d97',
+                            accent: '#20c997', // Teal
+                            loss: '#f43f5e',
+                            warning: '#eab308'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #252932; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b4252; }
+        
+        .tp-check {
+            appearance: none; width: 1.25rem; height: 1.25rem; border: 2px solid #3b4252;
+            border-radius: 0.25rem; background-color: transparent; display: grid; place-content: center; cursor: pointer; transition: all 0.2s ease;
+        }
+        .tp-check::before {
+            content: ""; width: 0.65em; height: 0.65em; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+            transform: scale(0); background-color: #20c997; transition: 120ms transform ease-in-out;
+        }
+        .tp-check:checked { border-color: #20c997; }
+        .tp-check:checked::before { transform: scale(1); }
+
+        /* Timeline Marker Pulse */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(32, 201, 151, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(32, 201, 151, 0); }
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(32, 201, 151, 0); }
+        }
+        .timeline-cursor {
+            animation: pulse-ring 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-tp-bg text-tp-text font-sans h-screen flex overflow-hidden">
+
+    <!-- Sidebar Architecture -->
+                            <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+    <aside class="w-16 hover:w-64 border-r border-tp-border flex flex-col flex-shrink-0 bg-tp-bg transition-all duration-300 z-50 absolute h-full lg:relative group">
+        <!-- Logo Area Team Design -->
+        <div class="h-24 flex items-center justify-center lg:justify-start px-3 gap-4 border-b border-tp-border/50 overflow-hidden cursor-default w-full">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#161920] to-[#0a0c10] border border-[#20c997]/50 flex items-center justify-center shadow-[0_0_10px_rgba(32,201,151,0.2)] shrink-0 group-hover:rotate-3 transition-transform duration-300 mx-auto group-hover:mx-0">
+                <span class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-[#20c997] to-white tracking-tighter">TD</span>
+            </div>
+            <span class="text-xl font-extrabold tracking-tighter uppercase font-display select-none opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300">Trade<span class="text-[#20c997] ml-1">Desk</span></span>
+        </div>
+        
+        <!-- Navigation Links Universali -->
+        <nav class="flex-1 overflow-x-hidden overflow-y-auto py-6 space-y-2 flex flex-col w-full group">
+            <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span>
+            </a>
+            
+            <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span>
+            </a>
+            
+            <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span>
+            </a>
+
+            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span>
+            </a>
+            
+            <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span>
+            </a>
+            
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+            
+            <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span>
+            </a>
+
+            <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span>
+            </a>
+
+            <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span>
+            </a>
+            
+            <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span>
+            </a>
+            
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+
+            <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span>
+            </a>
+        </nav>
+    </aside>
+
+
+
+
+
+
+
+    <main class="flex-1 flex flex-col h-full bg-[#0e1116] relative overflow-hidden">
+        
+        <!-- ==============================================
+             HEADER UNIVERSALE (Da replicare su altre pagine)
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+        <header class="flex justify-between items-center px-8 py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
+            
+            <!-- 1. LEFT: Page Title & Quick Actions -->
+            <div class="flex items-center gap-4 w-auto min-w-max">
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Giovedì 2 Aprile 2026</h1>
+                    <div class="flex gap-2.5 mt-1">
+                        <a href="analisi.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Trade Analisi</a>
+                        <a href="tabella_trades.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Tabella Trades</a>
+                        <a href="giornaliero.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> Giornaliero</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. CENTER: Timeline (Cronoprogramma) -->
+            <div class="hidden lg:flex items-center flex-1 max-w-3xl mx-8 gap-6">
+                <!-- Digital Clock & TFs -->
+                <div class="flex flex-col items-center justify-center shrink-0">
+                    <span id="digital-clock" class="text-xl font-display font-bold text-white tracking-widest tabular-nums leading-none">00:00:00</span>
+                    <div class="flex gap-1 mt-1.5">
+                        <span id="tf-5m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">5m</span>
+                        <span id="tf-15m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">15m</span>
+                        <span id="tf-30m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">30m</span>
+                        <span id="tf-1h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">1h</span>
+                        <span id="tf-4h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">4h</span>
+                    </div>
+                </div>
+
+                <!-- Timeline Container -->
+                <div class="flex-col flex-1 relative w-full mx-4">
+                    <div class="flex justify-between text-[10px] items-end font-bold uppercase tracking-widest mb-2 px-2">
+                        <span class="text-tp-muted opacity-30">Asia</span>
+                        <span class="text-tp-muted opacity-60">London</span>
+                        <span class="text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] scale-110 origin-bottom transition-all">New York (14-17)</span>
+                        <span class="text-tp-muted opacity-30">End</span>
+                    </div>
+                    <!-- Track Base futuristic gradient -->
+                    <div class="h-2 w-full bg-gradient-to-r from-tp-bg via-tp-border to-tp-bg rounded-full border border-tp-border/30 relative shadow-inner">
+                        <!-- Progress Fill glowing gradient -->
+                        <div id="timeline-progress" class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-teal-600 via-tp-accent to-[#22d3ee] rounded-full shadow-[0_0_10px_rgba(32,201,151,0.5)]" style="width: 45%;"></div>
+                        <!-- Time Cursor Dot Glowing -->
+                        <div id="timeline-dot" class="timeline-cursor absolute top-1/2 -ml-2.5 -mt-2.5 w-5 h-5 bg-white rounded-full border-[3px] border-tp-accent shadow-[0_0_15px_rgba(32,201,151,0.9)] z-10" style="left: 45%;"></div>
+                        <!-- Mock Markers -->
+                        <div class="absolute left-[30%] top-0 bottom-0 w-px bg-tp-border/50"></div>
+                        <div class="absolute left-[50%] top-0 bottom-0 w-px bg-tp-border/50"></div>
+                        <div class="absolute left-[70%] top-0 bottom-0 w-px bg-tp-border/50"></div>
+                        <!-- Current Time Glowing Line marker -->
+                        <div class="absolute left-[45%] -top-1 -bottom-1 w-[2px] bg-tp-text/20 rounded-full blur-[1px]"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. RIGHT: Indicators + Win Rate -->
+            <div class="flex items-center gap-4 w-auto shrink-0 justify-end">
+                <div class="hidden xl:flex items-center gap-6 bg-gradient-to-b from-[#13161c] to-[#0a0c10] border border-tp-border/40 px-6 py-3 rounded-2xl shadow-inner h-16 mr-4">
+                    <div class="flex flex-col items-center gap-1 group relative w-10">
+                        <i id="mindset-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i>
+                    </div>
+                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
+                    <div class="flex flex-col items-center gap-1 group relative w-10">
+                        <i id="market-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i>
+                    </div>
+                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
+                    <div class="flex flex-col items-center gap-1 group relative w-10">
+                        <i id="volatility-icon-wrapper" data-lucide="dollar-sign" class="w-7 h-7 text-tp-accent drop-shadow-[0_0_12px_rgba(32,201,151,0.8)] transition-all duration-300 transform"></i>
+                    </div>
+                </div>
+                <!-- Win Rate Invasivo e Tecnologico -->
+                <div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem] shadow-[0_0_15px_rgba(32,201,151,0.05)]">
+                    <div class="flex flex-col">
+                        <span class="text-[9px] text-tp-accent font-bold uppercase tracking-widest opacity-80">Win Rate</span>
+                        <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-tp-accent to-white drop-shadow-[0_0_8px_rgba(32,201,151,0.6)] leading-none mt-0.5">67%</span>
+                    </div>
+                    <!-- Anello neon -->
+                    <div class="relative w-10 h-10 flex items-center justify-center">
+                        <svg class="w-[120%] h-[120%] transform -rotate-90 overflow-visible absolute" viewBox="0 0 36 36">
+                            <path class="text-tp-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                            <path class="text-tp-accent drop-shadow-[0_0_4px_rgba(32,201,151,0.8)]" stroke-dasharray="67, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- ==============================================
+             BODY: PANNELLO DI CONTROLLO GIORNATA
+             ============================================== -->
+        <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
+            <div class="max-w-[1600px] mx-auto grid grid-cols-12 gap-6 pb-20">
+                
+                <!-- ROW 1: Checklist | Proprietà  | Alerts -->
+                <div class="col-span-12 lg:col-span-3 flex flex-col gap-6">
+                    <!-- Checklist -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col min-h-[300px] shadow-lg">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-4 border-b border-tp-border pb-2">Checklist Base</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3 group">
+                                <input type="checkbox" onchange="this.nextElementSibling.classList.toggle('line-through'); this.nextElementSibling.classList.toggle('text-tp-muted'); this.nextElementSibling.classList.toggle('text-tp-text');" class="tp-check mt-0.5">
+                                <label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">Review Macro Calendario</label>
+                            </li>
+                            <li class="flex items-start gap-3 group">
+                                <input type="checkbox" onchange="this.nextElementSibling.classList.toggle('line-through'); this.nextElementSibling.classList.toggle('text-tp-muted'); this.nextElementSibling.classList.toggle('text-tp-text');" class="tp-check mt-0.5">
+                                <label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">Controllato liquidità Asia</label>
+                            </li>
+                            <li class="flex items-start gap-3 group">
+                                <input type="checkbox" onchange="this.nextElementSibling.classList.toggle('line-through'); this.nextElementSibling.classList.toggle('text-tp-muted'); this.nextElementSibling.classList.toggle('text-tp-text');" class="tp-check mt-0.5">
+                                <label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">Verifica Marea Attuale</label>
+                            </li>
+                            <li class="flex items-start gap-3 group">
+                                <input type="checkbox" onchange="this.nextElementSibling.classList.toggle('line-through'); this.nextElementSibling.classList.toggle('text-tp-muted'); this.nextElementSibling.classList.toggle('text-tp-text');" class="tp-check mt-0.5">
+                                <label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">Aggiornare livelli HTF</label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-span-12 lg:col-span-6 flex flex-col gap-6">
+                    <!-- Notion-style Properties Window -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
+                        <div class="flex items-center justify-between mb-5">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-tp-text flex items-center gap-2"><i data-lucide="sliders" class="w-4 h-4 text-tp-muted"></i> Proprietà  Attive</h3>
+                            <button class="text-tp-muted hover:text-white"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-x-8 gap-y-4">
+                            
+                            <!-- Fajr -->
+                            <div class="flex items-center justify-between py-2 border-b border-tp-border/50 bg-[#161920]">
+                                <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="sunrise" class="w-3.5 h-3.5"></i> Fajr</span>
+                                <div class="text-tp-accent text-sm font-bold flex items-center"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
+                            </div>
+
+                            <!-- Marea -->
+                            <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
+                                <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="waves" class="w-3.5 h-3.5"></i> Marea</span>
+                                <span class="text-sm font-bold">11:30</span>
+                            </div>
+
+                            <!-- Stato Mentale (Read Only) -->
+                            <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
+                                <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="brain" class="w-3.5 h-3.5"></i> Stato Mentale</span>
+                                <div class="flex gap-1" title="Sincronizzato da MonitoraSmile">
+                                    <i data-lucide="smile" class="w-4 h-4 text-[#20c997]"></i>
+                                    <i data-lucide="smile" class="w-4 h-4 text-[#20c997]"></i>
+                                    <i data-lucide="dollar-sign" class="w-4 h-4 text-[#eab308]"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Sessioni Lavorate (Badgets toggle) -->
+                            <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
+                                <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="clock" class="w-3.5 h-3.5"></i> Sessioni</span>
+                                <div class="flex gap-1">
+                                    <button onclick="this.classList.toggle('bg-tp-border'); this.classList.toggle('text-white');" class="bg-tp-border text-white text-[9px] uppercase font-bold px-1.5 py-0.5 rounded transition-colors duration-200">AS</button>
+                                    <button onclick="this.classList.toggle('bg-tp-border'); this.classList.toggle('text-white');" class="bg-[#0a0c10] text-tp-muted text-[9px] uppercase font-bold px-1.5 py-0.5 rounded transition-colors duration-200">LO</button>
+                                    <button onclick="this.classList.toggle('bg-tp-border'); this.classList.toggle('text-white');" class="bg-[#0a0c10] text-tp-muted text-[9px] uppercase font-bold px-1.5 py-0.5 rounded transition-colors duration-200">NY</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-x-8 gap-y-4 mt-4">
+                            <!-- Note da Ieri -->
+                            <div class="flex flex-col">
+                                <span class="text-[10px] text-tp-muted font-bold uppercase flex items-center gap-1.5 mb-1.5"><i data-lucide="history" class="w-3 h-3"></i> Note da Ieri</span>
+                                <div class="bg-[#0a0c10] border border-tp-border/50 rounded flex-1 p-2 text-xs text-tp-muted italic h-[80px] overflow-y-auto">
+                                    Mantenere focus esclusivo su EURUSD, ignorare fakeouts asiatici.
+                                </div>
+                            </div>
+                            <!-- Note per Domani -->
+                            <div class="flex flex-col">
+                                <span class="text-[10px] text-tp-muted font-bold uppercase flex items-center gap-1.5 mb-1.5"><i data-lucide="calendar-clock" class="w-3 h-3"></i> Note per Domani</span>
+                                <textarea class="bg-[#0a0c10] border border-tp-border/50 rounded flex-1 p-2 text-xs text-tp-text h-[80px] outline-none focus:border-tp-accent resize-none placeholder-tp-muted/50" placeholder="Scrivi qui..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Notizia del giorno -->
+                        <div class="mt-4 pt-3 border-t border-tp-border flex items-center justify-between">
+                            <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="newspaper" class="w-3.5 h-3.5"></i> Notizie (Titoli)</span>
+                            <div class="flex flex-wrap gap-2 justify-end">
+                                <span class="bg-tp-loss/10 text-tp-loss border border-tp-loss/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase">US NFP</span>
+                                <span class="bg-tp-warning/10 text-tp-warning border border-tp-warning/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase">ISM PMI</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-12 lg:col-span-3 flex flex-col gap-6">
+                    <!-- Alerts e Reminder -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 flex-1 min-h-[300px]">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-[#eab308] mb-4 flex items-center gap-2 border-b border-tp-border pb-2"><i data-lucide="bell-ring" class="w-4 h-4"></i> Allert di Oggi</h3>
+                        
+                        <div class="space-y-3">
+                            <div class="bg-[#0a0c10] border border-tp-border hover:border-[#eab308]/40 rounded-lg p-3 transition-all group shadow-sm relative overflow-hidden">
+                                <div class="absolute inset-y-0 left-0 w-1 bg-[#eab308]/80"></div>
+                                <div class="flex justify-between items-start pl-2">
+                                    <div class="flex flex-col gap-1 flex-1 pr-2">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold text-white text-sm group-hover:text-[#eab308] transition-colors">EURUSD</span>
+                                            <span class="text-xs text-tp-muted font-bold ml-1">1.08500</span>
+                                        </div>
+                                        <p class="text-[10px] text-tp-muted/80 line-clamp-1 italic">Breakout M15 test resistenza...</p>
+                                    </div>
+                                    <!-- Azioni -->
+                                    <div class="flex gap-1.5 mt-1 shrink-0">
+                                        <button onclick="document.getElementById('modal-analisi-alert').classList.add('open')" class="bg-tp-border hover:bg-[#eab308]/20 hover:text-[#eab308] text-tp-text rounded p-1.5 transition-colors border border-transparent hover:border-[#eab308]/30" title="Apri Controllo Alert">
+                                            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                        <button onclick="this.closest('.group').remove()" class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-1.5 transition-colors border border-transparent hover:border-tp-loss/30" title="Ignora Allert">
+                                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-[#0a0c10] border border-purple-500/30 rounded-lg p-3 transition-all group shadow-sm relative overflow-hidden">
+                                <div class="absolute inset-y-0 left-0 w-1 bg-purple-500/80"></div>
+                                <div class="flex justify-between items-start pl-2">
+                                    <div class="flex flex-col gap-1 flex-1 pr-2">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold text-white text-sm group-hover:text-purple-400 transition-colors">Dato Macro</span>
+                                            <span class="text-xs text-tp-muted font-bold ml-1">NFP Rilasciato</span>
+                                        </div>
+                                        <p class="text-[10px] text-tp-muted/80 line-clamp-1 italic">Inserire Actual per archiviare andamento...</p>
+                                    </div>
+                                    <!-- Azioni -->
+                                    <div class="flex gap-1.5 mt-1 shrink-0">
+                                        <button onclick="document.getElementById('modal-news-alert').classList.add('open')" class="bg-tp-border hover:bg-purple-500/20 hover:text-purple-400 text-tp-text rounded p-1.5 transition-colors border border-transparent hover:border-purple-500/30" title="Apri Controllo Notizia">
+                                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                        <button onclick="this.closest('.group').remove()" class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-1.5 transition-colors border border-transparent hover:border-tp-loss/30" title="Ignora Allert">
+                                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROW 2: Reparto Sessioni & Bias Centrale | Extra Dx -->
+                <div class="col-span-12 lg:col-span-9 flex flex-col gap-6">
+                    
+                    <h2 class="text-lg font-bold border-b border-tp-border pb-2 mt-4 text-white">Analisi Sessioni</h2>
+                    <!-- Quadrati Sessione -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        
+                        <!-- Box Asia -->
+                        <div onclick="document.getElementById('modal-analisi-sessione').classList.add('open'); document.getElementById('session-title-modal').textContent = 'Analisi Sessione Asia';" class="bg-tp-bg/60 border border-tp-border rounded-xl p-5 hover:border-tp-accent transition-all cursor-pointer group flex flex-col items-center justify-center min-h-[160px] relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-br from-transparent to-tp-panel pointer-events-none"></div>
+                            <span class="text-xs font-bold uppercase tracking-widest text-tp-muted absolute top-4 left-4">Asia</span>
+                            
+                            <!-- Stato Empty -->
+                            <div class="bg-tp-border/30 rounded-full w-12 h-12 flex items-center justify-center group-hover:bg-tp-accent group-hover:text-[#0a0c10] transition-colors z-10 text-tp-muted">
+                                <i data-lucide="plus" class="w-6 h-6"></i>
+                            </div>
+                            <span class="text-xs mt-3 text-tp-muted group-hover:text-tp-text z-10 transition-colors">Aggiungi Input / Screenshot</span>
+                        </div>
+
+                        <!-- Box London (Compilato) -->
+                        <div onclick="document.getElementById('modal-analisi-sessione').classList.add('open'); document.getElementById('session-title-modal').textContent = 'Analisi Sessione London';" class="bg-tp-panel border border-tp-accent/40 rounded-xl p-5 hover:border-tp-accent transition-all cursor-pointer group flex flex-col min-h-[160px] relative">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-xs font-bold uppercase tracking-widest text-tp-accent">London</span>
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-tp-accent"></i>
+                            </div>
+                            <p class="text-sm text-tp-text/90 line-clamp-3">Manipolazione dei minimi di Asia avvenuta alle 09:15. Creata liquidità inducente sulla Supply M15.</p>
+                            <div class="mt-auto pt-3 flex gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#14231f] text-tp-accent">1 Screens</span>
+                            </div>
+                        </div>
+
+                        <!-- Box NY -->
+                        <div onclick="document.getElementById('modal-analisi-sessione').classList.add('open'); document.getElementById('session-title-modal').textContent = 'Analisi Sessione New York';" class="bg-tp-bg/60 border border-dash border-tp-border/70 rounded-xl p-5 hover:border-tp-accent transition-all cursor-pointer group flex flex-col items-center justify-center min-h-[160px] relative overflow-hidden">
+                            <span class="text-xs font-bold uppercase tracking-widest text-tp-muted absolute top-4 left-4">New York</span>
+                            <div class="bg-tp-border/30 rounded-full w-12 h-12 flex items-center justify-center group-hover:bg-tp-accent group-hover:text-[#0a0c10] transition-colors z-10 text-tp-muted">
+                                <i data-lucide="plus" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bias della Giornata -->
+                    <div class="flex items-center justify-between border-b border-tp-border pb-2 mt-2 mb-4">
+                        <h2 class="text-lg font-bold text-white">Bias Giornaliero</h2>
+                        <button onclick="document.getElementById('modal-bias-reperto').classList.add('open')" class="bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] px-3 py-1 text-xs font-bold uppercase rounded flex items-center gap-2 transition-colors shadow-sm">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Aggiungi Input / Reperto
+                        </button>
+                    </div>
+                    <div class="bg-tp-panel border border-tp-border rounded-xl p-5 w-full flex items-center gap-6 shadow-sm hover:border-tp-accent/30 transition-colors cursor-text">
+                        <div class="flex flex-col items-center justify-center bg-[#0a0c10] rounded-lg border border-tp-border w-24 h-24 shrink-0">
+                            <i data-lucide="trending-up" class="w-8 h-8 text-tp-accent mb-1"></i>
+                            <span class="text-xs font-bold text-tp-accent uppercase tracking-widest">Bullish</span>
+                        </div>
+                        <div class="flex-1">
+                            <textarea class="w-full bg-transparent resize-none border-none outline-none text-sm text-tp-text/90 h-20 placeholder-tp-muted" placeholder="Scrivi qui gli appunti sul Bias e motivazioni (HTF)...">Il Daily H4 è chiaramente bullish dopo aver rimbalzato sul FVG. Cerco long sui ritracciamenti nelle sessioni EU/NY.</textarea>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ROW 2/3 RIGHT: Stats & Econ News -->
+                <div class="col-span-12 lg:col-span-3 flex flex-col gap-6 pt-[64px]">
+                    
+                    <!-- Box: Forza USD & Snapshot Log -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col shadow-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2" id="live-chart-title"><i data-lucide="line-chart" class="w-4 h-4"></i> Forza USD (%)</h3>
+                            <div class="flex gap-1 bg-[#0a0c10] border border-tp-border p-1 rounded-lg">
+                                <button onclick="switchDailyChart('usd', this)" class="daily-chart-btn bg-tp-accent/20 text-tp-accent px-2 py-1 rounded text-[10px] font-bold uppercase transition-colors">USD</button>
+                                <button onclick="switchDailyChart('mindset', this)" class="daily-chart-btn text-tp-muted hover:text-white px-2 py-1 rounded text-[10px] font-bold uppercase transition-colors">Mind</button>
+                                <button onclick="switchDailyChart('vol', this)" class="daily-chart-btn text-tp-muted hover:text-white px-2 py-1 rounded text-[10px] font-bold uppercase transition-colors">Vol</button>
+                            </div>
+                        </div>
+                        <div class="relative w-full h-32">
+                            <canvas id="paniereChart"></canvas>
+                            <canvas id="mindsetChart" style="display:none;"></canvas>
+                            <canvas id="volChart" style="display:none;"></canvas>
+                        </div>
+                        <div class="mt-4 border-t border-tp-border/50 pt-4">
+                            <button onclick="recordDollarStrength()" class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-bold bg-tp-accent/10 border border-tp-accent text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors">
+                                <i data-lucide="camera" class="w-3.5 h-3.5"></i> Registra Snapshot
+                            </button>
+                            <ul class="dollar-strength-log mt-3 space-y-1 max-h-32 overflow-y-auto custom-scroll">
+                                <!-- Log appariranno qui -->
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- Stats Recap -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 grid grid-cols-2 gap-4 shadow-lg text-center relative overflow-hidden">
+                        <div class="absolute inset-x-0 bottom-0 top-1/2 bg-gradient-to-t from-black/20 pointer-events-none"></div>
+                        <div class="flex flex-col items-center p-3 border border-tp-border/50 bg-[#0a0c10] rounded-lg">
+                            <span class="text-2xl font-bold font-display text-tp-accent mb-0.5">2</span>
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">TP Presi</span>
+                        </div>
+                        <div class="flex flex-col items-center p-3 border border-tp-border/50 bg-[#0a0c10] rounded-lg">
+                            <span class="text-2xl font-bold font-display text-tp-loss mb-0.5">1</span>
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">Stop Loss</span>
+                        </div>
+                        <div class="col-span-2 flex items-center justify-between mt-2 pt-3 border-t border-tp-border/50">
+                            <span class="text-xs font-bold text-tp-muted uppercase">P/L Lordo</span>
+                            <span class="text-sm font-bold text-tp-accent">+ $890.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Market Calendar Micro-Widget -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-4 border-b border-tp-border pb-2 flex items-center gap-2"><i data-lucide="rss" class="w-4 h-4"></i> Dati Economici</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-tp-loss"></span><span class="font-bold text-tp-text">14:30</span></div>
+                                <span class="text-tp-muted">US NFP</span>
+                            </li>
+                            <li class="flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-tp-warning"></span><span class="font-bold text-tp-text">16:00</span></div>
+                                <span class="text-tp-muted">ISM PMI</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // SIMULAZIONE TIMELINE PER CURSOR (Si muove basato sull'orologio, o fissa)
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            // Simulazione basica: Posiziona il pallino al centro (es. ore 11:30)
+            // Nel futuro Cursor può leggere new Date().getHours() e scalare la percentuale su 24h o sulle fasce 09-17
+            
+            const progress = document.getElementById('timeline-progress');
+            const dot = document.getElementById('timeline-dot');
+            
+            // Impostiamo al "45%" per demo visiva
+            if(progress && dot) {
+                progress.style.width = '45%';
+                dot.style.left = '45%';
+            }
+        });
+
+        // Orologio Digitale & Blinker Timeframes
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            const clockEl = document.getElementById('digital-clock');
+            if(clockEl) clockEl.textContent = `${hours}:${minutes}:${seconds}`;
+
+            const m = now.getMinutes();
+            const s = now.getSeconds();
+            
+            // helper per far lampeggiare di giallo un elemento
+            const checkBlink = (id, isClosing) => {
+                const el = document.getElementById(id);
+                if(!el) return;
+                if(isClosing) {
+                    el.classList.add('bg-tp-warning', 'text-[#0a0c10]', 'animate-pulse');
+                    el.classList.remove('bg-tp-panel', 'text-tp-muted');
+                } else {
+                    el.classList.remove('bg-tp-warning', 'text-[#0a0c10]', 'animate-pulse');
+                    el.classList.add('bg-tp-panel', 'text-tp-muted');
+                }
+            };
+
+            // Lampeggiano negli ultimi 10 secondi della loro chiusura matematica:
+            checkBlink('tf-5m', (m % 5 === 4) && s >= 50);
+            checkBlink('tf-15m', (m % 15 === 14) && s >= 50);
+            checkBlink('tf-30m', (m % 30 === 29) && s >= 50);
+            checkBlink('tf-1h', (m === 59) && s >= 50);
+            checkBlink('tf-4h', ((now.getHours() % 4 === 3) && m === 59 && s >= 50));
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // CHATJS - Neon HUD Style
+        Chart.defaults.color = '#848d97';
+        Chart.defaults.font.family = 'Inter';
+        
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { backgroundColor: '#161920', titleColor: '#fff', bodyColor: '#20c997', borderColor: '#252932', borderWidth: 1 }
+            },
+            scales: {
+                x: { grid: { display: false, drawBorder: false }, ticks: { font: { size: 9 } } },
+                y: { grid: { color: 'rgba(37, 41, 50, 0.4)', drawBorder: false, borderDash: [5, 5] }, ticks: { font: { size: 9 }, maxTicksLimit: 5 } }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+        };
+
+        // USD Basket Line Chart
+        const ctxUSD = document.getElementById('paniereChart').getContext('2d');
+        const gradUSD = ctxUSD.createLinearGradient(0, 0, 0, 100);
+        gradUSD.addColorStop(0, 'rgba(32, 201, 151, 0.4)');
+        gradUSD.addColorStop(1, 'rgba(32, 201, 151, 0)');
+
+        let usdChartObj = new Chart(ctxUSD, {
+            type: 'line',
+            data: {
+                labels: ['9:00', '11:00', '13:00', '15:00', '17:00'],
+                datasets: [{
+                    label: 'USD Index',
+                    data: [104.2, 104.5, 104.4, 105.1, 105.0],
+                    borderColor: '#20c997',
+                    backgroundColor: gradUSD,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#0a0c10',
+                    pointBorderColor: '#20c997',
+                    pointBorderWidth: 2,
+                    pointRadius: 3
+                }]
+            },
+            options: commonOptions
+        });
+
+        // Mindset Step Chart (Sad/Meh/Smile) mapped to -1, 0, 1
+        const ctxMindset = document.getElementById('mindsetChart').getContext('2d');
+        let mindChartObj = new Chart(ctxMindset, {
+            type: 'line',
+            data: {
+                labels: ['9:00', '11:00', '13:00', '15:00', '17:00'],
+                datasets: [{
+                    label: 'Stato Mentale',
+                    data: [1, 1, 0, -1, 1], // verde, verde, giallo, rosso, verde
+                    borderColor: '#9333ea',
+                    backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                    borderWidth: 2,
+                    stepped: true,
+                    fill: true,
+                    pointRadius: 4,
+                    pointBackgroundColor: function(context) {
+                        var val = context.raw;
+                        if(val > 0) return '#20c997';
+                        if(val === 0) return '#eab308';
+                        return '#f43f5e';
+                    }
+                }]
+            },
+            options: { ...commonOptions, scales: { x: commonOptions.scales.x, y: { ...commonOptions.scales.y, min: -1.5, max: 1.5, ticks: { callback: function(value) { if(value===1) return 'Smile'; if(value===0) return 'Meh'; if(value===-1) return 'Tired'; return ''; } } } } }
+        });
+
+        // Volatility Bar Chart
+        const ctxVol = document.getElementById('volChart').getContext('2d');
+        let volChartObj = new Chart(ctxVol, {
+            type: 'bar',
+            data: {
+                labels: ['9:00', '11:00', '13:00', '15:00', '17:00'],
+                datasets: [{
+                    label: 'Volatilità ($)',
+                    data: [1, 2, 1, 3, 2],
+                    backgroundColor: '#eab308',
+                    borderRadius: 4,
+                    barPercentage: 0.4
+                }]
+            },
+            options: { ...commonOptions, scales: { x: commonOptions.scales.x, y: { ...commonOptions.scales.y, max: 3, ticks: { callback: function(value) { return '$'.repeat(value); } } } } }
+        });
+
+        function switchDailyChart(type, btnObj) {
+            document.querySelectorAll('.daily-chart-btn').forEach(b => {
+                b.classList.remove('bg-tp-accent/20', 'text-tp-accent');
+                b.classList.add('text-tp-muted');
+            });
+            btnObj.classList.add('bg-tp-accent/20', 'text-tp-accent');
+            btnObj.classList.remove('text-tp-muted');
+
+            document.getElementById('paniereChart').style.display = 'none';
+            document.getElementById('mindsetChart').style.display = 'none';
+            document.getElementById('volChart').style.display = 'none';
+
+            let titleEl = document.getElementById('live-chart-title');
+            if(type === 'usd') { document.getElementById('paniereChart').style.display = 'block'; titleEl.innerHTML = '<i data-lucide="line-chart" class="w-4 h-4"></i> Forza USD (%)'; }
+            if(type === 'mindset') { document.getElementById('mindsetChart').style.display = 'block'; titleEl.innerHTML = '<i data-lucide="brain" class="w-4 h-4"></i> Mindset Track'; }
+            if(type === 'vol') { document.getElementById('volChart').style.display = 'block'; titleEl.innerHTML = '<i data-lucide="activity" class="w-4 h-4"></i> LiquiditÃ (Vol)'; }
+            lucide.createIcons({root: titleEl});
+        }
+    </script>
+    <!-- MODAL: BIAS / REPERTO (Input Giornaliero) -->
+    <div id="modal-bias-reperto" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="this.parentElement.classList.remove('open')"></div>
+        
+        <!-- Modal Content -->
+        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-2xl mx-4 relative transform scale-95 transition-transform duration-300 z-10 flex flex-col shadow-2xl overflow-hidden h-[90vh] md:h-auto max-h-[90vh]">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-tp-panel relative overflow-hidden">
+                <div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-accent"></div>
+                <div class="flex items-center gap-3">
+                    <div class="bg-tp-accent/10 p-2 rounded-lg border border-tp-accent/20">
+                        <i data-lucide="microscope" class="w-5 h-5 text-tp-accent drop-shadow-[0_0_8px_rgba(32,201,151,0.5)]"></i>
+                    </div>
+                    <h2 class="text-xl font-bold flex gap-2 items-center">Archivia Reperto / Bias</h2>
+                </div>
+                <button onclick="document.getElementById('modal-bias-reperto').classList.remove('open')" class="text-tp-muted hover:text-tp-loss bg-tp-border/30 hover:bg-tp-loss/10 p-1.5 rounded-lg transition-colors border border-transparent hover:border-tp-loss/30">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 overflow-y-auto flex flex-col gap-6 custom-scroll">
+                
+                <div class="flex flex-col md:flex-row gap-6">
+                    <!-- Selettore Coin -->
+                    <div class="flex-1">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
+                            <i data-lucide="coins" class="w-4 h-4 text-tp-accent"></i> Asset
+                        </label>
+                        <select class="w-full bg-[#161920] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent transition-colors appearance-none">
+                            <option value="XAUUSD">XAUUSD (Gold)</option>
+                            <option value="EURUSD">EURUSD</option>
+                            <option value="US30">US30 (Dow Jones)</option>
+                            <option value="DXY">DXY (Dollar Index)</option>
+                        </select>
+                    </div>
+
+                    <!-- Destinazione Focus / Categorizzatore Esteso -->
+                    <div class="flex-1">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
+                            <i data-lucide="link" class="w-4 h-4 text-tp-accent"></i> Categorizzatore Universale
+                        </label>
+                        <div class="flex flex-col gap-2">
+                            <!-- Toggle Categorie -->
+                            <div class="flex gap-2">
+                                <button onclick="document.getElementById('c-cron-bias').style.display='block'; document.getElementById('c-strat-bias').style.display='none'; document.getElementById('c-trade-bias').style.display='none';" class="flex-1 px-2 py-1.5 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase transition-colors">Cronache</button>
+                                <button onclick="document.getElementById('c-cron-bias').style.display='none'; document.getElementById('c-strat-bias').style.display='block'; document.getElementById('c-trade-bias').style.display='none';" class="flex-1 px-2 py-1.5 rounded-lg text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase transition-colors">Strategia</button>
+                                <button onclick="document.getElementById('c-cron-bias').style.display='none'; document.getElementById('c-strat-bias').style.display='none'; document.getElementById('c-trade-bias').style.display='block';" class="flex-1 px-2 py-1.5 rounded-lg text-xs font-bold border border-blue-500 text-blue-400 bg-blue-500/10 uppercase transition-colors">Trade</button>
+                            </div>
+                            
+                            <!-- Selettori -->
+                            <div id="c-cron-bias" style="display: block;" class="mt-1">
+                                <select multiple class="w-full bg-[#0a0c10] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[80px] custom-scroll">
+                                    <option value="oggi">Oggi - Focus Sessione</option>
+                                    <option value="ieri">Ieri - Rilascio NFP</option>
+                                    <option value="altrieri">Lunedì - Apertura Mercati</option>
+                                </select>
+                            </div>
+
+                            <div id="c-strat-bias" style="display: none;" class="mt-1">
+                                <select multiple class="w-full bg-[#0a0c10] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none h-[80px] custom-scroll">
+                                    <option value="london">London Breakout</option>
+                                    <option value="asian">Asian Sweep</option>
+                                    <option value="news">News Scalping</option>
+                                    <option value="htf">Trend Continuation H4</option>
+                                </select>
+                            </div>
+                            
+                            <div id="c-trade-bias" style="display: none;" class="mt-1">
+                                <select multiple class="w-full bg-[#0a0c10] border border-blue-500/30 rounded-lg px-3 py-2 text-xs text-blue-400 font-bold outline-none h-[80px] custom-scroll">
+                                    <option value="104">Trade #TRD-104 (XAUUSD Long)</option>
+                                    <option value="103">Trade #TRD-103 (US30 Short)</option>
+                                    <option value="102">Trade #TRD-102 (EURUSD Long)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Screenshot Input -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
+                        <i data-lucide="image" class="w-4 h-4"></i> Reperto Grafico (Screen)
+                    </label>
+                    <div class="w-full flex items-center justify-center p-6 border-2 border-dashed border-tp-border/70 rounded-xl bg-[#161920] hover:border-tp-accent/50 hover:bg-tp-accent/5 transition-colors cursor-pointer group">
+                        <div class="text-center">
+                            <i data-lucide="upload-cloud" class="w-8 h-8 text-tp-muted group-hover:text-tp-accent mx-auto mb-2 transition-colors"></i>
+                            <span class="text-sm font-medium text-tp-muted group-hover:text-tp-text transition-colors">Trascina uno Screenshot o Clicca</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analisi Bias -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
+                        <i data-lucide="align-left" class="w-4 h-4"></i> Motivazioni Logiche (Input)
+                    </label>
+                    <textarea placeholder="Descrivi il bias giornaliero, il pattern strutturale o l'inefficienza individuata da salvare come reperto..." class="w-full bg-[#161920] border border-tp-border rounded-lg px-3 py-3 text-sm focus:border-tp-accent outline-none text-white min-h-[120px] resize-none"></textarea>
+                </div>
+
+                <!-- Selettore Tags Archiviazione -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
+                        <i data-lucide="tags" class="w-4 h-4"></i> Tag Identificativi (Archiviazione)
+                    </label>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="this.classList.toggle('border-tp-accent'); this.classList.toggle('text-tp-accent'); this.classList.toggle('bg-tp-accent/10'); this.classList.toggle('border-tp-border'); this.classList.toggle('text-tp-muted');" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Struttura</button>
+                        <button onclick="this.classList.toggle('border-tp-accent'); this.classList.toggle('text-tp-accent'); this.classList.toggle('bg-tp-accent/10'); this.classList.toggle('border-tp-border'); this.classList.toggle('text-tp-muted');" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Liquidità </button>
+                        <button onclick="this.classList.toggle('border-[#eab308]'); this.classList.toggle('text-[#eab308]'); this.classList.toggle('bg-[#eab308]/10'); this.classList.toggle('border-tp-border'); this.classList.toggle('text-tp-muted');" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Evento Macro</button>
+                        <button onclick="this.classList.toggle('border-purple-500'); this.classList.toggle('text-purple-400'); this.classList.toggle('bg-purple-500/10'); this.classList.toggle('border-tp-border'); this.classList.toggle('text-tp-muted');" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Correlazione Setup</button>
+                        <button class="px-3 py-1.5 rounded-lg text-xs font-bold border border-dashed border-tp-border hover:border-tp-text text-tp-muted uppercase transition-colors bg-transparent">+ Custom Tag</button>
+                    </div>
+                </div>
+
+                <hr class="border-tp-border">
+
+                <!-- Mindset Live / Volatilita Toggles -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
+                        <i data-lucide="brain" class="w-4 h-4"></i> Mindset & Volatilità  (Traccia Aggiornamento)
+                    </label>
+                    <div class="flex flex-wrap items-center gap-6">
+                        <!-- Mindset -->
+                        <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
+                            <button onclick="selectMindset(this, 'positive')" class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors" title="Focussed / Positivo">
+                                <i data-lucide="smile" class="w-6 h-6"></i>
+                            </button>
+                            <button onclick="selectMindset(this, 'neutral')" class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors" title="Neutrale">
+                                <i data-lucide="meh" class="w-6 h-6"></i>
+                            </button>
+                            <button onclick="selectMindset(this, 'negative')" class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors" title="Revenge / Fomo / Stanco">
+                                <i data-lucide="frown" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="hidden md:block w-px h-8 bg-tp-border"></div>
+                        
+                        <!-- Volatility -->
+                        <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
+                            <button onclick="selectVol(this, 'low')" class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors" title="Bassa Volatilità ">
+                                <div class="flex"><i data-lucide="dollar-sign" class="w-5 h-5"></i></div>
+                            </button>
+                            <button onclick="selectVol(this, 'med')" class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors" title="Media Volatilità ">
+                                <div class="flex"><i data-lucide="dollar-sign" class="w-5 h-5"></i><i data-lucide="dollar-sign" class="w-5 h-5 -ml-2"></i></div>
+                            </button>
+                            <button onclick="selectVol(this, 'high')" class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors" title="Alta Volatilità ">
+                                <div class="flex"><i data-lucide="dollar-sign" class="w-5 h-5"></i><i data-lucide="dollar-sign" class="w-5 h-5 -ml-2"></i><i data-lucide="dollar-sign" class="w-5 h-5 -ml-2"></i></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel">
+                <button onclick="document.getElementById('modal-bias-reperto').classList.remove('open')" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white transition-colors">Annulla</button>
+                <button onclick="document.getElementById('modal-bias-reperto').classList.remove('open')" class="bg-tp-accent text-[#0a0c10] px-6 py-2 rounded-lg text-sm font-black uppercase tracking-wider hover:bg-[#1bb887] transition-colors shadow-[0_0_15px_rgba(32,201,151,0.3)]">Archivia Reperto</button>
+            </div>
+            
+        </div>
+    </div>
+    
+    <!-- MODAL: ANALISI SESSIONE (Con Relazionatore Universale) -->
+    <div id="modal-analisi-sessione" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="this.parentElement.classList.remove('open')"></div>
+        
+        <!-- Modal Content -->
+        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-2xl mx-4 relative transform scale-95 transition-transform duration-300 z-10 flex flex-col shadow-2xl overflow-hidden h-[90vh] md:h-auto max-h-[90vh]">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-tp-panel relative overflow-hidden">
+                <div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-accent"></div>
+                <div class="flex items-center gap-3">
+                    <div class="bg-tp-accent/10 p-2 rounded-lg border border-tp-accent/20">
+                        <i data-lucide="sun" class="w-5 h-5 text-tp-accent drop-shadow-[0_0_8px_rgba(32,201,151,0.5)]"></i>
+                    </div>
+                    <h2 id="session-title-modal" class="text-xl font-bold flex gap-2 items-center">Analisi Sessione</h2>
+                </div>
+                <button onclick="document.getElementById('modal-analisi-sessione').classList.remove('open')" class="text-tp-muted hover:text-tp-loss bg-tp-border/30 hover:bg-tp-loss/10 p-1.5 rounded-lg transition-colors border border-transparent hover:border-tp-loss/30">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 overflow-y-auto flex flex-col gap-6 custom-scroll">
+                
+                <!-- TABS DELLE COIN PER MULTI-ANALISI -->
+                <div class="flex gap-2 border-b border-tp-border/50 pb-2">
+                    <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]', 'text-white', 'border-tp-border')); this.classList.add('bg-[#161920]', 'text-white', 'border-tp-border')" class="bg-[#161920] text-white border border-tp-border border-b-transparent rounded-t-lg px-4 py-2 text-xs font-bold uppercase tracking-widest">XAUUSD</button>
+                    <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]', 'text-white', 'border-tp-border')); this.classList.add('bg-[#161920]', 'text-white', 'border-tp-border')" class="text-tp-muted hover:text-white border border-transparent border-b-transparent rounded-t-lg px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors">EURUSD</button>
+                    <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]', 'text-white', 'border-tp-border')); this.classList.add('bg-[#161920]', 'text-white', 'border-tp-border')" class="text-tp-muted hover:text-white border border-transparent border-b-transparent rounded-t-lg px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors">US30</button>
+                    <button class="bg-tp-accent/10 text-tp-accent border border-tp-accent/20 rounded-t-lg px-3 py-2 text-xs font-bold uppercase tracking-widest hover:bg-tp-accent/20 transition-colors ml-auto"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                </div>
+
+                <!-- ROW: Minimo e Massimo Sessione & Bias per la Coin corrente -->
+                <div class="flex flex-col md:flex-row gap-6 bg-[#0e1116] p-4 rounded-b-xl rounded-tr-xl border border-tp-border -mt-6 pt-6">
+                    <div class="flex-1 flex gap-4">
+                        <div class="flex-1">
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-2">Massimo (High)</label>
+                            <input type="text" placeholder="Es. 2050.2" class="w-full bg-[#161920] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent transition-colors">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-2">Minimo (Low)</label>
+                            <input type="text" placeholder="Es. 2035.8" class="w-full bg-[#161920] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent transition-colors">
+                        </div>
+                    </div>
+
+                    <div class="flex-1">
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-2">Bias Asset</label>
+                        <div class="flex bg-[#161920] rounded-lg p-1 border border-tp-border">
+                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b => {b.classList.remove('bg-tp-accent/20','text-tp-accent','border-none'); b.classList.add('text-tp-muted')}); this.classList.remove('text-tp-muted'); this.classList.add('bg-tp-accent/20','text-tp-accent')" class="flex-1 px-3 py-1.5 rounded-md text-xs font-bold uppercase transition-colors bg-tp-accent/20 text-tp-accent">Long</button>
+                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b => {b.classList.remove('bg-tp-accent/20','text-tp-accent','bg-tp-loss/20','text-tp-loss','border-none'); b.classList.add('text-tp-muted')}); this.classList.remove('text-tp-muted'); this.classList.add('bg-tp-loss/20','text-tp-loss')" class="flex-1 px-3 py-1.5 rounded-md text-xs font-bold uppercase transition-colors text-tp-muted hover:text-white">Short</button>
+                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b => {b.classList.remove('bg-tp-accent/20','text-tp-accent','bg-tp-loss/20','text-tp-loss','bg-tp-border/50','text-white','border-none'); b.classList.add('text-tp-muted')}); this.classList.remove('text-tp-muted'); this.classList.add('bg-tp-border/50','text-white')" class="flex-1 px-3 py-1.5 rounded-md text-xs font-bold uppercase transition-colors text-tp-muted hover:text-white">Neutro</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Commento -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
+                        <i data-lucide="align-left" class="w-4 h-4"></i> Analisi / Commento
+                    </label>
+                    <textarea placeholder="Inserisci i dettagli di come si è comportata la sessione..." class="w-full bg-[#161920] border border-tp-border rounded-lg px-3 py-3 text-sm focus:border-tp-accent outline-none text-white min-h-[80px] resize-none"></textarea>
+                </div>
+
+                <hr class="border-tp-border/50">
+
+                <!-- RELAZIONATORE DI CATEGORIA (MODULO UNIVERSALE) -->
+                <div class="border border-purple-500/30 bg-purple-500/5 rounded-xl p-4 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 bottom-0 w-1 bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]"></div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-purple-400 mb-3 flex items-center gap-2">
+                        <i data-lucide="link" class="w-4 h-4"></i> Relazionatore di Dati
+                    </label>
+                    <p class="text-[10px] text-tp-muted mb-4 -mt-1 w-5/6 leading-relaxed">Trasforma questi dati in un blocco unico e riportali nella finestra adiacente della categoria che selezioni.</p>
+                    
+                    <div class="flex flex-col md:flex-row gap-4 items-center">
+                        <div class="flex flex-col gap-2 flex-1 w-full">
+                            <div class="flex gap-2">
+                                <button onclick="this.parentElement.querySelectorAll('button').forEach(b => {b.classList.remove('border-[#eab308]','text-[#eab308]','bg-[#eab308]/10','border-purple-500','text-purple-400','bg-purple-500/10','border-[#20c997]','text-[#20c997]','bg-[#20c997]/10'); b.classList.add('border-tp-border','text-tp-muted','bg-[#0a0c10]')}); this.classList.remove('border-tp-border','text-tp-muted','bg-[#0a0c10]'); this.classList.add('border-[#eab308]','text-[#eab308]','bg-[#eab308]/10')" class="flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-[#eab308] text-[#eab308] bg-[#eab308]/10 uppercase transition-colors shadow-[0_0_10px_rgba(234,179,8,0.1)]">Cronaca</button>
+                                <button onclick="this.parentElement.querySelectorAll('button').forEach(b => {b.classList.remove('border-[#eab308]','text-[#eab308]','bg-[#eab308]/10','border-purple-500','text-purple-400','bg-purple-500/10','border-[#20c997]','text-[#20c997]','bg-[#20c997]/10'); b.classList.add('border-tp-border','text-tp-muted','bg-[#0a0c10]')}); this.classList.remove('border-tp-border','text-tp-muted','bg-[#0a0c10]'); this.classList.add('border-purple-500','text-purple-400','bg-purple-500/10')" class="flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-tp-border text-tp-muted bg-[#0a0c10] hover:text-white transition-colors">Strategia</button>
+                                <button onclick="this.parentElement.querySelectorAll('button').forEach(b => {b.classList.remove('border-[#eab308]','text-[#eab308]','bg-[#eab308]/10','border-purple-500','text-purple-400','bg-purple-500/10','border-[#20c997]','text-[#20c997]','bg-[#20c997]/10'); b.classList.add('border-tp-border','text-tp-muted','bg-[#0a0c10]')}); this.classList.remove('border-tp-border','text-tp-muted','bg-[#0a0c10]'); this.classList.add('border-[#20c997]','text-[#20c997]','bg-[#20c997]/10')" class="flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-tp-border text-tp-muted bg-[#0a0c10] hover:text-white transition-colors">Trade DB</button>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 w-full">
+                            <select class="w-full bg-[#0a0c10] border border-purple-500/30 rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-purple-500 transition-colors appearance-none cursor-pointer">
+                                <option value="" disabled>Scegli la destinazione...</option>
+                                <option value="oggi" selected>Focus Attuale: 3 Aprile</option>
+                                <option value="ieri">NFP Event Page</option>
+                                <option value="nuova">+ Nuova Entità...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-tp-border/50">
+
+                <!-- Mindset Live / Volatilita Toggles -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
+                        <i data-lucide="brain" class="w-4 h-4"></i> Mindset & Volatilità 
+                    </label>
+                    <div class="flex flex-wrap items-center gap-6">
+                        <!-- Mindset -->
+                        <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
+                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]')); this.classList.add('bg-[#161920]')" class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i data-lucide="smile" class="w-5 h-5 text-[#20c997]"></i></button>
+                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]')); this.classList.add('bg-[#161920]')" class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i data-lucide="meh" class="w-5 h-5 text-[#eab308]"></i></button>
+                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]')); this.classList.add('bg-[#161920]')" class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i data-lucide="frown" class="w-5 h-5 text-[#f43f5e]"></i></button>
+                        </div>
+                        <div class="hidden md:block w-px h-8 bg-tp-border"></div>
+                        <!-- Volatility -->
+                        <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
+                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]','text-white')); this.classList.add('bg-[#161920]','text-white')" class="vol-btn px-3 py-1.5 rounded-lg text-xs font-bold text-tp-muted hover:bg-[#161920] transition-colors">$</button>
+                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]','text-white')); this.classList.add('bg-[#161920]','text-white')" class="vol-btn px-3 py-1.5 rounded-lg text-xs font-bold text-tp-muted hover:bg-[#161920] transition-colors">$$</button>
+                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]','text-white')); this.classList.add('bg-[#161920]','text-white')" class="vol-btn px-3 py-1.5 rounded-lg text-xs font-bold text-tp-muted hover:bg-[#161920] transition-colors">$$$</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel">
+                <button onclick="document.getElementById('modal-analisi-sessione').classList.remove('open')" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white transition-colors">Annulla</button>
+                <button onclick="propagateSessionData()" class="bg-purple-500 text-white px-6 py-2 rounded-lg text-sm font-black uppercase tracking-wider hover:bg-purple-400 transition-colors shadow-[0_0_15px_rgba(168,85,247,0.3)]">Propaga Dati (Relaziona)</button>
+            </div>
+            
+        </div>
+    </div>
+
+    
+
+<div id="modal-analisi-alert"
+            class="fixed inset-0 z-[100] flex justify-center items-center bg-black/70 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+            <!-- Click-away -->
+            <div class="absolute inset-0" onclick="this.parentElement.classList.remove('open')"></div>
+
+            <!-- Contenitore Due Colonne -->
+            <div class="relative w-full max-w-[1200px] h-[85vh] bg-[#0a0c10] border border-tp-border rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden transform scale-95 transition-transform duration-300"
+                id="modal-alert-content">
+
+                <!-- COLONNA SINISTRA: Form Box -->
+                <div class="w-full md:w-[450px] bg-tp-panel flex flex-col border-r border-tp-border z-10">
+                    <!-- Header -->
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-[#161920]">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="bell" class="w-5 h-5 text-[#eab308]"></i>
+                            <h2 class="text-base font-bold text-white uppercase tracking-widest">Validazione Allert</h2>
+                        </div>
+                        <button onclick="document.getElementById('modal-analisi-alert').classList.remove('open')"
+                            class="text-tp-muted hover:text-white bg-tp-border/20 p-1.5 rounded-lg transition-colors">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Corpo Form Scrollabile -->
+                    <div class="p-6 overflow-y-auto flex-1 flex flex-col gap-6 custom-scroll">
+
+                        <!-- Dati Ricevuti -->
+                        <div class="bg-[#0e1116] border border-tp-border p-4 rounded-lg flex flex-col gap-3">
+                            <div class="flex justify-between items-center border-b border-tp-border/50 pb-2">
+                                <span class="text-[#eab308] font-bold text-lg leading-none">XAUUSD</span>
+                                <span
+                                    class="bg-[#eab308]/10 text-[#eab308] border border-[#eab308]/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase">14:30</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-tp-muted font-bold uppercase tracking-wider">Trigger
+                                    Prezzo</span>
+                                <span
+                                    class="font-display font-bold text-white text-base bg-[#161d24] px-2 rounded border border-tp-border">2045.50</span>
+                            </div>
+                            <p class="text-xs text-tp-muted italic mt-1 leading-relaxed">Alert triggerato livello
+                                resistenza chiave H4 identificato pre-market. Possibile reazione per storno intaday.</p>
+                        </div>
+
+                        <!-- Spazio Commento Aperto -->
+                        <div>
+                            <label
+                                class="block text-[10px] font-bold uppercase tracking-widest text-[#eab308] mb-2">Analisi
+                                e Commento</label>
+                            <textarea placeholder="Analisi strutturale e motivazioni del test al livello..."
+                                class="w-full bg-[#0e1116] border border-tp-border rounded-lg px-3 py-3 text-sm focus:border-[#eab308] outline-none text-white h-[100px] resize-none"></textarea>
+                        </div>
+
+                        <!-- Monitora Smile Esistente -->
+                        <div>
+                            <label
+                                class="block text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-2">Stato
+                                Operativo (Live)</label>
+                            <div
+                                class="flex flex-wrap items-center gap-4 bg-[#0e1116] p-2 rounded-xl border border-tp-border">
+                                <div class="flex items-center gap-1">
+                                    <button
+                                        class="p-1.5 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
+                                            data-lucide="smile" class="w-5 h-5"></i></button>
+                                    <button
+                                        class="p-1.5 rounded-lg text-[#20c997] bg-[#161920] border border-tp-border"><i
+                                            data-lucide="meh" class="w-5 h-5"></i></button>
+                                    <button
+                                        class="p-1.5 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
+                                            data-lucide="frown" class="w-5 h-5"></i></button>
+                                </div>
+                                <div class="w-px h-6 bg-tp-border hidden sm:block"></div>
+                                <div class="flex items-center gap-1">
+                                    <button
+                                        class="p-1.5 rounded-lg text-[#eab308] bg-[#161920] border border-tp-border"><i
+                                            data-lucide="dollar-sign" class="w-4 h-4"></i></button>
+                                    <button class="p-1.5 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
+                                        <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i
+                                                data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Categorizzatore Multiselect -->
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-widest text-tp-accent mb-2"><i
+                                    data-lucide="tags" class="inline w-3 h-3 mb-0.5"></i> Categorizzatore</label>
+                            <div class="flex flex-col gap-3">
+                                <!-- Bottoni Destinazione -->
+                                <div class="flex gap-2">
+                                    <button
+                                        onclick="document.getElementById('cat-cron-alert').style.display='block'; document.getElementById('cat-strat-alert').style.display='none'; document.getElementById('cat-trade-alert').style.display='none';"
+                                        class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase transition-colors">Cronache</button>
+                                    <button
+                                        onclick="document.getElementById('cat-cron-alert').style.display='none'; document.getElementById('cat-strat-alert').style.display='block'; document.getElementById('cat-trade-alert').style.display='none';"
+                                        class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase transition-colors">Strategia</button>
+                                    <button
+                                        onclick="document.getElementById('cat-cron-alert').style.display='none'; document.getElementById('cat-strat-alert').style.display='none'; document.getElementById('cat-trade-alert').style.display='block';"
+                                        class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-blue-500 text-blue-400 bg-blue-500/10 uppercase transition-colors">Trade</button>
+                                </div>
+                                <!-- Multiselect Cronache -->
+                                <div id="cat-cron-alert" class="w-full">
+                                    <select multiple
+                                        class="w-full bg-[#0e1116] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[80px] custom-scroll">
+                                        <option value="oggi">Oggi - Focus Sessione</option>
+                                        <option value="ieri">Ieri - Rilascio NFP</option>
+                                        <option value="altrieri">Lunedì - Apertura Mercati</option>
+                                    </select>
+                                    <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione
+                                    </p>
+                                </div>
+                                <!-- Multiselect Strategie -->
+                                <div id="cat-strat-alert" class="w-full" style="display:none;">
+                                    <select multiple
+                                        class="w-full bg-[#0e1116] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none h-[80px] custom-scroll">
+                                        <option value="s1">London Breakout</option>
+                                        <option value="s2">Asian Sweep Liquidity</option>
+                                        <option value="s3">News Scalper</option>
+                                        <option value="s4">Trend Pullback H4</option>
+                                    </select>
+                                    <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione
+                                    </p>
+                                </div>
+                                <!-- Multiselect Trade Recenti -->
+                                <div id="cat-trade-alert" class="w-full" style="display:none;">
+                                    <select multiple
+                                        class="w-full bg-[#0e1116] border border-blue-500/30 rounded-lg px-3 py-2 text-xs text-blue-400 font-bold outline-none h-[80px] custom-scroll">
+                                        <option value="t1">XAUUSD - Eseguito (Buy @ 2045.50)</option>
+                                        <option value="t2">US30 - Eseguito (Sell @ 39800.0)</option>
+                                        <option value="t3">EURUSD - Pending (Buy @ 1.0850)</option>
+                                    </select>
+                                    <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Footer Form Salva -->
+                    <div class="px-6 py-4 border-t border-tp-border bg-[#161920]">
+                        <button
+                            class="w-full flex justify-center items-center gap-2 px-6 py-3 rounded-lg text-xs font-black uppercase tracking-widest text-[#0e1116] bg-[#eab308] hover:bg-yellow-400 transition-colors shadow-[0_0_15px_rgba(234,179,8,0.3)]"
+                            onclick="document.getElementById('modal-analisi-alert').classList.remove('open')">
+                            Accetta & Salva in DB
+                        </button>
+                    </div>
+                </div>
+
+                <!-- COLONNA DESTRA: Upload Reperto Grafico -->
+                <div class="flex-1 bg-[#050608] flex items-center justify-center p-8 relative group">
+                    <div
+                        class="absolute inset-4 border-2 border-dashed border-tp-border/50 group-hover:border-[#eab308]/50 rounded-xl transition-colors pointer-events-none z-0">
+                    </div>
+                    <div class="text-center z-10 cursor-pointer">
+                        <div
+                            class="w-16 h-16 rounded-full bg-[#161920] flex items-center justify-center border border-tp-border mb-4 mx-auto group-hover:scale-110 transition-transform">
+                            <i data-lucide="camera"
+                                class="w-6 h-6 text-tp-muted group-hover:text-[#eab308] transition-colors"></i>
+                        </div>
+                        <h3 class="text-white font-bold text-lg mb-1">Carica Reperto Grafico</h3>
+                        <p class="text-tp-muted text-sm">Trascina qui lo screenshot o clicca per caricare</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- NOTION-STYLE MODAL: "News Validation" -->
+        <div id="modal-news-alert"
+            class="fixed inset-0 z-[100] flex justify-center items-start pt-20 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">
+            <div class="absolute inset-0"
+                onclick="document.getElementById('modal-news-alert').classList.remove('open')"></div>
+
+            <div class="relative w-full max-w-3xl bg-[#0e1116] border border-tp-border rounded-2xl shadow-2xl p-0 flex flex-col max-h-[85vh] overflow-hidden transform scale-95 transition-transform duration-200"
+                id="modal-news-content">
+
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-[#161920]">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-purple-500/10 p-2 rounded-lg border border-purple-500/20">
+                            <i data-lucide="globe" class="w-5 h-5 text-purple-400"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-white">Validazione Post-Notizia: NFP</h2>
+                    </div>
+                    <button onclick="document.getElementById('modal-news-alert').classList.remove('open')"
+                        class="text-tp-muted hover:text-tp-text bg-tp-border/30 p-1.5 rounded-lg transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 overflow-y-auto flex flex-col gap-6 custom-scroll">
+
+                    <!-- Dati Importati N8N -->
+                    <div class="bg-tp-bg p-4 rounded-xl border border-tp-border flex flex-col gap-4">
+                        <div class="flex justify-between items-start border-b border-tp-border/50 pb-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wide text-purple-400"><i
+                                    data-lucide="database" class="inline w-3 h-3"></i> Importato da AI Server
+                                (Pre-News)</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Evento</span>
+                                <span class="font-bold text-sm">Non-Farm Payrolls</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Forecast /
+                                    Previous</span>
+                                <span class="font-bold text-sm text-tp-warning">205K <span
+                                        class="text-tp-muted font-normal text-xs ml-1">/ 275K</span></span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Impatto
+                                    Atteso</span>
+                                <span class="font-bold text-sm text-tp-loss">High (3 ðÅ¸â€Â¥)</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Commento Intelligenza
+                                N8N</span>
+                            <p class="text-xs text-tp-muted bg-tp-panel p-3 rounded-lg border border-tp-border/50">Un
+                                NFP pià¹ alto del forecast rafforzerà  il dollaro, potenziale spinta ribassista su
+                                Gold (XAUUSD).</p>
+                        </div>
+                    </div>
+
+                    <!-- Dati Approvazione Utente -->
+                    <div class="flex gap-4">
+                        <div class="flex-1 shrink-0 w-1/3">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2"><i
+                                    data-lucide="edit" class="inline w-3 h-3"></i> Immetti Dati Usciti</label>
+                            <input type="text" placeholder="Es. 303K"
+                                class="w-full bg-[#0a0c10] border border-tp-border hover:border-tp-accent focus:border-tp-accent rounded-lg px-3 py-2 text-xl font-bold font-display text-white outline-none transition-colors">
+                        </div>
+                        <div class="flex-1 w-2/3">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2"><i
+                                    data-lucide="align-left" class="inline w-3 h-3"></i> Commento Utente
+                                Post-News</label>
+                            <textarea placeholder="Analisi dei minimi presi, comportamento del trend post spike..."
+                                class="w-full bg-[#0a0c10] border border-tp-border hover:border-tp-accent focus:border-tp-accent rounded-lg px-3 py-2 text-sm text-white outline-none h-[48px] resize-none transition-colors"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Impact Widget (Grafico Freccie) -->
+                    <div class="bg-tp-bg p-4 rounded-xl border border-tp-border">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-4"><i
+                                data-lucide="trending-up" class="inline w-3 h-3"></i> Monitoratore Impatto Visivo
+                            Rapido</label>
+                        <div class="flex gap-4">
+                            <!-- XAUUSD -->
+                            <div
+                                class="flex items-center gap-3 bg-tp-panel px-3 py-1.5 rounded-lg border border-tp-border flex-1 justify-between group hover:border-tp-accent/30 transition-colors">
+                                <span class="font-bold text-sm tracking-wide">XAU/USD</span>
+                                <div class="flex gap-1 bg-[#0a0c10] rounded-md border border-tp-border p-1">
+                                    <button onclick="selectImpact(this)"
+                                        class="visual-impact hover:bg-tp-accent/20 hover:text-tp-accent px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
+                                            data-lucide="arrow-up" class="w-4 h-4"></i></button>
+                                    <button onclick="selectImpact(this)"
+                                        class="visual-impact hover:bg-tp-loss/20 hover:text-tp-loss px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
+                                            data-lucide="arrow-down" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+                            <!-- USD INDEX -->
+                            <div
+                                class="flex items-center gap-3 bg-tp-panel px-3 py-1.5 rounded-lg border border-tp-border flex-1 justify-between group hover:border-tp-accent/30 transition-colors">
+                                <span class="font-bold text-sm tracking-wide">US DXY</span>
+                                <div class="flex gap-1 bg-[#0a0c10] rounded-md border border-tp-border p-1">
+                                    <button onclick="selectImpact(this)"
+                                        class="visual-impact hover:bg-tp-accent/20 hover:text-tp-accent px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
+                                            data-lucide="arrow-up" class="w-4 h-4"></i></button>
+                                    <button onclick="selectImpact(this)"
+                                        class="visual-impact hover:bg-tp-loss/20 hover:text-tp-loss px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
+                                            data-lucide="arrow-down" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Proprieta Strategie/Tag -->
+                    <div>
+                        <div class="flex flex-wrap gap-2">
+                            <button
+                                onclick="this.classList.toggle('border-purple-500'); this.classList.toggle('text-purple-400'); this.classList.toggle('bg-purple-500/10')"
+                                class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Tag:
+                                Manipolazione</button>
+                            <button
+                                onclick="this.classList.toggle('border-purple-500'); this.classList.toggle('text-purple-400'); this.classList.toggle('bg-purple-500/10')"
+                                class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Tag:
+                                Reversal</button>
+                            <button
+                                onclick="this.classList.toggle('border-purple-500'); this.classList.toggle('text-purple-400'); this.classList.toggle('bg-purple-500/10')"
+                                class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Tag:
+                                Impulso Immediato</button>
+                        </div>
+                    </div>
+
+                    <hr class="border-tp-border/50">
+
+                    <!-- Categorizzatore Multiselect per Notizie -->
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-widest text-[#eab308] mb-2"><i
+                                data-lucide="tags" class="inline w-3 h-3 mb-0.5"></i> Categorizzatore Destinazione
+                            Focus</label>
+                        <div class="flex flex-col gap-3">
+                            <!-- Bottoni Destinazione -->
+                            <div class="flex gap-2">
+                                <button
+                                    onclick="document.getElementById('cat-cron-news').style.display='block'; document.getElementById('cat-strat-news').style.display='none'; document.getElementById('cat-trade-news').style.display='none';"
+                                    class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase transition-colors">Cronache</button>
+                                <button
+                                    onclick="document.getElementById('cat-cron-news').style.display='none'; document.getElementById('cat-strat-news').style.display='block'; document.getElementById('cat-trade-news').style.display='none';"
+                                    class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase transition-colors">Strategia</button>
+                                <button
+                                    onclick="document.getElementById('cat-cron-news').style.display='none'; document.getElementById('cat-strat-news').style.display='none'; document.getElementById('cat-trade-news').style.display='block';"
+                                    class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-blue-500 text-blue-400 bg-blue-500/10 uppercase transition-colors">Trade</button>
+                            </div>
+                            <!-- Multiselect Cronache -->
+                            <div id="cat-cron-news" class="w-full">
+                                <select multiple
+                                    class="w-full bg-[#0a0c10] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[80px] custom-scroll">
+                                    <option value="oggi">Oggi - Focus Notizie Focus</option>
+                                    <option value="domani">Domani - Preparativa</option>
+                                    <option value="ieri">Ieri - Impatto NFP</option>
+                                </select>
+                                <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione</p>
+                            </div>
+                            <!-- Multiselect Strategie -->
+                            <div id="cat-strat-news" class="w-full" style="display:none;">
+                                <select multiple
+                                    class="w-full bg-[#0a0c10] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none h-[80px] custom-scroll">
+                                    <option value="s1">London Breakout</option>
+                                    <option value="s2">Asian Sweep Liquidity</option>
+                                    <option value="s3">News Scalper</option>
+                                    <option value="s4">Trend Pullback H4</option>
+                                </select>
+                                <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione</p>
+                            </div>
+                            <!-- Multiselect Trade Recenti -->
+                            <div id="cat-trade-news" class="w-full" style="display:none;">
+                                <select multiple
+                                    class="w-full bg-[#0a0c10] border border-blue-500/30 rounded-lg px-3 py-2 text-xs text-blue-400 font-bold outline-none h-[80px] custom-scroll">
+                                    <option value="t1">XAUUSD - Eseguito (Buy @ 2045.50)</option>
+                                    <option value="t2">US30 - Eseguito (Sell @ 39800.0)</option>
+                                    <option value="t3">EURUSD - Pending (Buy @ 1.0850)</option>
+                                </select>
+                                <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-tp-border/50">
+
+                    <!-- Condizionatore Faccina/Mindset (Uguale a Modale Trade) -->
+                    <div>
+                        <label
+                            class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
+                            <i data-lucide="brain" class="w-4 h-4"></i> Mindset Live & Volatilità 
+                        </label>
+                        <div class="flex items-center gap-4">
+                            <!-- Mindset -->
+                            <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
+                                <button onclick="selectMindset(this, 'positive')"
+                                    class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
+                                        data-lucide="smile" class="w-5 h-5"></i></button>
+                                <button onclick="selectMindset(this, 'neutral')"
+                                    class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
+                                        data-lucide="meh" class="w-5 h-5"></i></button>
+                                <button onclick="selectMindset(this, 'negative')"
+                                    class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
+                                        data-lucide="frown" class="w-5 h-5"></i></button>
+                            </div>
+                            <div class="w-px h-6 bg-tp-border"></div>
+                            <!-- Volatility -->
+                            <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
+                                <button onclick="selectVol(this, 'low')"
+                                    class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
+                                    <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i></div>
+                                </button>
+                                <button onclick="selectVol(this, 'med')"
+                                    class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
+                                    <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i
+                                            data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>
+                                </button>
+                                <button onclick="selectVol(this, 'high')"
+                                    class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
+                                    <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i
+                                            data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i><i
+                                            data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="px-6 py-4 border-t border-tp-border bg-[#161920] flex justify-end gap-3 rounded-b-2xl">
+                    <button onclick="document.getElementById('modal-news-alert').classList.remove('open')"
+                        class="px-4 py-2 rounded-lg text-sm font-bold text-tp-text bg-tp-border/20 hover:bg-tp-border/50 border border-tp-border transition-colors">
+                        Ignora Notizia
+                    </button>
+                    <button onclick="document.getElementById('modal-news-alert').classList.remove('open')"
+                        class="flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold text-white bg-purple-600 hover:bg-purple-500 border border-transparent transition-all shadow-[0_0_15px_rgba(147,51,234,0.3)]"
+                        onclick="window.location.href='allert.html'">
+                        Invia a DB Notizie <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    
+<style>
+        /* CSS per gestire l'apertura del modale da inline javascript */
+        #modal-analisi-alert.open,
+        #modal-news-alert.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #modal-analisi-alert.open #modal-alert-content,
+        #modal-news-alert.open #modal-news-content {
+            transform: scale(1);
+        }
+    </style>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

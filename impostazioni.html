@@ -1,0 +1,491 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Desk - Impostazioni</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tp: {
+                            bg: '#0B0E14',
+                            panel: '#161920',
+                            panelHover: '#1c1f26',
+                            border: '#252932',
+                            text: '#f8fafc',
+                            muted: '#848d97',
+                            accent: '#20c997', // Teal
+                            loss: '#f43f5e',
+                            warning: '#eab308'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #252932; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b4252; }
+    </style>
+</head>
+<body class="bg-tp-bg text-tp-text font-sans h-screen flex overflow-hidden">
+
+    <!-- Sidebar finta, verrà  rimpiazzata da update.ps1 -->
+                        <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+    <aside class="w-16 hover:w-64 border-r border-tp-border flex flex-col flex-shrink-0 bg-tp-bg transition-all duration-300 z-50 absolute h-full lg:relative group">
+        <!-- Logo Area Team Design -->
+        <div class="h-24 flex items-center justify-center lg:justify-start px-3 gap-4 border-b border-tp-border/50 overflow-hidden cursor-default w-full">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#161920] to-[#0a0c10] border border-[#20c997]/50 flex items-center justify-center shadow-[0_0_10px_rgba(32,201,151,0.2)] shrink-0 group-hover:rotate-3 transition-transform duration-300 mx-auto group-hover:mx-0">
+                <span class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-[#20c997] to-white tracking-tighter">TD</span>
+            </div>
+            <span class="text-xl font-extrabold tracking-tighter uppercase font-display select-none opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300">Trade<span class="text-[#20c997] ml-1">Desk</span></span>
+        </div>
+        
+        <!-- Navigation Links Universali -->
+        <nav class="flex-1 overflow-x-hidden overflow-y-auto py-6 space-y-2 flex flex-col w-full group">
+            <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span>
+            </a>
+            
+            <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span>
+            </a>
+            
+            <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span>
+            </a>
+
+            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span>
+            </a>
+            
+            <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span>
+            </a>
+            
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+            
+            <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span>
+            </a>
+
+            <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span>
+            </a>
+
+            <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span>
+            </a>
+            
+            <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span>
+            </a>
+            
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+
+            <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span>
+            </a>
+        </nav>
+    </aside>
+
+
+
+
+
+
+    <main class="flex-1 flex flex-col h-full bg-[#0e1116] relative overflow-hidden">
+        
+        <!-- Header finto, verrà  rimpiazzato da update_header.ps1 ma teniamo h1 per il titolo -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+        <header class="flex justify-between items-center px-8 py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
+            
+            <!-- 1. LEFT: Page Title & Quick Actions -->
+            <div class="flex items-center gap-4 w-auto min-w-max">
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Pannello Configurazione</h1>
+                    <div class="flex gap-2.5 mt-1">
+                        <a href="analisi.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Trade Analisi</a>
+                        <a href="tabella_trades.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Tabella Trades</a>
+                        <a href="giornaliero.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> Giornaliero</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. CENTER: Timeline (Cronoprogramma) -->
+            <div class="hidden lg:flex items-center flex-1 max-w-3xl mx-8 gap-6">
+                <!-- Digital Clock & TFs -->
+                <div class="flex flex-col items-center justify-center shrink-0">
+                    <span id="digital-clock" class="text-xl font-display font-bold text-white tracking-widest tabular-nums leading-none">00:00:00</span>
+                    <div class="flex gap-1 mt-1.5">
+                        <span id="tf-5m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">5m</span>
+                        <span id="tf-15m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">15m</span>
+                        <span id="tf-30m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">30m</span>
+                        <span id="tf-1h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">1h</span>
+                        <span id="tf-4h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">4h</span>
+                    </div>
+                </div>
+
+                <!-- Timeline Container -->
+                <div class="flex-col flex-1 relative w-full mx-4">
+                    <div class="flex justify-between text-[10px] items-end font-bold uppercase tracking-widest mb-2 px-2">
+                        <span class="text-tp-muted opacity-30">Asia</span>
+                        <span class="text-tp-muted opacity-60">London</span>
+                        <span class="text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] scale-110 origin-bottom transition-all">New York (14-17)</span>
+                        <span class="text-tp-muted opacity-30">End</span>
+                    </div>
+                    <!-- Track Base futuristic gradient -->
+                    <div class="h-2 w-full bg-gradient-to-r from-tp-bg via-tp-border to-tp-bg rounded-full border border-tp-border/30 relative shadow-inner">
+                        <!-- Progress Fill glowing gradient -->
+                        <div id="timeline-progress" class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-teal-600 via-tp-accent to-[#22d3ee] rounded-full shadow-[0_0_10px_rgba(32,201,151,0.5)]" style="width: 45%;"></div>
+                        <!-- Time Cursor Dot Glowing -->
+                        <div id="timeline-dot" class="timeline-cursor absolute top-1/2 -ml-2.5 -mt-2.5 w-5 h-5 bg-white rounded-full border-[3px] border-tp-accent shadow-[0_0_15px_rgba(32,201,151,0.9)] z-10" style="left: 45%;"></div>
+                        <!-- Mock Markers -->
+                        <div class="absolute left-[30%] top-0 bottom-0 w-px bg-tp-border/50"></div>
+                        <div class="absolute left-[50%] top-0 bottom-0 w-px bg-tp-border/50"></div>
+                        <div class="absolute left-[70%] top-0 bottom-0 w-px bg-tp-border/50"></div>
+                        <!-- Current Time Glowing Line marker -->
+                        <div class="absolute left-[45%] -top-1 -bottom-1 w-[2px] bg-tp-text/20 rounded-full blur-[1px]"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. RIGHT: Indicators + Win Rate -->
+            <div class="flex items-center gap-4 w-auto shrink-0 justify-end">
+                <div class="hidden xl:flex items-center gap-6 bg-gradient-to-b from-[#13161c] to-[#0a0c10] border border-tp-border/40 px-6 py-3 rounded-2xl shadow-inner h-16 mr-4">
+                    <div class="flex flex-col items-center gap-1 group relative w-10">
+                        <i id="mindset-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i>
+                    </div>
+                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
+                    <div class="flex flex-col items-center gap-1 group relative w-10">
+                        <i id="market-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i>
+                    </div>
+                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
+                    <div class="flex flex-col items-center gap-1 group relative w-10">
+                        <i id="volatility-icon-wrapper" data-lucide="dollar-sign" class="w-7 h-7 text-tp-accent drop-shadow-[0_0_12px_rgba(32,201,151,0.8)] transition-all duration-300 transform"></i>
+                    </div>
+                </div>
+                <!-- Win Rate Invasivo e Tecnologico -->
+                <div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem] shadow-[0_0_15px_rgba(32,201,151,0.05)]">
+                    <div class="flex flex-col">
+                        <span class="text-[9px] text-tp-accent font-bold uppercase tracking-widest opacity-80">Win Rate</span>
+                        <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-tp-accent to-white drop-shadow-[0_0_8px_rgba(32,201,151,0.6)] leading-none mt-0.5">67%</span>
+                    </div>
+                    <!-- Anello neon -->
+                    <div class="relative w-10 h-10 flex items-center justify-center">
+                        <svg class="w-[120%] h-[120%] transform -rotate-90 overflow-visible absolute" viewBox="0 0 36 36">
+                            <path class="text-tp-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                            <path class="text-tp-accent drop-shadow-[0_0_4px_rgba(32,201,151,0.8)]" stroke-dasharray="67, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- Body delle Impostazioni -->
+        <div class="flex-1 overflow-y-auto p-8 scroll-smooth">
+            <div class="max-w-[1400px] mx-auto flex flex-col gap-8">
+                
+                <div class="flex items-center gap-3 border-b border-tp-border pb-4">
+                    <div class="p-2 bg-tp-accent/10 border border-tp-accent/30 rounded-lg">
+                        <i data-lucide="settings-2" class="w-6 h-6 text-tp-accent"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold tracking-tight">Motore Logico Trade Desk</h2>
+                        <p class="text-sm text-tp-muted mt-1">Modifica qui le variabili globali utilizzate in tutta la dashboard.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    
+                    <!-- BOX 1: Checklist Base -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border flex flex-col h-[400px] shadow-lg overflow-hidden">
+                        <div class="p-4 border-b border-tp-border/50 bg-[#0a0c10] flex justify-between items-center">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2">
+                                <i data-lucide="list-checks" class="w-4 h-4"></i> Checklist Base (Giornaliero)
+                            </h3>
+                            <button class="text-tp-accent hover:text-white transition-colors" title="Aggiungi">
+                                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div class="p-5 flex-1 overflow-y-auto">
+                            <div class="space-y-3">
+                                <!-- Elemento trascinabile finto -->
+                                <div class="flex items-center gap-3 p-3 bg-tp-bg border border-tp-border rounded-lg group cursor-grab">
+                                    <i data-lucide="grip-vertical" class="w-4 h-4 text-tp-muted opacity-50 group-hover:opacity-100 cursor-grab"></i>
+                                    <input type="text" value="Review Macro Calendario" class="flex-1 bg-transparent border-none outline-none text-sm font-medium text-tp-text">
+                                    <button class="text-tp-muted hover:text-tp-loss transition-colors opacity-0 group-hover:opacity-100"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 bg-tp-bg border border-tp-border rounded-lg group cursor-grab">
+                                    <i data-lucide="grip-vertical" class="w-4 h-4 text-tp-muted opacity-50 group-hover:opacity-100 cursor-grab"></i>
+                                    <input type="text" value="Controllato liquidità  Asia" class="flex-1 bg-transparent border-none outline-none text-sm font-medium text-tp-text">
+                                    <button class="text-tp-muted hover:text-tp-loss transition-colors opacity-0 group-hover:opacity-100"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 bg-tp-bg border border-tp-border rounded-lg group cursor-grab">
+                                    <i data-lucide="grip-vertical" class="w-4 h-4 text-tp-muted opacity-50 group-hover:opacity-100 cursor-grab"></i>
+                                    <input type="text" value="Verifica Marea Attuale" class="flex-1 bg-transparent border-none outline-none text-sm font-medium text-tp-text">
+                                    <button class="text-tp-muted hover:text-tp-loss transition-colors opacity-0 group-hover:opacity-100"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                </div>
+                                
+                                <!-- Input nuovo rapido -->
+                                <div class="flex items-center gap-3 p-3 bg-tp-bg/30 border border-dashed border-tp-border rounded-lg text-tp-muted">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    <input type="text" placeholder="Aggiungi nuova regola..." class="flex-1 bg-transparent border-none outline-none text-sm font-medium text-tp-text placeholder-tp-border">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOX 2: Timeline Orari -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border flex flex-col h-[400px] shadow-lg overflow-hidden">
+                        <div class="p-4 border-b border-tp-border/50 bg-[#0a0c10] flex justify-between items-center">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2">
+                                <i data-lucide="clock" class="w-4 h-4"></i> Orari Sessioni (Timeline)
+                            </h3>
+                        </div>
+                        <div class="p-5 flex-1 overflow-y-auto">
+                            <div class="space-y-4">
+                                <p class="text-[11px] text-tp-muted leading-tight mb-4">Questi orari modificheranno visivamente la timeline dell'header in tempo reale.</p>
+                                
+                                <div class="flex flex-col gap-1.5">
+                                    <label class="text-xs font-bold uppercase text-tp-muted">Asia Session</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="time" value="00:00" class="flex-1 bg-tp-bg border border-tp-border rounded px-3 py-2 text-sm outline-none focus:border-tp-accent text-tp-text">
+                                        <span class="text-tp-muted">-</span>
+                                        <input type="time" value="09:00" class="flex-1 bg-tp-bg border border-tp-border rounded px-3 py-2 text-sm outline-none focus:border-tp-accent text-tp-text">
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col gap-1.5">
+                                    <label class="text-xs font-bold uppercase text-tp-muted">London Session</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="time" value="09:00" class="flex-1 bg-tp-bg border border-tp-border rounded px-3 py-2 text-sm outline-none focus:border-tp-accent text-tp-text">
+                                        <span class="text-tp-muted">-</span>
+                                        <input type="time" value="11:30" class="flex-1 bg-tp-bg border border-tp-border rounded px-3 py-2 text-sm outline-none focus:border-tp-accent text-tp-text">
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col gap-1.5">
+                                    <label class="text-xs font-bold uppercase text-tp-muted">New York Session</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="time" value="14:00" class="flex-1 bg-tp-bg border border-tp-border rounded px-3 py-2 text-sm outline-none focus:border-tp-accent text-tp-text">
+                                        <span class="text-tp-muted">-</span>
+                                        <input type="time" value="17:00" class="flex-1 bg-tp-bg border border-tp-border rounded px-3 py-2 text-sm outline-none focus:border-tp-accent text-tp-text">
+                                    </div>
+                                </div>
+                                <button class="mt-2 w-full bg-tp-border/30 hover:bg-tp-border text-white text-xs font-bold py-2 rounded transition-colors">Salva Orari</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOX 3: Tag Asset e Proprietà  -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border flex flex-col h-[400px] shadow-lg overflow-hidden">
+                        <div class="p-4 border-b border-tp-border/50 bg-[#0a0c10] flex justify-between items-center">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2">
+                                <i data-lucide="tags" class="w-4 h-4"></i> Badge Asset & Proprietà 
+                            </h3>
+                        </div>
+                        <div class="p-5 flex-1 overflow-y-auto">
+                            <!-- Assets -->
+                            <div class="mb-5">
+                                <h4 class="text-xs font-bold text-white mb-2 pb-1 border-b border-tp-border/50">Coin Tracker (Asset)</h4>
+                                <div class="flex flex-wrap gap-2 mb-2">
+                                    <div class="flex items-center gap-1.5 px-2 py-1 bg-tp-bg border border-tp-border rounded group">
+                                        <div class="w-2 h-2 rounded-full bg-tp-accent"></div>
+                                        <span class="text-xs font-bold text-tp-text">XAUUSD</span>
+                                        <i data-lucide="x" class="w-3 h-3 text-tp-muted cursor-pointer hover:text-tp-loss ml-1"></i>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 px-2 py-1 bg-tp-bg border border-tp-border rounded group">
+                                        <div class="w-2 h-2 rounded-full bg-tp-warning"></div>
+                                        <span class="text-xs font-bold text-tp-text">US30</span>
+                                        <i data-lucide="x" class="w-3 h-3 text-tp-muted cursor-pointer hover:text-tp-loss ml-1"></i>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 px-2 py-1 bg-tp-bg border border-tp-border rounded group">
+                                        <div class="w-2 h-2 rounded-full bg-[#f43f5e]"></div>
+                                        <span class="text-xs font-bold text-tp-text">GER30</span>
+                                        <i data-lucide="x" class="w-3 h-3 text-tp-muted cursor-pointer hover:text-tp-loss ml-1"></i>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 px-2 py-1 bg-tp-bg/30 border border-dashed border-tp-border rounded cursor-pointer hover:border-tp-muted">
+                                        <i data-lucide="plus" class="w-3 h-3 text-tp-muted"></i>
+                                        <span class="text-[10px] uppercase font-bold text-tp-muted">Nuovo Asset</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Stati Mentali -->
+                            <div>
+                                <h4 class="text-xs font-bold text-white mb-2 pb-1 border-b border-tp-border/50">Opzioni Stato Mentale</h4>
+                                <div class="space-y-2">
+                                    <div class="flex gap-2">
+                                        <select class="bg-tp-bg border border-tp-border rounded px-2 py-1 text-xs outline-none text-tp-muted w-12">
+                                            <option>😊</option>
+                                        </select>
+                                        <input type="text" value="Eccellente Focus" class="flex-1 bg-tp-bg border border-tp-border rounded px-2 py-1 text-xs outline-none text-tp-text">
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <select class="bg-tp-bg border border-tp-border rounded px-2 py-1 text-xs outline-none text-tp-muted w-12">
+                                            <option>😐</option>
+                                        </select>
+                                        <input type="text" value="Stanchezza" class="flex-1 bg-tp-bg border border-tp-border rounded px-2 py-1 text-xs outline-none text-tp-text">
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <select class="bg-tp-bg border border-tp-border rounded px-2 py-1 text-xs outline-none text-tp-muted w-12">
+                                            <option>😤</option>
+                                        </select>
+                                        <input type="text" value="Fomo / Urgenza" class="flex-1 bg-tp-bg border border-tp-border rounded px-2 py-1 text-xs outline-none text-tp-text">
+                                    </div>
+                                    <button class="w-full mt-2 text-[10px] font-bold uppercase text-tp-muted border border-dashed border-tp-border py-1.5 hover:border-tp-muted hover:text-white transition-colors rounded">
+                                        + Aggiungi Opzione
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOX 4: Gestore Strategie (Playbook) -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border flex flex-col h-[400px] shadow-lg overflow-hidden lg:col-span-2 xl:col-span-3">
+                        <div class="p-4 border-b border-tp-border/50 bg-[#0a0c10] flex justify-between items-center">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2">
+                                <i data-lucide="book-open" class="w-4 h-4"></i> Setup Modelli Strategici
+                            </h3>
+                            <button class="bg-tp-accent/10 border border-tp-accent text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] text-[10px] uppercase font-bold py-1 px-3 rounded transition-colors" title="Aggiungi Strategia">
+                                Crea Strategia
+                            </button>
+                        </div>
+                        <div class="p-5 flex-1 overflow-y-auto">
+                            <p class="text-[11px] text-tp-muted mb-4">Crea le Etichette Base che usi per categorizzare i trade (questo alimenterà il menù a tendina nel dettaglio trade e sbloccherà gli slot nel Playbook).</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <!-- Card Strategia 1 -->
+                                <div class="flex flex-col bg-tp-bg border border-tp-border rounded-lg p-3 group">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <i data-lucide="target" class="w-4 h-4 text-tp-accent"></i>
+                                            <span class="text-sm font-bold text-white">London Breakout</span>
+                                        </div>
+                                        <div class="flex gap-1">
+                                            <button class="text-tp-muted hover:text-white"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
+                                            <button class="text-tp-muted hover:text-tp-loss"><i data-lucide="trash" class="w-3.5 h-3.5"></i></button>
+                                        </div>
+                                    </div>
+                                    <span class="text-[10px] text-tp-muted uppercase tracking-wider">Alias DB: lon-brk</span>
+                                    <span class="text-[10px] text-tp-accent mt-1 bg-tp-accent/10 w-fit px-1.5 py-0.5 rounded border border-tp-accent/20">Winrate target: 60%</span>
+                                </div>
+                                
+                                <!-- Card Strategia 2 -->
+                                <div class="flex flex-col bg-tp-bg border border-tp-border rounded-lg p-3 group">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <i data-lucide="trending-up" class="w-4 h-4 text-[#eab308]"></i>
+                                            <span class="text-sm font-bold text-white">ICT Turtle Soup</span>
+                                        </div>
+                                        <div class="flex gap-1">
+                                            <button class="text-tp-muted hover:text-white"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
+                                            <button class="text-tp-muted hover:text-tp-loss"><i data-lucide="trash" class="w-3.5 h-3.5"></i></button>
+                                        </div>
+                                    </div>
+                                    <span class="text-[10px] text-tp-muted uppercase tracking-wider">Alias DB: ict-ts</span>
+                                    <span class="text-[10px] text-tp-accent mt-1 bg-tp-accent/10 w-fit px-1.5 py-0.5 rounded border border-tp-accent/20">Winrate target: 45%</span>
+                                </div>
+
+                                <!-- Card Nuova Strategia finta p-placeholder -->
+                                <div class="flex flex-col justify-center items-center bg-[#0e1116] border border-dashed border-tp-border rounded-lg p-4 group cursor-pointer hover:border-tp-accent/50 transition-colors">
+                                    <i data-lucide="plus" class="w-6 h-6 text-tp-muted mb-1 group-hover:text-tp-accent"></i>
+                                    <span class="text-xs uppercase font-bold tracking-widest text-tp-muted group-hover:text-white">Aggiungi Modello</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

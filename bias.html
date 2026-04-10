@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Desk - Database Bias</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tp: {
+                            bg: '#0B0E14',
+                            panel: '#161920',
+                            panelHover: '#1c1f26',
+                            border: '#252932',
+                            text: '#f8fafc',
+                            muted: '#848d97',
+                            accent: '#20c997', // Teal
+                            loss: '#f43f5e',
+                            warning: '#eab308'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #252932; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b4252; }
+    </style>
+</head>
+<body class="bg-tp-bg text-tp-text font-sans h-screen flex overflow-hidden">
+
+    <!-- Sidebar Architecture -->
+                            <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+    <aside class="w-16 hover:w-64 border-r border-tp-border flex flex-col flex-shrink-0 bg-tp-bg transition-all duration-300 z-50 absolute h-full lg:relative group">
+        <!-- Logo Area Team Design -->
+        <div class="h-24 flex items-center justify-center lg:justify-start px-3 gap-4 border-b border-tp-border/50 overflow-hidden cursor-default w-full">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#161920] to-[#0a0c10] border border-[#20c997]/50 flex items-center justify-center shadow-[0_0_10px_rgba(32,201,151,0.2)] shrink-0 group-hover:rotate-3 transition-transform duration-300 mx-auto group-hover:mx-0">
+                <span class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-[#20c997] to-white tracking-tighter">TD</span>
+            </div>
+            <span class="text-xl font-extrabold tracking-tighter uppercase font-display select-none opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300">Trade<span class="text-[#20c997] ml-1">Desk</span></span>
+        </div>
+        
+        <!-- Navigation Links Universali -->
+        <nav class="flex-1 overflow-x-hidden overflow-y-auto py-6 space-y-2 flex flex-col w-full group">
+            <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span>
+            </a>
+            
+            <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span>
+            </a>
+            
+            <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span>
+            </a>
+
+            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span>
+            </a>
+            
+            <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span>
+            </a>
+            
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+            
+            <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span>
+            </a>
+
+            <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span>
+            </a>
+
+            <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span>
+            </a>
+            
+            <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span>
+            </a>
+            
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+
+            <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span>
+            </a>
+        </nav>
+    </aside>
+
+
+
+
+
+
+
+    <main class="flex-1 flex flex-col h-full bg-[#0e1116] relative overflow-hidden">
+        
+        <!-- Header -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+                <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+        <header class="flex justify-between items-center px-8 py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
+            
+            <!-- 1. LEFT: Page Title & Quick Actions -->
+            <div class="flex items-center gap-4 w-auto min-w-max">
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Database Bias</h1>
+                    <div class="flex gap-2.5 mt-1">
+                        <a href="analisi.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Trade Analisi</a>
+                        <a href="bias.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="microscope" class="w-3.5 h-3.5"></i> Database Bias</a>
+                        <a href="giornaliero.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> Giornaliero</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. CENTER: Timeline (Cronoprogramma) -->
+            <div class="hidden lg:flex items-center flex-1 max-w-3xl mx-8 gap-6">
+                <!-- Digital Clock & TFs -->
+                <div class="flex flex-col items-center justify-center shrink-0">
+                    <span id="digital-clock" class="text-xl font-display font-bold text-white tracking-widest tabular-nums leading-none">00:00:00</span>
+                    <div class="flex gap-1 mt-1.5">
+                        <span id="tf-5m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">5m</span>
+                        <span id="tf-15m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">15m</span>
+                        <span id="tf-30m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">30m</span>
+                        <span id="tf-1h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">1h</span>
+                        <span id="tf-4h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">4h</span>
+                    </div>
+                </div>
+
+                <!-- Timeline Container -->
+                <div class="flex-col flex-1 relative w-full mx-4">
+                    <div class="flex justify-between text-[10px] items-end font-bold uppercase tracking-widest mb-2 px-2">
+                        <span class="text-tp-muted opacity-30">Asia</span>
+                        <span class="text-tp-muted opacity-60">London</span>
+                        <span class="text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] scale-110 origin-bottom transition-all">New York (14-17)</span>
+                        <span class="text-tp-muted opacity-30">End</span>
+                    </div>
+                    <!-- Track Base futuristic gradient -->
+                    <div class="h-2 w-full bg-gradient-to-r from-tp-bg via-tp-border to-tp-bg rounded-full border border-tp-border/30 relative shadow-inner">
+                        <!-- Progress Fill glowing gradient -->
+                        <div id="timeline-progress" class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-teal-600 via-tp-accent to-[#22d3ee] rounded-full shadow-[0_0_10px_rgba(32,201,151,0.5)]" style="width: 45%;"></div>
+                        <!-- Time Cursor Dot Glowing -->
+                        <div id="timeline-dot" class="timeline-cursor absolute top-1/2 -ml-2.5 -mt-2.5 w-5 h-5 bg-white rounded-full border-[3px] border-tp-accent shadow-[0_0_15px_rgba(32,201,151,0.9)] z-10" style="left: 45%;"></div>
+                        <!-- Mock Markers -->
+                        <div class="absolute left-[30%] top-0 bottom-0 w-px bg-tp-border/50"></div>
+                        <div class="absolute left-[50%] top-0 bottom-0 w-px bg-tp-border/50"></div>
+                        <div class="absolute left-[70%] top-0 bottom-0 w-px bg-tp-border/50"></div>
+                        <!-- Current Time Glowing Line marker -->
+                        <div class="absolute left-[45%] -top-1 -bottom-1 w-[2px] bg-tp-text/20 rounded-full blur-[1px]"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. RIGHT: Indicators + Win Rate -->
+            <div class="flex items-center gap-4 w-auto shrink-0 justify-end">
+                <div class="hidden xl:flex items-center gap-6 bg-gradient-to-b from-[#13161c] to-[#0a0c10] border border-tp-border/40 px-6 py-3 rounded-2xl shadow-inner h-16 mr-4">
+                    <div class="flex flex-col items-center gap-1 group relative w-10">
+                        <i id="mindset-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i>
+                    </div>
+                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
+                    <div class="flex flex-col items-center gap-1 group relative w-10">
+                        <i id="market-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i>
+                    </div>
+                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
+                    <div class="flex flex-col items-center gap-1 group relative w-10">
+                        <i id="volatility-icon-wrapper" data-lucide="dollar-sign" class="w-7 h-7 text-tp-accent drop-shadow-[0_0_12px_rgba(32,201,151,0.8)] transition-all duration-300 transform"></i>
+                    </div>
+                </div>
+                <!-- Win Rate Invasivo e Tecnologico -->
+                <div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem] shadow-[0_0_15px_rgba(32,201,151,0.05)]">
+                    <div class="flex flex-col">
+                        <span class="text-[9px] text-tp-accent font-bold uppercase tracking-widest opacity-80">Win Rate</span>
+                        <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-tp-accent to-white drop-shadow-[0_0_8px_rgba(32,201,151,0.6)] leading-none mt-0.5">67%</span>
+                    </div>
+                    <!-- Anello neon -->
+                    <div class="relative w-10 h-10 flex items-center justify-center">
+                        <svg class="w-[120%] h-[120%] transform -rotate-90 overflow-visible absolute" viewBox="0 0 36 36">
+                            <path class="text-tp-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                            <path class="text-tp-accent drop-shadow-[0_0_4px_rgba(32,201,151,0.8)]" stroke-dasharray="67, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- List View -->
+        <div class="flex-1 overflow-y-auto p-8 scroll-smooth">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="text-sm text-tp-muted font-medium">
+                        <span>15 Bias archiviati in lista</span>
+                    </div>
+                </div>
+
+                <!-- Lista Trade (Cliccabili visualizzano il dettaglio) -->
+                <div class="space-y-2">
+                    
+                    <!-- Riga Bias Long -->
+                    <div onclick="window.location.href='dettaglio_bias.html'" class="group flex items-center p-4 bg-tp-panel border border-tp-border hover:border-tp-accent/50 rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
+                        <div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-accent"></div>
+                        
+                        <div class="flex items-center w-1/4 pl-3 gap-3">
+                            <span class="text-xs font-bold text-tp-muted uppercase tracking-widest bg-tp-bg px-2 py-1 rounded">#BIAS-015</span>
+                            <span class="font-bold text-lg group-hover:text-tp-accent transition-colors">XAUUSD</span>
+                        </div>
+                        
+                        <div class="w-1/4 flex flex-col justify-center">
+                            <span class="text-[10px] font-bold uppercase text-tp-muted mb-1">Direzione & Data</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold bg-[#14231f] text-tp-accent border border-tp-accent/20 px-2 py-0.5 rounded uppercase">Long (Buy)</span>
+                                <span class="text-xs font-bold text-tp-text">2 Aprile 2026</span>
+                            </div>
+                        </div>
+                        
+                        <div class="w-1/4 flex flex-col text-sm text-tp-muted justify-center">
+                            <span class="text-[10px] font-bold uppercase text-tp-muted mb-1">Tag Archiviazione</span>
+                            <div class="flex gap-1.5">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#0a0c10] border border-tp-border text-tp-muted uppercase">Struttura</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#0a0c10] border border-tp-border text-tp-muted uppercase">Liquidità</span>
+                            </div>
+                        </div>
+
+                        <div class="w-1/4 flex items-center justify-end gap-4 pr-4">
+                            <div class="flex items-center gap-2 text-tp-muted text-xs font-bold">
+                                <i data-lucide="image" class="w-4 h-4"></i> 1 Screen
+                            </div>
+                            <button class="bg-[#0a0c10] border border-tp-border text-white text-[10px] uppercase font-bold px-3 py-1.5 rounded hover:border-tp-accent hover:text-tp-accent transition-colors">
+                                Dettaglio
+                            </button>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-tp-muted group-hover:text-tp-accent transition-colors"></i>
+                        </div>
+                    </div>
+
+                    <!-- Riga Bias Short -->
+                    <div onclick="window.location.href='dettaglio_bias.html'" class="group flex items-center p-4 bg-tp-panel border border-tp-border hover:border-tp-loss/50 rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
+                        <div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-loss"></div>
+                        
+                        <div class="flex items-center w-1/4 pl-3 gap-3">
+                            <span class="text-xs font-bold text-tp-muted uppercase tracking-widest bg-tp-bg px-2 py-1 rounded">#BIAS-014</span>
+                            <span class="font-bold text-lg group-hover:text-tp-loss transition-colors">US30</span>
+                        </div>
+                        
+                        <div class="w-1/4 flex flex-col justify-center">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold bg-tp-loss/10 text-tp-loss border border-tp-loss/20 px-2 py-0.5 rounded uppercase">Short (Sell)</span>
+                                <span class="text-xs font-bold text-tp-text">1 Aprile 2026</span>
+                            </div>
+                        </div>
+                        
+                        <div class="w-1/4 flex flex-col text-sm text-tp-muted justify-center">
+                            <div class="flex gap-1.5">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/10 border border-purple-500/30 text-purple-400 uppercase">Correlazione</span>
+                            </div>
+                        </div>
+
+                        <div class="w-1/4 flex items-center justify-end gap-4 pr-4">
+                            <div class="flex items-center gap-2 text-tp-muted text-xs font-bold">
+                                <i data-lucide="image" class="w-4 h-4"></i> 2 Screen
+                            </div>
+                            <button class="bg-[#0a0c10] border border-tp-border text-white text-[10px] uppercase font-bold px-3 py-1.5 rounded hover:border-tp-loss hover:text-tp-loss transition-colors">
+                                Dettaglio
+                            </button>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-tp-muted group-hover:text-tp-loss transition-colors"></i>
+                        </div>
+                    </div>
+
+                    <!-- Riga Bias Neutro -->
+                    <div onclick="window.location.href='dettaglio_bias.html'" class="group flex items-center p-4 bg-tp-panel border border-tp-border hover:border-white/50 rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
+                        <div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-border"></div>
+                        
+                        <div class="flex items-center w-1/4 pl-3 gap-3">
+                            <span class="text-xs font-bold text-tp-muted uppercase tracking-widest bg-tp-bg px-2 py-1 rounded">#BIAS-013</span>
+                            <span class="font-bold text-lg text-tp-muted group-hover:text-white transition-colors">EURUSD</span>
+                        </div>
+                        
+                        <div class="w-1/4 flex flex-col justify-center">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold bg-[#0a0c10] text-tp-muted border border-tp-border px-2 py-0.5 rounded uppercase">Neutro</span>
+                                <span class="text-xs font-bold text-tp-muted">31 Marzo 2026</span>
+                            </div>
+                        </div>
+                        
+                        <div class="w-1/4 flex flex-col text-sm text-tp-muted justify-center">
+                            <div class="flex gap-1.5">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#eab308]/10 border border-[#eab308]/30 text-[#eab308] uppercase">Evento Macro</span>
+                            </div>
+                        </div>
+
+                        <div class="w-1/4 flex items-center justify-end gap-4 pr-4">
+                            <div class="flex items-center gap-2 text-tp-muted text-xs font-bold">
+                                <i data-lucide="image" class="w-4 h-4 opacity-30"></i> 0 Screen
+                            </div>
+                            <button class="bg-[#0a0c10] border border-tp-border text-tp-muted text-[10px] uppercase font-bold px-3 py-1.5 rounded hover:border-white hover:text-white transition-colors">
+                                Dettaglio
+                            </button>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-tp-muted transition-colors"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

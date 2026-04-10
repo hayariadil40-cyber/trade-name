@@ -1,0 +1,63 @@
+import sys
+
+with open('giornaliero.html', 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+new_lines = lines[:413] + [
+'                    <!-- Monitoraggio Comportamentale (Live) -->\n',
+'                    <div class="bg-tp-bg border border-tp-border rounded-xl p-4">\n',
+'                        <label class="block text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-4 border-b border-tp-border/50 pb-2 flex items-center justify-between">\n',
+'                            <span>Registro Comportamentale (Invia ad Eventi)</span>\n',
+'                        </label>\n',
+'                        <div class="flex flex-col gap-4">\n',
+'                            <div class="flex flex-wrap items-center gap-4">\n',
+'                                <div class="flex flex-col gap-1.5">\n',
+'                                    <span class="text-[9px] text-tp-muted font-bold uppercase tracking-widest">Stato Emotivo</span>\n',
+'                                    <div class="flex items-center gap-1 bg-[#0a0c10] p-1 rounded-lg border border-tp-border shadow-inner">\n',
+'                                        <button onclick="window.selectMindset(this, \'positive\')" class="mindset-btn p-1.5 rounded-md text-tp-muted hover:bg-[#161920] transition-colors" title="Focussed / Patient">\n',
+'                                            <i data-lucide="smile" class="w-4 h-4"></i>\n',
+'                                        </button>\n',
+'                                        <button onclick="window.selectMindset(this, \'neutral\')" class="mindset-btn p-1.5 rounded-md text-tp-muted hover:bg-[#161920] transition-colors" title="Distratto / Neutro">\n',
+'                                            <i data-lucide="meh" class="w-4 h-4"></i>\n',
+'                                        </button>\n',
+'                                        <button onclick="window.selectMindset(this, \'negative\')" class="mindset-btn p-1.5 rounded-md text-tp-muted hover:bg-[#161920] transition-colors" title="Frenetico / Emotivo">\n',
+'                                            <i data-lucide="frown" class="w-4 h-4"></i>\n',
+'                                        </button>\n',
+'                                    </div>\n',
+'                                </div>\n',
+'                                <div class="flex flex-col gap-1.5">\n',
+'                                    <span class="text-[9px] text-tp-muted font-bold uppercase tracking-widest">Volatilità Mercato</span>\n',
+'                                    <div class="flex items-center gap-1 bg-[#0a0c10] p-1 rounded-lg border border-tp-border shadow-inner">\n',
+'                                        <button onclick="window.selectVol(this, \'low\')" class="vol-btn p-1.5 rounded-md text-tp-muted hover:bg-[#161920] transition-colors" title="Bassa">\n',
+'                                            <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i></div>\n',
+'                                        </button>\n',
+'                                        <button onclick="window.selectVol(this, \'med\')" class="vol-btn p-1.5 rounded-md text-tp-muted hover:bg-[#161920] transition-colors" title="Media">\n',
+'                                            <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>\n',
+'                                        </button>\n',
+'                                        <button onclick="window.selectVol(this, \'high\')" class="vol-btn p-1.5 rounded-md text-tp-muted hover:bg-[#161920] transition-colors" title="Alta">\n',
+'                                            <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i><i data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>\n',
+'                                        </button>\n',
+'                                    </div>\n',
+'                                </div>\n',
+'                                <div class="flex flex-col gap-1.5 flex-1 min-w-[150px]">\n',
+'                                    <span class="text-[9px] text-tp-muted font-bold uppercase tracking-widest">Tag Mindset</span>\n',
+'                                    <select class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-2 py-1.5 text-xs focus:border-tp-accent outline-none text-white appearance-none cursor-pointer hover:border-tp-accent/50 transition-colors">\n',
+'                                        <option value="" disabled selected>Seleziona focus...</option>\n',
+'                                        <option value="focussed">⭐ Concentrato / Calmo</option>\n',
+'                                        <option value="fomo">🔥 FOMO / Fretta</option>\n',
+'                                        <option value="revenge">💣 Revenge Trading</option>\n',
+'                                        <option value="tired">⚠️ Stanco / Confuso</option>\n',
+'                                        <option value="bored">🥱 Annoiato / Overtrading</option>\n',
+'                                    </select>\n',
+'                                </div>\n',
+'                            </div>\n',
+'                            <div class="flex flex-col gap-1.5 mt-2">\n',
+'                                <span class="text-[9px] text-tp-muted font-bold uppercase tracking-widest">Note di Apertura / Riflessioni su come mi sento</span>\n',
+'                                <textarea class="w-full bg-[#0a0c10] border border-tp-border rounded-lg p-3 text-xs text-tp-text/90 outline-none min-h-[90px] resize-none placeholder-tp-muted/50 focus:border-tp-accent transition-colors shadow-inner" placeholder="Digita qui pensieri prima di affrontare i mercati..."></textarea>\n',
+'                            </div>\n',
+'                        </div>\n',
+'                    </div>\n'
+] + lines[444:]
+
+with open('giornaliero.html', 'w', encoding='utf-8') as f:
+    f.writelines(new_lines)

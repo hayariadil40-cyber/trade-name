@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Desk - Archivio Sessioni</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tp: {
+                            bg: '#0B0E14',
+                            panel: '#161920',
+                            panelHover: '#1c1f26',
+                            border: '#252932',
+                            text: '#f8fafc',
+                            muted: '#848d97',
+                            accent: '#20c997', // Teal
+                            loss: '#f43f5e',
+                            warning: '#eab308'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #252932; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b4252; }
+
+        .session-card.hidden { display: none; }
+        .filter-btn.active { border-color: #20c997; color: #20c997; background: rgba(32, 201, 151, 0.1); }
+    </style>
+</head>
+<body class="bg-tp-bg text-tp-text font-sans h-screen flex overflow-hidden">
+
+    <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+    <aside class="w-16 hover:w-64 border-r border-tp-border flex flex-col flex-shrink-0 bg-tp-bg transition-all duration-300 z-50 absolute h-full lg:relative group">
+        <!-- Logo Area Team Design -->
+        <div class="h-24 flex items-center justify-center lg:justify-start px-3 gap-4 border-b border-tp-border/50 overflow-hidden cursor-default w-full">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#161920] to-[#0a0c10] border border-[#20c997]/50 flex items-center justify-center shadow-[0_0_10px_rgba(32,201,151,0.2)] shrink-0 group-hover:rotate-3 transition-transform duration-300 mx-auto group-hover:mx-0">
+                <span class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-[#20c997] to-white tracking-tighter">TD</span>
+            </div>
+            <span class="text-xl font-extrabold tracking-tighter uppercase font-display select-none opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300">Trade<span class="text-[#20c997] ml-1">Desk</span></span>
+        </div>
+        
+        <!-- Navigation Links Universali -->
+        <nav class="flex-1 overflow-x-hidden overflow-y-auto py-6 space-y-2 flex flex-col w-full group">
+            <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span>
+            </a>
+            
+            <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span>
+            </a>
+            
+            <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span>
+            </a>
+
+            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span>
+            </a>
+            
+            <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span>
+            </a>
+            
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+            
+            <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span>
+            </a>
+
+            <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span>
+            </a>
+
+            <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span>
+            </a>
+            
+            <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span>
+            </a>
+            
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+
+            <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full bg-[#0e1116] relative overflow-hidden">
+        
+        <!-- Header Page -->
+        <header class="flex justify-between items-center px-8 py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
+            <div class="flex items-center gap-4">
+                <div class="bg-tp-accent/10 p-2 rounded-lg border border-tp-accent/20">
+                    <i data-lucide="archive" class="w-5 h-5 text-tp-accent"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white mb-0.5">Archivio Sessioni</h1>
+                    <p class="text-[10px] text-tp-muted uppercase font-bold tracking-widest">Cronologia Logica & Session Analysis</p>
+                </div>
+            </div>
+
+            <!-- Filtro Sessioni -->
+            <div class="flex items-center gap-2 bg-[#0a0c10] border border-tp-border p-1 rounded-xl">
+                <button onclick="filterSessions('all', this)" class="filter-btn active px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all tracking-wider border border-transparent">Tutte</button>
+                <button onclick="filterSessions('asia', this)" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all tracking-wider border border-transparent text-tp-muted hover:text-white">Asia</button>
+                <button onclick="filterSessions('london', this)" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all tracking-wider border border-transparent text-tp-muted hover:text-white">London</button>
+                <button onclick="filterSessions('ny', this)" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all tracking-wider border border-transparent text-tp-muted hover:text-white">New York</button>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="text-right flex flex-col">
+                    <span class="text-[9px] text-tp-muted font-bold uppercase tracking-widest">Totale Sessioni</span>
+                    <span class="text-lg font-black text-tp-accent leading-none">24</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 overflow-y-auto p-8 scroll-smooth custom-scroll">
+            <div class="max-w-7xl mx-auto">
+                
+                <!-- Griglia Sessioni -->
+                <div id="session-grid" class="flex flex-col gap-3">
+                    
+    <!-- Table Header (Optional but good for rows) -->
+    <div class="hidden md:flex items-center px-4 py-2 text-[10px] font-bold text-tp-muted uppercase tracking-widest border-b border-tp-border/50 sticky top-0 bg-[#0e1116] z-10">
+        <div class="w-1/4">Data Sessione</div>
+        <div class="w-[15%]">Asset Coin</div>
+        <div class="w-1/4">Volatilità / Range</div>
+        <div class="w-[15%]">Bias Result</div>
+        <div class="w-1/4 text-right">Azione</div>
+    </div>
+
+    <!-- Row Asia -->
+    <div class="session-card transition-all" data-session="asia">
+        <div onclick="window.location.href='dettaglio_sessione.html'" class="bg-tp-panel hover:bg-tp-panelHover border border-tp-border hover:border-[#20c997] rounded-xl p-4 transition-all cursor-pointer group flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
+            <div class="absolute w-1 bg-[#20c997] left-0 top-0 bottom-0 opacity-80"></div>
+            
+            <div class="flex items-center gap-4 w-1/4 pl-2">
+                <div class="w-10 h-10 rounded-lg bg-tp-bg flex items-center justify-center border border-[#20c997]/20 text-[#20c997] shrink-0">
+                    <i data-lucide="sun" class="w-5 h-5"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-sm font-bold text-white group-hover:text-[#20c997] transition-colors">Asia Session</span>
+                    <span class="text-[10px] text-tp-muted font-black tracking-widest">02 APRILE 2026</span>
+                </div>
+            </div>
+
+            <div class="w-[15%] flex items-center gap-2">
+                <span class="text-xs font-bold text-tp-text">XAUUSD</span>
+                <span class="text-[9px] bg-tp-border/50 px-1.5 py-0.5 rounded text-tp-muted">+2</span>
+            </div>
+
+            <div class="flex items-center gap-4 w-1/4">
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-bold text-tp-muted uppercase">Range: <span class="text-white">65 Pips</span></span>
+                    <div class="flex mt-1 text-tp-muted gap-0.5">
+                        <i data-lucide="dollar-sign" class="w-3.5 h-3.5 text-tp-muted"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-[15%]">
+                <span class="bg-[#20c997]/10 text-[#20c997] border border-[#20c997]/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">LONG</span>
+            </div>
+
+            <div class="w-1/4 flex justify-end items-center gap-4 border-t md:border-none border-tp-border pt-3 md:pt-0">
+                <i data-lucide="smile" class="w-5 h-5 text-[#20c997] drop-shadow-[0_0_5px_rgba(32,201,151,0.5)]"></i>
+                <button class="bg-tp-border/50 hover:bg-[#20c997]/20 text-tp-text hover:text-[#20c997] px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Dettagli</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row London -->
+    <div class="session-card transition-all" data-session="london">
+        <div onclick="window.location.href='dettaglio_sessione.html'" class="bg-tp-panel hover:bg-tp-panelHover border border-tp-border hover:border-purple-500/50 rounded-xl p-4 transition-all cursor-pointer group flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
+            <div class="absolute w-1 bg-purple-500 left-0 top-0 bottom-0 opacity-80"></div>
+            
+            <div class="flex items-center gap-4 w-1/4 pl-2">
+                <div class="w-10 h-10 rounded-lg bg-tp-bg flex items-center justify-center border border-purple-500/20 text-purple-400 shrink-0">
+                    <i data-lucide="cloud-rain" class="w-5 h-5"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-sm font-bold text-white group-hover:text-purple-400 transition-colors">London Session</span>
+                    <span class="text-[10px] text-tp-muted font-black tracking-widest">02 APRILE 2026</span>
+                </div>
+            </div>
+
+            <div class="w-[15%] flex items-center gap-2">
+                <span class="text-xs font-bold text-tp-text">EURUSD</span>
+            </div>
+
+            <div class="flex items-center gap-4 w-1/4">
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-bold text-tp-muted uppercase">Range: <span class="text-white">120 Pips</span></span>
+                    <div class="flex mt-1 text-tp-muted gap-0.5">
+                        <i data-lucide="dollar-sign" class="w-3.5 h-3.5 text-purple-400"></i>
+                        <i data-lucide="dollar-sign" class="w-3.5 h-3.5 text-purple-400 -ml-1"></i>
+                        <i data-lucide="dollar-sign" class="w-3.5 h-3.5 text-purple-400 -ml-1"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-[15%]">
+                <span class="bg-[#20c997]/10 text-[#20c997] border border-[#20c997]/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">LONG</span>
+            </div>
+
+            <div class="w-1/4 flex justify-end items-center gap-4 border-t md:border-none border-tp-border pt-3 md:pt-0">
+                <i data-lucide="smile" class="w-5 h-5 text-[#20c997]"></i>
+                <button class="bg-tp-border/50 hover:bg-purple-500/20 text-tp-text hover:text-purple-400 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Dettagli</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row NY -->
+    <div class="session-card transition-all" data-session="ny">
+        <div onclick="window.location.href='dettaglio_sessione.html'" class="bg-tp-panel hover:bg-tp-panelHover border border-tp-border hover:border-tp-loss/50 rounded-xl p-4 transition-all cursor-pointer group flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
+            <div class="absolute w-1 bg-tp-loss left-0 top-0 bottom-0 opacity-80"></div>
+            
+            <div class="flex items-center gap-4 w-1/4 pl-2">
+                <div class="w-10 h-10 rounded-lg bg-tp-bg flex items-center justify-center border border-tp-loss/20 text-tp-loss shrink-0">
+                    <i data-lucide="tower-control" class="w-5 h-5"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-sm font-bold text-white group-hover:text-tp-loss transition-colors">New York Session</span>
+                    <span class="text-[10px] text-tp-muted font-black tracking-widest">02 APRILE 2026</span>
+                </div>
+            </div>
+
+            <div class="w-[15%] flex items-center gap-2">
+                <span class="text-xs font-bold text-tp-text">US30</span>
+                <span class="text-[9px] bg-tp-border/50 px-1.5 py-0.5 rounded text-tp-muted">+1</span>
+            </div>
+
+            <div class="flex items-center gap-4 w-1/4">
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-bold text-tp-muted uppercase">Range: <span class="text-white">450 Pips</span></span>
+                    <div class="flex mt-1 text-tp-muted gap-0.5">
+                        <i data-lucide="dollar-sign" class="w-3.5 h-3.5 text-[#eab308]"></i>
+                        <i data-lucide="dollar-sign" class="w-3.5 h-3.5 text-[#eab308] -ml-1"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-[15%]">
+                <span class="bg-tp-loss/10 text-tp-loss border border-tp-loss/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">SHORT</span>
+            </div>
+
+            <div class="w-1/4 flex justify-end items-center gap-4 border-t md:border-none border-tp-border pt-3 md:pt-0">
+                <i data-lucide="frown" class="w-5 h-5 text-tp-loss"></i>
+                <button class="bg-tp-border/50 hover:bg-tp-loss/20 text-tp-text hover:text-tp-loss px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Dettagli</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+                                <span class="bg-tp-border text-tp-muted text-[9px] font-black px-2 py-0.5 rounded border border-tp-border uppercase tracking-widest">Neutral Bias</span>
+                            </div>
+                            <p class="text-sm text-tp-muted italic line-clamp-3 mb-4">Slow grind durante tutta la sessione. Nessun setup di alta qualità individuato.</p>
+                            <div class="mt-auto pt-4 border-t border-tp-border/50 flex justify-between">
+                                <i data-lucide="meh" class="w-4 h-4 text-tp-warning"></i>
+                                <span class="text-[9px] font-bold text-tp-muted uppercase">Range: 12.5 pips</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+
+        function filterSessions(session, btn) {
+            // Update buttons
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active', 'text-white'));
+            btn.classList.add('active', 'text-tp-accent');
+            if(session === 'all') {
+                btn.classList.replace('text-tp-accent', 'text-tp-accent');
+            }
+
+            // Filter cards
+            const cards = document.querySelectorAll('.session-card');
+            cards.forEach(card => {
+                if(session === 'all' || card.getAttribute('data-session') === session) {
+                    card.classList.remove('hidden');
+                    card.style.opacity = '0';
+                    setTimeout(() => card.style.opacity = '1', 50);
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

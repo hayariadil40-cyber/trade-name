@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Desk</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons (Lucide via CDN) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind CSS (via CDN for cursor-friendly modularity) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tp: {
+                            bg: '#0B0E14',
+                            panel: '#161920',
+                            panelHover: '#1c1f26',
+                            border: '#252932',
+                            text: '#f8fafc',
+                            muted: '#848d97',
+                            accent: '#20c997', // Teal color
+                            loss: '#f43f5e',
+                            warning: '#eab308'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Inter', 'sans-serif'] // For handwritten-like titles if needed, using extra bold
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Custom scrollbar for modern looks */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #252932;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b4252;
+        }
+
+        /* Drag UI Feedback */
+        .drag-over {
+            border-color: #20c997 !important;
+            background-color: rgba(32, 201, 151, 0.05) !important;
+        }
+
+        /* Checkbox custom style without plugins */
+        input[type="checkbox"].tp-check {
+            appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid #3b4252;
+            border-radius: 0.25rem;
+            background-color: transparent;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        input[type="checkbox"].tp-check::before {
+            content: "";
+            width: 0.65em;
+            height: 0.65em;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+            transform: scale(0);
+            background-color: #20c997;
+            transition: 120ms transform ease-in-out;
+        }
+
+        input[type="checkbox"].tp-check:checked {
+            border-color: #20c997;
+        }
+
+        input[type="checkbox"].tp-check:checked::before {
+            transform: scale(1);
+        }
+    </style>
+</head>
+
+<body class="bg-tp-bg text-tp-text font-sans h-screen w-screen flex overflow-hidden">
+
+    <!-- Sidebar Architecture -->
+    <!-- Predisposto per essere convertito in componente React/Cursor (es. <Sidebar />) -->
+    <!-- Sidebar Universale -->
+    <!-- Sidebar Universale -->
+    <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+        <!-- Sidebar Universale -->
+    <aside class="w-16 hover:w-64 border-r border-tp-border flex flex-col flex-shrink-0 bg-tp-bg transition-all duration-300 z-50 absolute h-full lg:relative group">
+        <!-- Logo Area Team Design -->
+        <div class="h-24 flex items-center justify-center lg:justify-start px-3 gap-4 border-b border-tp-border/50 overflow-hidden cursor-default w-full">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#161920] to-[#0a0c10] border border-[#20c997]/50 flex items-center justify-center shadow-[0_0_10px_rgba(32,201,151,0.2)] shrink-0 group-hover:rotate-3 transition-transform duration-300 mx-auto group-hover:mx-0">
+                <span class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-[#20c997] to-white tracking-tighter">TD</span>
+            </div>
+            <span class="text-xl font-extrabold tracking-tighter uppercase font-display select-none opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300">Trade<span class="text-[#20c997] ml-1">Desk</span></span>
+        </div>
+        
+        <!-- Navigation Links Universali -->
+        <nav class="flex-1 overflow-x-hidden overflow-y-auto py-6 space-y-2 flex flex-col w-full group">
+            <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span>
+            </a>
+            
+            <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span>
+            </a>
+            
+            <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span>
+            </a>
+
+            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span>
+            </a>
+            
+            <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span>
+            </a>
+            
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+            
+            <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span>
+            </a>
+
+            <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span>
+            </a>
+
+            <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span>
+            </a>
+            
+            <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span>
+            </a>
+            
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+
+            <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span>
+            </a>
+        </nav>
+    </aside>
+
+
+
+
+
+
+
+    <!-- Main Workspace Architecture -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#0e1116]">
+
+        <!-- Action Header -->
+        <!-- Predisposto per "Header" -->
+        <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+        <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+        <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+        <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+        <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+        <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+        <!-- ==============================================
+             HEADER UNIVERSALE
+             ============================================== -->
+        <header
+            class="flex justify-between items-center px-8 py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
+
+            <!-- 1. Page Title & Quick Actions -->
+            <div class="flex items-center gap-4 w-auto min-w-max mr-4">
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Dashboard</h1>
+                    <div class="flex gap-2.5 mt-1">
+                        <a href="analisi.html"
+                            class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i
+                                data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Trade Analisi</a>
+                        <a href="tabella_trades.html"
+                            class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i
+                                data-lucide="crosshair" class="w-3.5 h-3.5"></i> Tabella Trades</a>
+                        <a href="giornaliero.html"
+                            class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i
+                                data-lucide="calendar" class="w-3.5 h-3.5"></i> Giornaliero</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Central Clock -->
+            <div
+                class="hidden lg:flex flex-col items-center justify-center shrink-0 w-32 border-x border-tp-border/50 px-4 mb-2">
+                <span id="digital-clock"
+                    class="text-2xl font-display font-bold text-white tracking-widest tabular-nums leading-none">00:00:00</span>
+                <div class="flex gap-1 mt-2">
+                    <span id="tf-5m"
+                        class="px-1 py-0.5 text-[8px] font-bold bg-tp-bg border border-tp-border rounded text-tp-muted transition-colors">5m</span>
+                    <span id="tf-1h"
+                        class="px-1 py-0.5 text-[8px] font-bold bg-tp-bg border border-tp-border rounded text-tp-muted transition-colors">1H</span>
+                </div>
+            </div>
+
+            <!-- 3. Timeline Center -->
+            <div class="hidden xl:flex flex-col flex-1 relative w-full mx-8">
+                <div class="flex justify-between text-[10px] items-end font-bold uppercase tracking-widest mb-2 px-2">
+                    <span class="text-tp-muted opacity-30">Asia</span>
+                    <span class="text-tp-muted opacity-60">London</span>
+                    <span
+                        class="text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] scale-110 origin-bottom transition-all">New
+                        York</span>
+                    <span class="text-tp-muted opacity-30">End</span>
+                </div>
+                <!-- Track Base -->
+                <div
+                    class="h-2 w-full bg-gradient-to-r from-tp-bg via-tp-border to-tp-bg rounded-full border border-tp-border/30 relative shadow-inner">
+                    <div id="timeline-progress"
+                        class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-teal-600 via-tp-accent to-[#22d3ee] rounded-full shadow-[0_0_10px_rgba(32,201,151,0.5)]"
+                        style="width: 45%;"></div>
+                    <div id="timeline-dot"
+                        class="timeline-cursor absolute top-1/2 -ml-2.5 -mt-2.5 w-5 h-5 bg-white rounded-full border-[3px] border-tp-accent shadow-[0_0_15px_rgba(32,201,151,0.9)] z-10"
+                        style="left: 45%;"></div>
+                </div>
+            </div>
+
+            <!-- 4. MonitoraSmile -->
+            <div
+                class="hidden xl:flex items-center gap-4 bg-gradient-to-b from-[#13161c] to-[#0a0c10] border border-tp-border/40 px-5 py-2.5 rounded-xl shadow-inner mx-4">
+                <div class="flex flex-col items-center group relative cursor-pointer" title="Stato Fisico">
+                    <i id="mindset-icon-wrapper" data-lucide="smile"
+                        class="w-5 h-5 text-tp-accent transition-all duration-300 drop-shadow-md"></i>
+                </div>
+                <div class="w-px h-6 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
+                <div class="flex flex-col items-center group relative cursor-pointer" title="Mindset">
+                    <i id="market-icon-wrapper" data-lucide="smile"
+                        class="w-5 h-5 text-tp-accent transition-all duration-300 drop-shadow-md"></i>
+                </div>
+                <div class="w-px h-6 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
+                <div class="flex flex-col items-center group relative cursor-pointer" title="Volatilità">
+                    <i id="volatility-icon-wrapper" data-lucide="dollar-sign"
+                        class="w-5 h-5 text-tp-accent drop-shadow-[0_0_8px_rgba(32,201,151,0.6)] transition-all"></i>
+                </div>
+            </div>
+
+            <!-- 5. RIGHT: Win Rate -->
+            <div class="flex items-center gap-4 w-auto shrink-0 justify-end ml-4">
+                <div
+                    class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem] shadow-[0_0_15px_rgba(32,201,151,0.05)]">
+                    <div class="flex flex-col">
+                        <span class="text-[9px] text-tp-accent font-bold uppercase tracking-widest opacity-80">Win
+                            Rate</span>
+                        <span
+                            class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-tp-accent to-white drop-shadow-[0_0_8px_rgba(32,201,151,0.6)] leading-none mt-0.5">67%</span>
+                    </div>
+                    <div class="relative w-8 h-8 flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90 overflow-visible" viewBox="0 0 36 36">
+                            <path class="text-tp-border"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none" stroke="currentColor" stroke-width="3" />
+                            <path class="text-tp-accent" stroke-dasharray="67, 100"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+        </header>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- Grid Workspace (Scrollable Area) -->
+        <div class="flex-1 overflow-y-auto p-8">
+            <!-- The 3 Column CSS Grid matching sketch -->
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 pb-12">
+
+                <!-- /// LEFT COLUMN (Col Span: 3) /// -->
+                <div class="xl:col-span-3 flex flex-col gap-6">
+
+                    <!-- Box 1: Paniere USD -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 h-auto flex flex-col shadow-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted">Forza Paniere USD (%)
+                            </h3>
+                            <button class="text-tp-muted hover:text-tp-text"><i data-lucide="more-horizontal"
+                                    class="w-4 h-4"></i></button>
+                        </div>
+                        <div class="relative w-full h-40">
+                            <canvas id="paniereChart"></canvas>
+                        </div>
+                        <!-- Bottone Snapshot & Log -->
+                        <div class="mt-4 border-t border-tp-border/50 pt-4">
+                            <button onclick="recordDollarStrength()"
+                                class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-bold bg-tp-accent/10 border border-tp-accent text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors">
+                                <i data-lucide="camera" class="w-3.5 h-3.5"></i> Registra Dato Attuale
+                            </button>
+                            <ul class="dollar-strength-log mt-3 space-y-1 max-h-32 overflow-y-auto custom-scroll">
+                                <!-- Logs appariranno qui -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Box 2: Il Nome di Allah del Giorno -->
+                    <div
+                        class="bg-gradient-to-br from-[#161920] to-[#0a0c10] rounded-xl border border-[#20c997]/20 p-5 flex-1 min-h-[300px] shadow-[0_0_15px_rgba(32,201,151,0.05)] relative overflow-hidden group">
+                        <!-- Mock Data -->
+                        <div
+                            class="absolute -right-6 -top-6 opacity-10 rotate-12 transform group-hover:rotate-6 transition-transform duration-700 pointer-events-none">
+                            <span id="allah-bg-text" class="text-[10rem] font-display text-white">الله‎</span>
+                        </div>
+                        <div
+                            class="flex items-center justify-between mb-4 border-b border-tp-border/50 pb-3 relative z-10">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-[#20c997]">I Nomi di Allah</h3>
+                        </div>
+                        <div class="flex flex-col h-full justify-center -mt-6 relative z-10 p-2">
+                            <p id="allah-index"
+                                class="text-tp-muted text-[10px] font-bold uppercase tracking-widest opacity-80 mb-2">
+                                Nome Del Giorno (1/99)</p>
+                            <h2 id="allah-title"
+                                class="text-4xl md:text-5xl font-bold font-display text-white mb-2 tracking-tight">
+                                Ar-Rahman</h2>
+                            <p id="allah-translation" class="text-lg text-tp-accent italic font-serif opacity-90">Il
+                                Compassionevole</p>
+                            <div class="w-12 h-1 bg-[#20c997] mt-5 mb-4 rounded-full opacity-40"></div>
+                            <p id="allah-desc"
+                                class="text-sm text-tp-text/80 leading-relaxed max-w-[95%] italic border-l-2 border-tp-border pl-3">
+                                Colui la cui misericordia abbraccia incondizionatamente ogni cosa. Lascia che la
+                                compassione guidi oggi le tue azioni sul mercato, evitando avidità e fomo.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- /// CENTER COLUMN (Col Span: 6) /// -->
+                <div class="xl:col-span-6 flex flex-col gap-6">
+
+                    <!-- Box 3: Workflow & Eventi Sessione -->
+                    <div
+                        class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col h-[400px] shadow-lg relative overflow-hidden">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-tp-accent/5 to-transparent pointer-events-none">
+                        </div>
+                        <div
+                            class="flex items-center justify-between mb-4 border-b border-tp-border/50 pb-3 relative z-10">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="activity" class="w-4 h-4 text-tp-accent"></i>
+                                <h3 class="text-xs font-bold uppercase tracking-widest text-white">PROCESSI ATTIVI</h3>
+                            </div>
+                            <span
+                                class="bg-tp-accent/20 text-tp-accent px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-tp-accent/20 cursor-pointer hover:bg-tp-accent/30 transition-colors flex items-center gap-1">
+                                <i data-lucide="check-circle" class="w-3 h-3"></i> 1 in attesa
+                            </span>
+                        </div>
+
+                        <!-- Lista dei Ticket/Flussi attivi -->
+                        <div class="flex-1 overflow-y-auto space-y-3 pr-2 custom-scroll relative z-10">
+
+                            <!-- Ticket 1: Trade in Attesa -->
+                            <div
+                                class="bg-[#0a0c10] border border-tp-border hover:border-tp-accent/40 rounded-lg p-3 transition-all group shadow-sm relative overflow-hidden">
+                                <div class="absolute inset-y-0 left-0 w-1 bg-tp-warning/80"></div>
+                                <div class="flex justify-between items-start ml-2">
+                                    <div class="flex flex-col gap-1 flex-1 pr-4">
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="bg-tp-warning/10 text-tp-warning border border-tp-warning/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest">Esecuzione
+                                                Da Taggare</span>
+                                            <h4
+                                                class="text-sm font-bold text-white group-hover:text-tp-accent transition-colors">
+                                                Trade XAUUSD Eseguito</h4>
+                                        </div>
+                                        <p class="text-[10px] text-tp-muted leading-relaxed">Trade concluso per SL/TP.
+                                            Compilare Screen, Strategia e Mindset per archivio.</p>
+                                    </div>
+                                    <!-- Azioni -->
+                                    <div class="flex gap-1.5 mt-1 shrink-0">
+                                        <button onclick="window.location.href='dettaglio_trade.html'"
+                                            class="bg-tp-border hover:bg-tp-accent/20 hover:text-tp-accent text-tp-text rounded p-2 transition-colors border border-transparent hover:border-tp-accent/30"
+                                            title="Apri Compilazione">
+                                            <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="this.closest('.group').remove()"
+                                            class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-2 transition-colors border border-transparent hover:border-tp-loss/30"
+                                            title="Ignora Evento">
+                                            <i data-lucide="x" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Ticket 2: Notizia Macro in Attesa -->
+                            <div
+                                class="bg-[#0a0c10] border border-tp-border hover:border-purple-500/40 rounded-lg p-3 transition-all group shadow-sm relative overflow-hidden">
+                                <div class="absolute inset-y-0 left-0 w-1 bg-purple-500/80"></div>
+                                <div class="flex justify-between items-start ml-2">
+                                    <div class="flex flex-col gap-1 flex-1 pr-4">
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="bg-purple-500/10 text-purple-400 border border-purple-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest">Dato
+                                                Macro Rilasciato</span>
+                                            <h4
+                                                class="text-sm font-bold text-white group-hover:text-purple-400 transition-colors">
+                                                Non-Farm Payrolls (NFP)</h4>
+                                        </div>
+                                        <p class="text-[10px] text-tp-muted leading-relaxed">L'orario è scattato.
+                                            Inserire Actual per archiviare andamento Mercati/Notizia DB.</p>
+                                    </div>
+                                    <!-- Azioni -->
+                                    <div class="flex gap-1.5 mt-1 shrink-0">
+                                        <button
+                                            onclick="document.getElementById('modal-news-alert').classList.add('open')"
+                                            class="bg-tp-border hover:bg-purple-500/20 hover:text-purple-400 text-tp-text rounded p-2 transition-colors border border-transparent hover:border-purple-500/30"
+                                            title="Apri Controllo Notizia">
+                                            <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="this.closest('.group').remove()"
+                                            class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-2 transition-colors border border-transparent hover:border-tp-loss/30"
+                                            title="Ignora Notizia">
+                                            <i data-lucide="x" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Ticket 3: Giornata Aperta -->
+                            <div
+                                class="bg-[#0a0c10] border border-tp-border hover:border-teal-500/40 rounded-lg p-3 transition-all group shadow-sm relative overflow-hidden">
+                                <div class="absolute inset-y-0 left-0 w-1 bg-teal-500/80"></div>
+                                <div class="flex justify-between items-start ml-2">
+                                    <div class="flex flex-col gap-1 flex-1 pr-4">
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="bg-teal-500/10 text-teal-400 border border-teal-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest">Giornata
+                                                Iniziata</span>
+                                            <h4
+                                                class="text-sm font-bold text-white group-hover:text-teal-400 transition-colors">
+                                                Sessione 3 Aprile Open</h4>
+                                        </div>
+                                        <p class="text-[10px] text-tp-muted leading-relaxed">Checklist pre-market
+                                            completata. Andamento tracciato sul Diario.</p>
+                                    </div>
+                                    <!-- Azioni -->
+                                    <div class="flex gap-1.5 mt-1 shrink-0">
+                                        <!-- Collegamento per aprire direttamente a pagina intera o anche una finestra modale in futuro -->
+                                        <button onclick="window.location.href='dettaglio_giornata.html'"
+                                            class="bg-tp-border hover:bg-teal-500/20 hover:text-teal-400 text-tp-text rounded p-2 transition-colors border border-transparent hover:border-teal-500/30"
+                                            title="Apri Pagina del Giorno">
+                                            <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="this.closest('.group').remove()"
+                                            class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-2 transition-colors border border-transparent hover:border-tp-loss/30"
+                                            title="Chiudi/Elimina Giornata">
+                                            <i data-lucide="x" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Box 4: Calendario Macro (Custom UI) -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 h-[450px] flex flex-col shadow-lg">
+                        <div class="flex flex-col gap-3 mb-4 border-b border-tp-border/50 pb-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="globe-2" class="w-4 h-4 text-tp-muted"></i>
+                                    <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted">Calendario
+                                        Notizie</h3>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <!-- Bottoni Time Frame (Oggi, Domani, Settimana) -->
+                                <div class="flex gap-1 bg-[#0a0c10] border border-tp-border p-1 rounded-lg">
+                                    <button
+                                        class="bg-tp-accent/20 text-tp-accent px-2 py-1 rounded text-[9px] font-bold uppercase transition-colors">Oggi</button>
+                                    <button
+                                        class="text-tp-muted hover:text-white px-2 py-1 rounded text-[9px] font-bold uppercase transition-colors">Domani</button>
+                                    <button
+                                        class="text-tp-muted hover:text-white px-2 py-1 rounded text-[9px] font-bold uppercase transition-colors">Settimana</button>
+                                </div>
+                                <!-- Filtri impatto mockup -->
+                                <div class="flex gap-1.5">
+                                    <span
+                                        class="bg-tp-loss/10 text-tp-loss border border-tp-loss/20 px-2 py-1 rounded text-[9px] font-bold uppercase cursor-pointer hover:bg-tp-loss hover:text-white transition-colors">High</span>
+                                    <span
+                                        class="bg-tp-warning/10 text-tp-warning border border-tp-warning/20 px-2 py-1 rounded text-[9px] font-bold uppercase cursor-pointer hover:bg-tp-warning hover:text-[#0a0c10] transition-colors">Med</span>
+                                    <span
+                                        class="bg-tp-bg border border-tp-border text-tp-muted px-2 py-1 rounded text-[9px] font-bold uppercase cursor-pointer hover:bg-tp-border hover:text-white transition-colors">Low</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lista Notizie -->
+                        <div class="flex-1 overflow-y-auto space-y-2.5 pr-2 custom-scroll">
+
+                            <!-- Notizia High Impact -->
+                            <div onclick="document.getElementById('modal-news-alert').classList.add('open')"
+                                class="cursor-pointer flex items-center justify-between p-3 bg-[#0a0c10] border border-tp-border rounded-lg group hover:border-tp-accent/30 transition-colors">
+                                <div class="flex items-center gap-3 md:gap-4">
+                                    <span class="text-sm font-bold text-white tabular-nums">14:30</span>
+                                    <div class="w-px h-6 bg-tp-border"></div>
+                                    <span
+                                        class="text-[10px] font-bold bg-[#14231f] text-white border border-tp-border px-1.5 py-0.5 rounded">USD</span>
+                                    <!-- Expected Volatility Impact -->
+                                    <div class="flex gap-0.5 ml-1" title="High Impact">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-loss"></div>
+                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-loss"></div>
+                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-loss"></div>
+                                    </div>
+                                    <span
+                                        class="text-xs md:text-sm font-medium text-tp-text ml-1 md:ml-2 truncate max-w-[120px] md:max-w-xs">Non-Farm
+                                        Employment Change</span>
+                                </div>
+                                <button
+                                    class="text-tp-muted hover:text-[#eab308] opacity-50 group-hover:opacity-100 transition-all shrink-0"
+                                    title="Imposta Alert a -15m">
+                                    <i data-lucide="bell" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+
+                            <!-- Notizia High Impact con Alert Attivato -->
+                            <div onclick="document.getElementById('modal-news-alert').classList.add('open')"
+                                class="cursor-pointer flex items-center justify-between p-3 bg-[#0a0c10] border border-[#eab308]/40 rounded-lg group transition-colors relative overflow-hidden">
+                                <!-- Indicatore Alert attivo -->
+                                <div
+                                    class="absolute left-0 top-0 bottom-0 w-1 bg-[#eab308] shadow-[0_0_10px_rgba(234,179,8,0.8)]">
+                                </div>
+
+                                <div class="flex items-center gap-3 md:gap-4 ml-1">
+                                    <span class="text-sm font-bold text-white tabular-nums">14:30</span>
+                                    <div class="w-px h-6 bg-tp-border"></div>
+                                    <span
+                                        class="text-[10px] font-bold bg-[#14231f] text-white border border-tp-border px-1.5 py-0.5 rounded">USD</span>
+                                    <div class="flex gap-0.5 ml-1" title="High Impact">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-loss"></div>
+                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-loss"></div>
+                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-loss"></div>
+                                    </div>
+                                    <span
+                                        class="text-xs md:text-sm font-medium text-white ml-1 md:ml-2 truncate max-w-[120px] md:max-w-xs">Unemployment
+                                        Rate</span>
+                                </div>
+                                <button class="text-[#eab308] shrink-0" title="Alert Attivo (-15m)">
+                                    <i data-lucide="bell-ring"
+                                        class="w-4 h-4 filter drop-shadow-[0_0_2px_rgba(234,179,8,1)]"></i>
+                                </button>
+                            </div>
+
+                            <!-- Notizia Med Impact -->
+                            <div onclick="document.getElementById('modal-news-alert').classList.add('open')"
+                                class="cursor-pointer flex items-center justify-between p-3 bg-[#0a0c10] border border-tp-border rounded-lg group hover:border-tp-accent/30 transition-colors">
+                                <div class="flex items-center gap-3 md:gap-4">
+                                    <span class="text-sm font-bold text-tp-muted tabular-nums">16:00</span>
+                                    <div class="w-px h-6 bg-tp-border"></div>
+                                    <span
+                                        class="text-[10px] font-bold bg-[#241a1a] text-white border border-tp-border px-1.5 py-0.5 rounded">GBP</span>
+                                    <div class="flex gap-0.5 ml-1" title="Medium Impact">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-warning"></div>
+                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-warning"></div>
+                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-bg border border-tp-border"></div>
+                                    </div>
+                                    <span
+                                        class="text-xs md:text-sm font-medium text-tp-text ml-1 md:ml-2 truncate max-w-[120px] md:max-w-xs">BOE
+                                        Gov Bailey Speaks</span>
+                                </div>
+                                <button
+                                    class="text-tp-muted hover:text-[#eab308] opacity-50 group-hover:opacity-100 transition-all shrink-0"
+                                    title="Imposta Alert a -15m">
+                                    <i data-lucide="bell" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+
+                            <!-- Notizia Low Impact -->
+                            <div
+                                class="flex items-center justify-between p-3 bg-[#0a0c10] border border-tp-border rounded-lg group hover:border-tp-accent/30 transition-colors opacity-60">
+                                <div class="flex items-center gap-3 md:gap-4">
+                                    <span class="text-sm font-bold text-tp-muted tabular-nums">19:00</span>
+                                    <div class="w-px h-6 bg-tp-border"></div>
+                                    <span
+                                        class="text-[10px] font-bold bg-tp-panel text-tp-muted border border-tp-border px-1.5 py-0.5 rounded">EUR</span>
+                                    <div class="flex gap-0.5 ml-1" title="Low Impact">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-accent"></div>
+                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-bg border border-tp-border"></div>
+                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-bg border border-tp-border"></div>
+                                    </div>
+                                    <span
+                                        class="text-xs md:text-sm font-medium text-tp-muted ml-1 md:ml-2 truncate max-w-[120px] md:max-w-xs">German
+                                        Buba President Speaks</span>
+                                </div>
+                                <button
+                                    class="text-tp-muted hover:text-[#eab308] opacity-0 group-hover:opacity-50 transition-all shrink-0">
+                                    <i data-lucide="bell" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- /// RIGHT COLUMN (Col Span: 3) /// -->
+                <div class="xl:col-span-3 flex flex-col gap-6">
+
+                    <!-- Box 5: Watch List -->
+                    <div
+                        class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col h-auto min-h-[300px] shadow-lg">
+                        <div class="flex items-center justify-between mb-4 border-b border-tp-border/50 pb-3">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted">Wach List</h3>
+                            <button class="text-tp-muted hover:text-tp-text"><i data-lucide="settings-2"
+                                    class="w-4 h-4"></i></button>
+                        </div>
+
+                        <ul class="space-y-1 mt-1">
+                            <li onclick="window.openTradingViewModal('XAUUSD')"
+                                class="flex justify-between items-center p-2 rounded hover:bg-[#1c212a] transition-colors cursor-pointer group hover:shadow-[0_0_10px_rgba(32,201,151,0.1)] border border-transparent hover:border-tp-accent/30">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-2 h-2 rounded-full bg-tp-accent group-hover:shadow-[0_0_5px_rgba(32,201,151,0.8)]">
+                                    </div>
+                                    <span
+                                        class="font-bold tracking-wide group-hover:text-white transition-colors">XAUUSD</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-tp-accent text-xs font-bold tabular-nums">1.2% <i
+                                            data-lucide="trending-up"
+                                            class="w-3 h-3 inline-block ml-0.5 mb-0.5"></i></span>
+                                    <i data-lucide="external-link"
+                                        class="w-3 h-3 text-tp-muted opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                </div>
+                            </li>
+                            <li onclick="window.openTradingViewModal('US30')"
+                                class="flex justify-between items-center p-2 rounded hover:bg-[#1c212a] transition-colors cursor-pointer group hover:shadow-[0_0_10px_rgba(32,201,151,0.1)] border border-transparent hover:border-tp-accent/30">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-2 h-2 rounded-full bg-tp-loss"></div>
+                                    <span
+                                        class="font-bold tracking-wide text-tp-text/80 group-hover:text-white transition-colors">US30</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-tp-loss text-xs tabular-nums font-bold">-0.5% <i
+                                            data-lucide="trending-down"
+                                            class="w-3 h-3 inline-block ml-0.5 mb-0.5"></i></span>
+                                    <i data-lucide="external-link"
+                                        class="w-3 h-3 text-tp-muted opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                </div>
+                            </li>
+                            <li onclick="window.openTradingViewModal('EURUSD')"
+                                class="flex justify-between items-center p-2 rounded hover:bg-[#1c212a] transition-colors cursor-pointer group hover:shadow-[0_0_10px_rgba(32,201,151,0.1)] border border-transparent hover:border-tp-accent/30">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-2 h-2 rounded-full bg-tp-border group-hover:bg-tp-text transition-colors">
+                                    </div>
+                                    <span
+                                        class="font-bold tracking-wide text-tp-text/80 group-hover:text-white transition-colors">EURUSD</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-tp-muted text-xs tabular-nums">0.0%</span>
+                                    <i data-lucide="external-link"
+                                        class="w-3 h-3 text-tp-muted opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Box 6: Alerts & Nuovi Arrivi -->
+                    <div
+                        class="bg-tp-panel rounded-xl border border-tp-border p-5 flex-1 min-h-[250px] shadow-lg relative overflow-hidden mt-6">
+                        <div
+                            class="flex items-center justify-between mb-4 border-b border-tp-border/50 pb-3 relative z-10">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="bell-ring"
+                                    class="w-4 h-4 text-[#eab308] font-bold drop-shadow-[0_0_5px_rgba(234,179,8,0.5)]"></i>
+                                <h3 class="text-xs font-bold uppercase tracking-widest text-[#eab308] drop-shadow-sm">
+                                    Allert</h3>
+                            </div>
+                            <button
+                                class="text-tp-muted hover:text-white transition-colors text-xs font-bold px-2 py-1 bg-tp-border/30 rounded border border-tp-border/50">Disattiva</button>
+                        </div>
+
+                        <div class="space-y-3 relative z-10">
+                            <!-- Alert Item in arrivo (Pulse) -->
+                            <div
+                                class="p-3 bg-[#0a0c10] border border-tp-warning/40 hover:border-tp-warning/70 rounded-lg group transition-all relative overflow-hidden shadow-[0_0_15px_rgba(234,179,8,0.05)] cursor-pointer">
+                                <div
+                                    class="absolute left-0 top-0 bottom-0 w-1 bg-tp-warning shadow-[0_0_10px_rgba(234,179,8,0.8)]">
+                                </div>
+                                <div class="flex justify-between items-center ml-2">
+                                    <div class="flex flex-col">
+                                        <p class="text-tp-warning font-bold text-sm tracking-wide">XAUUSD</p>
+                                        <p class="text-[10px] text-tp-muted mt-0.5 font-bold uppercase"><i
+                                                data-lucide="target" class="inline w-3 h-3 text-tp-muted/70"></i> Prezzo
+                                            a <span class="text-white">2045.50</span></p>
+                                    </div>
+                                    <div class="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            onclick="document.getElementById('modal-analisi-alert').classList.add('open')"
+                                            class="bg-tp-border hover:bg-tp-accent/20 hover:text-tp-accent text-tp-muted rounded p-1 transition-colors border border-transparent hover:border-tp-accent/30"
+                                            title="Apri Chart">
+                                            <i data-lucide="line-chart" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                        <button onclick="this.closest('.group').remove()"
+                                            class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-1 transition-colors border border-transparent hover:border-tp-loss/30"
+                                            title="Rimuovi">
+                                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Alert Normal -->
+                            <div
+                                class="p-3 bg-tp-bg border border-tp-border rounded-lg group transition-all relative overflow-hidden opacity-60 hover:opacity-100 cursor-pointer">
+                                <div class="absolute left-0 top-0 bottom-0 w-1 bg-tp-accent"></div>
+                                <div class="flex justify-between items-center ml-2">
+                                    <div class="flex flex-col">
+                                        <p class="text-tp-accent font-bold text-sm tracking-wide">US30</p>
+                                        <p class="text-[10px] text-tp-muted mt-0.5 font-bold uppercase"><i
+                                                data-lucide="clock" class="inline w-3 h-3 text-tp-muted/70"></i>
+                                            Apertura NY 5 min</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-analisi-alert"
+            class="fixed inset-0 z-[100] flex justify-center items-center bg-black/70 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+            <!-- Click-away -->
+            <div class="absolute inset-0" onclick="this.parentElement.classList.remove('open')"></div>
+
+            <!-- Contenitore Due Colonne -->
+            <div class="relative w-full max-w-[1200px] h-[85vh] bg-[#0a0c10] border border-tp-border rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden transform scale-95 transition-transform duration-300"
+                id="modal-alert-content">
+
+                <!-- COLONNA SINISTRA: Form Box -->
+                <div class="w-full md:w-[450px] bg-tp-panel flex flex-col border-r border-tp-border z-10">
+                    <!-- Header -->
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-[#161920]">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="bell" class="w-5 h-5 text-[#eab308]"></i>
+                            <h2 class="text-base font-bold text-white uppercase tracking-widest">Validazione Allert</h2>
+                        </div>
+                        <button onclick="document.getElementById('modal-analisi-alert').classList.remove('open')"
+                            class="text-tp-muted hover:text-white bg-tp-border/20 p-1.5 rounded-lg transition-colors">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Corpo Form Scrollabile -->
+                    <div class="p-6 overflow-y-auto flex-1 flex flex-col gap-6 custom-scroll">
+
+                        <!-- Dati Ricevuti -->
+                        <div class="bg-[#0e1116] border border-tp-border p-4 rounded-lg flex flex-col gap-3">
+                            <div class="flex justify-between items-center border-b border-tp-border/50 pb-2">
+                                <span class="text-[#eab308] font-bold text-lg leading-none">XAUUSD</span>
+                                <span
+                                    class="bg-[#eab308]/10 text-[#eab308] border border-[#eab308]/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase">14:30</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-tp-muted font-bold uppercase tracking-wider">Trigger
+                                    Prezzo</span>
+                                <span
+                                    class="font-display font-bold text-white text-base bg-[#161d24] px-2 rounded border border-tp-border">2045.50</span>
+                            </div>
+                            <p class="text-xs text-tp-muted italic mt-1 leading-relaxed">Alert triggerato livello
+                                resistenza chiave H4 identificato pre-market. Possibile reazione per storno intaday.</p>
+                        </div>
+
+                        <!-- Spazio Commento Aperto -->
+                        <div>
+                            <label
+                                class="block text-[10px] font-bold uppercase tracking-widest text-[#eab308] mb-2">Analisi
+                                e Commento</label>
+                            <textarea placeholder="Analisi strutturale e motivazioni del test al livello..."
+                                class="w-full bg-[#0e1116] border border-tp-border rounded-lg px-3 py-3 text-sm focus:border-[#eab308] outline-none text-white h-[100px] resize-none"></textarea>
+                        </div>
+
+                        <!-- Monitora Smile Esistente -->
+                        <div>
+                            <label
+                                class="block text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-2">Stato
+                                Operativo (Live)</label>
+                            <div
+                                class="flex flex-wrap items-center gap-4 bg-[#0e1116] p-2 rounded-xl border border-tp-border">
+                                <div class="flex items-center gap-1">
+                                    <button
+                                        class="p-1.5 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
+                                            data-lucide="smile" class="w-5 h-5"></i></button>
+                                    <button
+                                        class="p-1.5 rounded-lg text-[#20c997] bg-[#161920] border border-tp-border"><i
+                                            data-lucide="meh" class="w-5 h-5"></i></button>
+                                    <button
+                                        class="p-1.5 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
+                                            data-lucide="frown" class="w-5 h-5"></i></button>
+                                </div>
+                                <div class="w-px h-6 bg-tp-border hidden sm:block"></div>
+                                <div class="flex items-center gap-1">
+                                    <button
+                                        class="p-1.5 rounded-lg text-[#eab308] bg-[#161920] border border-tp-border"><i
+                                            data-lucide="dollar-sign" class="w-4 h-4"></i></button>
+                                    <button class="p-1.5 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
+                                        <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i
+                                                data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Categorizzatore Multiselect -->
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-widest text-tp-accent mb-2"><i
+                                    data-lucide="tags" class="inline w-3 h-3 mb-0.5"></i> Categorizzatore</label>
+                            <div class="flex flex-col gap-3">
+                                <!-- Bottoni Destinazione -->
+                                <div class="flex gap-2">
+                                    <button
+                                        onclick="document.getElementById('cat-cron-alert').style.display='block'; document.getElementById('cat-strat-alert').style.display='none'; document.getElementById('cat-trade-alert').style.display='none';"
+                                        class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase transition-colors">Cronache</button>
+                                    <button
+                                        onclick="document.getElementById('cat-cron-alert').style.display='none'; document.getElementById('cat-strat-alert').style.display='block'; document.getElementById('cat-trade-alert').style.display='none';"
+                                        class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase transition-colors">Strategia</button>
+                                    <button
+                                        onclick="document.getElementById('cat-cron-alert').style.display='none'; document.getElementById('cat-strat-alert').style.display='none'; document.getElementById('cat-trade-alert').style.display='block';"
+                                        class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-blue-500 text-blue-400 bg-blue-500/10 uppercase transition-colors">Trade</button>
+                                </div>
+                                <!-- Multiselect Cronache -->
+                                <div id="cat-cron-alert" class="w-full">
+                                    <select multiple
+                                        class="w-full bg-[#0e1116] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[80px] custom-scroll">
+                                        <option value="oggi">Oggi - Focus Sessione</option>
+                                        <option value="ieri">Ieri - Rilascio NFP</option>
+                                        <option value="altrieri">Lunedì - Apertura Mercati</option>
+                                    </select>
+                                    <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione
+                                    </p>
+                                </div>
+                                <!-- Multiselect Strategie -->
+                                <div id="cat-strat-alert" class="w-full" style="display:none;">
+                                    <select multiple
+                                        class="w-full bg-[#0e1116] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none h-[80px] custom-scroll">
+                                        <option value="s1">London Breakout</option>
+                                        <option value="s2">Asian Sweep Liquidity</option>
+                                        <option value="s3">News Scalper</option>
+                                        <option value="s4">Trend Pullback H4</option>
+                                    </select>
+                                    <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione
+                                    </p>
+                                </div>
+                                <!-- Multiselect Trade Recenti -->
+                                <div id="cat-trade-alert" class="w-full" style="display:none;">
+                                    <select multiple
+                                        class="w-full bg-[#0e1116] border border-blue-500/30 rounded-lg px-3 py-2 text-xs text-blue-400 font-bold outline-none h-[80px] custom-scroll">
+                                        <option value="t1">XAUUSD - Eseguito (Buy @ 2045.50)</option>
+                                        <option value="t2">US30 - Eseguito (Sell @ 39800.0)</option>
+                                        <option value="t3">EURUSD - Pending (Buy @ 1.0850)</option>
+                                    </select>
+                                    <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Footer Form Salva -->
+                    <div class="px-6 py-4 border-t border-tp-border bg-[#161920]">
+                        <button
+                            class="w-full flex justify-center items-center gap-2 px-6 py-3 rounded-lg text-xs font-black uppercase tracking-widest text-[#0e1116] bg-[#eab308] hover:bg-yellow-400 transition-colors shadow-[0_0_15px_rgba(234,179,8,0.3)]"
+                            onclick="document.getElementById('modal-analisi-alert').classList.remove('open')">
+                            Accetta & Salva in DB
+                        </button>
+                    </div>
+                </div>
+
+                <!-- COLONNA DESTRA: Upload Reperto Grafico -->
+                <div class="flex-1 bg-[#050608] flex items-center justify-center p-8 relative group">
+                    <div
+                        class="absolute inset-4 border-2 border-dashed border-tp-border/50 group-hover:border-[#eab308]/50 rounded-xl transition-colors pointer-events-none z-0">
+                    </div>
+                    <div class="text-center z-10 cursor-pointer">
+                        <div
+                            class="w-16 h-16 rounded-full bg-[#161920] flex items-center justify-center border border-tp-border mb-4 mx-auto group-hover:scale-110 transition-transform">
+                            <i data-lucide="camera"
+                                class="w-6 h-6 text-tp-muted group-hover:text-[#eab308] transition-colors"></i>
+                        </div>
+                        <h3 class="text-white font-bold text-lg mb-1">Carica Reperto Grafico</h3>
+                        <p class="text-tp-muted text-sm">Trascina qui lo screenshot o clicca per caricare</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- NOTION-STYLE MODAL: "News Validation" -->
+        <div id="modal-news-alert"
+            class="fixed inset-0 z-[100] flex justify-center items-start pt-20 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">
+            <div class="absolute inset-0"
+                onclick="document.getElementById('modal-news-alert').classList.remove('open')"></div>
+
+            <div class="relative w-full max-w-3xl bg-[#0e1116] border border-tp-border rounded-2xl shadow-2xl p-0 flex flex-col max-h-[85vh] overflow-hidden transform scale-95 transition-transform duration-200"
+                id="modal-news-content">
+
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-[#161920]">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-purple-500/10 p-2 rounded-lg border border-purple-500/20">
+                            <i data-lucide="globe" class="w-5 h-5 text-purple-400"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-white">Validazione Post-Notizia: NFP</h2>
+                    </div>
+                    <button onclick="document.getElementById('modal-news-alert').classList.remove('open')"
+                        class="text-tp-muted hover:text-tp-text bg-tp-border/30 p-1.5 rounded-lg transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 overflow-y-auto flex flex-col gap-6 custom-scroll">
+
+                    <!-- Dati Importati N8N -->
+                    <div class="bg-tp-bg p-4 rounded-xl border border-tp-border flex flex-col gap-4">
+                        <div class="flex justify-between items-start border-b border-tp-border/50 pb-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wide text-purple-400"><i
+                                    data-lucide="database" class="inline w-3 h-3"></i> Importato da AI Server
+                                (Pre-News)</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Evento</span>
+                                <span class="font-bold text-sm">Non-Farm Payrolls</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Forecast /
+                                    Previous</span>
+                                <span class="font-bold text-sm text-tp-warning">205K <span
+                                        class="text-tp-muted font-normal text-xs ml-1">/ 275K</span></span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Impatto
+                                    Atteso</span>
+                                <span class="font-bold text-sm text-tp-loss">High (3 💥)</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Commento Intelligenza
+                                N8N</span>
+                            <p class="text-xs text-tp-muted bg-tp-panel p-3 rounded-lg border border-tp-border/50">Un
+                                NFP pià¹ alto del forecast rafforzerà  il dollaro, potenziale spinta ribassista su
+                                Gold (XAUUSD).</p>
+                        </div>
+                    </div>
+
+                    <!-- Dati Approvazione Utente -->
+                    <div class="flex gap-4">
+                        <div class="flex-1 shrink-0 w-1/3">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2"><i
+                                    data-lucide="edit" class="inline w-3 h-3"></i> Immetti Dati Usciti</label>
+                            <input type="text" placeholder="Es. 303K"
+                                class="w-full bg-[#0a0c10] border border-tp-border hover:border-tp-accent focus:border-tp-accent rounded-lg px-3 py-2 text-xl font-bold font-display text-white outline-none transition-colors">
+                        </div>
+                        <div class="flex-1 w-2/3">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2"><i
+                                    data-lucide="align-left" class="inline w-3 h-3"></i> Commento Utente
+                                Post-News</label>
+                            <textarea placeholder="Analisi dei minimi presi, comportamento del trend post spike..."
+                                class="w-full bg-[#0a0c10] border border-tp-border hover:border-tp-accent focus:border-tp-accent rounded-lg px-3 py-2 text-sm text-white outline-none h-[48px] resize-none transition-colors"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Impact Widget (Grafico Freccie) -->
+                    <div class="bg-tp-bg p-4 rounded-xl border border-tp-border">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-4"><i
+                                data-lucide="trending-up" class="inline w-3 h-3"></i> Monitoratore Impatto Visivo
+                            Rapido</label>
+                        <div class="flex gap-4">
+                            <!-- XAUUSD -->
+                            <div
+                                class="flex items-center gap-3 bg-tp-panel px-3 py-1.5 rounded-lg border border-tp-border flex-1 justify-between group hover:border-tp-accent/30 transition-colors">
+                                <span class="font-bold text-sm tracking-wide">XAU/USD</span>
+                                <div class="flex gap-1 bg-[#0a0c10] rounded-md border border-tp-border p-1">
+                                    <button onclick="selectImpact(this)"
+                                        class="visual-impact hover:bg-tp-accent/20 hover:text-tp-accent px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
+                                            data-lucide="arrow-up" class="w-4 h-4"></i></button>
+                                    <button onclick="selectImpact(this)"
+                                        class="visual-impact hover:bg-tp-loss/20 hover:text-tp-loss px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
+                                            data-lucide="arrow-down" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+                            <!-- USD INDEX -->
+                            <div
+                                class="flex items-center gap-3 bg-tp-panel px-3 py-1.5 rounded-lg border border-tp-border flex-1 justify-between group hover:border-tp-accent/30 transition-colors">
+                                <span class="font-bold text-sm tracking-wide">US DXY</span>
+                                <div class="flex gap-1 bg-[#0a0c10] rounded-md border border-tp-border p-1">
+                                    <button onclick="selectImpact(this)"
+                                        class="visual-impact hover:bg-tp-accent/20 hover:text-tp-accent px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
+                                            data-lucide="arrow-up" class="w-4 h-4"></i></button>
+                                    <button onclick="selectImpact(this)"
+                                        class="visual-impact hover:bg-tp-loss/20 hover:text-tp-loss px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
+                                            data-lucide="arrow-down" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Proprieta Strategie/Tag -->
+                    <div>
+                        <div class="flex flex-wrap gap-2">
+                            <button
+                                onclick="this.classList.toggle('border-purple-500'); this.classList.toggle('text-purple-400'); this.classList.toggle('bg-purple-500/10')"
+                                class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Tag:
+                                Manipolazione</button>
+                            <button
+                                onclick="this.classList.toggle('border-purple-500'); this.classList.toggle('text-purple-400'); this.classList.toggle('bg-purple-500/10')"
+                                class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Tag:
+                                Reversal</button>
+                            <button
+                                onclick="this.classList.toggle('border-purple-500'); this.classList.toggle('text-purple-400'); this.classList.toggle('bg-purple-500/10')"
+                                class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Tag:
+                                Impulso Immediato</button>
+                        </div>
+                    </div>
+
+                    <hr class="border-tp-border/50">
+
+                    <!-- Categorizzatore Multiselect per Notizie -->
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-widest text-[#eab308] mb-2"><i
+                                data-lucide="tags" class="inline w-3 h-3 mb-0.5"></i> Categorizzatore Destinazione
+                            Focus</label>
+                        <div class="flex flex-col gap-3">
+                            <!-- Bottoni Destinazione -->
+                            <div class="flex gap-2">
+                                <button
+                                    onclick="document.getElementById('cat-cron-news').style.display='block'; document.getElementById('cat-strat-news').style.display='none'; document.getElementById('cat-trade-news').style.display='none';"
+                                    class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase transition-colors">Cronache</button>
+                                <button
+                                    onclick="document.getElementById('cat-cron-news').style.display='none'; document.getElementById('cat-strat-news').style.display='block'; document.getElementById('cat-trade-news').style.display='none';"
+                                    class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase transition-colors">Strategia</button>
+                                <button
+                                    onclick="document.getElementById('cat-cron-news').style.display='none'; document.getElementById('cat-strat-news').style.display='none'; document.getElementById('cat-trade-news').style.display='block';"
+                                    class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-blue-500 text-blue-400 bg-blue-500/10 uppercase transition-colors">Trade</button>
+                            </div>
+                            <!-- Multiselect Cronache -->
+                            <div id="cat-cron-news" class="w-full">
+                                <select multiple
+                                    class="w-full bg-[#0a0c10] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[80px] custom-scroll">
+                                    <option value="oggi">Oggi - Focus Notizie Focus</option>
+                                    <option value="domani">Domani - Preparativa</option>
+                                    <option value="ieri">Ieri - Impatto NFP</option>
+                                </select>
+                                <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione</p>
+                            </div>
+                            <!-- Multiselect Strategie -->
+                            <div id="cat-strat-news" class="w-full" style="display:none;">
+                                <select multiple
+                                    class="w-full bg-[#0a0c10] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none h-[80px] custom-scroll">
+                                    <option value="s1">London Breakout</option>
+                                    <option value="s2">Asian Sweep Liquidity</option>
+                                    <option value="s3">News Scalper</option>
+                                    <option value="s4">Trend Pullback H4</option>
+                                </select>
+                                <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione</p>
+                            </div>
+                            <!-- Multiselect Trade Recenti -->
+                            <div id="cat-trade-news" class="w-full" style="display:none;">
+                                <select multiple
+                                    class="w-full bg-[#0a0c10] border border-blue-500/30 rounded-lg px-3 py-2 text-xs text-blue-400 font-bold outline-none h-[80px] custom-scroll">
+                                    <option value="t1">XAUUSD - Eseguito (Buy @ 2045.50)</option>
+                                    <option value="t2">US30 - Eseguito (Sell @ 39800.0)</option>
+                                    <option value="t3">EURUSD - Pending (Buy @ 1.0850)</option>
+                                </select>
+                                <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-tp-border/50">
+
+                    <!-- Condizionatore Faccina/Mindset (Uguale a Modale Trade) -->
+                    <div>
+                        <label
+                            class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
+                            <i data-lucide="brain" class="w-4 h-4"></i> Mindset Live & Volatilità 
+                        </label>
+                        <div class="flex items-center gap-4">
+                            <!-- Mindset -->
+                            <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
+                                <button onclick="selectMindset(this, 'positive')"
+                                    class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
+                                        data-lucide="smile" class="w-5 h-5"></i></button>
+                                <button onclick="selectMindset(this, 'neutral')"
+                                    class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
+                                        data-lucide="meh" class="w-5 h-5"></i></button>
+                                <button onclick="selectMindset(this, 'negative')"
+                                    class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
+                                        data-lucide="frown" class="w-5 h-5"></i></button>
+                            </div>
+                            <div class="w-px h-6 bg-tp-border"></div>
+                            <!-- Volatility -->
+                            <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
+                                <button onclick="selectVol(this, 'low')"
+                                    class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
+                                    <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i></div>
+                                </button>
+                                <button onclick="selectVol(this, 'med')"
+                                    class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
+                                    <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i
+                                            data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>
+                                </button>
+                                <button onclick="selectVol(this, 'high')"
+                                    class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
+                                    <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i
+                                            data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i><i
+                                            data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="px-6 py-4 border-t border-tp-border bg-[#161920] flex justify-end gap-3 rounded-b-2xl">
+                    <button onclick="document.getElementById('modal-news-alert').classList.remove('open')"
+                        class="px-4 py-2 rounded-lg text-sm font-bold text-tp-text bg-tp-border/20 hover:bg-tp-border/50 border border-tp-border transition-colors">
+                        Ignora Notizia
+                    </button>
+                    <button onclick="document.getElementById('modal-news-alert').classList.remove('open')"
+                        class="flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold text-white bg-purple-600 hover:bg-purple-500 border border-transparent transition-all shadow-[0_0_15px_rgba(147,51,234,0.3)]"
+                        onclick="window.location.href='allert.html'">
+                        Invia a DB Notizie <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <style>
+        /* CSS per gestire l'apertura del modale da inline javascript */
+        #modal-analisi-alert.open,
+        #modal-news-alert.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #modal-analisi-alert.open #modal-alert-content,
+        #modal-news-alert.open #modal-news-content {
+            transform: scale(1);
+        }
+    </style>
+    <script src="app.js"></script>
+    <script>
+        // Init Lucide Icons globally for any dynamically added DOM nodes too
+        lucide.createIcons();
+
+        // Selettore Grafico Impatto (Notizie)
+        function selectImpact(btn) {
+            let parent = btn.parentElement;
+            parent.querySelectorAll('.visual-impact').forEach(b => {
+                b.classList.remove('bg-tp-accent/20', 'text-tp-accent', 'bg-tp-loss/20', 'text-tp-loss');
+            });
+            if (btn.innerHTML.includes('arrow-up')) {
+                btn.classList.add('bg-tp-accent/20', 'text-tp-accent');
+            } else {
+                btn.classList.add('bg-tp-loss/20', 'text-tp-loss');
+            }
+        }
+
+        // Logica pulsanti modal Mindset / Volatilità
+        function selectMindset(btn, type) {
+            document.querySelectorAll('.mindset-btn').forEach(b => {
+                b.classList.remove('text-tp-accent', 'text-tp-warning', 'text-tp-loss', 'bg-tp-border/30');
+                b.classList.add('text-tp-muted');
+            });
+            btn.classList.remove('text-tp-muted');
+            btn.classList.add('bg-tp-border/30');
+            if (type === 'positive') btn.classList.add('text-tp-accent');
+            if (type === 'neutral') btn.classList.add('text-tp-warning');
+            if (type === 'negative') btn.classList.add('text-tp-loss');
+        }
+
+        function selectVol(btn, type) {
+            document.querySelectorAll('.vol-btn').forEach(b => {
+                b.classList.remove('text-tp-accent', 'text-tp-warning', 'text-tp-loss', 'bg-tp-border/30');
+                b.classList.add('text-tp-muted');
+            });
+            btn.classList.remove('text-tp-muted');
+            btn.classList.add('bg-tp-border/30');
+            if (type === 'low') btn.classList.add('text-tp-accent');
+            if (type === 'med') btn.classList.add('text-tp-warning');
+            if (type === 'high') btn.classList.add('text-tp-loss');
+        }
+    </script>
+</body>
+
+</html>
