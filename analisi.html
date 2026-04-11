@@ -1,17 +1,17 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trade Desk - Struttura Analisi & Statistica</title>
-    
+    <title>Trade Desk - Analisi & Statistica</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <script>
         tailwind.config = {
             theme: {
@@ -24,7 +24,7 @@
                             border: '#252932',
                             text: '#f8fafc',
                             muted: '#848d97',
-                            accent: '#20c997', // Teal
+                            accent: '#20c997',
                             loss: '#f43f5e',
                             warning: '#eab308',
                             blue: '#3b82f6'
@@ -51,11 +51,7 @@
 <body class="bg-tp-bg text-tp-text font-sans h-screen flex overflow-hidden">
 
     <!-- Sidebar Menu -->
-                            <!-- Sidebar Universale -->
-        <!-- Sidebar Universale -->
-        <!-- Sidebar Universale -->
-        <!-- Sidebar Universale -->
-        <!-- Sidebar Universale -->
+    <!-- Sidebar Universale -->
     <aside class="w-16 hover:w-64 border-r border-tp-border flex flex-col flex-shrink-0 bg-tp-bg transition-all duration-300 z-50 absolute h-full lg:relative group">
         <!-- Logo Area Team Design -->
         <div class="h-24 flex items-center justify-center lg:justify-start px-3 gap-4 border-b border-tp-border/50 overflow-hidden cursor-default w-full">
@@ -64,19 +60,19 @@
             </div>
             <span class="text-xl font-extrabold tracking-tighter uppercase font-display select-none opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300">Trade<span class="text-[#20c997] ml-1">Desk</span></span>
         </div>
-        
+
         <!-- Navigation Links Universali -->
         <nav class="flex-1 overflow-x-hidden overflow-y-auto py-6 space-y-2 flex flex-col w-full group">
             <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span>
             </a>
-            
+
             <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span>
             </a>
-            
+
             <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span>
@@ -86,14 +82,14 @@
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span>
             </a>
-            
+
             <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span>
             </a>
-            
+
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-            
+
             <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span>
@@ -108,12 +104,17 @@
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span>
             </a>
-            
+
+            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span>
+            </a>
+
             <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span>
             </a>
-            
+
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
 
             <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
@@ -123,38 +124,11 @@
         </nav>
     </aside>
 
-
-
-
-
-
-
     <main class="flex-1 flex flex-col h-full bg-[#0e1116] relative overflow-hidden">
-        
-        <!-- Header con Incrocio Filtri -->
-                <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-                <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-                <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-                <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-                <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-                <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-                <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
+
+        <!-- HEADER UNIVERSALE -->
         <header class="flex justify-between items-center px-8 py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
-            
+
             <!-- 1. LEFT: Page Title & Quick Actions -->
             <div class="flex items-center gap-4 w-auto min-w-max">
                 <div>
@@ -164,13 +138,6 @@
                         <a href="tabella_trades.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Tabella Trades</a>
                         <a href="giornaliero.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> Giornaliero</a>
                     </div>
-                </div>
-            </div>
-            <div class="flex gap-2.5 ml-8">
-                <div class="flex items-center gap-2 bg-[#0a0c10] border border-tp-border p-1 rounded-xl">
-                    <button class="filter-btn active px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all tracking-wider border border-transparent bg-[#161920] text-white">Tutto</button>
-                    <button class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all tracking-wider border border-transparent text-tp-muted hover:text-white">MT4</button>
-                    <button class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all tracking-wider border border-transparent text-tp-muted hover:text-white">Bybit</button>
                 </div>
             </div>
 
@@ -196,17 +163,12 @@
                         <span class="text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] scale-110 origin-bottom transition-all">New York (14-17)</span>
                         <span class="text-tp-muted opacity-30">End</span>
                     </div>
-                    <!-- Track Base futuristic gradient -->
                     <div class="h-2 w-full bg-gradient-to-r from-tp-bg via-tp-border to-tp-bg rounded-full border border-tp-border/30 relative shadow-inner">
-                        <!-- Progress Fill glowing gradient -->
                         <div id="timeline-progress" class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-teal-600 via-tp-accent to-[#22d3ee] rounded-full shadow-[0_0_10px_rgba(32,201,151,0.5)]" style="width: 45%;"></div>
-                        <!-- Time Cursor Dot Glowing -->
                         <div id="timeline-dot" class="timeline-cursor absolute top-1/2 -ml-2.5 -mt-2.5 w-5 h-5 bg-white rounded-full border-[3px] border-tp-accent shadow-[0_0_15px_rgba(32,201,151,0.9)] z-10" style="left: 45%;"></div>
-                        <!-- Mock Markers -->
                         <div class="absolute left-[30%] top-0 bottom-0 w-px bg-tp-border/50"></div>
                         <div class="absolute left-[50%] top-0 bottom-0 w-px bg-tp-border/50"></div>
                         <div class="absolute left-[70%] top-0 bottom-0 w-px bg-tp-border/50"></div>
-                        <!-- Current Time Glowing Line marker -->
                         <div class="absolute left-[45%] -top-1 -bottom-1 w-[2px] bg-tp-text/20 rounded-full blur-[1px]"></div>
                     </div>
                 </div>
@@ -227,59 +189,47 @@
                         <i id="volatility-icon-wrapper" data-lucide="dollar-sign" class="w-7 h-7 text-tp-accent drop-shadow-[0_0_12px_rgba(32,201,151,0.8)] transition-all duration-300 transform"></i>
                     </div>
                 </div>
-                <!-- Win Rate Invasivo e Tecnologico -->
+                <!-- Win Rate -->
                 <div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem] shadow-[0_0_15px_rgba(32,201,151,0.05)]">
                     <div class="flex flex-col">
                         <span class="text-[9px] text-tp-accent font-bold uppercase tracking-widest opacity-80">Win Rate</span>
-                        <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-tp-accent to-white drop-shadow-[0_0_8px_rgba(32,201,151,0.6)] leading-none mt-0.5">67%</span>
+                        <span id="headerWinRate" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-tp-accent to-white drop-shadow-[0_0_8px_rgba(32,201,151,0.6)] leading-none mt-0.5">--</span>
                     </div>
-                    <!-- Anello neon -->
                     <div class="relative w-10 h-10 flex items-center justify-center">
                         <svg class="w-[120%] h-[120%] transform -rotate-90 overflow-visible absolute" viewBox="0 0 36 36">
                             <path class="text-tp-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
-                            <path class="text-tp-accent drop-shadow-[0_0_4px_rgba(32,201,151,0.8)]" stroke-dasharray="67, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" />
+                            <path id="headerWinRateArc" class="text-tp-accent drop-shadow-[0_0_4px_rgba(32,201,151,0.8)]" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" />
                         </svg>
                     </div>
                 </div>
             </div>
         </header>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         <!-- Corpo dell'Analisi -->
         <div class="flex-1 overflow-y-auto scroll-smooth custom-scroll">
             <div class="p-8 max-w-[1700px] mx-auto flex flex-col gap-8">
-                
-                <!-- ROW 1: I 4 Grandi KPI in base ai filtri incrociati -->
+
+                <!-- Filtri: Periodo + Broker -->
+                <div class="flex justify-center gap-4 flex-wrap">
+                    <div class="flex items-center gap-2 bg-[#0a0c10] border border-tp-border p-1 rounded-xl">
+                        <button class="period-btn active px-5 py-2 rounded-lg text-xs font-bold uppercase transition-all tracking-wider border border-transparent bg-[#161920] text-white" data-period="all">Tutto</button>
+                        <button class="period-btn px-5 py-2 rounded-lg text-xs font-bold uppercase transition-all tracking-wider border border-transparent text-tp-muted hover:text-white" data-period="month">Mese</button>
+                        <button class="period-btn px-5 py-2 rounded-lg text-xs font-bold uppercase transition-all tracking-wider border border-transparent text-tp-muted hover:text-white" data-period="week">Settimana</button>
+                        <button class="period-btn px-5 py-2 rounded-lg text-xs font-bold uppercase transition-all tracking-wider border border-transparent text-tp-muted hover:text-white" data-period="today">Oggi</button>
+                    </div>
+                    <div class="flex items-center gap-2 bg-[#0a0c10] border border-tp-border p-1 rounded-xl">
+                        <button class="broker-btn active px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all tracking-wider border border-transparent bg-[#161920] text-white" data-broker="all">Tutti</button>
+                        <button class="broker-btn px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all tracking-wider border border-transparent text-tp-muted hover:text-white" data-broker="mt4">MT4</button>
+                        <button class="broker-btn px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all tracking-wider border border-transparent text-tp-muted hover:text-white" data-broker="bybit">Bybit</button>
+                    </div>
+                </div>
+
+                <!-- ROW 1: 4 KPI Cards -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
                     <div class="bg-tp-panel border border-tp-border rounded-xl p-6 shadow-md flex items-center justify-between">
                         <div>
-                            <span class="text-[10px] text-tp-muted font-bold tracking-widest uppercase block mb-1">Net PnL Globale</span>
-                            <span class="text-3xl font-display font-black text-white">+ $14,250.00</span>
+                            <span class="text-[10px] text-tp-muted font-bold tracking-widest uppercase block mb-1">Net PnL</span>
+                            <span id="kpiNetPnl" class="text-3xl font-display font-black text-white">--</span>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-tp-accent/10 flex items-center justify-center border border-tp-accent/20">
                             <i data-lucide="dollar-sign" class="w-5 h-5 text-tp-accent"></i>
@@ -288,11 +238,8 @@
 
                     <div class="bg-tp-panel border border-tp-border rounded-xl p-6 shadow-md flex items-center justify-between">
                         <div>
-                            <span class="text-[10px] text-tp-muted font-bold tracking-widest uppercase block mb-1">Win Rate & %</span>
-                            <div class="flex items-baseline gap-2">
-                                <span class="text-3xl font-display font-black text-white">68.5%</span>
-                                <span class="text-xs font-bold text-tp-accent">+2.4%</span>
-                            </div>
+                            <span class="text-[10px] text-tp-muted font-bold tracking-widest uppercase block mb-1">Win Rate</span>
+                            <span id="kpiWinRate" class="text-3xl font-display font-black text-white">--</span>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-[#161d24] flex items-center justify-center border border-tp-border">
                             <i data-lucide="target" class="w-5 h-5 text-tp-muted"></i>
@@ -301,8 +248,8 @@
 
                     <div class="bg-tp-panel border border-tp-border rounded-xl p-6 shadow-md flex items-center justify-between">
                         <div>
-                            <span class="text-[10px] text-tp-muted font-bold tracking-widest uppercase block mb-1">Risk / Reward Medio</span>
-                            <span class="text-3xl font-display font-black text-white">1 : 2.4</span>
+                            <span class="text-[10px] text-tp-muted font-bold tracking-widest uppercase block mb-1">R:R Medio</span>
+                            <span id="kpiRR" class="text-3xl font-display font-black text-white">--</span>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-[#161d24] flex items-center justify-center border border-tp-border">
                             <i data-lucide="scale" class="w-5 h-5 text-tp-muted"></i>
@@ -312,7 +259,7 @@
                     <div class="bg-tp-panel border border-tp-border rounded-xl p-6 shadow-md flex items-center justify-between">
                         <div>
                             <span class="text-[10px] text-tp-muted font-bold tracking-widest uppercase block mb-1">Max Drawdown</span>
-                            <span class="text-3xl font-display font-black text-tp-loss">- 4.2%</span>
+                            <span id="kpiDrawdown" class="text-3xl font-display font-black text-tp-loss">--</span>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-tp-loss/10 flex items-center justify-center border border-tp-loss/20">
                             <i data-lucide="trending-down" class="w-5 h-5 text-tp-loss"></i>
@@ -320,46 +267,39 @@
                     </div>
                 </div>
 
-                <!-- ROW 2: The Equity Curve (Regina) -->
-                <div class="bg-tp-panel border border-tp-border rounded-xl p-6 shadow-xl relative mt-2">
+                <!-- ROW 2: Equity Curve -->
+                <div class="bg-tp-panel border border-tp-border rounded-xl p-6 shadow-xl relative">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-sm font-bold uppercase tracking-widest text-[#848d97] flex items-center gap-2">
-                            <i data-lucide="trending-up" class="w-4 h-4 text-white"></i> Equity Curve (Balance)
+                            <i data-lucide="trending-up" class="w-4 h-4 text-white"></i> Equity Curve
                         </h3>
-                        <div class="flex gap-2">
-                            <span class="text-[10px] font-bold uppercase bg-tp-bg border border-tp-border text-white px-2 py-0.5 rounded">Trades n°</span>
-                        </div>
                     </div>
                     <div class="w-full h-[350px]">
-                        <canvas id="equityChart"></canvas>
+                        <canvas id="dashEquityChart"></canvas>
                     </div>
                 </div>
 
-                <!-- ROW 3: Correlazioni Statistiche -->
+                <!-- ROW 3: Two charts side by side -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    
-                    <!-- Breakdown Asset / Winrate -->
+
+                    <!-- Distribuzione Profitti per Asset -->
                     <div class="bg-tp-panel border border-tp-border rounded-xl p-6 shadow-lg flex flex-col">
                         <h3 class="text-sm font-bold uppercase tracking-widest text-[#848d97] flex items-center gap-2 mb-6">
-                            <i data-lucide="pie-chart" class="w-4 h-4 text-white"></i> Distribuzione Profitti & Winrate
+                            <i data-lucide="pie-chart" class="w-4 h-4 text-white"></i> Distribuzione Profitti per Asset
                         </h3>
-                        <div class="flex-1 flex items-center justify-center relative w-full h-[250px]">
-                            <canvas id="winratePieChart"></canvas>
+                        <div class="flex-1 flex items-center justify-center relative w-full h-[280px]">
+                            <canvas id="dashPieChart"></canvas>
                         </div>
-                        <p class="text-[11px] text-center text-tp-muted font-medium mt-4">La dimensione indica la generazione di PnL, i colori identificano le monete.</p>
                     </div>
 
-                    <!-- Momenti di Spinta (Cronache Correlation) -->
+                    <!-- Profittabilita per Sessione -->
                     <div class="bg-tp-panel border border-tp-border rounded-xl p-6 shadow-lg flex flex-col">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-sm font-bold uppercase tracking-widest text-[#848d97] flex items-center gap-2">
-                                <i data-lucide="clock" class="w-4 h-4 text-white"></i> Profittabilità  vs Momenti di Spinta (Cronache)
-                            </h3>
+                        <h3 class="text-sm font-bold uppercase tracking-widest text-[#848d97] flex items-center gap-2 mb-6">
+                            <i data-lucide="clock" class="w-4 h-4 text-white"></i> Profittabilita per Sessione
+                        </h3>
+                        <div class="flex-1 w-full h-[280px]">
+                            <canvas id="dashBarChart"></canvas>
                         </div>
-                        <div class="flex-1 w-full h-[250px]">
-                            <canvas id="pushMomentsChart"></canvas>
-                        </div>
-                        <p class="text-[11px] text-center text-tp-muted font-medium mt-4">Incrocio dei tuoi Entry Time con gli <b>Orari di Imbalance</b> segnati nelle <i>Cronache di Mercato</i>.</p>
                     </div>
 
                 </div>
@@ -370,20 +310,362 @@
 
     <script src="app.js"></script>
     <script>
+    (async function() {
+        // --- Chart instances ---
+        let equityChartInstance = null;
+        let pieChartInstance = null;
+        let barChartInstance = null;
+
+        // --- Filter state ---
+        let currentPeriod = 'all';
+        let currentBroker = 'all';
+
+        // --- Asset color map ---
+        const assetColors = {
+            'XAUUSD': '#20c997',
+            'US30': '#eab308',
+            'GER30': '#8b5cf6',
+            'NAS100': '#3b82f6',
+            'BTCUSD': '#f43f5e'
+        };
+        const fallbackColor = '#848d97';
+
+        // --- Period filter buttons ---
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.period-btn').forEach(b => {
+                    b.classList.remove('active', 'bg-[#161920]', 'text-white');
+                    b.classList.add('text-tp-muted');
+                });
+                btn.classList.add('active', 'bg-[#161920]', 'text-white');
+                btn.classList.remove('text-tp-muted');
+                currentPeriod = btn.dataset.period;
+                loadAnalisi();
+            });
+        });
+
+        // --- Broker filter buttons ---
+        document.querySelectorAll('.broker-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.broker-btn').forEach(b => {
+                    b.classList.remove('active', 'bg-[#161920]', 'text-white');
+                    b.classList.add('text-tp-muted');
+                });
+                btn.classList.add('active', 'bg-[#161920]', 'text-white');
+                btn.classList.remove('text-tp-muted');
+                currentBroker = btn.dataset.broker;
+                loadAnalisi();
+            });
+        });
+
+        // --- Filter trades by period + broker ---
+        function filterByPeriod(trades) {
+            // Filter by broker first
+            if (currentBroker !== 'all') {
+                trades = trades.filter(t => (t.sorgente || '').toLowerCase() === currentBroker);
+            }
+            if (currentPeriod === 'all') return trades;
+            const now = new Date();
+            let cutoff;
+            if (currentPeriod === 'today') {
+                cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            } else if (currentPeriod === 'week') {
+                cutoff = new Date(now);
+                cutoff.setDate(cutoff.getDate() - 7);
+            } else if (currentPeriod === 'month') {
+                cutoff = new Date(now);
+                cutoff.setMonth(cutoff.getMonth() - 1);
+            }
+            return trades.filter(t => {
+                const d = new Date(t.data);
+                return d >= cutoff;
+            });
+        }
+
+        // --- Format currency ---
+        function fmtPnl(val) {
+            const sign = val >= 0 ? '+' : '';
+            return sign + ' $' + Math.abs(val).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // --- Determine session from date string ---
+        function getSession(dateStr) {
+            const d = new Date(dateStr);
+            const h = d.getHours();
+            if (h >= 0 && h < 8) return 'Asia';
+            if (h >= 8 && h < 12) return 'London';
+            if (h >= 12 && h < 17) return 'New York';
+            return 'End';
+        }
+
+        // --- Main load function ---
+        async function loadAnalisi() {
+            const { data: allTrades, error } = await db
+                .from('trades')
+                .select('id, asset, direzione, data, entry_price, exit_price, stop_loss, pnl, esito, size')
+                .order('data', { ascending: true });
+
+            if (error) {
+                console.error('Supabase error:', error);
+                return;
+            }
+
+            const trades = filterByPeriod(allTrades || []);
+            const total = trades.length;
+
+            // --- KPI 1: Net PnL ---
+            const netPnl = trades.reduce((sum, t) => sum + (parseFloat(t.pnl) || 0), 0);
+            const pnlEl = document.getElementById('kpiNetPnl');
+            pnlEl.textContent = fmtPnl(netPnl);
+            pnlEl.className = pnlEl.className.replace(/text-tp-accent|text-tp-loss/g, '');
+            if (netPnl >= 0) {
+                pnlEl.classList.add('text-tp-accent');
+            } else {
+                pnlEl.classList.add('text-tp-loss');
+            }
+
+            // --- KPI 2: Win Rate ---
+            const wins = trades.filter(t => (t.esito || '').toLowerCase() === 'win' || parseFloat(t.pnl) > 0).length;
+            const winRate = total > 0 ? ((wins / total) * 100) : 0;
+            document.getElementById('kpiWinRate').textContent = total > 0 ? winRate.toFixed(1) + '%' : '--';
+
+            // Header win rate
+            document.getElementById('headerWinRate').textContent = total > 0 ? Math.round(winRate) + '%' : '--';
+            document.getElementById('headerWinRateArc').setAttribute('stroke-dasharray', Math.round(winRate) + ', 100');
+
+            // --- KPI 3: Average R:R ---
+            let rrValues = [];
+            trades.forEach(t => {
+                const entry = parseFloat(t.entry_price);
+                const exit = parseFloat(t.exit_price);
+                const sl = parseFloat(t.stop_loss);
+                if (!isNaN(entry) && !isNaN(exit) && !isNaN(sl) && Math.abs(entry - sl) > 0) {
+                    const rr = Math.abs(exit - entry) / Math.abs(entry - sl);
+                    rrValues.push(rr);
+                }
+            });
+            const avgRR = rrValues.length > 0 ? (rrValues.reduce((a, b) => a + b, 0) / rrValues.length) : 0;
+            document.getElementById('kpiRR').textContent = rrValues.length > 0 ? '1 : ' + avgRR.toFixed(1) : '--';
+
+            // --- KPI 4: Max Drawdown ---
+            let peak = 0;
+            let maxDD = 0;
+            let cumPnl = 0;
+            trades.forEach(t => {
+                cumPnl += (parseFloat(t.pnl) || 0);
+                if (cumPnl > peak) peak = cumPnl;
+                const dd = peak - cumPnl;
+                if (dd > maxDD) maxDD = dd;
+            });
+            const ddDisplay = peak > 0 ? ((maxDD / peak) * 100).toFixed(1) + '%' : (maxDD > 0 ? '$ ' + maxDD.toFixed(2) : '--');
+            document.getElementById('kpiDrawdown').textContent = maxDD > 0 ? '- ' + ddDisplay : '--';
+
+            // --- Equity Curve ---
+            buildEquityChart(trades);
+
+            // --- Pie Chart: PnL by Asset ---
+            buildPieChart(trades);
+
+            // --- Bar Chart: PnL by Session ---
+            buildBarChart(trades);
+        }
+
+        // --- Equity Curve Chart ---
+        function buildEquityChart(trades) {
+            const labels = [];
+            const dataPoints = [];
+            let running = 0;
+            trades.forEach(t => {
+                running += (parseFloat(t.pnl) || 0);
+                const d = new Date(t.data);
+                labels.push(d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' }));
+                dataPoints.push(running);
+            });
+
+            const ctx = document.getElementById('dashEquityChart').getContext('2d');
+            if (equityChartInstance) equityChartInstance.destroy();
+
+            equityChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Equity',
+                        data: dataPoints,
+                        borderColor: '#20c997',
+                        backgroundColor: 'rgba(32, 201, 151, 0.08)',
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: dataPoints.length > 50 ? 0 : 3,
+                        pointBackgroundColor: '#20c997',
+                        pointBorderColor: '#0B0E14',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#161920',
+                            borderColor: '#252932',
+                            borderWidth: 1,
+                            titleColor: '#f8fafc',
+                            bodyColor: '#848d97',
+                            callbacks: {
+                                label: ctx => '$ ' + ctx.parsed.y.toFixed(2)
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#848d97', font: { size: 10 }, maxTicksLimit: 15 },
+                            grid: { color: 'rgba(37,41,50,0.5)' }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#848d97',
+                                font: { size: 10 },
+                                callback: v => '$ ' + v.toLocaleString()
+                            },
+                            grid: { color: 'rgba(37,41,50,0.5)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Pie Chart: PnL by Asset ---
+        function buildPieChart(trades) {
+            const assetPnl = {};
+            trades.forEach(t => {
+                const a = t.asset || 'Altro';
+                assetPnl[a] = (assetPnl[a] || 0) + (parseFloat(t.pnl) || 0);
+            });
+
+            const labels = Object.keys(assetPnl);
+            const values = labels.map(l => assetPnl[l]);
+            const colors = labels.map(l => assetColors[l] || fallbackColor);
+
+            const ctx = document.getElementById('dashPieChart').getContext('2d');
+            if (pieChartInstance) pieChartInstance.destroy();
+
+            pieChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: colors,
+                        borderColor: '#161920',
+                        borderWidth: 3,
+                        hoverBorderColor: '#252932'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '55%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#f8fafc',
+                                font: { size: 11, weight: 'bold' },
+                                padding: 16,
+                                usePointStyle: true,
+                                pointStyleWidth: 10
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#161920',
+                            borderColor: '#252932',
+                            borderWidth: 1,
+                            titleColor: '#f8fafc',
+                            bodyColor: '#848d97',
+                            callbacks: {
+                                label: ctx => {
+                                    const v = ctx.parsed;
+                                    return ctx.label + ': $ ' + v.toFixed(2);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Bar Chart: PnL by Session ---
+        function buildBarChart(trades) {
+            const sessions = { 'Asia': 0, 'London': 0, 'New York': 0, 'End': 0 };
+            trades.forEach(t => {
+                const s = getSession(t.data);
+                sessions[s] += (parseFloat(t.pnl) || 0);
+            });
+
+            const labels = Object.keys(sessions);
+            const values = Object.values(sessions);
+            const colors = values.map(v => v >= 0 ? '#20c997' : '#f43f5e');
+
+            const ctx = document.getElementById('dashBarChart').getContext('2d');
+            if (barChartInstance) barChartInstance.destroy();
+
+            barChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'PnL per Sessione',
+                        data: values,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c === '#20c997' ? 'rgba(32,201,151,0.6)' : 'rgba(244,63,94,0.6)'),
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        maxBarThickness: 60
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#161920',
+                            borderColor: '#252932',
+                            borderWidth: 1,
+                            titleColor: '#f8fafc',
+                            bodyColor: '#848d97',
+                            callbacks: {
+                                label: ctx => '$ ' + ctx.parsed.y.toFixed(2)
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#f8fafc', font: { size: 11, weight: 'bold' } },
+                            grid: { display: false }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#848d97',
+                                font: { size: 10 },
+                                callback: v => '$ ' + v.toLocaleString()
+                            },
+                            grid: { color: 'rgba(37,41,50,0.5)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Initial load ---
+        await loadAnalisi();
+
+        // --- Init icons ---
         lucide.createIcons();
+    })();
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-

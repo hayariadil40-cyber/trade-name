@@ -105,6 +105,11 @@
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span>
             </a>
+
+            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span>
+            </a>
             
             <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div>
@@ -264,118 +269,61 @@
         <div class="flex-1 overflow-y-auto p-8 scroll-smooth">
             <div class="max-w-7xl mx-auto">
                 <div class="flex items-center justify-between mb-6">
-                    <div class="text-sm text-tp-muted font-medium">
-                        <span>12 Trades archiviati in lista</span>
-                    </div>
+                    <div class="text-sm text-tp-muted font-medium" id="trade-count">Caricamento...</div>
+                    <button onclick="window.location.href='dettaglio_trade.html'" class="bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 font-bold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition-colors">+ Nuovo Trade</button>
                 </div>
 
-                <!-- Lista Trade (Cliccabili visualizzano il dettaglio) -->
-                <div class="space-y-2">
-                    
-                    <!-- Riga Modello Win -->
-                    <div onclick="window.location.href='dettaglio_trade.html'" class="group flex items-center p-4 bg-tp-panel border border-tp-border hover:border-tp-accent/50 rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
-                        <div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-accent"></div>
-                        
-                        <div class="flex items-center w-1/5 pl-3 gap-3">
-                            <span class="text-xs font-bold text-tp-muted uppercase tracking-widest bg-tp-bg px-2 py-1 rounded">#TRD-104</span>
-                            <span class="font-bold text-lg group-hover:text-tp-accent transition-colors">XAUUSD</span>
-                        </div>
-                        
-                        <div class="w-1/5 flex items-center gap-2">
-                            <span class="text-xs font-bold bg-[#14231f] text-tp-accent border border-tp-accent/20 px-2 py-0.5 rounded uppercase uppercase">Long (Buy)</span>
-                            <span class="text-xs font-bold text-tp-muted">1.5 Lots</span>
-                        </div>
-                        
-                        <div class="w-1/5 flex items-center gap-2">
-                            <span class="bg-blue-500/10 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">MT4</span>
-                            <span class="bg-tp-accent/10 text-tp-accent border border-tp-accent/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Compilato</span>
-                        </div>
-                        
-                        <div class="w-1/5 flex flex-col text-sm text-tp-muted justify-center">
-                            <span>Open: <span class="text-white">2045.50</span></span>
-                            <span>Close: <span class="text-white">2060.00</span></span>
-                        </div>
+                <div id="trades-list" class="space-y-2"><!-- Dinamico --></div>
+                <div id="trades-empty" class="hidden text-center py-16 text-tp-muted"><i data-lucide="crosshair" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm font-bold">Nessun trade</p></div>
 
-                        <div class="w-1/5 flex items-center justify-end gap-6 pr-4">
-                            <div class="flex flex-col text-right">
-                                <span class="text-[10px] uppercase font-bold text-tp-muted tracking-widest">R:R</span>
-                                <span class="text-tp-text font-bold">1:3.2</span>
-                            </div>
-                            <div class="flex flex-col text-right w-20">
-                                <span class="text-sm font-bold text-tp-accent drop-shadow-[0_0_8px_rgba(32,201,151,0.4)]">+ $1450</span>
-                            </div>
-                            <i data-lucide="chevron-right" class="w-5 h-5 text-tp-muted group-hover:text-tp-accent transition-colors"></i>
-                        </div>
-                    </div>
-
-                    <!-- Riga Modello Loss -->
-                    <div onclick="window.location.href='dettaglio_trade.html'" class="group flex items-center p-4 bg-tp-panel border border-tp-border hover:border-tp-loss/50 rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
-                        <div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-loss"></div>
-                        
-                        <div class="flex items-center w-1/5 pl-3 gap-3">
-                            <span class="text-xs font-bold text-tp-muted uppercase tracking-widest bg-tp-bg px-2 py-1 rounded">#TRD-103</span>
-                            <span class="font-bold text-lg transition-colors">US30</span>
-                        </div>
-                        
-                        <div class="w-1/5 flex items-center gap-2">
-                            <span class="text-xs font-bold bg-tp-loss/10 text-tp-loss border border-tp-loss/20 px-2 py-0.5 rounded uppercase uppercase">Short (Sell)</span>
-                            <span class="text-xs font-bold text-tp-muted">0.5 Lots</span>
-                        </div>
-                        
-                        <div class="w-1/5 flex items-center gap-2">
-                            <span class="bg-[#eab308]/10 text-[#eab308] border border-[#eab308]/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">ByBit</span>
-                            <span class="bg-tp-loss/10 text-tp-loss border border-tp-loss/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Da Accettare</span>
-                        </div>
-                        
-                        <div class="w-1/5 flex flex-col text-sm text-tp-muted justify-center">
-                            <span>Open: <span class="text-white">38500</span></span>
-                            <span>Close: <span class="text-white">38650</span></span>
-                        </div>
-
-                        <div class="w-1/5 flex items-center justify-end gap-6 pr-4">
-                            <div class="flex flex-col text-right">
-                                <span class="text-[10px] uppercase font-bold text-tp-muted tracking-widest">R:R</span>
-                                <span class="text-tp-text font-bold">1:1 (SL)</span>
-                            </div>
-                            <div class="flex flex-col text-right w-20">
-                                <span class="text-sm font-bold text-tp-loss drop-shadow-[0_0_8px_rgba(244,63,94,0.4)]">- $750</span>
-                            </div>
-                            <i data-lucide="chevron-right" class="w-5 h-5 text-tp-muted group-hover:text-tp-loss transition-colors"></i>
-                        </div>
-                    </div>
-
-                    <!-- Additional Mock Rows for feeling -->
-                    <div class="opacity-70 group flex items-center p-4 bg-tp-panel border border-tp-border rounded-lg shadow-sm relative pointer-events-none">
-                        <div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-border"></div>
-                        <div class="flex items-center w-1/5 pl-3 gap-3">
-                            <span class="text-xs font-bold text-tp-muted uppercase tracking-widest bg-tp-bg px-2 py-1 rounded">#TRD-102</span>
-                            <span class="font-bold text-lg text-tp-muted">EURUSD</span>
-                        </div>
-                        <div class="w-1/5 flex items-center gap-2">
-                            <span class="text-xs font-bold bg-tp-bg text-tp-muted border border-tp-border px-2 py-0.5 rounded uppercase">Breakeven</span>
-                        </div>
-                        <div class="w-1/5 flex items-center gap-2">
-                            <span class="bg-blue-500/10 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">MT4</span>
-                            <span class="bg-[#0a0c10] text-tp-muted border border-tp-border px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Archiviato</span>
-                        </div>
-                        <div class="w-1/5 flex flex-col text-sm text-tp-muted justify-center">
-                            <span>Open: <span class="text-white">1.08500</span></span>
-                            <span>Close: <span class="text-white">1.08500</span></span>
-                        </div>
-                        <div class="w-1/5 flex items-center justify-end gap-6 pr-4">
-                            <span class="text-sm font-bold text-tp-muted">$ 0.00</span>
-                            <i data-lucide="minus" class="w-5 h-5 text-tp-muted"></i>
-                        </div>
-                    </div>
-
-                </div>
+            </div>
             </div>
         </div>
     </main>
 
     <script src="app.js"></script>
     <script>
-        lucide.createIcons();
+        document.addEventListener('DOMContentLoaded', async () => {
+            lucide.createIcons();
+            if (!db) return;
+            await loadTrades();
+        });
+
+        async function loadTrades() {
+            const { data, error } = await db.from('trades').select('*').order('data', { ascending: false });
+            if (error) { console.error(error); return; }
+            const list = document.getElementById('trades-list');
+            const empty = document.getElementById('trades-empty');
+            const count = document.getElementById('trade-count');
+
+            if (!data || !data.length) { empty.classList.remove('hidden'); count.textContent = '0 trades'; return; }
+            empty.classList.add('hidden');
+            count.textContent = `${data.length} trade${data.length === 1 ? '' : 's'}`;
+
+            list.innerHTML = data.map(t => {
+                const isWin = t.esito === 'win';
+                const isLoss = t.esito === 'loss';
+                const barColor = isWin ? 'bg-tp-accent' : isLoss ? 'bg-tp-loss' : 'bg-tp-border';
+                const hoverColor = isWin ? 'hover:border-tp-accent/50' : isLoss ? 'hover:border-tp-loss/50' : 'hover:border-white/50';
+                const nameColor = isWin ? 'group-hover:text-tp-accent' : isLoss ? 'group-hover:text-tp-loss' : 'group-hover:text-white';
+                const dirColor = t.direzione === 'LONG' ? 'text-tp-accent bg-[#14231f] border-tp-accent/20' : 'text-tp-loss bg-tp-loss/10 border-tp-loss/20';
+                const pnlColor = (t.pnl||0) >= 0 ? 'text-tp-accent' : 'text-tp-loss';
+                const pnlSign = (t.pnl||0) >= 0 ? '+' : '';
+                const stato = t.stato || 'nuovo';
+                const statoBadge = stato === 'completato' ? '<span class="text-[9px] px-2 py-0.5 rounded bg-tp-accent/10 text-tp-accent border border-tp-accent/20 font-bold uppercase">Completato</span>' : '<span class="text-[9px] px-2 py-0.5 rounded bg-tp-warning/10 text-tp-warning border border-tp-warning/20 font-bold uppercase">Da lavorare</span>';
+                const dateStr = t.data ? new Date(t.data).toLocaleDateString('it-IT', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '--';
+
+                return `<div onclick="window.location.href='dettaglio_trade.html?id=${t.id}'" class="group flex items-center p-4 bg-tp-panel border border-tp-border ${hoverColor} rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
+                    <div class="w-1 absolute left-0 top-0 bottom-0 ${barColor}"></div>
+                    <div class="flex items-center w-1/5 pl-3 gap-3"><span class="text-xs font-bold text-tp-muted bg-tp-bg px-2 py-1 rounded">${t.id.substring(0,8)}</span><span class="font-bold text-lg ${nameColor} transition-colors">${t.asset||'--'}</span></div>
+                    <div class="w-1/5 flex items-center gap-2"><span class="text-xs font-bold ${dirColor} border px-2 py-0.5 rounded uppercase">${t.direzione||'--'}</span><span class="text-xs font-bold text-tp-muted">${t.size||''} L</span></div>
+                    <div class="w-1/5 flex items-center gap-2"><span class="bg-blue-500/10 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase">${t.sorgente||'--'}</span>${statoBadge}</div>
+                    <div class="w-1/5 text-xs text-tp-muted">${dateStr}</div>
+                    <div class="w-1/5 flex items-center justify-end gap-4 pr-4"><span class="text-sm font-bold ${pnlColor}">${pnlSign}$${Math.abs(t.pnl||0).toFixed(0)}</span><i data-lucide="chevron-right" class="w-4 h-4 text-tp-muted"></i></div>
+                </div>`;
+            }).join('');
+            lucide.createIcons();
+        }
     </script>
 </body>
 </html>

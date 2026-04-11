@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trade Desk - Dettaglio Bias</title>
+    <title>Trade Desk - Dettaglio Reperto</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,8 +40,16 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #252932; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #3b4252; }
-        .drop-zone { transition: all 0.2s ease-in-out; }
-        .drop-zone.dragover { background-color: rgba(32, 201, 151, 0.05); border-color: #20c997; }
+        .save-flash { animation: flashGreen 0.6s ease; }
+        @keyframes flashGreen {
+            0% { box-shadow: 0 0 0 rgba(32,201,151,0); }
+            50% { box-shadow: 0 0 12px rgba(32,201,151,0.4); }
+            100% { box-shadow: 0 0 0 rgba(32,201,151,0); }
+        }
+        .dir-btn.active-long { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
+        .dir-btn.active-short { background: rgba(244,63,94,0.15); border-color: #f43f5e; color: #f43f5e; }
+        .cat-tab.active { opacity: 1; }
+        .cat-tab:not(.active) { opacity: 0.5; }
     </style>
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -58,68 +66,36 @@
             <span class="text-xl font-extrabold tracking-tighter uppercase font-display select-none opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300">Trade<span class="text-[#20c997] ml-1">Desk</span></span>
         </div>
         <nav class="flex-1 overflow-x-hidden overflow-y-auto py-6 space-y-2 flex flex-col w-full group">
-            <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span>
-            </a>
-            <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span>
-            </a>
-            <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span>
-            </a>
-            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span>
-            </a>
-            <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span>
-            </a>
+            <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span></a>
+            <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span></a>
+            <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span></a>
+            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span></a>
+            <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span></a>
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-            <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span>
-            </a>
-            <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span>
-            </a>
-            <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span>
-            </a>
-            <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span>
-            </a>
+            <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span></a>
+            <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span></a>
+            <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span></a>
+            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span></a>
+            <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span></a>
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-            <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span>
-            </a>
+            <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span></a>
         </nav>
     </aside>
 
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+    <main class="flex-1 flex flex-col h-full bg-[#0e1116] relative overflow-hidden">
 
-        <!-- Header -->
+        <!-- Header Universale -->
         <header class="flex justify-between items-center px-8 py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
             <div class="flex items-center gap-4 w-auto min-w-max">
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight text-white mb-1">#BIAS-015 — XAUUSD Long</h1>
+                    <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Reperto</h1>
                     <div class="flex gap-2.5 mt-1">
-                        <a href="bias.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="microscope" class="w-3.5 h-3.5"></i> Database Bias</a>
+                        <a href="analisi.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Trade Analisi</a>
                         <a href="tabella_trades.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Tabella Trades</a>
                         <a href="giornaliero.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> Giornaliero</a>
                     </div>
                 </div>
             </div>
-
-            <!-- CENTER: Clock & Timeline -->
             <div class="hidden lg:flex items-center flex-1 max-w-3xl mx-8 gap-6">
                 <div class="flex flex-col items-center justify-center shrink-0">
                     <span id="digital-clock" class="text-xl font-display font-bold text-white tracking-widest tabular-nums leading-none">00:00:00</span>
@@ -135,21 +111,26 @@
                     <div class="flex justify-between text-[10px] items-end font-bold uppercase tracking-widest mb-2 px-2">
                         <span class="text-tp-muted opacity-30">Asia</span>
                         <span class="text-tp-muted opacity-60">London</span>
-                        <span class="text-white">New York</span>
+                        <span class="text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] scale-110 origin-bottom transition-all">New York (14-17)</span>
                         <span class="text-tp-muted opacity-30">End</span>
                     </div>
                     <div class="h-2 w-full bg-gradient-to-r from-tp-bg via-tp-border to-tp-bg rounded-full border border-tp-border/30 relative shadow-inner">
                         <div id="timeline-progress" class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-teal-600 via-tp-accent to-[#22d3ee] rounded-full shadow-[0_0_10px_rgba(32,201,151,0.5)]" style="width: 45%;"></div>
-                        <div id="timeline-dot" class="absolute top-1/2 -ml-2.5 -mt-2.5 w-5 h-5 bg-white rounded-full border-[3px] border-tp-accent shadow-[0_0_15px_rgba(32,201,151,0.9)] z-10" style="left: 45%;"></div>
+                        <div id="timeline-dot" class="timeline-cursor absolute top-1/2 -ml-2.5 -mt-2.5 w-5 h-5 bg-white rounded-full border-[3px] border-tp-accent shadow-[0_0_15px_rgba(32,201,151,0.9)] z-10" style="left: 45%;"></div>
                         <div class="absolute left-[30%] top-0 bottom-0 w-px bg-tp-border/50"></div>
                         <div class="absolute left-[50%] top-0 bottom-0 w-px bg-tp-border/50"></div>
                         <div class="absolute left-[70%] top-0 bottom-0 w-px bg-tp-border/50"></div>
                     </div>
                 </div>
             </div>
-
-            <!-- RIGHT: Win Rate -->
             <div class="flex items-center gap-4 w-auto shrink-0 justify-end">
+                <div class="hidden xl:flex items-center gap-6 bg-gradient-to-b from-[#13161c] to-[#0a0c10] border border-tp-border/40 px-6 py-3 rounded-2xl shadow-inner h-16 mr-4">
+                    <div class="flex flex-col items-center gap-1 w-10"><i id="mindset-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i></div>
+                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
+                    <div class="flex flex-col items-center gap-1 w-10"><i id="market-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i></div>
+                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
+                    <div class="flex flex-col items-center gap-1 w-10"><i id="volatility-icon-wrapper" data-lucide="dollar-sign" class="w-7 h-7 text-tp-accent drop-shadow-[0_0_12px_rgba(32,201,151,0.8)] transition-all duration-300 transform"></i></div>
+                </div>
                 <div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem] shadow-[0_0_15px_rgba(32,201,151,0.05)]">
                     <div class="flex flex-col">
                         <span class="text-[9px] text-tp-accent font-bold uppercase tracking-widest opacity-80">Win Rate</span>
@@ -165,222 +146,391 @@
             </div>
         </header>
 
-        <!-- MAIN: 50/50 SPLIT VIEW -->
-        <div class="flex-1 flex flex-col lg:flex-row overflow-hidden p-6 gap-6 max-w-[1800px] w-full mx-auto">
+        <!-- ============================================ -->
+        <!-- CONTENUTO: Dettaglio Reperto / Bias          -->
+        <!-- ============================================ -->
+        <div class="flex-1 overflow-y-auto p-8 scroll-smooth">
+            <div class="max-w-[1600px] mx-auto">
 
-            <!-- SINISTRA: DATI BIAS (50%) -->
-            <div class="w-full lg:w-1/2 flex flex-col gap-6 overflow-y-auto pr-1">
-
-                <!-- Intestazione Bias -->
-                <div class="bg-tp-panel border border-tp-accent/30 rounded-xl p-6 shadow-[0_0_15px_rgba(32,201,151,0.05)] relative overflow-hidden">
-                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-tp-accent"></div>
-
-                    <div class="flex items-start justify-between mb-6">
-                        <div>
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">Archivio Bias</span>
-                            <h2 class="text-2xl font-black text-white mt-1">#BIAS-015</h2>
-                        </div>
-                        <span class="bg-tp-accent/10 border border-tp-accent/30 text-tp-accent text-xs font-bold px-3 py-1.5 rounded-lg uppercase tracking-widest flex items-center gap-2">
-                            <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Long (Buy)
-                        </span>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-y-5 gap-x-4">
-                        <div>
-                            <span class="text-[10px] uppercase font-bold text-tp-muted tracking-widest block mb-1">Asset</span>
-                            <span class="text-lg font-bold text-white">XAUUSD</span>
-                        </div>
-                        <div>
-                            <span class="text-[10px] uppercase font-bold text-tp-muted tracking-widest block mb-1">Data Archiviazione</span>
-                            <span class="text-sm font-bold text-white">2 Aprile 2026</span>
-                        </div>
-                        <div>
-                            <span class="text-[10px] uppercase font-bold text-tp-muted tracking-widest block mb-1">Timeframe HTF</span>
-                            <span class="text-sm font-bold text-tp-accent">H4 / Daily</span>
-                        </div>
-                    </div>
-
-                    <!-- Tag -->
-                    <div class="mt-5 pt-5 border-t border-tp-border">
-                        <span class="text-[10px] font-bold uppercase tracking-widest text-tp-muted block mb-3">Tag Catalogazione</span>
-                        <div class="flex flex-wrap gap-2">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-tp-bg border border-tp-border text-tp-muted uppercase">Struttura</span>
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-tp-bg border border-tp-border text-tp-muted uppercase">Liquidità</span>
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-tp-bg border border-tp-border text-tp-muted uppercase">FVG</span>
-                        </div>
-                    </div>
+                <!-- Torna indietro -->
+                <div class="flex items-center gap-2 mb-6 text-tp-muted hover:text-white transition-colors cursor-pointer w-fit" onclick="window.location.href='bias.html'">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span class="text-xs font-bold uppercase tracking-widest">Torna ai Reperti</span>
                 </div>
 
-                <!-- Analisi Testuale del Bias -->
-                <div class="bg-tp-panel border border-tp-border rounded-xl flex-1 flex flex-col p-6 shadow-lg">
-                    <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-4 border-b border-tp-border pb-2 flex items-center gap-2">
-                        <i data-lucide="brain" class="w-4 h-4 text-white"></i> Analisi Strutturale & Motivazione Bias
-                    </h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
 
-                    <textarea class="flex-1 w-full bg-[#0a0c10] border border-tp-border rounded-lg p-4 text-sm text-tp-text/90 outline-none resize-none min-h-[200px] placeholder-tp-muted/50 focus:border-tp-accent transition-colors shadow-inner leading-relaxed"
-                        placeholder="Descrivi qui il bias: struttura HTF, zone di interesse, motivazione direzionale...">Il Daily H4 è chiaramente bullish dopo aver rimbalzato sul FVG settimanale. Cerco long sui ritracciamenti nelle sessioni EU/NY, con target sulla liquidità precedente.
+                    <!-- SINISTRA: Dati Reperto -->
+                    <div id="bias-canvas" class="flex flex-col gap-6">
 
-Struttura: BOS rialzista confermato su H4. Ci sono minimi liquidi da raccogliere in zona 2250-2255 prima dell'impulso.
+                        <!-- Header Reperto -->
+                        <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
+                            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-tp-border/50">
+                                <div class="bg-tp-accent/10 p-2.5 rounded-lg border border-tp-accent/20">
+                                    <i data-lucide="microscope" class="w-6 h-6 text-tp-accent"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-xl font-bold text-white">Reperto</h2>
+                                    <span id="bias-id-display" class="text-[10px] font-bold text-tp-muted uppercase tracking-widest"></span>
+                                </div>
+                            </div>
 
-Setup atteso: entrare nel FVG su M15 dopo sweep dei minimi asiatici.</textarea>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    <!-- Controlli Salvataggio -->
-                    <div class="mt-4 flex items-center justify-between">
-                        <div class="flex gap-2">
-                            <span class="px-2 py-1 bg-tp-accent/10 border border-tp-accent/30 text-tp-accent text-[10px] font-bold rounded uppercase">Bias Attivo</span>
-                            <span class="px-2 py-1 bg-tp-bg border border-tp-border text-tp-muted text-[10px] font-bold rounded uppercase">0 Trades Correlati</span>
+                                <!-- Asset -->
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
+                                        <i data-lucide="coins" class="w-4 h-4 text-tp-accent"></i> Asset
+                                    </label>
+                                    <select id="bias-asset" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2.5 text-sm text-white font-bold outline-none focus:border-tp-accent transition-colors">
+                                        <option value="">Seleziona...</option>
+                                        <option value="XAUUSD">XAUUSD (Gold)</option>
+                                        <option value="EURUSD">EURUSD</option>
+                                        <option value="GBPUSD">GBPUSD</option>
+                                        <option value="US30">US30 (Dow Jones)</option>
+                                        <option value="NAS100">NAS100 (Nasdaq)</option>
+                                        <option value="DXY">DXY (Dollar Index)</option>
+                                        <option value="USDJPY">USDJPY</option>
+                                        <option value="BTCUSD">BTCUSD</option>
+                                    </select>
+                                </div>
+
+                                <!-- Data -->
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
+                                        <i data-lucide="calendar" class="w-4 h-4 text-tp-accent"></i> Data
+                                    </label>
+                                    <input id="bias-data" type="date" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2.5 text-sm text-white font-bold outline-none focus:border-tp-accent transition-colors">
+                                </div>
+
+                                <!-- Direzione -->
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
+                                        <i data-lucide="arrow-up-down" class="w-4 h-4 text-tp-accent"></i> Direzione
+                                    </label>
+                                    <div class="flex gap-3">
+                                        <button onclick="setDirection('LONG')" id="btn-long" class="dir-btn flex-1 px-4 py-3 rounded-lg text-sm font-bold border border-tp-border text-tp-muted uppercase transition-all flex items-center justify-center gap-2 hover:border-tp-accent/50">
+                                            <i data-lucide="trending-up" class="w-5 h-5"></i> Long
+                                        </button>
+                                        <button onclick="setDirection('SHORT')" id="btn-short" class="dir-btn flex-1 px-4 py-3 rounded-lg text-sm font-bold border border-tp-border text-tp-muted uppercase transition-all flex items-center justify-center gap-2 hover:border-tp-loss/50">
+                                            <i data-lucide="trending-down" class="w-5 h-5"></i> Short
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <button class="bg-tp-accent text-[#0a0c10] font-bold text-xs uppercase px-4 py-2 rounded-lg hover:bg-tp-accent/80 transition-colors flex items-center gap-2 shadow-sm">
-                            <i data-lucide="save" class="w-3.5 h-3.5"></i> Salva Note
-                        </button>
-                    </div>
-                </div>
 
-                <!-- Checklist Validazione Bias -->
-                <div class="bg-tp-panel border border-tp-border rounded-xl p-5">
-                    <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-4 flex items-center gap-2">
-                        <i data-lucide="check-square" class="w-4 h-4"></i> Checklist Validazione
-                    </h3>
-                    <div class="space-y-2">
-                        <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="checkbox" checked class="w-4 h-4 accent-[#20c997] cursor-pointer">
-                            <span class="text-sm text-tp-text/80 group-hover:text-white transition-colors">Trend HTF confermato (Daily / Weekly)</span>
-                        </label>
-                        <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="checkbox" checked class="w-4 h-4 accent-[#20c997] cursor-pointer">
-                            <span class="text-sm text-tp-text/80 group-hover:text-white transition-colors">BOS / CHoCH identificato su H4</span>
-                        </label>
-                        <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="checkbox" class="w-4 h-4 accent-[#20c997] cursor-pointer">
-                            <span class="text-sm text-tp-text/80 group-hover:text-white transition-colors">Zona di reazione (FVG / OB / SSL) localizzata</span>
-                        </label>
-                        <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="checkbox" class="w-4 h-4 accent-[#20c997] cursor-pointer">
-                            <span class="text-sm text-tp-text/80 group-hover:text-white transition-colors">Liquidità target identificata (Highs / Lows)</span>
-                        </label>
-                        <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="checkbox" class="w-4 h-4 accent-[#20c997] cursor-pointer">
-                            <span class="text-sm text-tp-text/80 group-hover:text-white transition-colors">Sessione ottimale per il setup verificata</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
+                        <!-- Commento -->
+                        <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
+                                <i data-lucide="align-left" class="w-4 h-4 text-tp-accent"></i> Commento
+                            </label>
+                            <textarea id="bias-commento" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-4 py-3 text-sm text-tp-text/90 outline-none min-h-[150px] resize-none focus:border-tp-accent transition-colors leading-relaxed" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="Descrivi il bias, il pattern strutturale o l'inefficienza individuata..."></textarea>
+                        </div>
 
-            <!-- DESTRA: SCREENSHOT & PROVE VISIVE (50%) -->
-            <div class="w-full lg:w-1/2 flex flex-col gap-6">
+                        <!-- Categorizzatore Universale -->
+                        <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
+                                <i data-lucide="link" class="w-4 h-4 text-tp-accent"></i> Categorizzatore Universale
+                            </label>
 
-                <!-- Area Screenshot Principale -->
-                <div class="bg-tp-panel border border-tp-border rounded-xl flex-1 flex flex-col p-6 shadow-xl">
-                    <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-4 flex items-center justify-between">
-                        <span class="flex items-center gap-2"><i data-lucide="image" class="w-4 h-4"></i> Screenshot Struttura HTF</span>
-                        <span class="text-[10px] bg-tp-bg px-2 py-0.5 rounded text-tp-muted border border-tp-border">1 / 1</span>
-                    </h3>
+                            <!-- Tab -->
+                            <div class="flex gap-2 mb-4">
+                                <button onclick="switchCatTab('cronache')" id="cat-tab-cronache" class="cat-tab active flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase transition-all">Cronache</button>
+                                <button onclick="switchCatTab('strategie')" id="cat-tab-strategie" class="cat-tab flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase transition-all">Strategia</button>
+                                <button onclick="switchCatTab('trades')" id="cat-tab-trades" class="cat-tab flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-blue-500 text-blue-400 bg-blue-500/10 uppercase transition-all">Trade</button>
+                            </div>
 
-                    <!-- Drop Zone Screenshot -->
-                    <div class="drop-zone flex-1 min-h-[320px] border-2 border-dashed border-tp-border rounded-xl flex flex-col items-center justify-center cursor-pointer bg-[#0a0c10] hover:border-tp-accent/50 transition-all group relative overflow-hidden"
-                         onclick="document.getElementById('screenshot-upload').click()">
-                        <div class="absolute inset-0 bg-gradient-to-b from-tp-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <i data-lucide="upload-cloud" class="w-12 h-12 text-tp-border group-hover:text-tp-accent/50 mb-3 transition-colors"></i>
-                        <p class="text-tp-muted text-sm font-bold group-hover:text-white transition-colors">Clicca o trascina screenshot HTF</p>
-                        <p class="text-tp-muted/60 text-xs mt-1">PNG, JPG, WebP • Daily, H4, H1</p>
-                        <input type="file" id="screenshot-upload" accept="image/*" class="hidden" onchange="previewScreenshot(this)">
+                            <!-- Selettori dinamici -->
+                            <div id="cat-cronache" class="cat-panel">
+                                <select id="sel-cronache" multiple class="w-full bg-[#0a0c10] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[100px]">
+                                    <!-- Caricato da Supabase -->
+                                </select>
+                                <p class="text-[10px] text-tp-muted mt-1">Ctrl+Click per selezione multipla</p>
+                            </div>
+                            <div id="cat-strategie" class="cat-panel hidden">
+                                <select id="sel-strategie" multiple class="w-full bg-[#0a0c10] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none h-[100px]">
+                                    <!-- Caricato da Supabase -->
+                                </select>
+                                <p class="text-[10px] text-tp-muted mt-1">Ctrl+Click per selezione multipla</p>
+                            </div>
+                            <div id="cat-trades" class="cat-panel hidden">
+                                <select id="sel-trades" multiple class="w-full bg-[#0a0c10] border border-blue-500/30 rounded-lg px-3 py-2 text-xs text-blue-400 font-bold outline-none h-[100px]">
+                                    <!-- Caricato da Supabase -->
+                                </select>
+                                <p class="text-[10px] text-tp-muted mt-1">Ctrl+Click per selezione multipla</p>
+                            </div>
+                        </div>
+
+                        <!-- Azioni -->
+                        <div class="flex gap-3">
+                            <button id="save-btn" onclick="saveBias()" class="flex-1 bg-tp-accent hover:bg-tp-accent/80 text-[#0a0c10] font-bold text-sm py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Salva Reperto
+                            </button>
+                            <button onclick="deleteBias()" class="bg-tp-bg border border-tp-loss/30 hover:bg-tp-loss/10 text-tp-loss font-bold text-sm px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Preview immagine (nascosta di default) -->
-                    <div id="screenshot-preview" class="hidden flex-1 min-h-[320px] relative rounded-xl overflow-hidden mt-0">
-                        <img id="preview-img" src="" alt="Screenshot Bias" class="w-full h-full object-contain bg-[#0a0c10]">
-                        <button onclick="clearScreenshot()" class="absolute top-3 right-3 bg-tp-bg/80 border border-tp-border rounded-lg p-1.5 text-tp-muted hover:text-tp-loss hover:border-tp-loss transition-colors backdrop-blur-sm">
-                            <i data-lucide="x" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
+                    <!-- DESTRA: Screenshot -->
+                    <div class="flex flex-col gap-6">
+                        <div class="bg-tp-panel border border-tp-border rounded-xl flex flex-col p-6 shadow-xl">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2">
+                                    <i data-lucide="image" class="w-4 h-4"></i> Screenshot
+                                </h3>
+                                <label class="text-[10px] text-tp-accent hover:text-white uppercase font-bold tracking-widest transition-colors flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="upload" class="w-3 h-3"></i> Carica
+                                    <input type="file" accept="image/*" multiple class="hidden" onchange="handleScreenshots(this.files)">
+                                </label>
+                            </div>
 
-                <!-- Metriche Rapide -->
-                <div class="grid grid-cols-3 gap-4">
-                    <div class="bg-tp-panel border border-tp-border rounded-xl p-4 flex flex-col items-center justify-center">
-                        <span class="text-[10px] uppercase font-bold text-tp-muted tracking-widest mb-2">Direzione</span>
-                        <i data-lucide="trending-up" class="w-8 h-8 text-tp-accent mb-1 drop-shadow-[0_0_8px_rgba(32,201,151,0.5)]"></i>
-                        <span class="text-xs font-bold text-tp-accent uppercase">Long</span>
-                    </div>
-                    <div class="bg-tp-panel border border-tp-border rounded-xl p-4 flex flex-col items-center justify-center">
-                        <span class="text-[10px] uppercase font-bold text-tp-muted tracking-widest mb-2">Durata</span>
-                        <span class="text-2xl font-black text-white leading-none">2</span>
-                        <span class="text-xs text-tp-muted mt-1">giorni attivo</span>
-                    </div>
-                    <div class="bg-tp-panel border border-tp-border rounded-xl p-4 flex flex-col items-center justify-center">
-                        <span class="text-[10px] uppercase font-bold text-tp-muted tracking-widest mb-2">Trades</span>
-                        <span class="text-2xl font-black text-white leading-none">0</span>
-                        <span class="text-xs text-tp-muted mt-1">correlati</span>
-                    </div>
-                </div>
+                            <div id="screenshots-grid" class="grid grid-cols-1 gap-4">
+                                <!-- Screenshots caricati dinamicamente -->
 
-                <!-- Note di Invalidazione -->
-                <div class="bg-tp-panel border border-tp-border rounded-xl p-5">
-                    <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-3 flex items-center gap-2">
-                        <i data-lucide="alert-triangle" class="w-4 h-4 text-tp-warning"></i> Scenari di Invalidazione
-                    </h3>
-                    <textarea class="w-full bg-[#0a0c10] border border-tp-border rounded-lg p-3 text-xs text-tp-text/90 outline-none min-h-[80px] resize-none placeholder-tp-muted/50 focus:border-tp-warning transition-colors shadow-inner"
-                        placeholder="Descrivi quando questo bias viene invalidato (es: rottura del minimo H4, chiusura sotto zona X)...">Bias invalidato se chiusura Daily sotto 2230. Rivalutare in caso di notizie macro US avverse (NFP, CPI).</textarea>
+                                <!-- Dropzone -->
+                                <label class="border-2 border-dashed border-tp-border rounded-xl flex flex-col items-center justify-center text-tp-muted cursor-pointer hover:border-tp-accent/50 hover:text-tp-accent hover:bg-tp-accent/5 transition-all min-h-[300px]">
+                                    <i data-lucide="upload-cloud" class="w-12 h-12 mb-3 opacity-40"></i>
+                                    <span class="text-sm font-bold">Clicca o trascina screenshot</span>
+                                    <span class="text-[10px] mt-1 opacity-60">PNG, JPG, WebP</span>
+                                    <input type="file" accept="image/*" multiple class="hidden" onchange="handleScreenshots(this.files)">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
+    <script src="app.js"></script>
     <script>
-        // Clock
-        function updateClock() {
-            const now = new Date();
-            const h = String(now.getHours()).padStart(2, '0');
-            const m = String(now.getMinutes()).padStart(2, '0');
-            const s = String(now.getSeconds()).padStart(2, '0');
-            const el = document.getElementById('digital-clock');
-            if (el) el.textContent = h + ':' + m + ':' + s;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+        // ============================================
+        // DETTAGLIO BIAS / REPERTO - Supabase Logic
+        // ============================================
 
-        // Screenshot preview
-        function previewScreenshot(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('preview-img').src = e.target.result;
-                    document.getElementById('screenshot-preview').classList.remove('hidden');
-                    document.getElementById('screenshot-preview').classList.add('flex');
-                    input.closest('.drop-zone').classList.add('hidden');
-                };
-                reader.readAsDataURL(input.files[0]);
+        const biasId = new URLSearchParams(window.location.search).get('id');
+        let currentDirection = '';
+        let screenshots = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            lucide.createIcons();
+
+            if (!db) { alert('Supabase non inizializzato.'); return; }
+
+            if (!biasId) {
+                // Nuovo reperto
+                try {
+                    const today = new Date().toISOString().split('T')[0];
+                    const { data, error } = await db
+                        .from('bias')
+                        .insert({ data: today, asset: '' })
+                        .select()
+                        .single();
+                    if (error) { alert('Errore creazione: ' + error.message); return; }
+                    window.location.href = `dettaglio_bias.html?id=${data.id}`;
+                } catch (e) { alert('Errore: ' + e.message); }
+                return;
             }
+
+            await loadBias();
+            await loadCategorizers();
+        });
+
+        // --- LOAD BIAS ---
+        async function loadBias() {
+            const { data, error } = await db
+                .from('bias')
+                .select('*')
+                .eq('id', biasId)
+                .single();
+
+            if (error || !data) { console.error(error); return; }
+
+            document.getElementById('bias-id-display').textContent = `ID: ${data.id.substring(0, 8)}`;
+            document.getElementById('bias-asset').value = data.asset || '';
+            document.getElementById('bias-data').value = data.data || '';
+            document.getElementById('bias-commento').value = data.commento || data.confluenze || '';
+
+            if (data.direzione) setDirection(data.direzione);
+
+            screenshots = data.screenshots || [];
+            renderScreenshots();
+
+            // Restore categorizzatori selections
+            if (data.categorizzatori) {
+                setTimeout(() => {
+                    restoreSelections('sel-cronache', data.categorizzatori.cronache || []);
+                    restoreSelections('sel-strategie', data.categorizzatori.strategie || []);
+                    restoreSelections('sel-trades', data.categorizzatori.trades || []);
+                }, 500);
+            }
+
+            // Auto-resize textarea
+            const ta = document.getElementById('bias-commento');
+            ta.style.height = '';
+            ta.style.height = ta.scrollHeight + 'px';
         }
 
-        function clearScreenshot() {
-            document.getElementById('screenshot-preview').classList.add('hidden');
-            document.getElementById('screenshot-preview').classList.remove('flex');
-            document.getElementById('screenshot-upload').value = '';
-            document.querySelector('.drop-zone').classList.remove('hidden');
-        }
-
-        // Drag & Drop
-        const dropZone = document.querySelector('.drop-zone');
-        if (dropZone) {
-            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-            dropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dropZone.classList.remove('dragover');
-                const file = e.dataTransfer.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    const input = document.getElementById('screenshot-upload');
-                    const dt = new DataTransfer();
-                    dt.items.add(file);
-                    input.files = dt.files;
-                    previewScreenshot(input);
-                }
+        function restoreSelections(selectId, ids) {
+            const sel = document.getElementById(selectId);
+            Array.from(sel.options).forEach(opt => {
+                opt.selected = ids.includes(opt.value);
             });
         }
 
-        // Init Lucide icons
-        lucide.createIcons();
+        // --- DIRECTION ---
+        function setDirection(dir) {
+            currentDirection = dir;
+            const btnLong = document.getElementById('btn-long');
+            const btnShort = document.getElementById('btn-short');
+
+            btnLong.classList.remove('active-long');
+            btnShort.classList.remove('active-short');
+
+            if (dir === 'LONG') btnLong.classList.add('active-long');
+            if (dir === 'SHORT') btnShort.classList.add('active-short');
+        }
+
+        // --- CATEGORIZER TABS ---
+        function switchCatTab(tab) {
+            document.querySelectorAll('.cat-panel').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('cat-' + tab).classList.remove('hidden');
+            document.getElementById('cat-tab-' + tab).classList.add('active');
+        }
+
+        // --- LOAD CATEGORIZERS FROM DB ---
+        async function loadCategorizers() {
+            // Cronache
+            const { data: cronache } = await db.from('cronache').select('id, data, titolo').order('data', { ascending: false }).limit(20);
+            const selCron = document.getElementById('sel-cronache');
+            (cronache || []).forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = `${c.data} - ${c.titolo}`;
+                selCron.appendChild(opt);
+            });
+
+            // Strategie
+            const { data: strategie } = await db.from('strategie').select('id, nome').order('nome');
+            const selStrat = document.getElementById('sel-strategie');
+            (strategie || []).forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = s.nome;
+                selStrat.appendChild(opt);
+            });
+
+            // Trades
+            const { data: trades } = await db.from('trades').select('id, asset, direzione, data').order('data', { ascending: false }).limit(30);
+            const selTrades = document.getElementById('sel-trades');
+            (trades || []).forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                const d = new Date(t.data).toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
+                opt.textContent = `${t.asset} ${t.direzione} - ${d}`;
+                selTrades.appendChild(opt);
+            });
+        }
+
+        function getSelectedValues(selectId) {
+            const sel = document.getElementById(selectId);
+            return Array.from(sel.selectedOptions).map(o => o.value);
+        }
+
+        // --- SCREENSHOTS ---
+        function renderScreenshots() {
+            const grid = document.getElementById('screenshots-grid');
+            const dropzone = grid.querySelector('label');
+            grid.querySelectorAll('.screenshot-item').forEach(el => el.remove());
+
+            screenshots.forEach((src, i) => {
+                const div = document.createElement('div');
+                div.className = 'screenshot-item relative group rounded-xl overflow-hidden border border-tp-border';
+                div.innerHTML = `
+                    <img src="${src}" class="w-full max-h-[400px] object-contain bg-[#0a0c10]" alt="Screenshot">
+                    <button onclick="removeScreenshot(${i})" class="absolute top-2 right-2 bg-black/70 text-tp-loss p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                `;
+                grid.insertBefore(div, dropzone);
+            });
+            lucide.createIcons();
+        }
+
+        function handleScreenshots(files) {
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    screenshots.push(e.target.result);
+                    renderScreenshots();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function removeScreenshot(index) {
+            screenshots.splice(index, 1);
+            renderScreenshots();
+        }
+
+        // --- SAVE ---
+        async function saveBias() {
+            const btn = document.getElementById('save-btn');
+            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvando...';
+            btn.disabled = true;
+
+            const payload = {
+                asset: document.getElementById('bias-asset').value,
+                data: document.getElementById('bias-data').value,
+                direzione: currentDirection,
+                commento: document.getElementById('bias-commento').value,
+                screenshots: screenshots,
+                categorizzatori: {
+                    cronache: getSelectedValues('sel-cronache'),
+                    strategie: getSelectedValues('sel-strategie'),
+                    trades: getSelectedValues('sel-trades')
+                }
+            };
+
+            const { error } = await db
+                .from('bias')
+                .update(payload)
+                .eq('id', biasId);
+
+            if (error) {
+                btn.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4"></i> Errore!';
+                btn.classList.replace('bg-tp-accent', 'bg-tp-loss');
+                setTimeout(() => {
+                    btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Salva Reperto';
+                    btn.classList.replace('bg-tp-loss', 'bg-tp-accent');
+                    btn.disabled = false;
+                    lucide.createIcons();
+                }, 2000);
+                alert('Errore: ' + error.message);
+                return;
+            }
+
+            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Salvato!';
+            const canvas = document.getElementById('bias-canvas');
+            canvas.classList.add('save-flash');
+            setTimeout(() => canvas.classList.remove('save-flash'), 600);
+            setTimeout(() => {
+                btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Salva Reperto';
+                btn.disabled = false;
+                lucide.createIcons();
+            }, 1500);
+        }
+
+        // --- DELETE ---
+        async function deleteBias() {
+            if (!confirm('Eliminare questo reperto?')) return;
+            const { error } = await db.from('bias').delete().eq('id', biasId);
+            if (!error) window.location.href = 'bias.html';
+        }
     </script>
 </body>
 </html>

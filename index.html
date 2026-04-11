@@ -36,7 +36,7 @@
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
-                        display: ['Inter', 'sans-serif'] // For handwritten-like titles if needed, using extra bold
+                        display: ['Inter', 'sans-serif']
                     }
                 }
             }
@@ -111,13 +111,7 @@
 
 <body class="bg-tp-bg text-tp-text font-sans h-screen w-screen flex overflow-hidden">
 
-    <!-- Sidebar Architecture -->
-    <!-- Predisposto per essere convertito in componente React/Cursor (es. <Sidebar />) -->
     <!-- Sidebar Universale -->
-    <!-- Sidebar Universale -->
-    <!-- Sidebar Universale -->
-        <!-- Sidebar Universale -->
-        <!-- Sidebar Universale -->
     <aside class="w-16 hover:w-64 border-r border-tp-border flex flex-col flex-shrink-0 bg-tp-bg transition-all duration-300 z-50 absolute h-full lg:relative group">
         <!-- Logo Area Team Design -->
         <div class="h-24 flex items-center justify-center lg:justify-start px-3 gap-4 border-b border-tp-border/50 overflow-hidden cursor-default w-full">
@@ -126,19 +120,19 @@
             </div>
             <span class="text-xl font-extrabold tracking-tighter uppercase font-display select-none opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300">Trade<span class="text-[#20c997] ml-1">Desk</span></span>
         </div>
-        
+
         <!-- Navigation Links Universali -->
         <nav class="flex-1 overflow-x-hidden overflow-y-auto py-6 space-y-2 flex flex-col w-full group">
             <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span>
             </a>
-            
+
             <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span>
             </a>
-            
+
             <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span>
@@ -148,14 +142,14 @@
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span>
             </a>
-            
+
             <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span>
             </a>
-            
+
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-            
+
             <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span>
@@ -170,12 +164,17 @@
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span>
             </a>
-            
+
+            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span>
+            </a>
+
             <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span>
             </a>
-            
+
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
 
             <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
@@ -185,38 +184,10 @@
         </nav>
     </aside>
 
-
-
-
-
-
-
     <!-- Main Workspace Architecture -->
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#0e1116]">
 
-        <!-- Action Header -->
-        <!-- Predisposto per "Header" -->
-        <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-        <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-        <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-        <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-        <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-        <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-        <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
+        <!-- HEADER UNIVERSALE -->
         <header
             class="flex justify-between items-center px-8 py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
 
@@ -286,7 +257,7 @@
                         class="w-5 h-5 text-tp-accent transition-all duration-300 drop-shadow-md"></i>
                 </div>
                 <div class="w-px h-6 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
-                <div class="flex flex-col items-center group relative cursor-pointer" title="Volatilità">
+                <div class="flex flex-col items-center group relative cursor-pointer" title="Volatilita">
                     <i id="volatility-icon-wrapper" data-lucide="dollar-sign"
                         class="w-5 h-5 text-tp-accent drop-shadow-[0_0_8px_rgba(32,201,151,0.6)] transition-all"></i>
                 </div>
@@ -317,35 +288,9 @@
 
         </header>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         <!-- Grid Workspace (Scrollable Area) -->
         <div class="flex-1 overflow-y-auto p-8">
-            <!-- The 3 Column CSS Grid matching sketch -->
+            <!-- The 3 Column CSS Grid -->
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 pb-12">
 
                 <!-- /// LEFT COLUMN (Col Span: 3) /// -->
@@ -360,16 +305,15 @@
                                     class="w-4 h-4"></i></button>
                         </div>
                         <div class="relative w-full h-40">
-                            <canvas id="paniereChart"></canvas>
+                            <canvas id="dashPaniereChart"></canvas>
                         </div>
                         <!-- Bottone Snapshot & Log -->
                         <div class="mt-4 border-t border-tp-border/50 pt-4">
                             <button onclick="recordDollarStrength()"
                                 class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-bold bg-tp-accent/10 border border-tp-accent text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors">
-                                <i data-lucide="camera" class="w-3.5 h-3.5"></i> Registra Dato Attuale
+                                <i data-lucide="camera" class="w-3.5 h-3.5"></i> Registra Dato
                             </button>
                             <ul class="dollar-strength-log mt-3 space-y-1 max-h-32 overflow-y-auto custom-scroll">
-                                <!-- Logs appariranno qui -->
                             </ul>
                         </div>
                     </div>
@@ -377,10 +321,9 @@
                     <!-- Box 2: Il Nome di Allah del Giorno -->
                     <div
                         class="bg-gradient-to-br from-[#161920] to-[#0a0c10] rounded-xl border border-[#20c997]/20 p-5 flex-1 min-h-[300px] shadow-[0_0_15px_rgba(32,201,151,0.05)] relative overflow-hidden group">
-                        <!-- Mock Data -->
                         <div
                             class="absolute -right-6 -top-6 opacity-10 rotate-12 transform group-hover:rotate-6 transition-transform duration-700 pointer-events-none">
-                            <span id="allah-bg-text" class="text-[10rem] font-display text-white">الله‎</span>
+                            <span id="allah-bg-text" class="text-[10rem] font-display text-white">&#1575;&#1604;&#1604;&#1607;</span>
                         </div>
                         <div
                             class="flex items-center justify-between mb-4 border-b border-tp-border/50 pb-3 relative z-10">
@@ -398,8 +341,7 @@
                             <div class="w-12 h-1 bg-[#20c997] mt-5 mb-4 rounded-full opacity-40"></div>
                             <p id="allah-desc"
                                 class="text-sm text-tp-text/80 leading-relaxed max-w-[95%] italic border-l-2 border-tp-border pl-3">
-                                Colui la cui misericordia abbraccia incondizionatamente ogni cosa. Lascia che la
-                                compassione guidi oggi le tue azioni sul mercato, evitando avidità e fomo.
+                                Colui la cui misericordia abbraccia incondizionatamente ogni cosa creata nell'universo.
                             </p>
                         </div>
                     </div>
@@ -408,9 +350,9 @@
                 <!-- /// CENTER COLUMN (Col Span: 6) /// -->
                 <div class="xl:col-span-6 flex flex-col gap-6">
 
-                    <!-- Box 3: Workflow & Eventi Sessione -->
+                    <!-- Box 3: Processi Attivi -->
                     <div
-                        class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col h-[400px] shadow-lg relative overflow-hidden">
+                        class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col min-h-[400px] shadow-lg relative overflow-hidden">
                         <div
                             class="absolute inset-0 bg-gradient-to-br from-tp-accent/5 to-transparent pointer-events-none">
                         </div>
@@ -420,121 +362,23 @@
                                 <i data-lucide="activity" class="w-4 h-4 text-tp-accent"></i>
                                 <h3 class="text-xs font-bold uppercase tracking-widest text-white">PROCESSI ATTIVI</h3>
                             </div>
-                            <span
-                                class="bg-tp-accent/20 text-tp-accent px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-tp-accent/20 cursor-pointer hover:bg-tp-accent/30 transition-colors flex items-center gap-1">
-                                <i data-lucide="check-circle" class="w-3 h-3"></i> 1 in attesa
+                            <span id="processi-badge"
+                                class="bg-tp-accent/20 text-tp-accent px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-tp-accent/20 flex items-center gap-1">
+                                <i data-lucide="check-circle" class="w-3 h-3"></i> <span id="processi-count">0</span> in attesa
                             </span>
                         </div>
 
                         <!-- Lista dei Ticket/Flussi attivi -->
-                        <div class="flex-1 overflow-y-auto space-y-3 pr-2 custom-scroll relative z-10">
-
-                            <!-- Ticket 1: Trade in Attesa -->
-                            <div
-                                class="bg-[#0a0c10] border border-tp-border hover:border-tp-accent/40 rounded-lg p-3 transition-all group shadow-sm relative overflow-hidden">
-                                <div class="absolute inset-y-0 left-0 w-1 bg-tp-warning/80"></div>
-                                <div class="flex justify-between items-start ml-2">
-                                    <div class="flex flex-col gap-1 flex-1 pr-4">
-                                        <div class="flex items-center gap-2">
-                                            <span
-                                                class="bg-tp-warning/10 text-tp-warning border border-tp-warning/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest">Esecuzione
-                                                Da Taggare</span>
-                                            <h4
-                                                class="text-sm font-bold text-white group-hover:text-tp-accent transition-colors">
-                                                Trade XAUUSD Eseguito</h4>
-                                        </div>
-                                        <p class="text-[10px] text-tp-muted leading-relaxed">Trade concluso per SL/TP.
-                                            Compilare Screen, Strategia e Mindset per archivio.</p>
-                                    </div>
-                                    <!-- Azioni -->
-                                    <div class="flex gap-1.5 mt-1 shrink-0">
-                                        <button onclick="window.location.href='dettaglio_trade.html'"
-                                            class="bg-tp-border hover:bg-tp-accent/20 hover:text-tp-accent text-tp-text rounded p-2 transition-colors border border-transparent hover:border-tp-accent/30"
-                                            title="Apri Compilazione">
-                                            <i data-lucide="edit-3" class="w-4 h-4"></i>
-                                        </button>
-                                        <button onclick="this.closest('.group').remove()"
-                                            class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-2 transition-colors border border-transparent hover:border-tp-loss/30"
-                                            title="Ignora Evento">
-                                            <i data-lucide="x" class="w-4 h-4"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                        <div id="processi-list" class="flex-1 overflow-y-auto space-y-3 pr-2 custom-scroll relative z-10">
+                            <!-- Populated by JS -->
+                            <div class="flex items-center justify-center h-32 text-tp-muted text-sm">
+                                <i data-lucide="loader-2" class="w-5 h-5 animate-spin mr-2"></i> Caricamento...
                             </div>
-
-                            <!-- Ticket 2: Notizia Macro in Attesa -->
-                            <div
-                                class="bg-[#0a0c10] border border-tp-border hover:border-purple-500/40 rounded-lg p-3 transition-all group shadow-sm relative overflow-hidden">
-                                <div class="absolute inset-y-0 left-0 w-1 bg-purple-500/80"></div>
-                                <div class="flex justify-between items-start ml-2">
-                                    <div class="flex flex-col gap-1 flex-1 pr-4">
-                                        <div class="flex items-center gap-2">
-                                            <span
-                                                class="bg-purple-500/10 text-purple-400 border border-purple-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest">Dato
-                                                Macro Rilasciato</span>
-                                            <h4
-                                                class="text-sm font-bold text-white group-hover:text-purple-400 transition-colors">
-                                                Non-Farm Payrolls (NFP)</h4>
-                                        </div>
-                                        <p class="text-[10px] text-tp-muted leading-relaxed">L'orario è scattato.
-                                            Inserire Actual per archiviare andamento Mercati/Notizia DB.</p>
-                                    </div>
-                                    <!-- Azioni -->
-                                    <div class="flex gap-1.5 mt-1 shrink-0">
-                                        <button
-                                            onclick="document.getElementById('modal-news-alert').classList.add('open')"
-                                            class="bg-tp-border hover:bg-purple-500/20 hover:text-purple-400 text-tp-text rounded p-2 transition-colors border border-transparent hover:border-purple-500/30"
-                                            title="Apri Controllo Notizia">
-                                            <i data-lucide="edit-3" class="w-4 h-4"></i>
-                                        </button>
-                                        <button onclick="this.closest('.group').remove()"
-                                            class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-2 transition-colors border border-transparent hover:border-tp-loss/30"
-                                            title="Ignora Notizia">
-                                            <i data-lucide="x" class="w-4 h-4"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Ticket 3: Giornata Aperta -->
-                            <div
-                                class="bg-[#0a0c10] border border-tp-border hover:border-teal-500/40 rounded-lg p-3 transition-all group shadow-sm relative overflow-hidden">
-                                <div class="absolute inset-y-0 left-0 w-1 bg-teal-500/80"></div>
-                                <div class="flex justify-between items-start ml-2">
-                                    <div class="flex flex-col gap-1 flex-1 pr-4">
-                                        <div class="flex items-center gap-2">
-                                            <span
-                                                class="bg-teal-500/10 text-teal-400 border border-teal-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest">Giornata
-                                                Iniziata</span>
-                                            <h4
-                                                class="text-sm font-bold text-white group-hover:text-teal-400 transition-colors">
-                                                Sessione 3 Aprile Open</h4>
-                                        </div>
-                                        <p class="text-[10px] text-tp-muted leading-relaxed">Checklist pre-market
-                                            completata. Andamento tracciato sul Diario.</p>
-                                    </div>
-                                    <!-- Azioni -->
-                                    <div class="flex gap-1.5 mt-1 shrink-0">
-                                        <!-- Collegamento per aprire direttamente a pagina intera o anche una finestra modale in futuro -->
-                                        <button onclick="window.location.href='dettaglio_giornata.html'"
-                                            class="bg-tp-border hover:bg-teal-500/20 hover:text-teal-400 text-tp-text rounded p-2 transition-colors border border-transparent hover:border-teal-500/30"
-                                            title="Apri Pagina del Giorno">
-                                            <i data-lucide="edit-3" class="w-4 h-4"></i>
-                                        </button>
-                                        <button onclick="this.closest('.group').remove()"
-                                            class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-2 transition-colors border border-transparent hover:border-tp-loss/30"
-                                            title="Chiudi/Elimina Giornata">
-                                            <i data-lucide="x" class="w-4 h-4"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
 
-                    <!-- Box 4: Calendario Macro (Custom UI) -->
-                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 h-[450px] flex flex-col shadow-lg">
+                    <!-- Box 4: Calendario Notizie -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 min-h-[450px] flex flex-col shadow-lg">
                         <div class="flex flex-col gap-3 mb-4 border-b border-tp-border/50 pb-3">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
@@ -545,129 +389,31 @@
                             </div>
                             <div class="flex items-center justify-between">
                                 <!-- Bottoni Time Frame (Oggi, Domani, Settimana) -->
-                                <div class="flex gap-1 bg-[#0a0c10] border border-tp-border p-1 rounded-lg">
-                                    <button
-                                        class="bg-tp-accent/20 text-tp-accent px-2 py-1 rounded text-[9px] font-bold uppercase transition-colors">Oggi</button>
-                                    <button
-                                        class="text-tp-muted hover:text-white px-2 py-1 rounded text-[9px] font-bold uppercase transition-colors">Domani</button>
-                                    <button
-                                        class="text-tp-muted hover:text-white px-2 py-1 rounded text-[9px] font-bold uppercase transition-colors">Settimana</button>
+                                <div id="cal-time-filters" class="flex gap-1 bg-[#0a0c10] border border-tp-border p-1 rounded-lg">
+                                    <button data-filter="oggi"
+                                        class="cal-time-btn active bg-tp-accent/20 text-tp-accent px-2 py-1 rounded text-[9px] font-bold uppercase transition-colors">Oggi</button>
+                                    <button data-filter="domani"
+                                        class="cal-time-btn text-tp-muted hover:text-white px-2 py-1 rounded text-[9px] font-bold uppercase transition-colors">Domani</button>
+                                    <button data-filter="settimana"
+                                        class="cal-time-btn text-tp-muted hover:text-white px-2 py-1 rounded text-[9px] font-bold uppercase transition-colors">Settimana</button>
                                 </div>
-                                <!-- Filtri impatto mockup -->
-                                <div class="flex gap-1.5">
-                                    <span
-                                        class="bg-tp-loss/10 text-tp-loss border border-tp-loss/20 px-2 py-1 rounded text-[9px] font-bold uppercase cursor-pointer hover:bg-tp-loss hover:text-white transition-colors">High</span>
-                                    <span
-                                        class="bg-tp-warning/10 text-tp-warning border border-tp-warning/20 px-2 py-1 rounded text-[9px] font-bold uppercase cursor-pointer hover:bg-tp-warning hover:text-[#0a0c10] transition-colors">Med</span>
-                                    <span
-                                        class="bg-tp-bg border border-tp-border text-tp-muted px-2 py-1 rounded text-[9px] font-bold uppercase cursor-pointer hover:bg-tp-border hover:text-white transition-colors">Low</span>
+                                <!-- Filtri impatto -->
+                                <div id="cal-impact-filters" class="flex gap-1.5">
+                                    <button data-impact="high"
+                                        class="cal-impact-btn active bg-tp-loss/10 text-tp-loss border border-tp-loss/20 px-2 py-1 rounded text-[9px] font-bold uppercase cursor-pointer hover:bg-tp-loss hover:text-white transition-colors">High</button>
+                                    <button data-impact="medium"
+                                        class="cal-impact-btn active bg-tp-warning/10 text-tp-warning border border-tp-warning/20 px-2 py-1 rounded text-[9px] font-bold uppercase cursor-pointer hover:bg-tp-warning hover:text-[#0a0c10] transition-colors">Med</button>
+                                    <button data-impact="low"
+                                        class="cal-impact-btn active bg-tp-bg border border-tp-border text-tp-muted px-2 py-1 rounded text-[9px] font-bold uppercase cursor-pointer hover:bg-tp-border hover:text-white transition-colors">Low</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Lista Notizie -->
-                        <div class="flex-1 overflow-y-auto space-y-2.5 pr-2 custom-scroll">
-
-                            <!-- Notizia High Impact -->
-                            <div onclick="document.getElementById('modal-news-alert').classList.add('open')"
-                                class="cursor-pointer flex items-center justify-between p-3 bg-[#0a0c10] border border-tp-border rounded-lg group hover:border-tp-accent/30 transition-colors">
-                                <div class="flex items-center gap-3 md:gap-4">
-                                    <span class="text-sm font-bold text-white tabular-nums">14:30</span>
-                                    <div class="w-px h-6 bg-tp-border"></div>
-                                    <span
-                                        class="text-[10px] font-bold bg-[#14231f] text-white border border-tp-border px-1.5 py-0.5 rounded">USD</span>
-                                    <!-- Expected Volatility Impact -->
-                                    <div class="flex gap-0.5 ml-1" title="High Impact">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-loss"></div>
-                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-loss"></div>
-                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-loss"></div>
-                                    </div>
-                                    <span
-                                        class="text-xs md:text-sm font-medium text-tp-text ml-1 md:ml-2 truncate max-w-[120px] md:max-w-xs">Non-Farm
-                                        Employment Change</span>
-                                </div>
-                                <button
-                                    class="text-tp-muted hover:text-[#eab308] opacity-50 group-hover:opacity-100 transition-all shrink-0"
-                                    title="Imposta Alert a -15m">
-                                    <i data-lucide="bell" class="w-4 h-4"></i>
-                                </button>
+                        <div id="calendario-list" class="flex-1 overflow-y-auto space-y-2.5 pr-2 custom-scroll">
+                            <div class="flex items-center justify-center h-32 text-tp-muted text-sm">
+                                <i data-lucide="loader-2" class="w-5 h-5 animate-spin mr-2"></i> Caricamento...
                             </div>
-
-                            <!-- Notizia High Impact con Alert Attivato -->
-                            <div onclick="document.getElementById('modal-news-alert').classList.add('open')"
-                                class="cursor-pointer flex items-center justify-between p-3 bg-[#0a0c10] border border-[#eab308]/40 rounded-lg group transition-colors relative overflow-hidden">
-                                <!-- Indicatore Alert attivo -->
-                                <div
-                                    class="absolute left-0 top-0 bottom-0 w-1 bg-[#eab308] shadow-[0_0_10px_rgba(234,179,8,0.8)]">
-                                </div>
-
-                                <div class="flex items-center gap-3 md:gap-4 ml-1">
-                                    <span class="text-sm font-bold text-white tabular-nums">14:30</span>
-                                    <div class="w-px h-6 bg-tp-border"></div>
-                                    <span
-                                        class="text-[10px] font-bold bg-[#14231f] text-white border border-tp-border px-1.5 py-0.5 rounded">USD</span>
-                                    <div class="flex gap-0.5 ml-1" title="High Impact">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-loss"></div>
-                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-loss"></div>
-                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-loss"></div>
-                                    </div>
-                                    <span
-                                        class="text-xs md:text-sm font-medium text-white ml-1 md:ml-2 truncate max-w-[120px] md:max-w-xs">Unemployment
-                                        Rate</span>
-                                </div>
-                                <button class="text-[#eab308] shrink-0" title="Alert Attivo (-15m)">
-                                    <i data-lucide="bell-ring"
-                                        class="w-4 h-4 filter drop-shadow-[0_0_2px_rgba(234,179,8,1)]"></i>
-                                </button>
-                            </div>
-
-                            <!-- Notizia Med Impact -->
-                            <div onclick="document.getElementById('modal-news-alert').classList.add('open')"
-                                class="cursor-pointer flex items-center justify-between p-3 bg-[#0a0c10] border border-tp-border rounded-lg group hover:border-tp-accent/30 transition-colors">
-                                <div class="flex items-center gap-3 md:gap-4">
-                                    <span class="text-sm font-bold text-tp-muted tabular-nums">16:00</span>
-                                    <div class="w-px h-6 bg-tp-border"></div>
-                                    <span
-                                        class="text-[10px] font-bold bg-[#241a1a] text-white border border-tp-border px-1.5 py-0.5 rounded">GBP</span>
-                                    <div class="flex gap-0.5 ml-1" title="Medium Impact">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-warning"></div>
-                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-warning"></div>
-                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-bg border border-tp-border"></div>
-                                    </div>
-                                    <span
-                                        class="text-xs md:text-sm font-medium text-tp-text ml-1 md:ml-2 truncate max-w-[120px] md:max-w-xs">BOE
-                                        Gov Bailey Speaks</span>
-                                </div>
-                                <button
-                                    class="text-tp-muted hover:text-[#eab308] opacity-50 group-hover:opacity-100 transition-all shrink-0"
-                                    title="Imposta Alert a -15m">
-                                    <i data-lucide="bell" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-
-                            <!-- Notizia Low Impact -->
-                            <div
-                                class="flex items-center justify-between p-3 bg-[#0a0c10] border border-tp-border rounded-lg group hover:border-tp-accent/30 transition-colors opacity-60">
-                                <div class="flex items-center gap-3 md:gap-4">
-                                    <span class="text-sm font-bold text-tp-muted tabular-nums">19:00</span>
-                                    <div class="w-px h-6 bg-tp-border"></div>
-                                    <span
-                                        class="text-[10px] font-bold bg-tp-panel text-tp-muted border border-tp-border px-1.5 py-0.5 rounded">EUR</span>
-                                    <div class="flex gap-0.5 ml-1" title="Low Impact">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-accent"></div>
-                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-bg border border-tp-border"></div>
-                                        <div class="w-1.5 h-1.5 rounded-full bg-tp-bg border border-tp-border"></div>
-                                    </div>
-                                    <span
-                                        class="text-xs md:text-sm font-medium text-tp-muted ml-1 md:ml-2 truncate max-w-[120px] md:max-w-xs">German
-                                        Buba President Speaks</span>
-                                </div>
-                                <button
-                                    class="text-tp-muted hover:text-[#eab308] opacity-0 group-hover:opacity-50 transition-all shrink-0">
-                                    <i data-lucide="bell" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-
                         </div>
                     </div>
                 </div>
@@ -677,595 +423,587 @@
 
                     <!-- Box 5: Watch List -->
                     <div
-                        class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col h-auto min-h-[300px] shadow-lg">
+                        class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col h-auto min-h-[280px] shadow-lg">
                         <div class="flex items-center justify-between mb-4 border-b border-tp-border/50 pb-3">
-                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted">Wach List</h3>
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted">Watchlist</h3>
                             <button class="text-tp-muted hover:text-tp-text"><i data-lucide="settings-2"
                                     class="w-4 h-4"></i></button>
                         </div>
 
-                        <ul class="space-y-1 mt-1">
-                            <li onclick="window.openTradingViewModal('XAUUSD')"
-                                class="flex justify-between items-center p-2 rounded hover:bg-[#1c212a] transition-colors cursor-pointer group hover:shadow-[0_0_10px_rgba(32,201,151,0.1)] border border-transparent hover:border-tp-accent/30">
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-2 h-2 rounded-full bg-tp-accent group-hover:shadow-[0_0_5px_rgba(32,201,151,0.8)]">
-                                    </div>
-                                    <span
-                                        class="font-bold tracking-wide group-hover:text-white transition-colors">XAUUSD</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-tp-accent text-xs font-bold tabular-nums">1.2% <i
-                                            data-lucide="trending-up"
-                                            class="w-3 h-3 inline-block ml-0.5 mb-0.5"></i></span>
-                                    <i data-lucide="external-link"
-                                        class="w-3 h-3 text-tp-muted opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                                </div>
-                            </li>
-                            <li onclick="window.openTradingViewModal('US30')"
-                                class="flex justify-between items-center p-2 rounded hover:bg-[#1c212a] transition-colors cursor-pointer group hover:shadow-[0_0_10px_rgba(32,201,151,0.1)] border border-transparent hover:border-tp-accent/30">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-2 h-2 rounded-full bg-tp-loss"></div>
-                                    <span
-                                        class="font-bold tracking-wide text-tp-text/80 group-hover:text-white transition-colors">US30</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-tp-loss text-xs tabular-nums font-bold">-0.5% <i
-                                            data-lucide="trending-down"
-                                            class="w-3 h-3 inline-block ml-0.5 mb-0.5"></i></span>
-                                    <i data-lucide="external-link"
-                                        class="w-3 h-3 text-tp-muted opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                                </div>
-                            </li>
-                            <li onclick="window.openTradingViewModal('EURUSD')"
-                                class="flex justify-between items-center p-2 rounded hover:bg-[#1c212a] transition-colors cursor-pointer group hover:shadow-[0_0_10px_rgba(32,201,151,0.1)] border border-transparent hover:border-tp-accent/30">
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-2 h-2 rounded-full bg-tp-border group-hover:bg-tp-text transition-colors">
-                                    </div>
-                                    <span
-                                        class="font-bold tracking-wide text-tp-text/80 group-hover:text-white transition-colors">EURUSD</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-tp-muted text-xs tabular-nums">0.0%</span>
-                                    <i data-lucide="external-link"
-                                        class="w-3 h-3 text-tp-muted opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                                </div>
-                            </li>
+                        <ul id="watchlist" class="space-y-1 mt-1">
+                            <!-- Populated by JS -->
                         </ul>
                     </div>
 
-                    <!-- Box 6: Alerts & Nuovi Arrivi -->
+                    <!-- Box 6: Allert Non Lavorati -->
                     <div
-                        class="bg-tp-panel rounded-xl border border-tp-border p-5 flex-1 min-h-[250px] shadow-lg relative overflow-hidden mt-6">
+                        class="bg-tp-panel rounded-xl border border-tp-border p-5 flex-1 min-h-[250px] shadow-lg relative overflow-hidden">
                         <div
                             class="flex items-center justify-between mb-4 border-b border-tp-border/50 pb-3 relative z-10">
                             <div class="flex items-center gap-2">
                                 <i data-lucide="bell-ring"
                                     class="w-4 h-4 text-[#eab308] font-bold drop-shadow-[0_0_5px_rgba(234,179,8,0.5)]"></i>
                                 <h3 class="text-xs font-bold uppercase tracking-widest text-[#eab308] drop-shadow-sm">
-                                    Allert</h3>
+                                    Allert Non Lavorati</h3>
                             </div>
-                            <button
-                                class="text-tp-muted hover:text-white transition-colors text-xs font-bold px-2 py-1 bg-tp-border/30 rounded border border-tp-border/50">Disattiva</button>
+                            <span id="allert-count-badge" class="text-tp-muted text-[10px] font-bold px-2 py-1 bg-tp-border/30 rounded border border-tp-border/50">0</span>
                         </div>
 
-                        <div class="space-y-3 relative z-10">
-                            <!-- Alert Item in arrivo (Pulse) -->
-                            <div
-                                class="p-3 bg-[#0a0c10] border border-tp-warning/40 hover:border-tp-warning/70 rounded-lg group transition-all relative overflow-hidden shadow-[0_0_15px_rgba(234,179,8,0.05)] cursor-pointer">
-                                <div
-                                    class="absolute left-0 top-0 bottom-0 w-1 bg-tp-warning shadow-[0_0_10px_rgba(234,179,8,0.8)]">
-                                </div>
-                                <div class="flex justify-between items-center ml-2">
-                                    <div class="flex flex-col">
-                                        <p class="text-tp-warning font-bold text-sm tracking-wide">XAUUSD</p>
-                                        <p class="text-[10px] text-tp-muted mt-0.5 font-bold uppercase"><i
-                                                data-lucide="target" class="inline w-3 h-3 text-tp-muted/70"></i> Prezzo
-                                            a <span class="text-white">2045.50</span></p>
-                                    </div>
-                                    <div class="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button
-                                            onclick="document.getElementById('modal-analisi-alert').classList.add('open')"
-                                            class="bg-tp-border hover:bg-tp-accent/20 hover:text-tp-accent text-tp-muted rounded p-1 transition-colors border border-transparent hover:border-tp-accent/30"
-                                            title="Apri Chart">
-                                            <i data-lucide="line-chart" class="w-3.5 h-3.5"></i>
-                                        </button>
-                                        <button onclick="this.closest('.group').remove()"
-                                            class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-1 transition-colors border border-transparent hover:border-tp-loss/30"
-                                            title="Rimuovi">
-                                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Alert Normal -->
-                            <div
-                                class="p-3 bg-tp-bg border border-tp-border rounded-lg group transition-all relative overflow-hidden opacity-60 hover:opacity-100 cursor-pointer">
-                                <div class="absolute left-0 top-0 bottom-0 w-1 bg-tp-accent"></div>
-                                <div class="flex justify-between items-center ml-2">
-                                    <div class="flex flex-col">
-                                        <p class="text-tp-accent font-bold text-sm tracking-wide">US30</p>
-                                        <p class="text-[10px] text-tp-muted mt-0.5 font-bold uppercase"><i
-                                                data-lucide="clock" class="inline w-3 h-3 text-tp-muted/70"></i>
-                                            Apertura NY 5 min</p>
-                                    </div>
-                                </div>
+                        <div id="allert-list" class="space-y-3 relative z-10 max-h-[350px] overflow-y-auto custom-scroll">
+                            <div class="flex items-center justify-center h-20 text-tp-muted text-sm">
+                                <i data-lucide="loader-2" class="w-5 h-5 animate-spin mr-2"></i> Caricamento...
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="modal-analisi-alert"
-            class="fixed inset-0 z-[100] flex justify-center items-center bg-black/70 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
-            <!-- Click-away -->
-            <div class="absolute inset-0" onclick="this.parentElement.classList.remove('open')"></div>
-
-            <!-- Contenitore Due Colonne -->
-            <div class="relative w-full max-w-[1200px] h-[85vh] bg-[#0a0c10] border border-tp-border rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden transform scale-95 transition-transform duration-300"
-                id="modal-alert-content">
-
-                <!-- COLONNA SINISTRA: Form Box -->
-                <div class="w-full md:w-[450px] bg-tp-panel flex flex-col border-r border-tp-border z-10">
-                    <!-- Header -->
-                    <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-[#161920]">
-                        <div class="flex items-center gap-3">
-                            <i data-lucide="bell" class="w-5 h-5 text-[#eab308]"></i>
-                            <h2 class="text-base font-bold text-white uppercase tracking-widest">Validazione Allert</h2>
-                        </div>
-                        <button onclick="document.getElementById('modal-analisi-alert').classList.remove('open')"
-                            class="text-tp-muted hover:text-white bg-tp-border/20 p-1.5 rounded-lg transition-colors">
-                            <i data-lucide="x" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-
-                    <!-- Corpo Form Scrollabile -->
-                    <div class="p-6 overflow-y-auto flex-1 flex flex-col gap-6 custom-scroll">
-
-                        <!-- Dati Ricevuti -->
-                        <div class="bg-[#0e1116] border border-tp-border p-4 rounded-lg flex flex-col gap-3">
-                            <div class="flex justify-between items-center border-b border-tp-border/50 pb-2">
-                                <span class="text-[#eab308] font-bold text-lg leading-none">XAUUSD</span>
-                                <span
-                                    class="bg-[#eab308]/10 text-[#eab308] border border-[#eab308]/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase">14:30</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs text-tp-muted font-bold uppercase tracking-wider">Trigger
-                                    Prezzo</span>
-                                <span
-                                    class="font-display font-bold text-white text-base bg-[#161d24] px-2 rounded border border-tp-border">2045.50</span>
-                            </div>
-                            <p class="text-xs text-tp-muted italic mt-1 leading-relaxed">Alert triggerato livello
-                                resistenza chiave H4 identificato pre-market. Possibile reazione per storno intaday.</p>
-                        </div>
-
-                        <!-- Spazio Commento Aperto -->
-                        <div>
-                            <label
-                                class="block text-[10px] font-bold uppercase tracking-widest text-[#eab308] mb-2">Analisi
-                                e Commento</label>
-                            <textarea placeholder="Analisi strutturale e motivazioni del test al livello..."
-                                class="w-full bg-[#0e1116] border border-tp-border rounded-lg px-3 py-3 text-sm focus:border-[#eab308] outline-none text-white h-[100px] resize-none"></textarea>
-                        </div>
-
-                        <!-- Monitora Smile Esistente -->
-                        <div>
-                            <label
-                                class="block text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-2">Stato
-                                Operativo (Live)</label>
-                            <div
-                                class="flex flex-wrap items-center gap-4 bg-[#0e1116] p-2 rounded-xl border border-tp-border">
-                                <div class="flex items-center gap-1">
-                                    <button
-                                        class="p-1.5 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
-                                            data-lucide="smile" class="w-5 h-5"></i></button>
-                                    <button
-                                        class="p-1.5 rounded-lg text-[#20c997] bg-[#161920] border border-tp-border"><i
-                                            data-lucide="meh" class="w-5 h-5"></i></button>
-                                    <button
-                                        class="p-1.5 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
-                                            data-lucide="frown" class="w-5 h-5"></i></button>
-                                </div>
-                                <div class="w-px h-6 bg-tp-border hidden sm:block"></div>
-                                <div class="flex items-center gap-1">
-                                    <button
-                                        class="p-1.5 rounded-lg text-[#eab308] bg-[#161920] border border-tp-border"><i
-                                            data-lucide="dollar-sign" class="w-4 h-4"></i></button>
-                                    <button class="p-1.5 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
-                                        <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i
-                                                data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Categorizzatore Multiselect -->
-                        <div>
-                            <label class="block text-[10px] font-bold uppercase tracking-widest text-tp-accent mb-2"><i
-                                    data-lucide="tags" class="inline w-3 h-3 mb-0.5"></i> Categorizzatore</label>
-                            <div class="flex flex-col gap-3">
-                                <!-- Bottoni Destinazione -->
-                                <div class="flex gap-2">
-                                    <button
-                                        onclick="document.getElementById('cat-cron-alert').style.display='block'; document.getElementById('cat-strat-alert').style.display='none'; document.getElementById('cat-trade-alert').style.display='none';"
-                                        class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase transition-colors">Cronache</button>
-                                    <button
-                                        onclick="document.getElementById('cat-cron-alert').style.display='none'; document.getElementById('cat-strat-alert').style.display='block'; document.getElementById('cat-trade-alert').style.display='none';"
-                                        class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase transition-colors">Strategia</button>
-                                    <button
-                                        onclick="document.getElementById('cat-cron-alert').style.display='none'; document.getElementById('cat-strat-alert').style.display='none'; document.getElementById('cat-trade-alert').style.display='block';"
-                                        class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-blue-500 text-blue-400 bg-blue-500/10 uppercase transition-colors">Trade</button>
-                                </div>
-                                <!-- Multiselect Cronache -->
-                                <div id="cat-cron-alert" class="w-full">
-                                    <select multiple
-                                        class="w-full bg-[#0e1116] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[80px] custom-scroll">
-                                        <option value="oggi">Oggi - Focus Sessione</option>
-                                        <option value="ieri">Ieri - Rilascio NFP</option>
-                                        <option value="altrieri">Lunedì - Apertura Mercati</option>
-                                    </select>
-                                    <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione
-                                    </p>
-                                </div>
-                                <!-- Multiselect Strategie -->
-                                <div id="cat-strat-alert" class="w-full" style="display:none;">
-                                    <select multiple
-                                        class="w-full bg-[#0e1116] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none h-[80px] custom-scroll">
-                                        <option value="s1">London Breakout</option>
-                                        <option value="s2">Asian Sweep Liquidity</option>
-                                        <option value="s3">News Scalper</option>
-                                        <option value="s4">Trend Pullback H4</option>
-                                    </select>
-                                    <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione
-                                    </p>
-                                </div>
-                                <!-- Multiselect Trade Recenti -->
-                                <div id="cat-trade-alert" class="w-full" style="display:none;">
-                                    <select multiple
-                                        class="w-full bg-[#0e1116] border border-blue-500/30 rounded-lg px-3 py-2 text-xs text-blue-400 font-bold outline-none h-[80px] custom-scroll">
-                                        <option value="t1">XAUUSD - Eseguito (Buy @ 2045.50)</option>
-                                        <option value="t2">US30 - Eseguito (Sell @ 39800.0)</option>
-                                        <option value="t3">EURUSD - Pending (Buy @ 1.0850)</option>
-                                    </select>
-                                    <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- Footer Form Salva -->
-                    <div class="px-6 py-4 border-t border-tp-border bg-[#161920]">
-                        <button
-                            class="w-full flex justify-center items-center gap-2 px-6 py-3 rounded-lg text-xs font-black uppercase tracking-widest text-[#0e1116] bg-[#eab308] hover:bg-yellow-400 transition-colors shadow-[0_0_15px_rgba(234,179,8,0.3)]"
-                            onclick="document.getElementById('modal-analisi-alert').classList.remove('open')">
-                            Accetta & Salva in DB
-                        </button>
-                    </div>
-                </div>
-
-                <!-- COLONNA DESTRA: Upload Reperto Grafico -->
-                <div class="flex-1 bg-[#050608] flex items-center justify-center p-8 relative group">
-                    <div
-                        class="absolute inset-4 border-2 border-dashed border-tp-border/50 group-hover:border-[#eab308]/50 rounded-xl transition-colors pointer-events-none z-0">
-                    </div>
-                    <div class="text-center z-10 cursor-pointer">
-                        <div
-                            class="w-16 h-16 rounded-full bg-[#161920] flex items-center justify-center border border-tp-border mb-4 mx-auto group-hover:scale-110 transition-transform">
-                            <i data-lucide="camera"
-                                class="w-6 h-6 text-tp-muted group-hover:text-[#eab308] transition-colors"></i>
-                        </div>
-                        <h3 class="text-white font-bold text-lg mb-1">Carica Reperto Grafico</h3>
-                        <p class="text-tp-muted text-sm">Trascina qui lo screenshot o clicca per caricare</p>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- NOTION-STYLE MODAL: "News Validation" -->
-        <div id="modal-news-alert"
-            class="fixed inset-0 z-[100] flex justify-center items-start pt-20 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">
-            <div class="absolute inset-0"
-                onclick="document.getElementById('modal-news-alert').classList.remove('open')"></div>
-
-            <div class="relative w-full max-w-3xl bg-[#0e1116] border border-tp-border rounded-2xl shadow-2xl p-0 flex flex-col max-h-[85vh] overflow-hidden transform scale-95 transition-transform duration-200"
-                id="modal-news-content">
-
-                <!-- Modal Header -->
-                <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-[#161920]">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-purple-500/10 p-2 rounded-lg border border-purple-500/20">
-                            <i data-lucide="globe" class="w-5 h-5 text-purple-400"></i>
-                        </div>
-                        <h2 class="text-xl font-bold text-white">Validazione Post-Notizia: NFP</h2>
-                    </div>
-                    <button onclick="document.getElementById('modal-news-alert').classList.remove('open')"
-                        class="text-tp-muted hover:text-tp-text bg-tp-border/30 p-1.5 rounded-lg transition-colors">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                    </button>
-                </div>
-
-                <!-- Modal Body -->
-                <div class="p-6 overflow-y-auto flex flex-col gap-6 custom-scroll">
-
-                    <!-- Dati Importati N8N -->
-                    <div class="bg-tp-bg p-4 rounded-xl border border-tp-border flex flex-col gap-4">
-                        <div class="flex justify-between items-start border-b border-tp-border/50 pb-2">
-                            <span class="text-[10px] font-bold uppercase tracking-wide text-purple-400"><i
-                                    data-lucide="database" class="inline w-3 h-3"></i> Importato da AI Server
-                                (Pre-News)</span>
-                        </div>
-                        <div class="grid grid-cols-3 gap-4">
-                            <div>
-                                <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Evento</span>
-                                <span class="font-bold text-sm">Non-Farm Payrolls</span>
-                            </div>
-                            <div>
-                                <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Forecast /
-                                    Previous</span>
-                                <span class="font-bold text-sm text-tp-warning">205K <span
-                                        class="text-tp-muted font-normal text-xs ml-1">/ 275K</span></span>
-                            </div>
-                            <div>
-                                <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Impatto
-                                    Atteso</span>
-                                <span class="font-bold text-sm text-tp-loss">High (3 💥)</span>
-                            </div>
-                        </div>
-                        <div>
-                            <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Commento Intelligenza
-                                N8N</span>
-                            <p class="text-xs text-tp-muted bg-tp-panel p-3 rounded-lg border border-tp-border/50">Un
-                                NFP pià¹ alto del forecast rafforzerà  il dollaro, potenziale spinta ribassista su
-                                Gold (XAUUSD).</p>
-                        </div>
-                    </div>
-
-                    <!-- Dati Approvazione Utente -->
-                    <div class="flex gap-4">
-                        <div class="flex-1 shrink-0 w-1/3">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2"><i
-                                    data-lucide="edit" class="inline w-3 h-3"></i> Immetti Dati Usciti</label>
-                            <input type="text" placeholder="Es. 303K"
-                                class="w-full bg-[#0a0c10] border border-tp-border hover:border-tp-accent focus:border-tp-accent rounded-lg px-3 py-2 text-xl font-bold font-display text-white outline-none transition-colors">
-                        </div>
-                        <div class="flex-1 w-2/3">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2"><i
-                                    data-lucide="align-left" class="inline w-3 h-3"></i> Commento Utente
-                                Post-News</label>
-                            <textarea placeholder="Analisi dei minimi presi, comportamento del trend post spike..."
-                                class="w-full bg-[#0a0c10] border border-tp-border hover:border-tp-accent focus:border-tp-accent rounded-lg px-3 py-2 text-sm text-white outline-none h-[48px] resize-none transition-colors"></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Impact Widget (Grafico Freccie) -->
-                    <div class="bg-tp-bg p-4 rounded-xl border border-tp-border">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-4"><i
-                                data-lucide="trending-up" class="inline w-3 h-3"></i> Monitoratore Impatto Visivo
-                            Rapido</label>
-                        <div class="flex gap-4">
-                            <!-- XAUUSD -->
-                            <div
-                                class="flex items-center gap-3 bg-tp-panel px-3 py-1.5 rounded-lg border border-tp-border flex-1 justify-between group hover:border-tp-accent/30 transition-colors">
-                                <span class="font-bold text-sm tracking-wide">XAU/USD</span>
-                                <div class="flex gap-1 bg-[#0a0c10] rounded-md border border-tp-border p-1">
-                                    <button onclick="selectImpact(this)"
-                                        class="visual-impact hover:bg-tp-accent/20 hover:text-tp-accent px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
-                                            data-lucide="arrow-up" class="w-4 h-4"></i></button>
-                                    <button onclick="selectImpact(this)"
-                                        class="visual-impact hover:bg-tp-loss/20 hover:text-tp-loss px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
-                                            data-lucide="arrow-down" class="w-4 h-4"></i></button>
-                                </div>
-                            </div>
-                            <!-- USD INDEX -->
-                            <div
-                                class="flex items-center gap-3 bg-tp-panel px-3 py-1.5 rounded-lg border border-tp-border flex-1 justify-between group hover:border-tp-accent/30 transition-colors">
-                                <span class="font-bold text-sm tracking-wide">US DXY</span>
-                                <div class="flex gap-1 bg-[#0a0c10] rounded-md border border-tp-border p-1">
-                                    <button onclick="selectImpact(this)"
-                                        class="visual-impact hover:bg-tp-accent/20 hover:text-tp-accent px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
-                                            data-lucide="arrow-up" class="w-4 h-4"></i></button>
-                                    <button onclick="selectImpact(this)"
-                                        class="visual-impact hover:bg-tp-loss/20 hover:text-tp-loss px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
-                                            data-lucide="arrow-down" class="w-4 h-4"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Proprieta Strategie/Tag -->
-                    <div>
-                        <div class="flex flex-wrap gap-2">
-                            <button
-                                onclick="this.classList.toggle('border-purple-500'); this.classList.toggle('text-purple-400'); this.classList.toggle('bg-purple-500/10')"
-                                class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Tag:
-                                Manipolazione</button>
-                            <button
-                                onclick="this.classList.toggle('border-purple-500'); this.classList.toggle('text-purple-400'); this.classList.toggle('bg-purple-500/10')"
-                                class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Tag:
-                                Reversal</button>
-                            <button
-                                onclick="this.classList.toggle('border-purple-500'); this.classList.toggle('text-purple-400'); this.classList.toggle('bg-purple-500/10')"
-                                class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Tag:
-                                Impulso Immediato</button>
-                        </div>
-                    </div>
-
-                    <hr class="border-tp-border/50">
-
-                    <!-- Categorizzatore Multiselect per Notizie -->
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-widest text-[#eab308] mb-2"><i
-                                data-lucide="tags" class="inline w-3 h-3 mb-0.5"></i> Categorizzatore Destinazione
-                            Focus</label>
-                        <div class="flex flex-col gap-3">
-                            <!-- Bottoni Destinazione -->
-                            <div class="flex gap-2">
-                                <button
-                                    onclick="document.getElementById('cat-cron-news').style.display='block'; document.getElementById('cat-strat-news').style.display='none'; document.getElementById('cat-trade-news').style.display='none';"
-                                    class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase transition-colors">Cronache</button>
-                                <button
-                                    onclick="document.getElementById('cat-cron-news').style.display='none'; document.getElementById('cat-strat-news').style.display='block'; document.getElementById('cat-trade-news').style.display='none';"
-                                    class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase transition-colors">Strategia</button>
-                                <button
-                                    onclick="document.getElementById('cat-cron-news').style.display='none'; document.getElementById('cat-strat-news').style.display='none'; document.getElementById('cat-trade-news').style.display='block';"
-                                    class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-blue-500 text-blue-400 bg-blue-500/10 uppercase transition-colors">Trade</button>
-                            </div>
-                            <!-- Multiselect Cronache -->
-                            <div id="cat-cron-news" class="w-full">
-                                <select multiple
-                                    class="w-full bg-[#0a0c10] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[80px] custom-scroll">
-                                    <option value="oggi">Oggi - Focus Notizie Focus</option>
-                                    <option value="domani">Domani - Preparativa</option>
-                                    <option value="ieri">Ieri - Impatto NFP</option>
-                                </select>
-                                <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione</p>
-                            </div>
-                            <!-- Multiselect Strategie -->
-                            <div id="cat-strat-news" class="w-full" style="display:none;">
-                                <select multiple
-                                    class="w-full bg-[#0a0c10] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none h-[80px] custom-scroll">
-                                    <option value="s1">London Breakout</option>
-                                    <option value="s2">Asian Sweep Liquidity</option>
-                                    <option value="s3">News Scalper</option>
-                                    <option value="s4">Trend Pullback H4</option>
-                                </select>
-                                <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione</p>
-                            </div>
-                            <!-- Multiselect Trade Recenti -->
-                            <div id="cat-trade-news" class="w-full" style="display:none;">
-                                <select multiple
-                                    class="w-full bg-[#0a0c10] border border-blue-500/30 rounded-lg px-3 py-2 text-xs text-blue-400 font-bold outline-none h-[80px] custom-scroll">
-                                    <option value="t1">XAUUSD - Eseguito (Buy @ 2045.50)</option>
-                                    <option value="t2">US30 - Eseguito (Sell @ 39800.0)</option>
-                                    <option value="t3">EURUSD - Pending (Buy @ 1.0850)</option>
-                                </select>
-                                <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr class="border-tp-border/50">
-
-                    <!-- Condizionatore Faccina/Mindset (Uguale a Modale Trade) -->
-                    <div>
-                        <label
-                            class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
-                            <i data-lucide="brain" class="w-4 h-4"></i> Mindset Live & Volatilità 
-                        </label>
-                        <div class="flex items-center gap-4">
-                            <!-- Mindset -->
-                            <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
-                                <button onclick="selectMindset(this, 'positive')"
-                                    class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
-                                        data-lucide="smile" class="w-5 h-5"></i></button>
-                                <button onclick="selectMindset(this, 'neutral')"
-                                    class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
-                                        data-lucide="meh" class="w-5 h-5"></i></button>
-                                <button onclick="selectMindset(this, 'negative')"
-                                    class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
-                                        data-lucide="frown" class="w-5 h-5"></i></button>
-                            </div>
-                            <div class="w-px h-6 bg-tp-border"></div>
-                            <!-- Volatility -->
-                            <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
-                                <button onclick="selectVol(this, 'low')"
-                                    class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
-                                    <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i></div>
-                                </button>
-                                <button onclick="selectVol(this, 'med')"
-                                    class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
-                                    <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i
-                                            data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>
-                                </button>
-                                <button onclick="selectVol(this, 'high')"
-                                    class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
-                                    <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i
-                                            data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i><i
-                                            data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="px-6 py-4 border-t border-tp-border bg-[#161920] flex justify-end gap-3 rounded-b-2xl">
-                    <button onclick="document.getElementById('modal-news-alert').classList.remove('open')"
-                        class="px-4 py-2 rounded-lg text-sm font-bold text-tp-text bg-tp-border/20 hover:bg-tp-border/50 border border-tp-border transition-colors">
-                        Ignora Notizia
-                    </button>
-                    <button onclick="document.getElementById('modal-news-alert').classList.remove('open')"
-                        class="flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold text-white bg-purple-600 hover:bg-purple-500 border border-transparent transition-all shadow-[0_0_15px_rgba(147,51,234,0.3)]"
-                        onclick="window.location.href='allert.html'">
-                        Invia a DB Notizie <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </button>
                 </div>
             </div>
         </div>
 
     </main>
 
-    <style>
-        /* CSS per gestire l'apertura del modale da inline javascript */
-        #modal-analisi-alert.open,
-        #modal-news-alert.open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        #modal-analisi-alert.open #modal-alert-content,
-        #modal-news-alert.open #modal-news-content {
-            transform: scale(1);
-        }
-    </style>
     <script src="app.js"></script>
     <script>
-        // Init Lucide Icons globally for any dynamically added DOM nodes too
-        lucide.createIcons();
+    // ==========================================
+    // DASHBOARD INLINE SCRIPTS
+    // ==========================================
 
-        // Selettore Grafico Impatto (Notizie)
-        function selectImpact(btn) {
-            let parent = btn.parentElement;
-            parent.querySelectorAll('.visual-impact').forEach(b => {
-                b.classList.remove('bg-tp-accent/20', 'text-tp-accent', 'bg-tp-loss/20', 'text-tp-loss');
-            });
-            if (btn.innerHTML.includes('arrow-up')) {
-                btn.classList.add('bg-tp-accent/20', 'text-tp-accent');
-            } else {
-                btn.classList.add('bg-tp-loss/20', 'text-tp-loss');
+    // --- 99 Nomi di Allah ---
+    const ALLAH_NAMES_99 = [
+        { trans: "Ar-Rahman", arab: "\u0627\u0644\u0631\u0651\u064E\u062D\u0652\u0645\u064E\u0646\u064F", meaning: "Il Compassionevole", desc: "Colui la cui misericordia abbraccia incondizionatamente ogni cosa creata, dal piu piccolo granello di sabbia alla piu vasta galassia. La Sua compassione precede ogni altra cosa ed e la fonte di ogni bene." },
+        { trans: "Ar-Rahim", arab: "\u0627\u0644\u0631\u0651\u064E\u062D\u0650\u064A\u0645\u064F", meaning: "Il Misericordioso", desc: "Colui che elargisce misericordia costante e specifica ai Suoi servi devoti. La Sua misericordia e un fiume inesauribile che scorre verso chi si volge a Lui con sincerita." },
+        { trans: "Al-Malik", arab: "\u0627\u0644\u0652\u0645\u064E\u0644\u0650\u0643\u064F", meaning: "Il Sovrano", desc: "L'Assoluto detentore della sovranita su ogni reame visibile e invisibile. Il Suo dominio e perfetto, senza rivali ne limiti, e tutto esiste sotto la Sua autorita." },
+        { trans: "Al-Quddus", arab: "\u0627\u0644\u0652\u0642\u064F\u062F\u0651\u064F\u0648\u0633\u064F", meaning: "Il Purissimo", desc: "Colui che e assolutamente puro e libero da ogni imperfezione, difetto o mancanza. La Sua santita trascende ogni comprensione umana ed e la fonte di ogni purificazione." },
+        { trans: "As-Salam", arab: "\u0627\u0644\u0633\u0651\u064E\u0644\u0627\u064E\u0645\u064F", meaning: "La Pace", desc: "La fonte di ogni pace e sicurezza. Colui che salva le Sue creature da ogni pericolo e imperfezione. Da Lui emana la serenita che pervade i cuori dei credenti." },
+        { trans: "Al-Mu'min", arab: "\u0627\u0644\u0652\u0645\u064F\u0624\u0652\u0645\u0650\u0646\u064F", meaning: "Il Garante della Fede", desc: "Colui che conferma la verita e dona sicurezza ai cuori. Egli e il custode della fede, che illumina le anime e protegge dalla falsita e dal dubbio." },
+        { trans: "Al-Muhaymin", arab: "\u0627\u0644\u0652\u0645\u064F\u0647\u064E\u064A\u0652\u0645\u0650\u0646\u064F", meaning: "Il Custode Vigilante", desc: "Colui che veglia su ogni cosa con attenzione assoluta. Nulla sfugge alla Sua osservazione, ed Egli protegge e preserva ogni creatura con cura infinita." },
+        { trans: "Al-Aziz", arab: "\u0627\u0644\u0652\u0639\u064E\u0632\u0650\u064A\u0632\u064F", meaning: "L'Eccelso in Potenza", desc: "Colui la cui potenza e invincibile e la cui dignita e ineguagliabile. Nessuna forza puo resistere alla Sua volonta, e la Sua gloria pervade l'intero creato." },
+        { trans: "Al-Jabbar", arab: "\u0627\u0644\u0652\u062C\u064E\u0628\u0651\u064E\u0627\u0631\u064F", meaning: "Il Riparatore Supremo", desc: "Colui che ripara cio che e spezzato e ristabilisce l'ordine. Egli risana i cuori afflitti e restaura cio che sembra irrimediabilmente perduto con la Sua potenza infinita." },
+        { trans: "Al-Mutakabbir", arab: "\u0627\u0644\u0652\u0645\u064F\u062A\u064E\u0643\u064E\u0628\u0651\u0650\u0631\u064F", meaning: "Il Supremo in Grandezza", desc: "Colui la cui grandezza trascende ogni immaginazione. Solo a Lui appartiene la vera grandezza, e ogni orgoglio nelle creature e un mero riflesso imperfetto della Sua maesta." },
+        { trans: "Al-Khaliq", arab: "\u0627\u0644\u0652\u062E\u064E\u0627\u0644\u0650\u0642\u064F", meaning: "Il Creatore", desc: "Colui che porta all'esistenza dal nulla con la Sua sola volonta. Ogni forma di vita, ogni stella e ogni atomo esistono grazie al Suo atto creativo originale." },
+        { trans: "Al-Bari'", arab: "\u0627\u0644\u0652\u0628\u064E\u0627\u0631\u0650\u0626\u064F", meaning: "Il Plasmatore dal Nulla", desc: "Colui che evolve e sviluppa le creature donando loro forma distinta e unica. Egli libera l'esistenza dal caos primordiale, plasmandola con ordine e bellezza." },
+        { trans: "Al-Musawwir", arab: "\u0627\u0644\u0652\u0645\u064F\u0635\u064E\u0648\u0651\u0650\u0631\u064F", meaning: "Il Modellatore delle Forme", desc: "Colui che da a ogni creatura la sua forma unica e irripetibile. Ogni volto, ogni foglia, ogni fiocco di neve porta l'impronta della Sua arte divina infinita." },
+        { trans: "Al-Ghaffar", arab: "\u0627\u0644\u0652\u063A\u064E\u0641\u0651\u064E\u0627\u0631\u064F", meaning: "Il Perdonatore", desc: "Colui che perdona ripetutamente e copre i peccati con il Suo velo di misericordia. La Sua capacita di perdonare non ha limiti e abbraccia ogni anima pentita." },
+        { trans: "Al-Qahhar", arab: "\u0627\u0644\u0652\u0642\u064E\u0647\u0651\u064E\u0627\u0631\u064F", meaning: "Il Dominatore Irresistibile", desc: "Colui che sottomette ogni cosa alla Sua volonta con potenza irresistibile. Nessuna forza nel creato puo opporsi al Suo decreto, e ogni tiranno e impotente davanti a Lui." },
+        { trans: "Al-Wahhab", arab: "\u0627\u0644\u0652\u0648\u064E\u0647\u0651\u064E\u0627\u0628\u064F", meaning: "Il Donatore Generoso", desc: "Colui che dona abbondantemente senza che Gli venga chiesto e senza aspettarsi ricompensa. I Suoi doni fluiscono incessantemente come pioggia benefica su tutta la creazione." },
+        { trans: "Ar-Razzaq", arab: "\u0627\u0644\u0631\u0651\u064E\u0632\u0651\u064E\u0627\u0642\u064F", meaning: "Il Provveditore", desc: "Colui che provvede il sostentamento a ogni creatura vivente, dalla formica nascosta alla balena negli abissi. Il Suo provvedere e garantito e non conosce esaurimento." },
+        { trans: "Al-Fattah", arab: "\u0627\u0644\u0652\u0641\u064E\u062A\u0651\u064E\u0627\u062D\u064F", meaning: "Colui che Apre", desc: "Colui che apre le porte della misericordia e della conoscenza. Egli rimuove gli ostacoli e dischiude i sentieri della comprensione a chi cerca con sincerita." },
+        { trans: "Al-'Alim", arab: "\u0627\u064E\u0644\u0652\u0639\u064E\u0644\u0650\u064A\u0652\u0645\u064F", meaning: "L'Onnisciente", desc: "Colui la cui conoscenza abbraccia ogni cosa, dal visibile all'invisibile, dal passato al futuro. Nulla e nascosto alla Sua sapienza, nemmeno il piu segreto pensiero." },
+        { trans: "Al-Qabid", arab: "\u0627\u0644\u0652\u0642\u064E\u0627\u0628\u0650\u0636\u064F", meaning: "Colui che Trattiene", desc: "Colui che contrae e trattiene per saggezza divina. Egli restringe il sostentamento o il cuore come prova, per poi espandere con generosita ancor piu grande." },
+        { trans: "Al-Basit", arab: "\u0627\u0644\u0652\u0628\u064E\u0627\u0633\u0650\u0637\u064F", meaning: "Colui che Espande", desc: "Colui che espande e allarga con generosita. Egli dilata i cuori con gioia e fede, e stende la Sua provvidenza su chi si rivolge a Lui con fiducia." },
+        { trans: "Al-Khafid", arab: "\u0627\u0644\u0652\u062E\u064E\u0627\u0641\u0650\u0636\u064F", meaning: "Colui che Abbassa", desc: "Colui che abbassa gli arroganti e i tiranni dalla loro posizione elevata. La Sua giustizia ristabilisce l'equilibrio e umilia chi si e innalzato ingiustamente." },
+        { trans: "Ar-Rafi'", arab: "\u0627\u0644\u0631\u0651\u064E\u0627\u0641\u0650\u0639\u064F", meaning: "Colui che Innalza", desc: "Colui che innalza i Suoi servi in rango e dignita. Egli eleva gli umili e i giusti, conferendo loro onore e stazione elevata presso di Se." },
+        { trans: "Al-Mu'izz", arab: "\u0627\u0644\u0652\u0645\u064F\u0639\u0650\u0632\u0651\u064F", meaning: "Il Datore di Onore", desc: "Colui che conferisce onore e dignita a chi vuole. L'onore vero proviene solo da Lui, e chi Egli onora non potra mai essere realmente umiliato." },
+        { trans: "Al-Mudhill", arab: "\u0627\u0644\u0652\u0645\u064F\u0630\u0650\u0644\u0651\u064F", meaning: "Colui che Umilia", desc: "Colui che toglie l'onore a chi persiste nella ribellione e nell'ingiustizia. Il Suo decreto porta umilta ai cuori induriti e giustizia dove regna l'oppressione." },
+        { trans: "As-Sami'", arab: "\u0627\u0644\u0633\u0651\u064E\u0645\u0650\u064A\u0639\u064F", meaning: "L'Audiente", desc: "Colui che ascolta ogni suono, ogni sussurro, ogni preghiera silenziosa del cuore. Il Suo udito abbraccia l'intero universo e nessuna invocazione e mai ignorata." },
+        { trans: "Al-Basir", arab: "\u0627\u0644\u0652\u0628\u064E\u0635\u0650\u064A\u0631\u064F", meaning: "Il Vedente", desc: "Colui che vede ogni cosa con chiarezza assoluta, dal movimento dell'atomo nel buio piu profondo al volo dell'uccello nelle altezze del cielo. Nulla e celato al Suo sguardo." },
+        { trans: "Al-Hakam", arab: "\u0627\u0644\u0652\u062D\u064E\u0643\u064E\u0645\u064F", meaning: "Il Giudice Supremo", desc: "Colui il cui giudizio e definitivo e perfettamente giusto. Le Sue sentenze sono irrevocabili e contengono una saggezza che trascende la comprensione umana." },
+        { trans: "Al-'Adl", arab: "\u0627\u0644\u0652\u0639\u064E\u062F\u0652\u0644\u064F", meaning: "Il Giusto", desc: "Colui che e la giustizia stessa nella sua forma piu pura. Non vi e nemmeno l'ombra di ingiustizia nelle Sue azioni, e ogni Suo decreto porta equilibrio perfetto." },
+        { trans: "Al-Latif", arab: "\u0627\u0644\u0644\u0651\u064E\u0637\u0650\u064A\u0641\u064F", meaning: "Il Sottile e Gentile", desc: "Colui la cui gentilezza e cosi sottile e raffinata da essere impercettibile. Egli opera attraverso vie misteriose e delicate, portando bene anche dove non ci si aspetta." },
+        { trans: "Al-Khabir", arab: "\u0627\u0644\u0652\u062E\u064E\u0628\u0650\u064A\u0631\u064F", meaning: "Il Consapevole di Tutto", desc: "Colui che conosce la realta interiore di ogni cosa. La Sua consapevolezza penetra nelle profondita nascoste dell'esistenza, oltre ogni apparenza superficiale." },
+        { trans: "Al-Halim", arab: "\u0627\u0644\u0652\u062D\u064E\u0644\u0650\u064A\u0645\u064F", meaning: "Il Clemente", desc: "Colui che non affretta la punizione nonostante la disobbedienza delle creature. La Sua clemenza offre sempre il tempo per il pentimento e la correzione." },
+        { trans: "Al-'Azim", arab: "\u0627\u0644\u0652\u0639\u064E\u0638\u0650\u064A\u0645\u064F", meaning: "L'Immenso", desc: "Colui la cui grandezza e magnificenza sono oltre ogni misura e comprensione. La Sua immensita abbraccia tutto cio che esiste ed e fonte di venerazione infinita." },
+        { trans: "Al-Ghafur", arab: "\u0627\u0644\u0652\u063A\u064E\u0641\u064F\u0648\u0631\u064F", meaning: "Il Perdonatore Copioso", desc: "Colui che perdona abbondantemente e ripetutamente. La Sua capacita di perdonare e come un oceano senza fondo che accoglie ogni pentimento sincero senza mai respingerlo." },
+        { trans: "Ash-Shakur", arab: "\u0627\u0644\u0634\u0651\u064E\u0643\u064F\u0648\u0631\u064F", meaning: "Il Riconoscente", desc: "Colui che apprezza e ricompensa abbondantemente anche il piu piccolo atto di bene. La Sua gratitudine verso i servi moltiplica ogni buona azione in misura incommensurabile." },
+        { trans: "Al-'Aliyy", arab: "\u0627\u0644\u0652\u0639\u064E\u0644\u0650\u064A\u0651\u064F", meaning: "L'Altissimo", desc: "Colui che e al di sopra di tutto in rango, potere e perfezione. La Sua elevatezza non ha pari e trascende ogni concetto di altezza fisica o spirituale." },
+        { trans: "Al-Kabir", arab: "\u0627\u0644\u0652\u0643\u064E\u0628\u0650\u064A\u0631\u064F", meaning: "Il Grande", desc: "Colui la cui grandezza e incommensurabile e incomparabile. Tutto nel creato, per quanto vasto e maestoso, e infinitamente piccolo rispetto alla Sua magnificenza." },
+        { trans: "Al-Hafiz", arab: "\u0627\u0644\u0652\u062D\u064E\u0641\u0650\u064A\u0638\u064F", meaning: "Il Preservatore", desc: "Colui che preserva e protegge ogni cosa dall'annientamento. La Sua custodia mantiene l'equilibrio dell'universo e salvaguarda ogni creatura dal male." },
+        { trans: "Al-Muqit", arab: "\u0627\u0644\u0652\u0645\u064F\u0642\u0650\u064A\u062A\u064F", meaning: "Il Nutritore", desc: "Colui che sostenta e nutre ogni creatura con cio di cui ha bisogno, sia materialmente che spiritualmente. Il Suo nutrimento sostiene ogni forma di vita in ogni istante." },
+        { trans: "Al-Hasib", arab: "\u0627\u0644\u0652\u062D\u064E\u0633\u0650\u064A\u0628\u064F", meaning: "Colui che Tiene il Conto", desc: "Colui che tiene conto di ogni cosa con precisione infinita. Nessun atto, parola o pensiero sfugge al Suo calcolo, e il Suo rendiconto e perfetto e completo." },
+        { trans: "Al-Jalil", arab: "\u0627\u0644\u0652\u062C\u064E\u0644\u0650\u064A\u0644\u064F", meaning: "Il Maestoso", desc: "Colui la cui maesta ispira reverenza e venerazione. La Sua grandezza e accompagnata da una bellezza che riempie i cuori di timore reverenziale e meraviglia." },
+        { trans: "Al-Karim", arab: "\u0627\u0644\u0652\u0643\u064E\u0631\u0650\u064A\u0645\u064F", meaning: "Il Generoso", desc: "Colui la cui generosita non ha limiti e non richiede contropartita. Egli dona senza misura, perdona senza condizione e onora senza che il servo lo meriti." },
+        { trans: "Ar-Raqib", arab: "\u0627\u0644\u0631\u0651\u064E\u0642\u0650\u064A\u0628\u064F", meaning: "Il Vigilante", desc: "Colui che osserva ogni cosa in ogni istante senza mai distrarsi. La Sua vigilanza e costante e onnicomprensiva, abbracciando ogni dettaglio dell'esistenza." },
+        { trans: "Al-Mujib", arab: "\u0627\u0644\u0652\u0645\u064F\u062C\u0650\u064A\u0628\u064F", meaning: "Colui che Risponde", desc: "Colui che risponde alle preghiere e alle suppliche dei Suoi servi. La Sua risposta e sempre presente, anche quando giunge in forme che l'essere umano non si aspetta." },
+        { trans: "Al-Wasi'", arab: "\u0627\u0644\u0652\u0648\u064E\u0627\u0633\u0650\u0639\u064F", meaning: "L'Immenso in Vastita", desc: "Colui la cui capacita e conoscenza abbracciano ogni cosa senza limiti. La Sua vastita comprende e supera ogni dimensione concepibile dello spazio e del tempo." },
+        { trans: "Al-Hakim", arab: "\u0627\u0644\u0652\u062D\u064E\u0643\u0650\u064A\u0645\u064F", meaning: "Il Saggio", desc: "Colui che agisce con saggezza perfetta in ogni cosa. Ogni Suo decreto contiene una sapienza profonda, anche quando la mente umana non riesce a comprenderla." },
+        { trans: "Al-Wadud", arab: "\u0627\u0644\u0652\u0648\u064E\u062F\u064F\u0648\u062F\u064F", meaning: "L'Amorevole", desc: "Colui il cui amore per le Sue creature e puro, incondizionato e inesauribile. Il Suo amore e la forza che muove l'universo e sostiene ogni legame di affetto tra gli esseri." },
+        { trans: "Al-Majid", arab: "\u0627\u0644\u0652\u0645\u064E\u062C\u0650\u064A\u062F\u064F", meaning: "Il Glorioso", desc: "Colui la cui gloria e magnificenza sono senza paragone. La Sua nobilta e generosita si manifestano in ogni aspetto della creazione con splendore travolgente." },
+        { trans: "Al-Ba'ith", arab: "\u0627\u0644\u0652\u0628\u064E\u0627\u0639\u0650\u062B\u064F", meaning: "Colui che Risuscita", desc: "Colui che riporta alla vita dopo la morte e risveglia i cuori dalla negligenza. Il Suo potere di resurrezione e assoluto e si manifesta in ogni primavera della natura." },
+        { trans: "Ash-Shahid", arab: "\u0627\u0644\u0634\u0651\u064E\u0647\u0650\u064A\u062F\u064F", meaning: "Il Testimone", desc: "Colui che e testimone di ogni cosa che accade nell'universo. La Sua testimonianza e la piu veritiera e nulla puo essere nascosto o alterato davanti a Lui." },
+        { trans: "Al-Haqq", arab: "\u0627\u0644\u0652\u062D\u064E\u0642\u0651\u064F", meaning: "La Verita Assoluta", desc: "Colui che e la Verita stessa nella sua essenza piu pura. La Sua esistenza e la realta fondamentale su cui si fonda ogni altra verita e ogni altra esistenza." },
+        { trans: "Al-Wakil", arab: "\u0627\u0644\u0652\u0648\u064E\u0643\u0650\u064A\u0644\u064F", meaning: "Il Garante Fiduciario", desc: "Colui al quale ci si puo affidare completamente per la gestione dei propri affari. La Sua tutela e la piu sicura e chi si affida a Lui non sara mai deluso." },
+        { trans: "Al-Qawiyy", arab: "\u0627\u0644\u0652\u0642\u064E\u0648\u0650\u064A\u0651\u064F", meaning: "Il Forte", desc: "Colui la cui forza e illimitata e non conosce debolezza o stanchezza. La Sua potenza sostiene l'intero universo senza il minimo sforzo o diminuzione." },
+        { trans: "Al-Matin", arab: "\u0627\u0644\u0652\u0645\u064E\u062A\u0650\u064A\u0646\u064F", meaning: "Il Saldo", desc: "Colui la cui fermezza e solidita sono incrollabili. Il Suo potere e inesauribile e la Sua determinazione e irremovibile, senza mai vacillare o indebolirsi." },
+        { trans: "Al-Waliyy", arab: "\u0627\u0644\u0652\u0648\u064E\u0644\u0650\u064A\u0651\u064F", meaning: "Il Protettore Amico", desc: "Colui che e l'amico e il protettore piu vicino ai Suoi servi. La Sua amicizia e una luce che guida nelle tenebre e un sostegno che non viene mai meno." },
+        { trans: "Al-Hamid", arab: "\u0627\u0644\u0652\u062D\u064E\u0645\u0650\u064A\u062F\u064F", meaning: "Il Lodato", desc: "Colui che e degno di ogni lode e ringraziamento. Ogni forma di perfezione e bellezza nell'universo e motivo per lodare Lui, la fonte di ogni bene." },
+        { trans: "Al-Muhsi", arab: "\u0627\u0644\u0652\u0645\u064F\u062D\u0652\u0635\u0650\u064A", meaning: "Colui che Enumera", desc: "Colui che conosce il numero esatto di ogni cosa nell'universo. Ogni goccia di pioggia, ogni foglia caduta, ogni battito di cuore sono contati nella Sua conoscenza infinita." },
+        { trans: "Al-Mubdi'", arab: "\u0627\u0644\u0652\u0645\u064F\u0628\u0652\u062F\u0650\u0626\u064F", meaning: "L'Originatore", desc: "Colui che da inizio alla creazione dal nulla assoluto, senza modello precedente. La Sua capacita creativa e senza precedenti e ogni inizio porta la Sua impronta unica." },
+        { trans: "Al-Mu'id", arab: "\u0627\u0644\u0652\u0645\u064F\u0639\u0650\u064A\u062F\u064F", meaning: "Colui che Restaura", desc: "Colui che riporta la creazione all'esistenza dopo il suo annientamento. Il Suo potere di restaurazione e una promessa di rinnovamento eterno per tutto cio che e stato." },
+        { trans: "Al-Muhyi", arab: "\u0627\u0644\u0652\u0645\u064F\u062D\u0652\u064A\u0650\u064A", meaning: "Il Datore di Vita", desc: "Colui che da la vita a cio che era privo di essa. La vita in ogni sua forma, dal primo respiro del neonato al germogliare del seme, e un dono della Sua potenza creatrice." },
+        { trans: "Al-Mumit", arab: "\u0627\u0644\u0652\u0645\u064F\u0645\u0650\u064A\u062A\u064F", meaning: "Colui che Da la Morte", desc: "Colui che decreta la fine della vita terrena per ogni creatura. La morte non e distruzione ma un passaggio verso un'altra dimensione dell'esistenza decretata da Lui." },
+        { trans: "Al-Hayy", arab: "\u0627\u0644\u0652\u062D\u064E\u064A\u0651\u064F", meaning: "Il Vivente", desc: "Colui la cui vita e eterna, senza inizio ne fine. La Sua vita e la fonte di ogni altra vita e non dipende da nulla, mentre tutto dipende da Lui per esistere." },
+        { trans: "Al-Qayyum", arab: "\u0627\u0644\u0652\u0642\u064E\u064A\u0651\u064F\u0648\u0645\u064F", meaning: "L'Autosufficiente", desc: "Colui che sussiste di per Se e sostiene l'intera creazione. Senza il Suo sostegno costante, l'universo cesserebbe di esistere in un istante. Egli non ha bisogno di nulla." },
+        { trans: "Al-Wajid", arab: "\u0627\u0644\u0652\u0648\u064E\u0627\u062C\u0650\u062F\u064F", meaning: "Colui che Trova", desc: "Colui che possiede tutto e non manca di nulla. Ogni cosa cercata e gia presente nella Sua conoscenza e potere, e nulla puo sottrarsi alla Sua percezione." },
+        { trans: "Al-Majid", arab: "\u0627\u0644\u0652\u0645\u064E\u0627\u062C\u0650\u062F\u064F", meaning: "Il Nobile Glorioso", desc: "Colui la cui nobilta e gloria sono estreme e la cui generosita e illimitata. La Sua magnificenza si manifesta attraverso atti di infinita benevolenza e splendore." },
+        { trans: "Al-Wahid", arab: "\u0627\u0644\u0652\u0648\u064E\u0627\u062D\u0650\u062F\u064F", meaning: "L'Unico", desc: "Colui che e unico nella Sua essenza, nei Suoi attributi e nelle Sue azioni. Non vi e nulla che Gli sia simile e la Sua unicita e il fondamento di ogni verita." },
+        { trans: "Al-Ahad", arab: "\u0627\u0644\u0623\u062D\u064E\u062F\u064F", meaning: "L'Uno Indivisibile", desc: "Colui che e assolutamente Uno, senza parti, senza composizione e senza molteplicita. La Sua unita e la verita piu profonda e fondamentale dell'intera esistenza." },
+        { trans: "As-Samad", arab: "\u0627\u0644\u0635\u0651\u064E\u0645\u064E\u062F\u064F", meaning: "L'Eterno Rifugio", desc: "Colui al quale tutte le creature si rivolgono nelle loro necessita. Egli e il rifugio ultimo, autosufficiente e completo, da cui tutto dipende e che non dipende da nulla." },
+        { trans: "Al-Qadir", arab: "\u0627\u0644\u0652\u0642\u064E\u0627\u062F\u0650\u0631\u064F", meaning: "L'Onnipotente", desc: "Colui che ha potere assoluto su ogni cosa. La Sua capacita di agire e illimitata e quando decide una cosa, dice 'Sii' e quella cosa diviene istantaneamente." },
+        { trans: "Al-Muqtadir", arab: "\u0627\u0644\u0652\u0645\u064F\u0642\u0652\u062A\u064E\u062F\u0650\u0631\u064F", meaning: "Il Prevalente in Potere", desc: "Colui il cui potere e supremo e si manifesta con piena efficacia. Nulla puo impedire la realizzazione della Sua volonta e ogni cosa e sotto il Suo controllo totale." },
+        { trans: "Al-Muqaddim", arab: "\u0627\u0644\u0652\u0645\u064F\u0642\u064E\u062F\u0651\u0650\u0645\u064F", meaning: "Colui che Anticipa", desc: "Colui che porta avanti chi vuole e accelera cio che desidera. La Sua saggezza determina l'ordine delle cose e il tempo in cui ogni evento si manifesta." },
+        { trans: "Al-Mu'akhkhir", arab: "\u0627\u0644\u0652\u0645\u064F\u0624\u064E\u062E\u0651\u0650\u0631\u064F", meaning: "Colui che Posticipa", desc: "Colui che ritarda e pospone secondo la Sua saggezza infinita. Il Suo ritardo non e dimenticanza ma pianificazione divina, e ogni indugio nasconde un proposito perfetto." },
+        { trans: "Al-Awwal", arab: "\u0627\u0644\u0623\u0648\u0651\u064E\u0644\u064F", meaning: "Il Primo", desc: "Colui che esiste prima di ogni cosa, senza inizio. La Sua anteriorita e assoluta e non vi fu mai un momento in cui Egli non esistesse. Tutto ha origine da Lui." },
+        { trans: "Al-Akhir", arab: "\u0627\u0644\u0622\u062E\u0650\u0631\u064F", meaning: "L'Ultimo", desc: "Colui che rimarra dopo la scomparsa di ogni cosa creata. La Sua permanenza e eterna e quando tutto cessera, solo Lui rimarra nella Sua gloria infinita e immutabile." },
+        { trans: "Az-Zahir", arab: "\u0627\u0644\u0638\u0651\u064E\u0627\u0647\u0650\u0631\u064F", meaning: "Il Manifesto", desc: "Colui la cui esistenza e evidente attraverso i segni della Sua creazione. Ogni meraviglia dell'universo e una testimonianza della Sua presenza manifesta e innegabile." },
+        { trans: "Al-Batin", arab: "\u0627\u0644\u0652\u0628\u064E\u0627\u0637\u0650\u0646\u064F", meaning: "Il Nascosto", desc: "Colui la cui essenza e nascosta alla percezione delle creature. Nessun senso o intelletto puo afferrare la Sua vera natura, che rimane un mistero insondabile." },
+        { trans: "Al-Wali", arab: "\u0627\u0644\u0652\u0648\u064E\u0627\u0644\u0650\u064A", meaning: "Il Governante", desc: "Colui che governa l'intero universo con autorita assoluta. La Sua gestione del creato e perfetta, senza errore o trascuratezza, abbracciando ogni dettaglio dell'esistenza." },
+        { trans: "Al-Muta'ali", arab: "\u0627\u0644\u0652\u0645\u064F\u062A\u064E\u0639\u064E\u0627\u0644\u0650\u064A", meaning: "L'Eccelso Trascendente", desc: "Colui che e sublimemente elevato al di sopra di ogni attributo delle creature. La Sua trascendenza supera ogni concetto e ogni tentativo di definizione umana." },
+        { trans: "Al-Barr", arab: "\u0627\u0644\u0652\u0628\u064E\u0631\u0651\u064F", meaning: "Il Benefico", desc: "Colui la cui bonta e dolcezza pervadono ogni aspetto dell'esistenza. La Sua benevolenza si estende a tutte le creature, meritevoli o meno, con generosita sconfinata." },
+        { trans: "At-Tawwab", arab: "\u0627\u0644\u062A\u0651\u064E\u0648\u0651\u064E\u0627\u0628\u064F", meaning: "Colui che Accetta il Pentimento", desc: "Colui che accoglie continuamente il pentimento sincero dei Suoi servi. La Sua porta e sempre aperta per chi ritorna con cuore contrito, e la Sua gioia nel perdonare e immensa." },
+        { trans: "Al-Muntaqim", arab: "\u0627\u0644\u0652\u0645\u064F\u0646\u062A\u064E\u0642\u0650\u0645\u064F", meaning: "Il Vendicatore Giusto", desc: "Colui che retribuisce con giustizia chi persiste nell'oppressione e nel male. La Sua retribuzione non e vendetta cieca ma ristabilimento dell'ordine e della giustizia divina." },
+        { trans: "Al-'Afuww", arab: "\u0627\u0644\u0652\u0639\u064E\u0641\u064F\u0648\u0651\u064F", meaning: "Il Perdonatore Totale", desc: "Colui che cancella completamente i peccati come se non fossero mai esistiti. Il Suo perdono non lascia traccia e restituisce al servo la purezza originale del cuore." },
+        { trans: "Ar-Ra'uf", arab: "\u0627\u0644\u0631\u0651\u064E\u0624\u064F\u0648\u0641\u064F", meaning: "Il Compassionevole Tenero", desc: "Colui la cui tenerezza e compassione sono estremamente delicate e profonde. La Sua dolcezza verso le creature supera la tenerezza di una madre verso il suo neonato." },
+        { trans: "Malik-ul-Mulk", arab: "\u0645\u064E\u0627\u0644\u0650\u0643\u064F \u0627\u0644\u0652\u0645\u064F\u0644\u0652\u0643\u0650", meaning: "Il Signore del Regno", desc: "Colui che possiede il dominio assoluto su ogni reame dell'esistenza. Il Suo regno e senza confini e ogni sovranita terrena e un prestito temporaneo dalla Sua autorita." },
+        { trans: "Dhul-Jalali wal-Ikram", arab: "\u0630\u064F\u0648 \u0627\u0644\u0652\u062C\u064E\u0644\u0627\u064E\u0644\u0650 \u0648\u064E\u0627\u0644\u0652\u0625\u0650\u0643\u0652\u0631\u064E\u0627\u0645\u0650", meaning: "Signore di Maesta e Generosita", desc: "Colui che riunisce in Se la maesta piu sublime e la generosita piu nobile. Il Suo volto e degno di venerazione eterna e la Sua generosita non ha paragone nell'esistenza." },
+        { trans: "Al-Muqsit", arab: "\u0627\u0644\u0652\u0645\u064F\u0642\u0652\u0633\u0650\u0637\u064F", meaning: "L'Equo", desc: "Colui che stabilisce la giustizia con perfetto equilibrio. La Sua equita non conosce favoritismi e ogni creatura riceve esattamente cio che le spetta con precisione divina." },
+        { trans: "Al-Jami'", arab: "\u0627\u0644\u0652\u062C\u064E\u0627\u0645\u0650\u0639\u064F", meaning: "Colui che Riunisce", desc: "Colui che riunira tutte le creature nel Giorno del Giudizio e che unifica gli opposti con armonia. La Sua capacita di riunire abbraccia ogni dimensione dell'esistenza." },
+        { trans: "Al-Ghaniyy", arab: "\u0627\u0644\u0652\u063A\u064E\u0646\u0650\u064A\u0651\u064F", meaning: "Il Ricco di Se", desc: "Colui che e totalmente autosufficiente e non ha bisogno di nulla e di nessuno. La Sua ricchezza e intrinseca e immutabile, mentre tutto il creato ha bisogno di Lui." },
+        { trans: "Al-Mughni", arab: "\u0627\u0644\u0652\u0645\u064F\u063A\u0652\u0646\u0650\u064A", meaning: "L'Arricchitore", desc: "Colui che arricchisce chi vuole tra le Sue creature. La Sua capacita di donare abbondanza, sia materiale che spirituale, e illimitata e si manifesta con generosita divina." },
+        { trans: "Al-Mani'", arab: "\u0627\u0644\u0652\u0645\u064E\u0627\u0646\u0650\u0639\u064F", meaning: "Il Difensore che Impedisce", desc: "Colui che impedisce cio che potrebbe nuocere alle Sue creature. La Sua protezione e uno scudo invisibile che blocca il male prima che possa raggiungere i Suoi servi." },
+        { trans: "Ad-Darr", arab: "\u0627\u0644\u0636\u0651\u064E\u0627\u0631\u0651\u064F", meaning: "Colui che Puo Causare Afflizione", desc: "Colui che permette la prova e la difficolta come mezzo di purificazione e crescita. Le afflizioni che decreta contengono saggezza nascosta e sono strumenti di elevazione spirituale." },
+        { trans: "An-Nafi'", arab: "\u0627\u0644\u0646\u0651\u064E\u0627\u0641\u0650\u0639\u064F", meaning: "Il Benefattore", desc: "Colui che crea il beneficio e il vantaggio per le Sue creature. Ogni bene che raggiunge una creatura proviene dalla Sua volonta benefica e dalla Sua grazia illimitata." },
+        { trans: "An-Nur", arab: "\u0627\u0644\u0646\u0651\u064F\u0648\u0631\u064F", meaning: "La Luce", desc: "Colui che e la Luce dei cieli e della terra. La Sua luce illumina ogni oscurita, guida ogni anima smarrita e rivela la verita nascosta dietro i veli dell'apparenza." },
+        { trans: "Al-Hadi", arab: "\u0627\u0644\u0652\u0647\u064E\u0627\u062F\u0650\u064A", meaning: "La Guida", desc: "Colui che guida le creature sulla retta via con sapienza e misericordia. La Sua guida e la bussola dell'anima, che conduce verso la verita attraverso ogni nebbia di confusione." },
+        { trans: "Al-Badi'", arab: "\u0627\u0644\u0652\u0628\u064E\u062F\u0650\u064A\u0639\u064F", meaning: "L'Originatore Incomparabile", desc: "Colui che crea con originalita assoluta, senza modello precedente. Ogni Sua creazione e un capolavoro unico che non ha eguali ne precedenti nella storia dell'esistenza." },
+        { trans: "Al-Baqi", arab: "\u0627\u0644\u0652\u0628\u064E\u0627\u0642\u0650\u064A", meaning: "L'Eterno", desc: "Colui la cui esistenza e permanente e non conosce fine. Mentre tutto nel creato e transitorio e destinato a perire, Egli solo rimane eternamente nella Sua perfezione." },
+        { trans: "Al-Warith", arab: "\u0627\u0644\u0652\u0648\u064E\u0627\u0631\u0650\u062B\u064F", meaning: "L'Erede Supremo", desc: "Colui che eredita tutto dopo la scomparsa delle creature. Quando ogni cosa tornera al nulla, solo Lui rimarra come il legittimo possessore di tutto cio che fu." },
+        { trans: "Ar-Rashid", arab: "\u0627\u0644\u0631\u0651\u064E\u0634\u0650\u064A\u062F\u064F", meaning: "La Guida Retta", desc: "Colui che guida con perfetta rettitudine e conduce ogni cosa verso la sua giusta destinazione. La Sua direzione e infallibile e porta sempre al bene ultimo e definitivo." },
+        { trans: "As-Sabur", arab: "\u0627\u0644\u0635\u0651\u064E\u0628\u064F\u0648\u0631\u064F", meaning: "Il Paziente", desc: "Colui la cui pazienza e infinita e non Si affretta nel punire. La Sua longanimita da tempo al peccatore di pentirsi e al negligente di risvegliarsi, con clemenza senza fine." }
+    ];
+
+    // --- Init 99 Nomi di Allah ---
+    function initNomiDiAllah99() {
+        const titleEl = document.getElementById('allah-title');
+        if (!titleEl) return;
+
+        const now = new Date();
+        const start = new Date(now.getFullYear(), 0, 0);
+        const diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+        const oneDay = 1000 * 60 * 60 * 24;
+        const dayOfYear = Math.floor(diff / oneDay);
+        const nameIndex = dayOfYear % 99;
+        const name = ALLAH_NAMES_99[nameIndex];
+
+        document.getElementById('allah-index').textContent = 'Nome Del Giorno (' + (nameIndex + 1) + '/99)';
+        document.getElementById('allah-bg-text').textContent = name.arab;
+        titleEl.textContent = name.trans;
+        document.getElementById('allah-translation').textContent = name.meaning;
+        document.getElementById('allah-desc').textContent = name.desc;
+    }
+
+    // --- Init Paniere USD Chart ---
+    function initPaniereChart() {
+        const ctx = document.getElementById('dashPaniereChart');
+        if (!ctx) return;
+        Chart.defaults.color = '#848d97';
+        Chart.defaults.font.family = 'Inter';
+
+        // Random placeholder data
+        const labels = ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', 'Now'];
+        const data = labels.map(() => (Math.random() * 4 - 1.5).toFixed(1));
+
+        new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Forza USD (%)',
+                    data,
+                    borderColor: '#f8fafc',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    pointBackgroundColor: '#f8fafc',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#161920',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#f8fafc',
+                        borderColor: '#252932',
+                        borderWidth: 1,
+                        displayColors: false,
+                    }
+                },
+                scales: {
+                    x: { display: true, grid: { display: false, drawBorder: false }, ticks: { font: { size: 9 }, color: '#848d97' } },
+                    y: {
+                        display: true, position: 'right',
+                        grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
+                        ticks: { font: { size: 9 }, color: '#848d97', callback: v => v > 0 ? '+' + v + '%' : v + '%' }
+                    }
+                },
+                interaction: { mode: 'index', intersect: false }
             }
+        });
+    }
+
+    // --- Init Watchlist ---
+    function initWatchlist() {
+        const coins = [
+            { symbol: 'XAUUSD', price: '2,345.80', pct: '+1.2%', up: true },
+            { symbol: 'US30', price: '39,450.00', pct: '-0.5%', up: false },
+            { symbol: 'GER30', price: '18,210.50', pct: '+0.3%', up: true },
+            { symbol: 'NAS100', price: '17,890.25', pct: '+0.8%', up: true },
+            { symbol: 'BTCUSD', price: '68,420.00', pct: '-1.1%', up: false }
+        ];
+        const ul = document.getElementById('watchlist');
+        if (!ul) return;
+        ul.innerHTML = coins.map(c => `
+            <li class="flex justify-between items-center p-2 rounded hover:bg-[#1c212a] transition-colors cursor-pointer group hover:shadow-[0_0_10px_rgba(32,201,151,0.1)] border border-transparent hover:border-tp-accent/30">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 rounded-full ${c.up ? 'bg-tp-accent' : 'bg-tp-loss'}"></div>
+                    <span class="font-bold tracking-wide group-hover:text-white transition-colors">${c.symbol}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-tp-muted text-[10px] tabular-nums">${c.price}</span>
+                    <span class="${c.up ? 'text-tp-accent' : 'text-tp-loss'} text-xs font-bold tabular-nums">${c.pct}</span>
+                </div>
+            </li>
+        `).join('');
+    }
+
+    // --- SUPABASE: Processi Attivi ---
+    async function loadProcessiAttivi() {
+        const container = document.getElementById('processi-list');
+        const countEl = document.getElementById('processi-count');
+        if (!container) return;
+
+        let tickets = [];
+
+        try {
+            // Giornate da compilare
+            const { data: giornate } = await db.from('giornate').select('id, data').eq('stato', 'nuovo');
+            if (giornate) giornate.forEach(g => tickets.push({
+                type: 'giornata', label: 'Giornata Da Compilare', title: 'Giornata ' + (g.data || ''),
+                desc: 'Compilare la giornata con note, mindset e sessioni.', id: g.id,
+                link: 'dettaglio_giornata.html?id=' + g.id, color: 'teal', table: 'giornate'
+            }));
+
+            // Trades da lavorare
+            const { data: trades } = await db.from('trades').select('id, asset').eq('stato', 'nuovo');
+            if (trades) trades.forEach(t => tickets.push({
+                type: 'trade', label: 'Trade Da Lavorare', title: 'Trade ' + (t.asset || ''),
+                desc: 'Trade da compilare con screenshot, strategia e mindset.', id: t.id,
+                link: 'dettaglio_trade.html?id=' + t.id, color: 'warning', table: 'trades'
+            }));
+
+            // Allert notizie scadute
+            const today = new Date().toISOString().split('T')[0];
+            const { data: allerts } = await db.from('allert').select('id, titolo, data_evento').eq('stato', 'nuovo').lte('data_evento', today);
+            if (allerts) allerts.forEach(a => tickets.push({
+                type: 'allert', label: 'Notizia Da Validare', title: a.titolo || 'Notizia',
+                desc: 'L\'orario e scattato. Inserire dati per archiviare.', id: a.id,
+                link: 'allert.html', color: 'purple', table: 'allert'
+            }));
+
+            // Allert prezzo
+            const { data: allertPrezzo } = await db.from('allert_prezzo').select('id, coin, prezzo').eq('stato', 'nuovo');
+            if (allertPrezzo) allertPrezzo.forEach(ap => tickets.push({
+                type: 'allert_prezzo', label: 'Allert Da Validare', title: (ap.coin || '') + ' @ ' + (ap.prezzo || ''),
+                desc: 'Alert prezzo triggerato. Validare e categorizzare.', id: ap.id,
+                link: 'allert.html', color: 'orange', table: 'allert_prezzo'
+            }));
+
+            // Cronache da compilare
+            try {
+                const { data: cronache } = await db.from('cronache').select('id, titolo').eq('stato', 'nuovo');
+                if (cronache) cronache.forEach(c => tickets.push({
+                    type: 'cronaca', label: 'Cronaca Da Compilare', title: c.titolo || 'Cronaca',
+                    desc: 'Cronaca da compilare con dettagli e analisi.', id: c.id,
+                    link: 'dettaglio_cronaca.html?id=' + c.id, color: 'teal', table: 'cronache'
+                }));
+            } catch(e) { console.warn('cronache.stato non esiste ancora'); }
+
+        } catch (err) {
+            console.error('Errore caricamento processi:', err);
         }
 
-        // Logica pulsanti modal Mindset / Volatilità
-        function selectMindset(btn, type) {
-            document.querySelectorAll('.mindset-btn').forEach(b => {
-                b.classList.remove('text-tp-accent', 'text-tp-warning', 'text-tp-loss', 'bg-tp-border/30');
-                b.classList.add('text-tp-muted');
-            });
-            btn.classList.remove('text-tp-muted');
-            btn.classList.add('bg-tp-border/30');
-            if (type === 'positive') btn.classList.add('text-tp-accent');
-            if (type === 'neutral') btn.classList.add('text-tp-warning');
-            if (type === 'negative') btn.classList.add('text-tp-loss');
+        countEl.textContent = tickets.length;
+
+        if (tickets.length === 0) {
+            container.innerHTML = '<div class="flex flex-col items-center justify-center h-32 text-tp-muted text-sm"><i data-lucide="check-circle" class="w-8 h-8 mb-2 text-tp-accent"></i>Nessun processo in attesa</div>';
+            lucide.createIcons({ root: container });
+            return;
         }
 
-        function selectVol(btn, type) {
-            document.querySelectorAll('.vol-btn').forEach(b => {
-                b.classList.remove('text-tp-accent', 'text-tp-warning', 'text-tp-loss', 'bg-tp-border/30');
-                b.classList.add('text-tp-muted');
-            });
-            btn.classList.remove('text-tp-muted');
-            btn.classList.add('bg-tp-border/30');
-            if (type === 'low') btn.classList.add('text-tp-accent');
-            if (type === 'med') btn.classList.add('text-tp-warning');
-            if (type === 'high') btn.classList.add('text-tp-loss');
+        const colorMap = {
+            teal: { bar: 'bg-teal-500/80', badge: 'bg-teal-500/10 text-teal-400 border-teal-500/20', hover: 'hover:border-teal-500/40', btnHover: 'hover:bg-teal-500/20 hover:text-teal-400 hover:border-teal-500/30', txtHover: 'group-hover:text-teal-400' },
+            warning: { bar: 'bg-tp-warning/80', badge: 'bg-tp-warning/10 text-tp-warning border-tp-warning/20', hover: 'hover:border-tp-warning/40', btnHover: 'hover:bg-tp-warning/20 hover:text-tp-warning hover:border-tp-warning/30', txtHover: 'group-hover:text-tp-warning' },
+            purple: { bar: 'bg-purple-500/80', badge: 'bg-purple-500/10 text-purple-400 border-purple-500/20', hover: 'hover:border-purple-500/40', btnHover: 'hover:bg-purple-500/20 hover:text-purple-400 hover:border-purple-500/30', txtHover: 'group-hover:text-purple-400' },
+            orange: { bar: 'bg-orange-500/80', badge: 'bg-orange-500/10 text-orange-400 border-orange-500/20', hover: 'hover:border-orange-500/40', btnHover: 'hover:bg-orange-500/20 hover:text-orange-400 hover:border-orange-500/30', txtHover: 'group-hover:text-orange-400' }
+        };
+
+        container.innerHTML = tickets.map(t => {
+            const c = colorMap[t.color] || colorMap.teal;
+            return `
+            <div class="bg-[#0a0c10] border border-tp-border ${c.hover} rounded-lg p-3 transition-all group shadow-sm relative overflow-hidden" data-ticket-id="${t.id}" data-ticket-table="${t.table}">
+                <div class="absolute inset-y-0 left-0 w-1 ${c.bar}"></div>
+                <div class="flex justify-between items-start ml-2">
+                    <div class="flex flex-col gap-1 flex-1 pr-4">
+                        <div class="flex items-center gap-2">
+                            <span class="${c.badge} border px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest">${t.label}</span>
+                            <h4 class="text-sm font-bold text-white ${c.txtHover} transition-colors">${t.title}</h4>
+                        </div>
+                        <p class="text-[10px] text-tp-muted leading-relaxed">${t.desc}</p>
+                    </div>
+                    <div class="flex gap-1.5 mt-1 shrink-0">
+                        <button onclick="window.location.href='${t.link}'"
+                            class="bg-tp-border ${c.btnHover} text-tp-text rounded p-2 transition-colors border border-transparent" title="Apri">
+                            <i data-lucide="edit-3" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="ignoreTicket(this, '${t.table}', '${t.id}')"
+                            class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-2 transition-colors border border-transparent hover:border-tp-loss/30" title="Ignora">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+
+        lucide.createIcons({ root: container });
+    }
+
+    // Ignore ticket
+    async function ignoreTicket(btn, table, id) {
+        try {
+            await db.from(table).update({ stato: 'ignorato' }).eq('id', id);
+            const card = btn.closest('[data-ticket-id]');
+            if (card) card.remove();
+            // Update count
+            const countEl = document.getElementById('processi-count');
+            const remaining = document.querySelectorAll('#processi-list [data-ticket-id]').length;
+            if (countEl) countEl.textContent = remaining;
+        } catch (err) {
+            console.error('Errore ignore:', err);
         }
+    }
+    window.ignoreTicket = ignoreTicket;
+
+    // --- SUPABASE: Calendario Notizie ---
+    let calTimeFilter = 'oggi';
+    let calImpactFilters = { high: true, medium: true, low: true };
+    let allertCache = [];
+
+    async function loadCalendarioNotizie() {
+        const container = document.getElementById('calendario-list');
+        if (!container) return;
+
+        try {
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+
+            // Build date range
+            let startDate = todayStr;
+            let endDate = todayStr;
+
+            if (calTimeFilter === 'domani') {
+                const tomorrow = new Date(today);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                startDate = tomorrow.toISOString().split('T')[0];
+                endDate = startDate;
+            } else if (calTimeFilter === 'settimana') {
+                const endWeek = new Date(today);
+                endWeek.setDate(endWeek.getDate() + 7);
+                endDate = endWeek.toISOString().split('T')[0];
+            }
+
+            const { data, error } = await db.from('allert')
+                .select('*')
+                .gte('data_evento', startDate)
+                .lte('data_evento', endDate)
+                .order('ora_evento', { ascending: true });
+
+            if (error) throw error;
+            allertCache = data || [];
+        } catch (err) {
+            console.error('Errore calendario:', err);
+            allertCache = [];
+        }
+
+        renderCalendario();
+    }
+
+    function renderCalendario() {
+        const container = document.getElementById('calendario-list');
+        if (!container) return;
+
+        // Filter by impact
+        const filtered = allertCache.filter(a => {
+            const impact = (a.impatto || '').toLowerCase();
+            if ((impact === 'high' || impact === 'alto') && !calImpactFilters.high) return false;
+            if ((impact === 'medium' || impact === 'medio') && !calImpactFilters.medium) return false;
+            if ((impact === 'low' || impact === 'basso') && !calImpactFilters.low) return false;
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="flex flex-col items-center justify-center h-32 text-tp-muted text-sm"><i data-lucide="calendar-x" class="w-8 h-8 mb-2"></i>Nessuna notizia trovata</div>';
+            lucide.createIcons({ root: container });
+            return;
+        }
+
+        container.innerHTML = filtered.map(a => {
+            const impact = (a.impatto || 'basso').toLowerCase();
+            const time = a.ora_evento ? a.ora_evento.substring(0, 5) : '--:--';
+            const currency = a.valuta || 'USD';
+
+            let dots = '';
+            if (impact === 'high' || impact === 'alto') {
+                dots = '<div class="w-1.5 h-1.5 rounded-full bg-tp-loss"></div><div class="w-1.5 h-1.5 rounded-full bg-tp-loss"></div><div class="w-1.5 h-1.5 rounded-full bg-tp-loss"></div>';
+            } else if (impact === 'medium' || impact === 'medio') {
+                dots = '<div class="w-1.5 h-1.5 rounded-full bg-tp-warning"></div><div class="w-1.5 h-1.5 rounded-full bg-tp-warning"></div><div class="w-1.5 h-1.5 rounded-full bg-tp-bg border border-tp-border"></div>';
+            } else {
+                dots = '<div class="w-1.5 h-1.5 rounded-full bg-tp-accent"></div><div class="w-1.5 h-1.5 rounded-full bg-tp-bg border border-tp-border"></div><div class="w-1.5 h-1.5 rounded-full bg-tp-bg border border-tp-border"></div>';
+            }
+
+            const opacityClass = (impact === 'low' || impact === 'basso') ? 'opacity-60' : '';
+
+            return `
+            <div onclick="window.location.href='allert.html'"
+                class="cursor-pointer flex items-center justify-between p-3 bg-[#0a0c10] border border-tp-border rounded-lg group hover:border-tp-accent/30 transition-colors ${opacityClass}">
+                <div class="flex items-center gap-3 md:gap-4">
+                    <span class="text-sm font-bold ${impact === 'low' ? 'text-tp-muted' : 'text-white'} tabular-nums">${time}</span>
+                    <div class="w-px h-6 bg-tp-border"></div>
+                    <span class="text-[10px] font-bold bg-[#14231f] text-white border border-tp-border px-1.5 py-0.5 rounded">${currency}</span>
+                    <div class="flex gap-0.5 ml-1" title="${impact} Impact">${dots}</div>
+                    <span class="text-xs md:text-sm font-medium text-tp-text ml-1 md:ml-2 truncate max-w-[120px] md:max-w-xs">${a.titolo || 'Evento'}</span>
+                </div>
+                <button class="text-tp-muted hover:text-[#eab308] opacity-50 group-hover:opacity-100 transition-all shrink-0" title="Apri">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+            </div>`;
+        }).join('');
+
+        lucide.createIcons({ root: container });
+    }
+
+    // --- SUPABASE: Allert Non Lavorati ---
+    async function loadAllertNonLavorati() {
+        const container = document.getElementById('allert-list');
+        const countBadge = document.getElementById('allert-count-badge');
+        if (!container) return;
+
+        try {
+            const { data, error } = await db.from('allert_prezzo')
+                .select('*')
+                .not('stato', 'in', '("completato","ignorato")')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            const items = data || [];
+            if (countBadge) countBadge.textContent = items.length;
+
+            if (items.length === 0) {
+                container.innerHTML = '<div class="flex flex-col items-center justify-center h-20 text-tp-muted text-sm"><i data-lucide="bell-off" class="w-6 h-6 mb-2"></i>Nessun allert attivo</div>';
+                lucide.createIcons({ root: container });
+                return;
+            }
+
+            container.innerHTML = items.map(a => {
+                const time = a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--';
+                return `
+                <div onclick="window.location.href='allert.html'"
+                    class="p-3 bg-[#0a0c10] border border-tp-warning/40 hover:border-tp-warning/70 rounded-lg group transition-all relative overflow-hidden shadow-[0_0_15px_rgba(234,179,8,0.05)] cursor-pointer">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-tp-warning shadow-[0_0_10px_rgba(234,179,8,0.8)]"></div>
+                    <div class="flex justify-between items-center ml-2">
+                        <div class="flex flex-col">
+                            <p class="text-tp-warning font-bold text-sm tracking-wide">${a.coin || 'N/A'}</p>
+                            <p class="text-[10px] text-tp-muted mt-0.5 font-bold uppercase">
+                                <i data-lucide="target" class="inline w-3 h-3 text-tp-muted/70"></i> Prezzo a <span class="text-white">${a.prezzo || '--'}</span>
+                                <span class="ml-2 text-tp-muted/50">${time}</span>
+                            </p>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-tp-muted opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    </div>
+                </div>`;
+            }).join('');
+
+            lucide.createIcons({ root: container });
+        } catch (err) {
+            console.error('Errore allert:', err);
+            container.innerHTML = '<div class="text-tp-muted text-sm text-center py-4">Errore nel caricamento</div>';
+        }
+    }
+
+    // --- Filter Button Logic ---
+    function setupCalendarFilters() {
+        // Time filters (toggle)
+        document.querySelectorAll('.cal-time-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.cal-time-btn').forEach(b => {
+                    b.classList.remove('active', 'bg-tp-accent/20', 'text-tp-accent');
+                    b.classList.add('text-tp-muted');
+                });
+                btn.classList.add('active', 'bg-tp-accent/20', 'text-tp-accent');
+                btn.classList.remove('text-tp-muted');
+                calTimeFilter = btn.dataset.filter;
+                loadCalendarioNotizie();
+            });
+        });
+
+        // Impact filters (toggle on/off)
+        document.querySelectorAll('.cal-impact-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const impact = btn.dataset.impact;
+                calImpactFilters[impact] = !calImpactFilters[impact];
+
+                if (calImpactFilters[impact]) {
+                    btn.classList.add('active');
+                    btn.style.opacity = '1';
+                } else {
+                    btn.classList.remove('active');
+                    btn.style.opacity = '0.35';
+                }
+                renderCalendario();
+            });
+        });
+    }
+
+    // --- Record Dollar Strength ---
+    window.recordDollarStrength = function() {
+        const logLists = document.querySelectorAll('.dollar-strength-log');
+        if (logLists.length === 0) return;
+
+        const currentVal = '+' + (Math.random() * 3 - 0.5).toFixed(1) + '%';
+        const now = new Date();
+        const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+
+        const entryHtml = `
+            <li class="flex items-center justify-between text-xs p-2 bg-[#0a0c10] border border-tp-border rounded-lg mb-2">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-tp-muted"></i>
+                    <span class="font-bold text-tp-text">${timeStr}</span>
+                </div>
+                <span class="font-bold text-tp-accent bg-tp-accent/10 px-2 py-0.5 rounded border border-tp-accent/20">${currentVal}</span>
+            </li>
+        `;
+
+        logLists.forEach(list => {
+            list.insertAdjacentHTML('afterbegin', entryHtml);
+            lucide.createIcons({ root: list });
+        });
+    };
+
+    // --- INIT ---
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        initNomiDiAllah99();
+        initPaniereChart();
+        initWatchlist();
+        setupCalendarFilters();
+
+        // Load Supabase data
+        loadProcessiAttivi();
+        loadCalendarioNotizie();
+        loadAllertNonLavorati();
+    });
     </script>
 </body>
 

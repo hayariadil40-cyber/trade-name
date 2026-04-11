@@ -3,422 +3,345 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trade Desk - Database Notizie</title>
-    
+    <title>Trade Desk - Eventi</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        tp: {
-                            bg: '#0B0E14',
-                            panel: '#161920',
-                            panelHover: '#1c1f26',
-                            border: '#252932',
-                            text: '#f8fafc',
-                            muted: '#848d97',
-                            accent: '#20c997', // Teal
-                            loss: '#f43f5e',
-                            warning: '#eab308'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Inter', 'sans-serif']
-                    }
-                }
-            }
-        }
+        tailwind.config = { theme: { extend: { colors: { tp: { bg:'#0B0E14', panel:'#161920', panelHover:'#1c1f26', border:'#252932', text:'#f8fafc', muted:'#848d97', accent:'#20c997', loss:'#f43f5e', warning:'#eab308' }}, fontFamily: { sans:['Inter','sans-serif'], display:['Inter','sans-serif'] }}}}
     </script>
     <style>
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #252932; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3b4252; }
+        .main-tab.active { border-bottom-color: #20c997; color: #f8fafc; }
+        .main-tab:not(.active) { border-bottom-color: transparent; color: #848d97; }
+        .cat-tab.active { opacity: 1; } .cat-tab:not(.active) { opacity: 0.5; }
     </style>
-    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
 </head>
 <body class="bg-tp-bg text-tp-text font-sans h-screen flex overflow-hidden">
 
-    <!-- Sidebar Architecture -->
-                            <!-- Sidebar Universale -->
-        <!-- Sidebar Universale -->
-        <!-- Sidebar Universale -->
-        <!-- Sidebar Universale -->
-        <!-- Sidebar Universale -->
+    <!-- Sidebar -->
     <aside class="w-16 hover:w-64 border-r border-tp-border flex flex-col flex-shrink-0 bg-tp-bg transition-all duration-300 z-50 absolute h-full lg:relative group">
-        <!-- Logo Area Team Design -->
         <div class="h-24 flex items-center justify-center lg:justify-start px-3 gap-4 border-b border-tp-border/50 overflow-hidden cursor-default w-full">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#161920] to-[#0a0c10] border border-[#20c997]/50 flex items-center justify-center shadow-[0_0_10px_rgba(32,201,151,0.2)] shrink-0 group-hover:rotate-3 transition-transform duration-300 mx-auto group-hover:mx-0">
-                <span class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-[#20c997] to-white tracking-tighter">TD</span>
-            </div>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#161920] to-[#0a0c10] border border-[#20c997]/50 flex items-center justify-center shadow-[0_0_10px_rgba(32,201,151,0.2)] shrink-0 group-hover:rotate-3 transition-transform duration-300 mx-auto group-hover:mx-0"><span class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-[#20c997] to-white tracking-tighter">TD</span></div>
             <span class="text-xl font-extrabold tracking-tighter uppercase font-display select-none opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300">Trade<span class="text-[#20c997] ml-1">Desk</span></span>
         </div>
-        
-        <!-- Navigation Links Universali -->
         <nav class="flex-1 overflow-x-hidden overflow-y-auto py-6 space-y-2 flex flex-col w-full group">
-            <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span>
-            </a>
-            
-            <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span>
-            </a>
-            
-            <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span>
-            </a>
-
-            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span>
-            </a>
-            
-            <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span>
-            </a>
-            
+            <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span></a>
+            <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span></a>
+            <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span></a>
+            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span></a>
+            <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span></a>
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-            
-            <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span>
-            </a>
-
-            <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span>
-            </a>
-
-            <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span>
-            </a>
-            
-            <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span>
-            </a>
-            
+            <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span></a>
+            <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span></a>
+            <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span></a>
+            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span></a>
+            <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span></a>
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-
-            <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span>
-            </a>
+            <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span></a>
         </nav>
     </aside>
 
-
-
-
-
-
-
     <main class="flex-1 flex flex-col h-full bg-[#0e1116] relative overflow-hidden">
-        
         <!-- Header -->
-                <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-                <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-                <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-                <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-                <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-                <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
-                <!-- ==============================================
-             HEADER UNIVERSALE
-             ============================================== -->
         <header class="flex justify-between items-center px-8 py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
-            
-            <!-- 1. LEFT: Page Title & Quick Actions -->
-            <div class="flex items-center gap-4 w-auto min-w-max">
-                <div>
-                    <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Database Eventi</h1>
-                    <div class="flex gap-2.5 mt-1">
-                        <a href="analisi.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Trade Analisi</a>
-                        <a href="tabella_trades.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Tabella Trades</a>
-                        <a href="giornaliero.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> Giornaliero</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. CENTER: Timeline (Cronoprogramma) -->
-            <div class="hidden lg:flex items-center flex-1 max-w-3xl mx-8 gap-6">
-                <!-- Digital Clock & TFs -->
-                <div class="flex flex-col items-center justify-center shrink-0">
-                    <span id="digital-clock" class="text-xl font-display font-bold text-white tracking-widest tabular-nums leading-none">00:00:00</span>
-                    <div class="flex gap-1 mt-1.5">
-                        <span id="tf-5m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">5m</span>
-                        <span id="tf-15m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">15m</span>
-                        <span id="tf-30m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">30m</span>
-                        <span id="tf-1h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">1h</span>
-                        <span id="tf-4h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">4h</span>
-                    </div>
-                </div>
-
-                <!-- Timeline Container -->
-                <div class="flex-col flex-1 relative w-full mx-4">
-                    <div class="flex justify-between text-[10px] items-end font-bold uppercase tracking-widest mb-2 px-2">
-                        <span class="text-tp-muted opacity-30">Asia</span>
-                        <span class="text-tp-muted opacity-60">London</span>
-                        <span class="text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] scale-110 origin-bottom transition-all">New York (14-17)</span>
-                        <span class="text-tp-muted opacity-30">End</span>
-                    </div>
-                    <!-- Track Base futuristic gradient -->
-                    <div class="h-2 w-full bg-gradient-to-r from-tp-bg via-tp-border to-tp-bg rounded-full border border-tp-border/30 relative shadow-inner">
-                        <!-- Progress Fill glowing gradient -->
-                        <div id="timeline-progress" class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-teal-600 via-tp-accent to-[#22d3ee] rounded-full shadow-[0_0_10px_rgba(32,201,151,0.5)]" style="width: 45%;"></div>
-                        <!-- Time Cursor Dot Glowing -->
-                        <div id="timeline-dot" class="timeline-cursor absolute top-1/2 -ml-2.5 -mt-2.5 w-5 h-5 bg-white rounded-full border-[3px] border-tp-accent shadow-[0_0_15px_rgba(32,201,151,0.9)] z-10" style="left: 45%;"></div>
-                        <!-- Mock Markers -->
-                        <div class="absolute left-[30%] top-0 bottom-0 w-px bg-tp-border/50"></div>
-                        <div class="absolute left-[50%] top-0 bottom-0 w-px bg-tp-border/50"></div>
-                        <div class="absolute left-[70%] top-0 bottom-0 w-px bg-tp-border/50"></div>
-                        <!-- Current Time Glowing Line marker -->
-                        <div class="absolute left-[45%] -top-1 -bottom-1 w-[2px] bg-tp-text/20 rounded-full blur-[1px]"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. RIGHT: Indicators + Win Rate -->
-            <div class="flex items-center gap-4 w-auto shrink-0 justify-end">
-                <div class="hidden xl:flex items-center gap-6 bg-gradient-to-b from-[#13161c] to-[#0a0c10] border border-tp-border/40 px-6 py-3 rounded-2xl shadow-inner h-16 mr-4">
-                    <div class="flex flex-col items-center gap-1 group relative w-10">
-                        <i id="mindset-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i>
-                    </div>
-                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
-                    <div class="flex flex-col items-center gap-1 group relative w-10">
-                        <i id="market-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i>
-                    </div>
-                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
-                    <div class="flex flex-col items-center gap-1 group relative w-10">
-                        <i id="volatility-icon-wrapper" data-lucide="dollar-sign" class="w-7 h-7 text-tp-accent drop-shadow-[0_0_12px_rgba(32,201,151,0.8)] transition-all duration-300 transform"></i>
-                    </div>
-                </div>
-                <!-- Win Rate Invasivo e Tecnologico -->
-                <div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem] shadow-[0_0_15px_rgba(32,201,151,0.05)]">
-                    <div class="flex flex-col">
-                        <span class="text-[9px] text-tp-accent font-bold uppercase tracking-widest opacity-80">Win Rate</span>
-                        <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-tp-accent to-white drop-shadow-[0_0_8px_rgba(32,201,151,0.6)] leading-none mt-0.5">67%</span>
-                    </div>
-                    <!-- Anello neon -->
-                    <div class="relative w-10 h-10 flex items-center justify-center">
-                        <svg class="w-[120%] h-[120%] transform -rotate-90 overflow-visible absolute" viewBox="0 0 36 36">
-                            <path class="text-tp-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
-                            <path class="text-tp-accent drop-shadow-[0_0_4px_rgba(32,201,151,0.8)]" stroke-dasharray="67, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
+            <div class="flex items-center gap-4 w-auto min-w-max"><div><h1 class="text-xl font-bold tracking-tight text-white mb-1">Eventi</h1><div class="flex gap-2.5 mt-1"><a href="analisi.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Trade Analisi</a><a href="tabella_trades.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Tabella Trades</a><a href="giornaliero.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> Giornaliero</a></div></div></div>
+            <div class="hidden lg:flex items-center flex-1 max-w-3xl mx-8 gap-6"><div class="flex flex-col items-center justify-center shrink-0"><span id="digital-clock" class="text-xl font-display font-bold text-white tracking-widest tabular-nums leading-none">00:00:00</span><div class="flex gap-1 mt-1.5"><span id="tf-5m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted">5m</span><span id="tf-15m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted">15m</span><span id="tf-30m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted">30m</span><span id="tf-1h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted">1h</span><span id="tf-4h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted">4h</span></div></div><div class="flex-col flex-1 relative w-full mx-4"><div class="flex justify-between text-[10px] items-end font-bold uppercase tracking-widest mb-2 px-2"><span class="text-tp-muted opacity-30">Asia</span><span class="text-tp-muted opacity-60">London</span><span class="text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] scale-110 origin-bottom">New York</span><span class="text-tp-muted opacity-30">End</span></div><div class="h-2 w-full bg-gradient-to-r from-tp-bg via-tp-border to-tp-bg rounded-full border border-tp-border/30 relative shadow-inner"><div id="timeline-progress" class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-teal-600 via-tp-accent to-[#22d3ee] rounded-full" style="width:45%"></div><div id="timeline-dot" class="absolute top-1/2 -ml-2.5 -mt-2.5 w-5 h-5 bg-white rounded-full border-[3px] border-tp-accent shadow-[0_0_15px_rgba(32,201,151,0.9)] z-10" style="left:45%"></div></div></div></div>
+            <div class="flex items-center gap-4 w-auto shrink-0 justify-end"><div class="hidden xl:flex items-center gap-6 bg-gradient-to-b from-[#13161c] to-[#0a0c10] border border-tp-border/40 px-6 py-3 rounded-2xl shadow-inner h-16 mr-4"><div class="flex flex-col items-center gap-1 w-10"><i id="mindset-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent drop-shadow-md"></i></div><div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div><div class="flex flex-col items-center gap-1 w-10"><i id="market-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent drop-shadow-md"></i></div><div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div><div class="flex flex-col items-center gap-1 w-10"><i id="volatility-icon-wrapper" data-lucide="dollar-sign" class="w-7 h-7 text-tp-accent drop-shadow-[0_0_12px_rgba(32,201,151,0.8)]"></i></div></div><div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem]"><div class="flex flex-col"><span class="text-[9px] text-tp-accent font-bold uppercase tracking-widest opacity-80">Win Rate</span><span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-tp-accent to-white leading-none mt-0.5">67%</span></div><div class="relative w-10 h-10 flex items-center justify-center"><svg class="w-[120%] h-[120%] transform -rotate-90 overflow-visible absolute" viewBox="0 0 36 36"><path class="text-tp-border" d="M18 2.0845a15.9155 15.9155 0 010 31.831a15.9155 15.9155 0 010-31.831" fill="none" stroke="currentColor" stroke-width="3"/><path class="text-tp-accent" stroke-dasharray="67,100" d="M18 2.0845a15.9155 15.9155 0 010 31.831a15.9155 15.9155 0 010-31.831" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg></div></div></div>
         </header>
 
+        <!-- 3 Tab -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <div class="flex border-b border-tp-border px-8 bg-tp-panel/50 flex-shrink-0">
+                <button onclick="switchMainTab('calendario')" class="main-tab active px-6 py-3 text-sm font-bold uppercase tracking-widest border-b-2 transition-all flex items-center gap-2"><i data-lucide="globe" class="w-4 h-4"></i> Calendario</button>
+                <button onclick="switchMainTab('allert')" class="main-tab px-6 py-3 text-sm font-bold uppercase tracking-widest border-b-2 transition-all flex items-center gap-2"><i data-lucide="bell" class="w-4 h-4"></i> Allert</button>
+                <button onclick="switchMainTab('smile')" class="main-tab px-6 py-3 text-sm font-bold uppercase tracking-widest border-b-2 transition-all flex items-center gap-2"><i data-lucide="heart" class="w-4 h-4"></i> MonitoraSmile</button>
+            </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        <!-- List View -->
-        <div class="flex-1 overflow-y-auto p-8 scroll-smooth">
-            <div class="max-w-7xl mx-auto">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="text-sm text-tp-muted font-medium">
-                        <span>Database generale Eventi e Comportamento</span>
+            <div class="flex-1 overflow-y-auto p-8 scroll-smooth">
+                <!-- TAB 1: CALENDARIO -->
+                <div id="tab-calendario" class="tab-content max-w-7xl mx-auto">
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button onclick="filterCalendar('oggi')" class="cal-filter text-tp-accent bg-tp-accent/10 border border-tp-accent/30 px-3 py-1.5 rounded-lg text-xs font-bold uppercase">Oggi</button>
+                        <button onclick="filterCalendar('domani')" class="cal-filter text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase hover:text-white">Domani</button>
+                        <button onclick="filterCalendar('settimana')" class="cal-filter text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase hover:text-white">Settimana</button>
+                        <button onclick="filterCalendar('tutte')" class="cal-filter text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase hover:text-white">Tutte</button>
+                        <div class="w-px h-6 bg-tp-border self-center mx-2"></div>
+                        <button onclick="toggleImpactFilter('alto', this)" class="cal-impact text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase hover:text-white" data-impact="alto">Alto</button>
+                        <button onclick="toggleImpactFilter('medio', this)" class="cal-impact text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase hover:text-white" data-impact="medio">Medio</button>
+                        <button onclick="toggleImpactFilter('basso', this)" class="cal-impact text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase hover:text-white" data-impact="basso">Basso</button>
                     </div>
+                    <div id="cal-list" class="space-y-2"></div>
+                    <div id="cal-empty" class="hidden text-center py-16 text-tp-muted"><i data-lucide="globe" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm font-bold">Nessuna notizia</p></div>
                 </div>
 
-                <!-- 1. TABELLA NOTIZIE MACRO -->
-                <div class="mb-10">
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-purple-400 mb-4 flex items-center gap-2 border-b border-tp-border pb-2">
-                        <i data-lucide="globe" class="w-4 h-4"></i> Notizie Macro (Economic Calendar)
-                    </h2>
-                    <div class="space-y-2">
-                        
-                        <!-- Riga Modello High Impact -->
-                        <div onclick="window.location.href='dettaglio_allert.html'" class="group flex items-center p-4 bg-tp-panel border border-tp-border hover:border-purple-500/50 rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
-                            <div class="w-1 absolute left-0 top-0 bottom-0 bg-purple-500"></div>
-                            <div class="flex items-center w-1/4 pl-3 gap-3">
-                                <span class="text-xs font-bold text-tp-muted uppercase tracking-widest bg-tp-bg px-2 py-1 rounded">#EVT-92</span>
-                                <span class="font-bold text-lg group-hover:text-purple-400 transition-colors">NFP</span>
-                            </div>
-                            <div class="w-1/4 flex items-center gap-2">
-                                <span class="text-xs font-bold bg-tp-loss/10 text-tp-loss border border-tp-loss/20 px-2 py-0.5 rounded uppercase">High Impact</span>
-                                <span class="text-xs font-bold text-tp-muted ml-2">14:30 (GMT+1)</span>
-                            </div>
-                            <div class="w-1/4 flex flex-col text-sm text-tp-muted justify-center">
-                                <span>Actual: <span class="text-white">303K</span> (F: 205K)</span>
-                                <span class="text-xs mt-0.5"><span class="text-tp-loss text-[10px] uppercase font-bold">XAU ↓</span> / <span class="text-tp-accent text-[10px] uppercase font-bold">DXY ↑</span></span>
-                            </div>
-                            <div class="w-1/4 flex items-center justify-end gap-6 pr-4">
-                                <i data-lucide="chevron-right" class="w-5 h-5 text-tp-muted group-hover:text-purple-400 transition-colors"></i>
-                            </div>
-                        </div>
-
-                        <!-- Riga Modello Medium Impact -->
-                        <div onclick="window.location.href='dettaglio_allert.html'" class="group flex items-center p-4 bg-tp-panel border border-tp-border hover:border-tp-warning/50 rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
-                            <div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-warning"></div>
-                            <div class="flex items-center w-1/4 pl-3 gap-3">
-                                <span class="text-xs font-bold text-tp-muted uppercase tracking-widest bg-tp-bg px-2 py-1 rounded">#EVT-91</span>
-                                <span class="font-bold text-lg group-hover:text-tp-warning transition-colors">Jobless Claims</span>
-                            </div>
-                            <div class="w-1/4 flex items-center gap-2">
-                                <span class="text-xs font-bold bg-tp-warning/10 text-tp-warning border border-tp-warning/20 px-2 py-0.5 rounded uppercase">Med Impact</span>
-                                <span class="text-xs font-bold text-tp-muted ml-2">14:30 (GMT+1)</span>
-                            </div>
-                            <div class="w-1/4 flex flex-col text-sm text-tp-muted justify-center">
-                                <span>Actual: <span class="text-white">210K</span> (F: 215K)</span>
-                                <span class="text-xs mt-0.5"><span class="text-tp-accent text-[10px] uppercase font-bold">US30 ↑</span></span>
-                            </div>
-                            <div class="w-1/4 flex items-center justify-end gap-6 pr-4">
-                                <i data-lucide="chevron-right" class="w-5 h-5 text-tp-muted group-hover:text-tp-warning transition-colors"></i>
-                            </div>
-                        </div>
-                    </div>
+                <!-- TAB 2: ALLERT -->
+                <div id="tab-allert" class="tab-content hidden max-w-7xl mx-auto">
+                    <div id="allert-list" class="space-y-2"></div>
+                    <div id="allert-empty" class="hidden text-center py-16 text-tp-muted"><i data-lucide="bell" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm font-bold">Nessun allert</p></div>
                 </div>
 
-                <!-- 2. TABELLA ALLERT -->
-                <div class="mb-10">
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-[#22d3ee] mb-4 flex items-center gap-2 border-b border-tp-border pb-2">
-                        <i data-lucide="bell-ring" class="w-4 h-4"></i> Allert di Prezzo (MT4 Custom)
-                    </h2>
-                    <div class="space-y-2">
-                        
-                        <!-- Riga Custom Alert -->
-                        <div onclick="window.location.href='dettaglio_allert.html'" class="opacity-70 group flex items-center p-4 bg-tp-panel border border-tp-border hover:border-[#22d3ee]/50 rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
-                            <div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-border group-hover:bg-[#22d3ee] transition-colors"></div>
-                            <div class="flex items-center w-1/4 pl-3 gap-3">
-                                <span class="text-xs font-bold text-tp-muted uppercase tracking-widest bg-tp-bg px-2 py-1 rounded">#ALRT-15</span>
-                                <span class="font-bold text-lg text-tp-muted group-hover:text-white transition-colors">EURUSD Target</span>
-                            </div>
-                            <div class="w-1/4 flex items-center gap-2">
-                                <span class="text-xs font-bold bg-[#22d3ee]/10 text-[#22d3ee] border border-[#22d3ee]/20 px-2 py-0.5 rounded uppercase">Price Alert</span>
-                            </div>
-                            <div class="w-1/4 flex flex-col text-sm text-tp-muted justify-center">
-                                <span>Triggered: <span class="text-white">1.0850</span></span>
-                                <span class="text-xs mt-0.5">Ignorato manual.</span>
-                            </div>
-                            <div class="w-1/4 flex items-center justify-end gap-6 pr-4">
-                                <i data-lucide="chevron-right" class="w-5 h-5 text-tp-muted group-hover:text-[#22d3ee] transition-colors"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. TABELLA MINDSET -->
-                <div class="mb-10">
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-tp-accent mb-4 flex items-center gap-2 border-b border-tp-border pb-2">
-                        <i data-lucide="smile" class="w-4 h-4"></i> MonitoraSmile (Mindset Registrati)
-                    </h2>
-                    <div class="space-y-2">
-                        
-                        <!-- Riga Modello Mindset -->
-                        <div class="group flex items-center p-4 bg-tp-panel border border-tp-border hover:border-tp-accent/50 rounded-lg transition-all cursor-default shadow-sm relative overflow-hidden">
-                            <div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-accent"></div>
-                            <div class="flex items-center w-1/4 pl-3 gap-3">
-                                <span class="text-xs font-bold text-tp-muted uppercase tracking-widest bg-tp-bg px-2 py-1 rounded">#MIND-01</span>
-                                <span class="font-bold text-lg text-white">Focussed / Calmo</span>
-                            </div>
-                            <div class="w-1/4 flex items-center gap-2">
-                                <span class="text-xs font-bold bg-tp-accent/10 text-tp-accent border border-tp-accent/20 px-2 py-0.5 rounded uppercase">Mood Pre-Market</span>
-                                <span class="text-xs font-bold text-tp-muted ml-2">Oggi, 08:30</span>
-                            </div>
-                            <div class="w-1/4 flex flex-col text-sm text-tp-muted justify-center">
-                                <span class="italic">"Ottima dormita, pronto per NY"</span>
-                            </div>
-                            <div class="w-1/4 flex items-center justify-end gap-6 pr-4">
-                                <div class="flex items-center gap-3">
-                                    <i data-lucide="smile" class="w-5 h-5 text-tp-accent"></i>
-                                    <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4 text-tp-accent"></i></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Riga Modello Mindset Negativo -->
-                        <div class="group flex items-center p-4 bg-tp-panel border border-tp-border hover:border-tp-loss/50 rounded-lg transition-all cursor-default shadow-sm relative overflow-hidden">
-                            <div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-loss"></div>
-                            <div class="flex items-center w-1/4 pl-3 gap-3">
-                                <span class="text-xs font-bold text-tp-muted uppercase tracking-widest bg-tp-bg px-2 py-1 rounded">#MIND-02</span>
-                                <span class="font-bold text-lg text-white">FOMO / Fretta</span>
-                            </div>
-                            <div class="w-1/4 flex items-center gap-2">
-                                <span class="text-xs font-bold bg-tp-loss/10 text-tp-loss border border-tp-loss/20 px-2 py-0.5 rounded uppercase">Post-Trade</span>
-                                <span class="text-xs font-bold text-tp-muted ml-2">Ieri, 15:45</span>
-                            </div>
-                            <div class="w-1/4 flex flex-col text-sm text-tp-muted justify-center">
-                                <span class="italic">"Ingresso anticipato per colpa di X(Twitter)"</span>
-                            </div>
-                            <div class="w-1/4 flex items-center justify-end gap-6 pr-4">
-                                <div class="flex items-center gap-3">
-                                    <i data-lucide="frown" class="w-5 h-5 text-tp-loss"></i>
-                                    <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4 text-tp-loss"></i><i data-lucide="dollar-sign" class="w-4 h-4 -ml-2 text-tp-loss"></i><i data-lucide="dollar-sign" class="w-4 h-4 -ml-2 text-tp-loss"></i></div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+                <!-- TAB 3: MONITORASMILE -->
+                <div id="tab-smile" class="tab-content hidden max-w-7xl mx-auto">
+                    <div id="smile-list" class="space-y-2"></div>
+                    <div id="smile-empty" class="hidden text-center py-16 text-tp-muted"><i data-lucide="heart" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm font-bold">Nessun record</p></div>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- MODAL: Validazione Post-Notizia -->
+    <div id="modal-news" class="fixed inset-0 z-50 flex items-start pt-16 justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal('modal-news')"></div>
+        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-3xl mx-4 relative z-10 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-tp-panel relative"><div class="absolute top-0 bottom-0 left-0 w-1 bg-purple-500"></div><div class="flex items-center gap-3"><div class="bg-purple-500/10 p-2 rounded-lg border border-purple-500/20"><i data-lucide="globe" class="w-5 h-5 text-purple-400"></i></div><h2 id="modal-news-title" class="text-lg font-bold">Validazione Post-Notizia</h2></div><button onclick="closeModal('modal-news')" class="text-tp-muted hover:text-tp-loss p-1.5 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+            <div class="p-6 overflow-y-auto flex flex-col gap-5">
+                <div class="bg-tp-panel border border-tp-border rounded-lg p-4"><h3 class="text-[10px] font-bold uppercase tracking-widest text-purple-400 mb-3 flex items-center gap-2"><i data-lucide="download" class="w-3 h-3"></i> Dati Importati (N8N)</h3><div class="grid grid-cols-3 gap-3"><div><span class="text-[9px] text-tp-muted uppercase font-bold block">Evento</span><span id="mn-evento" class="text-sm font-bold text-white">--</span></div><div><span class="text-[9px] text-tp-muted uppercase font-bold block">Precedente</span><span id="mn-precedente" class="text-sm font-bold text-tp-muted">--</span></div><div><span class="text-[9px] text-tp-muted uppercase font-bold block">Previsto</span><span id="mn-previsto" class="text-sm font-bold text-white">--</span></div></div><div class="mt-3 pt-3 border-t border-tp-border/50"><span class="text-[9px] text-tp-muted uppercase font-bold block mb-1">Analisi AI</span><p id="mn-analisi-ai" class="text-xs text-tp-muted/80 italic">--</p></div></div>
+                <div class="grid grid-cols-3 gap-4"><div><label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-2">Dato Effettivo</label><input id="mn-effettivo" type="text" placeholder="Es. 303K" class="w-full bg-[#161920] border border-tp-border rounded-lg px-3 py-2.5 text-lg text-tp-accent font-bold outline-none focus:border-tp-accent"></div><div class="col-span-2"><label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-2">Commento</label><input id="mn-commento" type="text" placeholder="Il tuo commento..." class="w-full bg-[#161920] border border-tp-border rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-tp-accent"></div></div>
+                <div class="bg-tp-panel border border-tp-border rounded-lg p-4"><h3 class="text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-3">Impatto Mercato</h3><div class="flex gap-6"><div class="flex-1"><span class="text-xs font-bold text-white block mb-2">XAU/USD</span><div class="flex gap-2"><button onclick="setImpact('xau','up')" id="xau-up" class="impact-xau flex-1 py-2 rounded-lg border border-tp-border text-tp-muted font-bold text-sm transition-all hover:border-tp-accent/50 flex items-center justify-center gap-1"><i data-lucide="trending-up" class="w-4 h-4"></i> Up</button><button onclick="setImpact('xau','down')" id="xau-down" class="impact-xau flex-1 py-2 rounded-lg border border-tp-border text-tp-muted font-bold text-sm transition-all hover:border-tp-loss/50 flex items-center justify-center gap-1"><i data-lucide="trending-down" class="w-4 h-4"></i> Down</button></div></div><div class="w-px bg-tp-border"></div><div class="flex-1"><span class="text-xs font-bold text-white block mb-2">Indici</span><div class="flex gap-2"><button onclick="setImpact('indici','up')" id="indici-up" class="impact-indici flex-1 py-2 rounded-lg border border-tp-border text-tp-muted font-bold text-sm transition-all hover:border-tp-accent/50 flex items-center justify-center gap-1"><i data-lucide="trending-up" class="w-4 h-4"></i> Up</button><button onclick="setImpact('indici','down')" id="indici-down" class="impact-indici flex-1 py-2 rounded-lg border border-tp-border text-tp-muted font-bold text-sm transition-all hover:border-tp-loss/50 flex items-center justify-center gap-1"><i data-lucide="trending-down" class="w-4 h-4"></i> Down</button></div></div></div></div>
+                <div class="bg-tp-panel border border-tp-border rounded-lg p-4"><label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2"><i data-lucide="link" class="w-3 h-3 text-tp-accent"></i> Categorizzatore</label><div class="flex gap-2 mb-3"><button onclick="switchModalCat('cronache')" id="mcat-tab-cronache" class="cat-tab active flex-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase">Cronache</button><button onclick="switchModalCat('strategie')" id="mcat-tab-strategie" class="cat-tab flex-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase">Strategia</button><button onclick="switchModalCat('trades')" id="mcat-tab-trades" class="cat-tab flex-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-500 text-blue-400 bg-blue-500/10 uppercase">Trade</button></div><div id="mcat-cronache" class="mcat-panel"><select id="msel-cronache" multiple class="w-full bg-[#0a0c10] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[70px]"></select></div><div id="mcat-strategie" class="mcat-panel hidden"><select id="msel-strategie" multiple class="w-full bg-[#0a0c10] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none h-[70px]"></select></div><div id="mcat-trades" class="mcat-panel hidden"><select id="msel-trades" multiple class="w-full bg-[#0a0c10] border border-blue-500/30 rounded-lg px-3 py-2 text-xs text-blue-400 font-bold outline-none h-[70px]"></select></div></div>
+            </div>
+            <div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel"><button onclick="ignoreNews()" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white border border-tp-border rounded-lg">Ignora</button><button onclick="saveNews()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider">Salva</button></div>
+        </div>
+    </div>
+
+    <!-- MODAL: Validazione Allert -->
+    <div id="modal-allert" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="closeModal('modal-allert')"></div>
+        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-[1100px] mx-4 relative z-10 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-tp-panel relative"><div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-warning"></div><div class="flex items-center gap-3"><div class="bg-tp-warning/10 p-2 rounded-lg border border-tp-warning/20"><i data-lucide="bell" class="w-5 h-5 text-tp-warning"></i></div><h2 id="modal-allert-title" class="text-lg font-bold">Validazione Allert</h2></div><button onclick="closeModal('modal-allert')" class="text-tp-muted hover:text-tp-loss p-1.5 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+            <div class="p-6 overflow-y-auto flex flex-col lg:flex-row gap-6">
+                <div class="flex-1 flex flex-col gap-5">
+                    <div class="bg-tp-panel border border-tp-border rounded-lg p-4"><h3 class="text-[10px] font-bold uppercase tracking-widest text-tp-warning mb-3">Dati Ricevuti</h3><div class="grid grid-cols-2 gap-3"><div><span class="text-[9px] text-tp-muted uppercase font-bold block">Coin</span><span id="ma-coin" class="text-sm font-bold text-white">--</span></div><div><span class="text-[9px] text-tp-muted uppercase font-bold block">Prezzo</span><span id="ma-prezzo" class="text-sm font-bold text-tp-warning">--</span></div><div><span class="text-[9px] text-tp-muted uppercase font-bold block">Ora</span><span id="ma-ora" class="text-sm font-bold text-tp-muted">--</span></div><div><span class="text-[9px] text-tp-muted uppercase font-bold block">Descrizione</span><span id="ma-desc" class="text-sm text-tp-muted">--</span></div></div></div>
+                    <div><label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-2">Commento</label><textarea id="ma-commento" class="w-full bg-[#161920] border border-tp-border rounded-lg px-3 py-3 text-sm outline-none text-white min-h-[80px] resize-none focus:border-tp-accent" placeholder="Analisi..."></textarea></div>
+                    <div class="bg-tp-panel border border-tp-border rounded-lg p-4"><label class="block text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-3">Stato Emotivo & Volatilita</label><div class="flex items-center gap-6"><div class="flex items-center gap-1 bg-[#0a0c10] p-1.5 rounded-lg border border-tp-border"><button onclick="setAlertMindset('positive')" class="a-mindset-btn p-2 rounded-md text-tp-muted hover:bg-[#161920]"><i data-lucide="smile" class="w-5 h-5"></i></button><button onclick="setAlertMindset('neutral')" class="a-mindset-btn p-2 rounded-md text-tp-muted hover:bg-[#161920]"><i data-lucide="meh" class="w-5 h-5"></i></button><button onclick="setAlertMindset('negative')" class="a-mindset-btn p-2 rounded-md text-tp-muted hover:bg-[#161920]"><i data-lucide="frown" class="w-5 h-5"></i></button></div><div class="w-px h-8 bg-tp-border"></div><div class="flex items-center gap-1 bg-[#0a0c10] p-1.5 rounded-lg border border-tp-border"><button onclick="setAlertVol('low')" class="a-vol-btn p-2 rounded-md text-tp-muted hover:bg-[#161920]"><i data-lucide="dollar-sign" class="w-5 h-5"></i></button><button onclick="setAlertVol('medium')" class="a-vol-btn p-2 rounded-md text-tp-muted hover:bg-[#161920]"><div class="flex"><i data-lucide="dollar-sign" class="w-5 h-5"></i><i data-lucide="dollar-sign" class="w-5 h-5 -ml-2"></i></div></button><button onclick="setAlertVol('high')" class="a-vol-btn p-2 rounded-md text-tp-muted hover:bg-[#161920]"><div class="flex"><i data-lucide="dollar-sign" class="w-5 h-5"></i><i data-lucide="dollar-sign" class="w-5 h-5 -ml-2"></i><i data-lucide="dollar-sign" class="w-5 h-5 -ml-2"></i></div></button></div></div></div>
+                    <div class="bg-tp-panel border border-tp-border rounded-lg p-4"><label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2"><i data-lucide="link" class="w-3 h-3 text-tp-accent"></i> Categorizzatore</label><div class="flex gap-2 mb-3"><button onclick="switchAlertCat('cronache')" id="acat-tab-cronache" class="cat-tab active flex-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase">Cronache</button><button onclick="switchAlertCat('strategie')" id="acat-tab-strategie" class="cat-tab flex-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase">Strategia</button><button onclick="switchAlertCat('trades')" id="acat-tab-trades" class="cat-tab flex-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-500 text-blue-400 bg-blue-500/10 uppercase">Trade</button></div><div id="acat-cronache" class="acat-panel"><select id="asel-cronache" multiple class="w-full bg-[#0a0c10] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[70px]"></select></div><div id="acat-strategie" class="acat-panel hidden"><select id="asel-strategie" multiple class="w-full bg-[#0a0c10] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none h-[70px]"></select></div><div id="acat-trades" class="acat-panel hidden"><select id="asel-trades" multiple class="w-full bg-[#0a0c10] border border-blue-500/30 rounded-lg px-3 py-2 text-xs text-blue-400 font-bold outline-none h-[70px]"></select></div></div>
+                </div>
+                <div class="lg:w-1/2 flex flex-col"><label class="text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2"><i data-lucide="image" class="w-4 h-4"></i> Screenshot</label><div id="allert-screen-empty" onclick="document.getElementById('allert-screen-input').click()" class="border-2 border-dashed border-tp-border rounded-xl flex flex-col items-center justify-center cursor-pointer bg-[#0a0c10] hover:border-tp-warning/50 transition-all" style="aspect-ratio:16/9"><i data-lucide="upload-cloud" class="w-10 h-10 text-tp-muted/40 mx-auto mb-2"></i><span class="text-xs font-bold text-tp-muted uppercase tracking-widest">Carica Screenshot</span></div><div id="allert-screen-filled" class="hidden rounded-xl overflow-hidden border border-tp-border bg-[#0a0c10] relative" style="aspect-ratio:16/9"><img id="allert-screen-img" class="w-full h-full object-contain" alt=""><button onclick="removeAllertScreen()" class="absolute top-2 right-2 bg-black/70 text-tp-loss p-1.5 rounded-lg z-10"><i data-lucide="x" class="w-4 h-4"></i></button></div><input type="file" accept="image/*" class="hidden" id="allert-screen-input" onchange="handleAllertScreen(this.files)"></div>
+            </div>
+            <div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel"><button onclick="ignoreAllert()" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white border border-tp-border rounded-lg">Ignora</button><button onclick="saveAllert()" class="bg-tp-warning hover:bg-tp-warning/80 text-[#0e1116] px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider">Accetta & Salva</button></div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
     <script>
-        lucide.createIcons();
+        let allCalendar = [], allAllerts = [], currentNewsId = null, currentAllertId = null;
+        let alertMindset = '', alertVol = '', allertScreenshot = '', newsImpact = { xau: '', indici: '' };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            lucide.createIcons();
+            if (!db) return;
+            await Promise.all([loadCalendar(), loadAllerts(), loadSmile(), loadCategorizers()]);
+        });
+
+        function switchMainTab(tab) {
+            document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            event.target.closest('.main-tab').classList.add('active');
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+        }
+
+        // === CALENDARIO ===
+        async function loadCalendar() {
+            const { data } = await db.from('allert').select('*').order('data_evento', { ascending: false });
+            allCalendar = data || [];
+            renderCalendar(allCalendar);
+        }
+
+        function renderCalendar(items) {
+            const list = document.getElementById('cal-list'), empty = document.getElementById('cal-empty');
+            if (!items.length) { empty.classList.remove('hidden'); list.innerHTML = ''; return; }
+            empty.classList.add('hidden');
+            list.innerHTML = items.map(n => {
+                const ic = n.impatto === 'alto' ? 'tp-loss' : n.impatto === 'medio' ? 'tp-warning' : 'tp-muted';
+                const bar = n.impatto === 'alto' ? 'bg-tp-loss' : n.impatto === 'medio' ? 'bg-tp-warning' : 'bg-tp-border';
+                const st = n.stato || 'nuovo';
+                const badge = st === 'completato' ? '<span class="text-[9px] px-2 py-0.5 rounded bg-tp-accent/10 text-tp-accent border border-tp-accent/20 font-bold uppercase">Completato</span>' : st === 'ignorato' ? '<span class="text-[9px] px-2 py-0.5 rounded bg-tp-border text-tp-muted font-bold uppercase">Ignorato</span>' : '<span class="text-[9px] px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold uppercase">Da lavorare</span>';
+                const d = n.data_evento ? new Date(n.data_evento+'T00:00:00').toLocaleDateString('it-IT',{day:'2-digit',month:'short'}) : '';
+                const t = n.ora_evento ? n.ora_evento.substring(0,5) : '';
+                return `<div onclick="openNewsModal('${n.id}')" class="group flex items-center p-4 bg-tp-panel border border-tp-border hover:border-${ic}/50 rounded-lg cursor-pointer shadow-sm relative overflow-hidden"><div class="w-1 absolute left-0 top-0 bottom-0 ${bar}"></div><div class="w-[30%] pl-3"><span class="font-bold text-sm text-white group-hover:text-${ic}">${n.titolo||'--'}</span><span class="text-[10px] text-tp-muted ml-2">${n.valuta||''}</span></div><div class="w-[15%] flex gap-2"><span class="text-xs font-bold text-tp-muted">${d}</span><span class="text-xs font-bold text-white">${t}</span></div><div class="w-[15%]"><span class="text-[10px] font-bold px-2 py-0.5 rounded border border-${ic}/30 text-${ic} uppercase">${n.impatto||'--'}</span></div><div class="w-[20%] flex gap-3 text-xs"><div><span class="text-[9px] text-tp-muted block">Prev</span><span class="font-bold text-tp-muted">${n.valore_atteso||'--'}</span></div><div><span class="text-[9px] text-tp-muted block">Eff</span><span class="font-bold ${n.valore_effettivo?'text-tp-accent':'text-tp-muted/40'}">${n.valore_effettivo||'--'}</span></div></div><div class="w-[20%] flex justify-end items-center gap-3">${badge}<i data-lucide="chevron-right" class="w-4 h-4 text-tp-muted"></i></div></div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function filterCalendar(p) {
+            document.querySelectorAll('.cal-filter').forEach(b=>{b.classList.remove('text-tp-accent','bg-tp-accent/10','border-tp-accent/30');b.classList.add('text-tp-muted','border-tp-border')});
+            event.target.classList.add('text-tp-accent','bg-tp-accent/10','border-tp-accent/30');event.target.classList.remove('text-tp-muted','border-tp-border');
+            const today=new Date().toISOString().split('T')[0], tmr=new Date(Date.now()+864e5).toISOString().split('T')[0], wk=new Date(Date.now()+7*864e5).toISOString().split('T')[0];
+            let f=allCalendar;
+            if(p==='oggi')f=allCalendar.filter(n=>n.data_evento===today);
+            if(p==='domani')f=allCalendar.filter(n=>n.data_evento===tmr);
+            if(p==='settimana')f=allCalendar.filter(n=>n.data_evento>=today&&n.data_evento<=wk);
+            renderCalendar(f);
+        }
+        let activeImpacts = [];
+        function toggleImpactFilter(level, btn) {
+            const idx = activeImpacts.indexOf(level);
+            const colors = { alto: ['text-tp-loss', 'border-tp-loss/30', 'bg-tp-loss/10'], medio: ['text-tp-warning', 'border-tp-warning/30', 'bg-tp-warning/10'], basso: ['text-tp-accent', 'border-tp-accent/30', 'bg-tp-accent/10'] };
+            if (idx > -1) {
+                // Deselect
+                activeImpacts.splice(idx, 1);
+                btn.classList.remove(...colors[level]);
+                btn.classList.add('text-tp-muted', 'border-tp-border');
+            } else {
+                // Select
+                activeImpacts.push(level);
+                btn.classList.add(...colors[level]);
+                btn.classList.remove('text-tp-muted', 'border-tp-border');
+            }
+            if (activeImpacts.length === 0) renderCalendar(allCalendar);
+            else renderCalendar(allCalendar.filter(n => activeImpacts.includes(n.impatto)));
+        }
+
+        function openNewsModal(id) {
+            currentNewsId=id; const n=allCalendar.find(x=>x.id===id); if(!n)return;
+            document.getElementById('mn-evento').textContent=n.titolo||'--';
+            document.getElementById('mn-precedente').textContent=n.valore_atteso||'--';
+            document.getElementById('mn-previsto').textContent=n.valore_atteso||'--';
+            document.getElementById('mn-analisi-ai').textContent=n.note||'Nessuna analisi AI';
+            document.getElementById('mn-effettivo').value=n.valore_effettivo||'';
+            document.getElementById('mn-commento').value='';
+            document.getElementById('modal-news-title').textContent=`Validazione: ${n.titolo||'Notizia'}`;
+            newsImpact={xau:'',indici:''};
+            document.querySelectorAll('.impact-xau,.impact-indici').forEach(b=>{b.classList.remove('border-tp-accent','text-tp-accent','bg-tp-accent/10','border-tp-loss','text-tp-loss','bg-tp-loss/10');b.classList.add('border-tp-border','text-tp-muted')});
+            document.getElementById('modal-news').classList.add('open'); lucide.createIcons();
+        }
+
+        function setImpact(asset,dir) {
+            newsImpact[asset]=dir;
+            document.querySelectorAll('.impact-'+asset).forEach(b=>{b.classList.remove('border-tp-accent','text-tp-accent','bg-tp-accent/10','border-tp-loss','text-tp-loss','bg-tp-loss/10');b.classList.add('border-tp-border','text-tp-muted')});
+            const btn=document.getElementById(`${asset}-${dir}`);
+            if(dir==='up'){btn.classList.add('border-tp-accent','text-tp-accent','bg-tp-accent/10');btn.classList.remove('border-tp-border','text-tp-muted')}
+            else{btn.classList.add('border-tp-loss','text-tp-loss','bg-tp-loss/10');btn.classList.remove('border-tp-border','text-tp-muted')}
+        }
+
+        async function saveNews(){
+            await db.from('allert').update({valore_effettivo:document.getElementById('mn-effettivo').value,stato:'completato'}).eq('id',currentNewsId);
+            closeModal('modal-news'); await loadCalendar();
+        }
+        async function ignoreNews(){
+            await db.from('allert').update({stato:'ignorato'}).eq('id',currentNewsId);
+            closeModal('modal-news'); await loadCalendar();
+        }
+
+        // === ALLERT PREZZO ===
+        async function loadAllerts() {
+            const { data } = await db.from('allert_prezzo').select('*').order('created_at',{ascending:false});
+            allAllerts=data||[]; renderAllerts(allAllerts);
+        }
+
+        function renderAllerts(items) {
+            const list=document.getElementById('allert-list'),empty=document.getElementById('allert-empty');
+            if(!items.length){empty.classList.remove('hidden');list.innerHTML='';return}
+            empty.classList.add('hidden');
+            list.innerHTML=items.map(a=>{
+                const st=a.stato||'nuovo';
+                const badge=st==='completato'?'<span class="text-[9px] px-2 py-0.5 rounded bg-tp-accent/10 text-tp-accent border border-tp-accent/20 font-bold uppercase">Completato</span>':st==='ignorato'?'<span class="text-[9px] px-2 py-0.5 rounded bg-tp-border text-tp-muted font-bold uppercase">Ignorato</span>':'<span class="text-[9px] px-2 py-0.5 rounded bg-tp-warning/10 text-tp-warning border border-tp-warning/20 font-bold uppercase">Da lavorare</span>';
+                const t=a.ora?a.ora.substring(0,5):new Date(a.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+                return `<div onclick="openAllertModal('${a.id}')" class="group flex items-center p-4 bg-tp-panel border border-tp-border hover:border-tp-warning/50 rounded-lg cursor-pointer shadow-sm relative overflow-hidden"><div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-warning"></div><div class="w-1/4 pl-3 flex items-center gap-3"><span class="font-bold text-sm text-white group-hover:text-tp-warning">${a.coin||'--'}</span><span class="text-xs font-bold text-tp-warning">${a.prezzo||''}</span></div><div class="w-1/4 text-xs text-tp-muted">${t} - ${a.descrizione||''}</div><div class="w-1/4">${badge}</div><div class="w-1/4 flex justify-end"><i data-lucide="chevron-right" class="w-4 h-4 text-tp-muted group-hover:text-tp-warning"></i></div></div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function openAllertModal(id) {
+            currentAllertId=id; const a=allAllerts.find(x=>x.id===id); if(!a)return;
+            document.getElementById('ma-coin').textContent=a.coin||'--';
+            document.getElementById('ma-prezzo').textContent=a.prezzo||'--';
+            document.getElementById('ma-ora').textContent=a.ora||'--';
+            document.getElementById('ma-desc').textContent=a.descrizione||'--';
+            document.getElementById('ma-commento').value=a.commento||'';
+            document.getElementById('modal-allert-title').textContent=`Allert: ${a.coin||''} ${a.prezzo||''}`;
+            allertScreenshot=a.screenshot||''; renderAllertScreen();
+            alertMindset='';alertVol='';
+            document.querySelectorAll('.a-mindset-btn,.a-vol-btn').forEach(b=>{b.classList.remove('text-tp-accent','text-tp-warning','text-tp-loss');b.classList.add('text-tp-muted')});
+            document.getElementById('modal-allert').classList.add('open'); lucide.createIcons();
+        }
+
+        function renderAllertScreen(){
+            const e=document.getElementById('allert-screen-empty'),f=document.getElementById('allert-screen-filled'),i=document.getElementById('allert-screen-img');
+            if(allertScreenshot){i.src=allertScreenshot;e.classList.add('hidden');f.classList.remove('hidden')}else{e.classList.remove('hidden');f.classList.add('hidden')}
+        }
+        function handleAllertScreen(files){if(!files.length)return;const r=new FileReader();r.onload=e=>{allertScreenshot=e.target.result;renderAllertScreen();lucide.createIcons()};r.readAsDataURL(files[0])}
+        function removeAllertScreen(){allertScreenshot='';renderAllertScreen();lucide.createIcons()}
+
+        function setAlertMindset(type){
+            alertMindset=type;
+            document.querySelectorAll('.a-mindset-btn').forEach(b=>{b.classList.remove('text-tp-accent','text-tp-warning','text-tp-loss');b.classList.add('text-tp-muted')});
+            const btns=document.querySelectorAll('.a-mindset-btn');
+            if(type==='positive'){btns[0].classList.remove('text-tp-muted');btns[0].classList.add('text-tp-accent')}
+            if(type==='neutral'){btns[1].classList.remove('text-tp-muted');btns[1].classList.add('text-tp-warning')}
+            if(type==='negative'){btns[2].classList.remove('text-tp-muted');btns[2].classList.add('text-tp-loss')}
+            saveSmileRecord(type,alertVol);
+        }
+        function setAlertVol(type){
+            alertVol=type;
+            document.querySelectorAll('.a-vol-btn').forEach(b=>{b.classList.remove('text-tp-accent','text-tp-warning','text-tp-loss');b.classList.add('text-tp-muted')});
+            const btns=document.querySelectorAll('.a-vol-btn');
+            if(type==='low'){btns[0].classList.remove('text-tp-muted');btns[0].classList.add('text-tp-loss')}
+            if(type==='medium'){btns[1].classList.remove('text-tp-muted');btns[1].classList.add('text-tp-warning')}
+            if(type==='high'){btns[2].classList.remove('text-tp-muted');btns[2].classList.add('text-tp-accent')}
+            saveSmileRecord(alertMindset,type);
+        }
+
+        async function saveAllert(){
+            await db.from('allert_prezzo').update({commento:document.getElementById('ma-commento').value,screenshot:allertScreenshot,stato:'completato'}).eq('id',currentAllertId);
+            closeModal('modal-allert'); await loadAllerts();
+        }
+        async function ignoreAllert(){
+            await db.from('allert_prezzo').update({stato:'ignorato'}).eq('id',currentAllertId);
+            closeModal('modal-allert'); await loadAllerts();
+        }
+
+        // === MONITORASMILE ===
+        async function loadSmile(){
+            const{data}=await db.from('monitora_smile').select('*').order('created_at',{ascending:false});
+            renderSmile(data||[]);
+        }
+
+        function renderSmile(items){
+            const list=document.getElementById('smile-list'),empty=document.getElementById('smile-empty');
+            if(!items.length){empty.classList.remove('hidden');list.innerHTML='';return}
+            empty.classList.add('hidden');
+            list.innerHTML=items.map(s=>{
+                const mi=s.mindset==='positive'?'smile':s.mindset==='negative'?'frown':'meh';
+                const mc=s.mindset==='positive'?'text-tp-accent':s.mindset==='negative'?'text-tp-loss':'text-tp-warning';
+                const vc=s.volatilita==='high'?'text-tp-accent':s.volatilita==='low'?'text-tp-loss':'text-tp-warning';
+                const vt=s.volatilita==='high'?'$$$':s.volatilita==='medium'?'$$':s.volatilita==='low'?'$':'--';
+                const d=new Date(s.created_at).toLocaleString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+                return `<div class="flex items-center p-4 bg-tp-panel border border-tp-border rounded-lg shadow-sm relative overflow-hidden"><div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-accent"></div><div class="w-1/4 pl-3 flex items-center gap-3"><i data-lucide="${mi}" class="w-6 h-6 ${mc}"></i><span class="font-bold text-sm ${mc} capitalize">${s.mindset||'--'}</span></div><div class="w-1/4 font-bold ${vc}">${vt}</div><div class="w-1/4 text-xs text-tp-muted">${s.sorgente||'manuale'}</div><div class="w-1/4 text-xs text-tp-muted text-right">${d}</div></div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        async function saveSmileRecord(m,v){
+            if(!m&&!v)return;
+            await db.from('monitora_smile').insert({mindset:m||null,volatilita:v||null,sorgente:'eventi'});
+            await loadSmile();
+        }
+
+        // === CATEGORIZERS ===
+        async function loadCategorizers(){
+            const{data:cr}=await db.from('cronache').select('id,data,titolo').order('data',{ascending:false}).limit(20);
+            const{data:st}=await db.from('strategie').select('id,nome').order('nome');
+            const{data:tr}=await db.from('trades').select('id,asset,direzione,data').order('data',{ascending:false}).limit(30);
+            ['msel','asel'].forEach(px=>{
+                const sc=document.getElementById(px+'-cronache'),ss=document.getElementById(px+'-strategie'),st2=document.getElementById(px+'-trades');
+                (cr||[]).forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.data} - ${c.titolo}`;sc.appendChild(o)});
+                (st||[]).forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.nome;ss.appendChild(o)});
+                (tr||[]).forEach(t=>{const o=document.createElement('option');o.value=t.id;const d=new Date(t.data).toLocaleDateString('it-IT',{day:'2-digit',month:'short'});o.textContent=`${t.asset} ${t.direzione} - ${d}`;st2.appendChild(o)});
+            });
+        }
+
+        function switchModalCat(tab){document.querySelectorAll('.mcat-panel').forEach(p=>p.classList.add('hidden'));document.querySelectorAll('[id^="mcat-tab-"]').forEach(t=>t.classList.remove('active'));document.getElementById('mcat-'+tab).classList.remove('hidden');document.getElementById('mcat-tab-'+tab).classList.add('active')}
+        function switchAlertCat(tab){document.querySelectorAll('.acat-panel').forEach(p=>p.classList.add('hidden'));document.querySelectorAll('[id^="acat-tab-"]').forEach(t=>t.classList.remove('active'));document.getElementById('acat-'+tab).classList.remove('hidden');document.getElementById('acat-tab-'+tab).classList.add('active')}
+        function closeModal(id){document.getElementById(id).classList.remove('open')}
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -131,6 +131,11 @@
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span>
             </a>
+
+            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span>
+            </a>
             
             <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div>
@@ -287,253 +292,85 @@
 
 
 
-        <!-- Database List View (Notion Database Style) -->
+        <!-- Database List View -->
+        <!-- Database List View -->
         <div class="flex-1 overflow-y-auto p-8">
-            
             <div class="max-w-7xl mx-auto">
                 <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-4 text-sm text-tp-muted font-medium">
-                        <button class="hover:text-tp-text transition-colors flex items-center gap-1"><i data-lucide="filter" class="w-4 h-4"></i> Filtra</button>
-                        <button class="hover:text-tp-text transition-colors flex items-center gap-1"><i data-lucide="arrow-up-down" class="w-4 h-4"></i> Ordina</button>
-                        <span>4 Giornate archiviate</span>
-                    </div>
-                    <div class="flex items-center gap-2 bg-tp-panel p-1 rounded-lg border border-tp-border">
-                        <button class="p-1.5 bg-[#0a0c10] rounded border border-tp-border text-tp-accent shadow-sm"><i data-lucide="layout-list" class="w-4 h-4"></i></button>
-                        <button class="p-1.5 text-tp-muted hover:text-tp-text transition-colors rounded"><i data-lucide="layout-grid" class="w-4 h-4"></i></button>
-                    </div>
+                    <div class="text-sm text-tp-muted font-medium" id="day-count">Caricamento...</div>
+                    <button onclick="createNewDay()" class="bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 font-bold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition-colors flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> Nuova Giornata</button>
                 </div>
-
-                <!-- Lista Database ("Cards" in stile riga Notion) -->
-                <div class="space-y-3">
-                    
-                    <!-- Card Riga 1 -->
-                    <div onclick="window.location.href='dettaglio_giornata.html'" class="group flex items-center justify-between p-4 bg-tp-panel border border-tp-border hover:border-tp-accent/50 rounded-xl transition-all cursor-pointer shadow-sm">
-                        <div class="flex items-center gap-6 w-1/3">
-                            <div class="bg-tp-bg/50 px-3 py-2 rounded-lg border border-tp-border/50 shadow-inner flex flex-col items-center min-w-[3.5rem]">
-                                <span class="text-[10px] font-bold text-tp-muted uppercase tracking-wider">Apr</span>
-                                <span class="text-xl font-bold font-display text-white mt-1 leading-none">01</span>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-lg group-hover:text-tp-accent transition-colors">Lunedì 1 Aprile 2026</h3>
-                                <div class="flex gap-2 mt-2">
-                                    <span class="px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-[#14231f] border border-tp-accent/30 text-tp-accent">XAUUSD</span>
-                                    <span class="px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-[#252932] border border-tp-border text-tp-muted">US30</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="hidden md:flex flex-col gap-1 w-1/3 text-sm text-tp-muted">
-                            <div class="flex items-center gap-2"><i data-lucide="smile" class="w-4 h-4 text-tp-accent"></i> Mindset: Focussed, Calm</div>
-                            <div class="flex items-center gap-2"><i data-lucide="dollar-sign" class="w-4 h-4 text-tp-accent"></i> Bassa Volatilità</div>
-                        </div>
-                        <div class="flex items-center gap-2 w-1/6 justify-end">
-                            <span class="text-sm font-bold text-tp-accent">+ $495.90</span>
-                        </div>
-                        <button class="ml-4 opacity-0 group-hover:opacity-100 p-2 text-tp-muted hover:text-tp-text transition-all bg-tp-border/30 rounded-lg"><i data-lucide="arrow-right" class="w-5 h-5"></i></button>
-                    </div>
-
-                    <!-- Card Riga 2 -->
-                    <div onclick="window.location.href='dettaglio_giornata.html'" class="group flex items-center justify-between p-4 bg-tp-panel border border-tp-border hover:border-tp-accent/50 rounded-xl transition-all cursor-pointer shadow-sm">
-                        <div class="flex items-center gap-6 w-1/3">
-                            <div class="bg-tp-bg/50 px-3 py-2 rounded-lg border border-tp-border/50 shadow-inner flex flex-col items-center min-w-[3.5rem]">
-                                <span class="text-[10px] font-bold text-tp-muted uppercase tracking-wider">Mar</span>
-                                <span class="text-xl font-bold font-display text-white mt-1 leading-none">31</span>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-lg group-hover:text-tp-accent transition-colors">Venerdì 31 Marzo 2026</h3>
-                                <div class="flex gap-2 mt-2">
-                                    <span class="px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-[#14231f] border border-tp-accent/30 text-tp-accent">EURUSD</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="hidden md:flex flex-col gap-1 w-1/3 text-sm text-tp-muted">
-                            <div class="flex items-center gap-2"><i data-lucide="meh" class="w-4 h-4 text-tp-warning"></i> Mindset: FOMO, Stanco</div>
-                            <div class="flex items-center gap-2"><i data-lucide="dollar-sign" class="w-4 h-4 text-tp-loss"></i> NFP Release</div>
-                        </div>
-                        <div class="flex items-center gap-2 w-1/6 justify-end">
-                            <span class="text-sm font-bold text-tp-loss">- $120.00</span>
-                        </div>
-                        <button class="ml-4 opacity-0 group-hover:opacity-100 p-2 text-tp-muted hover:text-tp-text transition-all bg-tp-border/30 rounded-lg"><i data-lucide="arrow-right" class="w-5 h-5"></i></button>
-                    </div>
-
-                    <!-- Mock data x compilazione rapida visuale -->
-                    <div class="flex items-center justify-center p-8 border-2 border-dashed border-tp-border/50 rounded-xl text-tp-muted hover:border-tp-border hover:bg-tp-panel/50 transition-colors cursor-pointer mt-4" onclick="toggleModal('modal-add-giornata')">
-                        <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Crea nuova entry
-                    </div>
-                </div>
-
+                <div id="days-list" class="space-y-3"></div>
+                <div id="days-empty" class="hidden text-center py-16 text-tp-muted"><i data-lucide="calendar" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm font-bold">Nessuna giornata</p></div>
             </div>
         </div>
-
-        <!-- NOTION-STYLE MODAL: "Inizia Giornata" -->
-        <div id="modal-add-giornata" class="modal-overlay fixed inset-0 z-50 flex justify-center items-start pt-20 bg-black/60 backdrop-blur-sm">
-            
-            <!-- Click-away chiude la finestra -->
-            <div class="absolute inset-0" onclick="toggleModal('modal-add-giornata')"></div>
-            
-            <div class="modal-content relative w-full max-w-2xl bg-tp-bg border border-tp-border rounded-2xl shadow-2xl p-0 flex flex-col max-h-[85vh] overflow-hidden">
-                
-                <!-- Modal Header -->
-                <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-tp-panel">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-tp-accent/10 p-2 rounded-lg border border-tp-accent/20">
-                            <i data-lucide="file-plus-2" class="w-5 h-5 text-tp-accent"></i>
-                        </div>
-                        <h2 class="text-xl font-bold">Nuova Giornata</h2>
-                    </div>
-                    <button onclick="toggleModal('modal-add-giornata')" class="text-tp-muted hover:text-tp-text bg-tp-border/30 p-1.5 rounded-lg transition-colors">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                    </button>
-                </div>
-
-                <!-- Modal Body (Scrollable form area) -->
-                <div class="p-6 overflow-y-auto flex flex-col gap-6 custom-scroll">
-                    
-                    <!-- Pre-filled Title / Date -->
-                    <div>
-                        <input type="text" id="modal-title" value="Operatività  del 2 Aprile 2026" class="w-full bg-transparent border-none text-3xl font-bold text-white placeholder-tp-muted focus:outline-none focus:ring-0 px-0">
-                        <div class="flex items-center gap-2 mt-2 text-tp-muted text-sm">
-                            <i data-lucide="calendar" class="w-4 h-4"></i> <span id="modal-date-subtitle">Giovedà¬, 02-04-2026</span>
-                            <span class="mx-2 text-tp-border">•</span>
-                            <i data-lucide="clock" class="w-4 h-4"></i> Assegnata automaticamente
-                        </div>
-                    </div>
-
-                    <hr class="border-tp-border">
-
-                    <!-- Selezione Rapida "Cambi" (Asset pilling system) -->
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
-                            <i data-lucide="candlestick-chart" class="w-4 h-4"></i> Seleziona Asset/Cambi Base
-                        </label>
-                        <div class="flex flex-wrap gap-2">
-                            <!-- Toggle Pills -->
-                            <button onclick="this.classList.toggle('border-tp-accent'); this.classList.toggle('text-tp-accent'); this.classList.toggle('bg-tp-accent/10'); this.classList.toggle('border-tp-border'); this.classList.toggle('text-tp-muted');" class="px-3 py-1.5 rounded-lg text-sm font-semibold border border-tp-border text-tp-muted uppercase transition-colors">XAUUSD</button>
-                            <button onclick="this.classList.toggle('border-tp-accent'); this.classList.toggle('text-tp-accent'); this.classList.toggle('bg-tp-accent/10'); this.classList.toggle('border-tp-border'); this.classList.toggle('text-tp-muted');" class="px-3 py-1.5 rounded-lg text-sm font-semibold border border-tp-border text-tp-muted uppercase transition-colors">US30</button>
-                            <button onclick="this.classList.toggle('border-tp-accent'); this.classList.toggle('text-tp-accent'); this.classList.toggle('bg-tp-accent/10'); this.classList.toggle('border-tp-border'); this.classList.toggle('text-tp-muted');" class="px-3 py-1.5 rounded-lg text-sm font-semibold border border-tp-border text-tp-muted uppercase transition-colors">GER30</button>
-                            <button onclick="this.classList.toggle('border-tp-accent'); this.classList.toggle('text-tp-accent'); this.classList.toggle('bg-tp-accent/10'); this.classList.toggle('border-tp-border'); this.classList.toggle('text-tp-muted');" class="px-3 py-1.5 rounded-lg text-sm font-semibold border border-tp-border text-tp-muted uppercase transition-colors">EURUSD</button>
-                            <input type="text" placeholder="+ Aggiungi altro..." class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-[#0a0c10] border border-tp-border focus:border-tp-text outline-none text-white w-32 placeholder-tp-border">
-                        </div>
-                    </div>
-
-                    <!-- Monitoraggio Comportamentale (Live) -->
-                    <div class="bg-tp-bg border border-tp-border rounded-xl p-4">
-                        <label class="block text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-4 border-b border-tp-border/50 pb-2 flex items-center justify-between">
-                            <span>MonitoraSmileVol</span>
-                        </label>
-                        <div class="flex flex-col gap-4">
-                            <div class="flex flex-wrap items-center gap-4">
-                                <div class="flex flex-col gap-1.5">
-                                    <span class="text-[9px] text-tp-muted font-bold uppercase tracking-widest">Stato Emotivo</span>
-                                    <div class="flex items-center gap-1 bg-[#0a0c10] p-1 rounded-lg border border-tp-border shadow-inner">
-                                        <button onclick="window.selectMindset(this, 'positive')" class="mindset-btn p-1.5 rounded-md text-tp-muted hover:bg-[#161920] transition-colors" title="Focussed / Patient">
-                                            <i data-lucide="smile" class="w-4 h-4"></i>
-                                        </button>
-                                        <button onclick="window.selectMindset(this, 'neutral')" class="mindset-btn p-1.5 rounded-md text-tp-muted hover:bg-[#161920] transition-colors" title="Distratto / Neutro">
-                                            <i data-lucide="meh" class="w-4 h-4"></i>
-                                        </button>
-                                        <button onclick="window.selectMindset(this, 'negative')" class="mindset-btn p-1.5 rounded-md text-tp-muted hover:bg-[#161920] transition-colors" title="Frenetico / Emotivo">
-                                            <i data-lucide="frown" class="w-4 h-4"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col gap-1.5">
-                                    <span class="text-[9px] text-tp-muted font-bold uppercase tracking-widest">Volatilità Mercato</span>
-                                    <div class="flex items-center gap-1 bg-[#0a0c10] p-1 rounded-lg border border-tp-border shadow-inner">
-                                        <button onclick="window.selectVol(this, 'low')" class="vol-btn p-1.5 rounded-md text-tp-muted hover:bg-[#161920] transition-colors" title="Bassa">
-                                            <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i></div>
-                                        </button>
-                                        <button onclick="window.selectVol(this, 'med')" class="vol-btn p-1.5 rounded-md text-tp-muted hover:bg-[#161920] transition-colors" title="Media">
-                                            <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>
-                                        </button>
-                                        <button onclick="window.selectVol(this, 'high')" class="vol-btn p-1.5 rounded-md text-tp-muted hover:bg-[#161920] transition-colors" title="Alta">
-                                            <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i><i data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col gap-1.5 flex-1 min-w-[150px]">
-                                    <span class="text-[9px] text-tp-muted font-bold uppercase tracking-widest">Tag Mindset</span>
-                                    <select class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-2 py-1.5 text-xs focus:border-tp-accent outline-none text-white appearance-none cursor-pointer hover:border-tp-accent/50 transition-colors">
-                                        <option value="" disabled selected>Seleziona focus...</option>
-                                        <option value="focussed">⭐ Concentrato / Calmo</option>
-                                        <option value="fomo">🔥 FOMO / Fretta</option>
-                                        <option value="revenge">💣 Revenge Trading</option>
-                                        <option value="tired">⚠️ Stanco / Confuso</option>
-                                        <option value="bored">🥱 Annoiato / Overtrading</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-1.5 mt-2">
-                                <span class="text-[9px] text-tp-muted font-bold uppercase tracking-widest">Note di Apertura / Riflessioni su come mi sento</span>
-                                <textarea class="w-full bg-[#0a0c10] border border-tp-border rounded-lg p-3 text-xs text-tp-text/90 outline-none min-h-[90px] resize-none placeholder-tp-muted/50 focus:border-tp-accent transition-colors shadow-inner" placeholder="Digita qui pensieri prima di affrontare i mercati..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Modal Footer (Action Buttons) -->
-                <div class="px-6 py-4 border-t border-tp-border bg-tp-panel flex justify-end gap-3 rounded-b-2xl">
-                    <button onclick="toggleModal('modal-add-giornata')" class="px-4 py-2 rounded-lg text-sm font-bold text-tp-text bg-tp-border/20 hover:bg-tp-border/50 border border-tp-border transition-colors">
-                        Annulla
-                    </button>
-                    <!-- Trigger la creazione visiva temporanea per demo -->
-                    <button onclick="demoCreateDay()" class="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold text-[#0e1116] bg-tp-accent hover:bg-teal-400 border border-transparent hover:border-teal-300 transition-all shadow-lg active:scale-95">
-                        <i data-lucide="save" class="w-4 h-4"></i> Crea & Apri
-                    </button>
-                </div>
-            </div>
-        </div>
-
     </main>
 
     <script src="app.js"></script>
     <script>
-        lucide.createIcons();
+        const DAYS_IT = ['Domenica','Lunedi','Martedi','Mercoledi','Giovedi','Venerdi','Sabato'];
+        const MONTHS_IT = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
 
-        // Finestra Modal logic
-        function toggleModal(id) {
-            const el = document.getElementById(id);
-            if(el) {
-                el.classList.toggle('open');
-            }
-        }
-
-        // Setup Date dynamically on load so the UX feels brilliant and fast
-        document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const dateStr = today.toLocaleDateString('it-IT', options);
-            
-            const titleInput = document.getElementById('modal-title');
-            const subtitle = document.getElementById('modal-date-subtitle');
-            
-            if(titleInput) titleInput.value = "Operatività  del " + today.getDate() + " " + today.toLocaleString('it-IT', { month: 'long' });
-            if(subtitle) subtitle.innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+        document.addEventListener('DOMContentLoaded', async () => {
+            lucide.createIcons();
+            if (!db) return;
+            await loadDays();
         });
 
-        // Mock Action to simulate "Trello-like / Notion-like" immediate saving
-        function demoCreateDay() {
-            // Close modal
-            toggleModal('modal-add-giornata');
-            // Mock feedback loop
-            setTimeout(() => {
-                alert("Questa funzione sarà  cablata " + 
-                      "da Cursor per generare e inserire la nuova scheda nel Database!"); 
-            }, 300);
+        async function loadDays() {
+            const { data, error } = await db.from('giornate').select('*').order('data', { ascending: false });
+            if (error) { console.error(error); return; }
+            const list = document.getElementById('days-list');
+            const empty = document.getElementById('days-empty');
+            const count = document.getElementById('day-count');
+            if (!data || !data.length) { empty.classList.remove('hidden'); list.innerHTML = ''; count.textContent = '0 giornate'; return; }
+            empty.classList.add('hidden');
+            count.textContent = `${data.length} giornat${data.length === 1 ? 'a' : 'e'}`;
+
+            list.innerHTML = data.map(g => {
+                const d = new Date(g.data + 'T00:00:00');
+                const dayName = DAYS_IT[d.getDay()];
+                const monthAbbr = MONTHS_IT[d.getMonth()];
+                const dayNum = d.getDate().toString().padStart(2, '0');
+                const dateStr = `${dayName} ${dayNum} ${monthAbbr} ${d.getFullYear()}`;
+                const moodIcon = g.mindset === 'positive' ? 'smile' : g.mindset === 'negative' ? 'frown' : 'meh';
+                const moodColor = g.mindset === 'positive' ? 'text-tp-accent' : g.mindset === 'negative' ? 'text-tp-loss' : 'text-tp-warning';
+                const pnl = g.pnl || 0;
+                const pnlColor = pnl >= 0 ? 'text-tp-accent' : 'text-tp-loss';
+                const pnlSign = pnl >= 0 ? '+' : '';
+                return `
+                    <div onclick="window.location.href='dettaglio_giornata.html?id=${g.id}'" class="group flex items-center justify-between p-4 bg-tp-panel border border-tp-border hover:border-tp-accent/50 rounded-xl transition-all cursor-pointer shadow-sm">
+                        <div class="flex items-center gap-6 w-1/3">
+                            <div class="bg-tp-bg/50 px-3 py-2 rounded-lg border border-tp-border/50 shadow-inner flex flex-col items-center min-w-[3.5rem]">
+                                <span class="text-[10px] font-bold text-tp-muted uppercase tracking-wider">${monthAbbr}</span>
+                                <span class="text-xl font-bold font-display text-white mt-1 leading-none">${dayNum}</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg group-hover:text-tp-accent transition-colors">${dateStr}</h3>
+                                <span class="text-[10px] text-tp-muted font-bold">${g.n_trades || 0} trades</span>
+                            </div>
+                        </div>
+                        <div class="hidden md:flex items-center gap-3 w-1/3">
+                            <i data-lucide="${moodIcon}" class="w-5 h-5 ${moodColor}"></i>
+                            <span class="text-xs text-tp-muted">${g.mindset || '--'}</span>
+                        </div>
+                        <div class="flex items-center gap-2 w-1/6 justify-end">
+                            <span class="text-sm font-bold ${pnlColor}">${pnlSign} $${Math.abs(pnl).toFixed(2)}</span>
+                        </div>
+                        <button class="ml-4 opacity-0 group-hover:opacity-100 p-2 text-tp-muted hover:text-tp-text transition-all bg-tp-border/30 rounded-lg"><i data-lucide="arrow-right" class="w-5 h-5"></i></button>
+                    </div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        async function createNewDay() {
+            const today = new Date().toISOString().split('T')[0];
+            const { data: existing } = await db.from('giornate').select('id').eq('data', today).single();
+            if (existing) { window.location.href = `dettaglio_giornata.html?id=${existing.id}`; return; }
+            const { data, error } = await db.from('giornate').insert({ data: today }).select().single();
+            if (error) { alert('Errore: ' + error.message); return; }
+            window.location.href = `dettaglio_giornata.html?id=${data.id}`;
         }
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-

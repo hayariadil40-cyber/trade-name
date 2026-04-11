@@ -127,6 +127,11 @@
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span>
             </a>
+
+            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span>
+            </a>
             
             <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div>
@@ -260,250 +265,208 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         <!-- ==============================================
              BODY: PANNELLO DI CONTROLLO GIORNATA
              ============================================== -->
         <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
             <div class="max-w-[1600px] mx-auto grid grid-cols-12 gap-6 pb-20">
-                
-                <!-- ROW 1: Checklist | Proprietà  | Alerts -->
+
+                <!-- ==========================================
+                     LEFT COLUMN (col-span-3)
+                     ========================================== -->
                 <div class="col-span-12 lg:col-span-3 flex flex-col gap-6">
-                    <!-- Checklist -->
-                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col min-h-[300px] shadow-lg">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-4 border-b border-tp-border pb-2">Checklist Base</h3>
-                        <ul class="space-y-4">
-                            <li class="flex items-start gap-3 group">
-                                <input type="checkbox" onchange="this.nextElementSibling.classList.toggle('line-through'); this.nextElementSibling.classList.toggle('text-tp-muted'); this.nextElementSibling.classList.toggle('text-tp-text');" class="tp-check mt-0.5">
+
+                    <!-- 1. Checklist -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col shadow-lg">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-4 border-b border-tp-border pb-2 flex items-center gap-2">
+                            <i data-lucide="check-square" class="w-4 h-4"></i> Checklist Base
+                        </h3>
+                        <ul id="checklist-items" class="space-y-4">
+                            <li class="flex items-start gap-3 group" data-key="review_macro">
+                                <input type="checkbox" class="tp-check mt-0.5" onchange="toggleCheckLabel(this)">
                                 <label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">Review Macro Calendario</label>
                             </li>
-                            <li class="flex items-start gap-3 group">
-                                <input type="checkbox" onchange="this.nextElementSibling.classList.toggle('line-through'); this.nextElementSibling.classList.toggle('text-tp-muted'); this.nextElementSibling.classList.toggle('text-tp-text');" class="tp-check mt-0.5">
-                                <label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">Controllato liquidità Asia</label>
+                            <li class="flex items-start gap-3 group" data-key="liquidita_asia">
+                                <input type="checkbox" class="tp-check mt-0.5" onchange="toggleCheckLabel(this)">
+                                <label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">Controllato liquidit&agrave; Asia</label>
                             </li>
-                            <li class="flex items-start gap-3 group">
-                                <input type="checkbox" onchange="this.nextElementSibling.classList.toggle('line-through'); this.nextElementSibling.classList.toggle('text-tp-muted'); this.nextElementSibling.classList.toggle('text-tp-text');" class="tp-check mt-0.5">
+                            <li class="flex items-start gap-3 group" data-key="verifica_marea">
+                                <input type="checkbox" class="tp-check mt-0.5" onchange="toggleCheckLabel(this)">
                                 <label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">Verifica Marea Attuale</label>
                             </li>
-                            <li class="flex items-start gap-3 group">
-                                <input type="checkbox" onchange="this.nextElementSibling.classList.toggle('line-through'); this.nextElementSibling.classList.toggle('text-tp-muted'); this.nextElementSibling.classList.toggle('text-tp-text');" class="tp-check mt-0.5">
+                            <li class="flex items-start gap-3 group" data-key="livelli_htf">
+                                <input type="checkbox" class="tp-check mt-0.5" onchange="toggleCheckLabel(this)">
                                 <label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">Aggiornare livelli HTF</label>
                             </li>
                         </ul>
                     </div>
+
+                    <!-- (Allert spostati a destra) -->
                 </div>
 
+                <!-- ==========================================
+                     CENTER COLUMN (col-span-6)
+                     ========================================== -->
                 <div class="col-span-12 lg:col-span-6 flex flex-col gap-6">
-                    <!-- Notion-style Properties Window -->
-                    <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
-                        <div class="flex items-center justify-between mb-5">
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-tp-text flex items-center gap-2"><i data-lucide="sliders" class="w-4 h-4 text-tp-muted"></i> Proprietà  Attive</h3>
-                            <button class="text-tp-muted hover:text-white"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-x-8 gap-y-4">
-                            
-                            <!-- Fajr -->
-                            <div class="flex items-center justify-between py-2 border-b border-tp-border/50 bg-[#161920]">
-                                <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="sunrise" class="w-3.5 h-3.5"></i> Fajr</span>
-                                <div class="text-tp-accent text-sm font-bold flex items-center"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
-                            </div>
 
-                            <!-- Marea -->
+                    <!-- 0. Dati Giornata -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-4 border-b border-tp-border pb-2 flex items-center gap-2"><i data-lucide="sliders" class="w-4 h-4"></i> Dati Giornata</h3>
+
+                        <!-- Riga 1: Fajr + Marea -->
+                        <div class="grid grid-cols-2 gap-6 mb-4">
+                            <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
+                                <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="sunrise" class="w-3.5 h-3.5"></i> Fajr</span>
+                                <button onclick="toggleFajr(this)" id="btn-fajr" class="text-tp-muted text-sm px-2 py-0.5 rounded border border-tp-border hover:border-tp-accent/50 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+                            </div>
                             <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
                                 <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="waves" class="w-3.5 h-3.5"></i> Marea</span>
-                                <span class="text-sm font-bold">11:30</span>
+                                <input id="inp-marea" type="text" placeholder="--:--" class="bg-[#0a0c10] border border-tp-border rounded px-2 py-0.5 text-sm text-white font-bold outline-none w-16 text-center focus:border-tp-accent">
                             </div>
+                        </div>
 
-                            <!-- Stato Mentale (Read Only) -->
+                        <!-- Riga 2: MonitoraSmile ultimo + Sessioni -->
+                        <div class="grid grid-cols-2 gap-6 mb-4">
                             <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
-                                <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="brain" class="w-3.5 h-3.5"></i> Stato Mentale</span>
-                                <div class="flex gap-1" title="Sincronizzato da MonitoraSmile">
-                                    <i data-lucide="smile" class="w-4 h-4 text-[#20c997]"></i>
-                                    <i data-lucide="smile" class="w-4 h-4 text-[#20c997]"></i>
-                                    <i data-lucide="dollar-sign" class="w-4 h-4 text-[#eab308]"></i>
+                                <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="brain" class="w-3.5 h-3.5"></i> Stato</span>
+                                <div class="flex items-center gap-2">
+                                    <div class="flex gap-1">
+                                        <button onclick="setMindset('positive',this)" class="mind-btn p-1 rounded text-tp-muted hover:bg-[#161920]"><i data-lucide="smile" class="w-4 h-4"></i></button>
+                                        <button onclick="setMindset('neutral',this)" class="mind-btn p-1 rounded text-tp-muted hover:bg-[#161920]"><i data-lucide="meh" class="w-4 h-4"></i></button>
+                                        <button onclick="setMindset('negative',this)" class="mind-btn p-1 rounded text-tp-muted hover:bg-[#161920]"><i data-lucide="frown" class="w-4 h-4"></i></button>
+                                    </div>
+                                    <div class="w-px h-5 bg-tp-border"></div>
+                                    <div class="flex gap-1">
+                                        <button onclick="setVolatility('low',this)" class="vol-btn text-[11px] font-bold px-1.5 py-0.5 rounded text-tp-muted hover:bg-[#161920]">$</button>
+                                        <button onclick="setVolatility('medium',this)" class="vol-btn text-[11px] font-bold px-1.5 py-0.5 rounded text-tp-muted hover:bg-[#161920]">$$</button>
+                                        <button onclick="setVolatility('high',this)" class="vol-btn text-[11px] font-bold px-1.5 py-0.5 rounded text-tp-muted hover:bg-[#161920]">$$$</button>
+                                    </div>
                                 </div>
                             </div>
-                            
-                            <!-- Sessioni Lavorate (Badgets toggle) -->
                             <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
                                 <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="clock" class="w-3.5 h-3.5"></i> Sessioni</span>
                                 <div class="flex gap-1">
-                                    <button onclick="this.classList.toggle('bg-tp-border'); this.classList.toggle('text-white');" class="bg-tp-border text-white text-[9px] uppercase font-bold px-1.5 py-0.5 rounded transition-colors duration-200">AS</button>
-                                    <button onclick="this.classList.toggle('bg-tp-border'); this.classList.toggle('text-white');" class="bg-[#0a0c10] text-tp-muted text-[9px] uppercase font-bold px-1.5 py-0.5 rounded transition-colors duration-200">LO</button>
-                                    <button onclick="this.classList.toggle('bg-tp-border'); this.classList.toggle('text-white');" class="bg-[#0a0c10] text-tp-muted text-[9px] uppercase font-bold px-1.5 py-0.5 rounded transition-colors duration-200">NY</button>
+                                    <button onclick="toggleSession(this,'AS')" data-session="AS" class="session-tog text-[9px] uppercase font-bold px-2 py-1 rounded bg-[#0a0c10] text-tp-muted border border-transparent hover:border-[#f43f5e]/40">AS</button>
+                                    <button onclick="toggleSession(this,'LO')" data-session="LO" class="session-tog text-[9px] uppercase font-bold px-2 py-1 rounded bg-[#0a0c10] text-tp-muted border border-transparent hover:border-[#eab308]/40">LO</button>
+                                    <button onclick="toggleSession(this,'NY')" data-session="NY" class="session-tog text-[9px] uppercase font-bold px-2 py-1 rounded bg-[#0a0c10] text-tp-muted border border-transparent hover:border-[#20c997]/40">NY</button>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-x-8 gap-y-4 mt-4">
-                            <!-- Note da Ieri -->
-                            <div class="flex flex-col">
-                                <span class="text-[10px] text-tp-muted font-bold uppercase flex items-center gap-1.5 mb-1.5"><i data-lucide="history" class="w-3 h-3"></i> Note da Ieri</span>
-                                <div class="bg-[#0a0c10] border border-tp-border/50 rounded flex-1 p-2 text-xs text-tp-muted italic h-[80px] overflow-y-auto">
-                                    Mantenere focus esclusivo su EURUSD, ignorare fakeouts asiatici.
-                                </div>
+                        <!-- Riga 3: Commento ieri + Commento domani -->
+                        <div class="grid grid-cols-2 gap-6 mb-4">
+                            <div>
+                                <span class="text-[10px] text-tp-muted font-bold uppercase flex items-center gap-1.5 mb-1.5"><i data-lucide="history" class="w-3 h-3"></i> Commento Ieri</span>
+                                <div id="note-ieri" class="bg-[#0a0c10] border border-tp-border/50 rounded p-2 text-xs text-tp-muted italic h-[60px] overflow-y-auto">--</div>
                             </div>
-                            <!-- Note per Domani -->
-                            <div class="flex flex-col">
-                                <span class="text-[10px] text-tp-muted font-bold uppercase flex items-center gap-1.5 mb-1.5"><i data-lucide="calendar-clock" class="w-3 h-3"></i> Note per Domani</span>
-                                <textarea class="bg-[#0a0c10] border border-tp-border/50 rounded flex-1 p-2 text-xs text-tp-text h-[80px] outline-none focus:border-tp-accent resize-none placeholder-tp-muted/50" placeholder="Scrivi qui..."></textarea>
+                            <div>
+                                <span class="text-[10px] text-tp-muted font-bold uppercase flex items-center gap-1.5 mb-1.5"><i data-lucide="calendar-clock" class="w-3 h-3"></i> Commento Domani</span>
+                                <textarea id="note-domani" class="w-full bg-[#0a0c10] border border-tp-border/50 rounded p-2 text-xs text-tp-text h-[60px] outline-none focus:border-tp-accent resize-none placeholder-tp-muted/50" placeholder="Scrivi qui..."></textarea>
                             </div>
                         </div>
 
-                        <!-- Notizia del giorno -->
-                        <div class="mt-4 pt-3 border-t border-tp-border flex items-center justify-between">
-                            <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="newspaper" class="w-3.5 h-3.5"></i> Notizie (Titoli)</span>
-                            <div class="flex flex-wrap gap-2 justify-end">
-                                <span class="bg-tp-loss/10 text-tp-loss border border-tp-loss/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase">US NFP</span>
-                                <span class="bg-tp-warning/10 text-tp-warning border border-tp-warning/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase">ISM PMI</span>
+                        <!-- Riga 4: Notizie -->
+                        <div>
+                            <span class="text-[10px] text-tp-muted font-bold uppercase flex items-center gap-1.5 mb-1.5"><i data-lucide="newspaper" class="w-3 h-3"></i> Notizie</span>
+                            <div id="notizie-oggi" class="bg-[#0a0c10] border border-tp-border/50 rounded p-2 text-xs overflow-y-auto space-y-1 flex flex-wrap gap-2">
+                                <p class="text-tp-muted/50 italic">Nessuna notizia</p>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- 1. Sessioni -->
+                    <div>
+                        <h2 class="text-lg font-bold border-b border-tp-border pb-2 text-white mb-4 flex items-center gap-2">
+                            <i data-lucide="layers" class="w-5 h-5 text-tp-muted"></i> Sessioni
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="sessioni-cards">
+                            <!-- Asia Card -->
+                            <div onclick="openSession('asia')" class="session-card bg-tp-bg/60 border-2 border-[#f43f5e]/30 rounded-xl hover:border-[#f43f5e] transition-all cursor-pointer group flex flex-col min-h-[260px] relative overflow-hidden" data-session-name="asia">
+                                <div class="flex-[3] bg-[#0a0c10] rounded-t-xl flex items-center justify-center overflow-hidden relative" id="session-thumb-asia">
+                                    <div class="flex flex-col items-center gap-2 text-tp-muted group-hover:text-[#f43f5e] transition-colors">
+                                        <i data-lucide="image-plus" class="w-8 h-8"></i>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider">No Screenshot</span>
+                                    </div>
+                                </div>
+                                <div class="flex-[2] p-4 flex flex-col justify-center">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm font-bold uppercase tracking-widest text-[#f43f5e]">Asia</span>
+                                        <span class="text-[10px] font-bold uppercase text-tp-muted" id="session-status-asia">Non Iniziata</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- London Card -->
+                            <div onclick="openSession('london')" class="session-card bg-tp-bg/60 border-2 border-[#eab308]/30 rounded-xl hover:border-[#eab308] transition-all cursor-pointer group flex flex-col min-h-[260px] relative overflow-hidden" data-session-name="london">
+                                <div class="flex-[3] bg-[#0a0c10] rounded-t-xl flex items-center justify-center overflow-hidden relative" id="session-thumb-london">
+                                    <div class="flex flex-col items-center gap-2 text-tp-muted group-hover:text-[#eab308] transition-colors">
+                                        <i data-lucide="image-plus" class="w-8 h-8"></i>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider">No Screenshot</span>
+                                    </div>
+                                </div>
+                                <div class="flex-[2] p-4 flex flex-col justify-center">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm font-bold uppercase tracking-widest text-[#eab308]">London</span>
+                                        <span class="text-[10px] font-bold uppercase text-tp-muted" id="session-status-london">Non Iniziata</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- New York Card -->
+                            <div onclick="openSession('newyork')" class="session-card bg-tp-bg/60 border-2 border-[#20c997]/30 rounded-xl hover:border-[#20c997] transition-all cursor-pointer group flex flex-col min-h-[260px] relative overflow-hidden" data-session-name="newyork">
+                                <div class="flex-[3] bg-[#0a0c10] rounded-t-xl flex items-center justify-center overflow-hidden relative" id="session-thumb-newyork">
+                                    <div class="flex flex-col items-center gap-2 text-tp-muted group-hover:text-[#20c997] transition-colors">
+                                        <i data-lucide="image-plus" class="w-8 h-8"></i>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider">No Screenshot</span>
+                                    </div>
+                                </div>
+                                <div class="flex-[2] p-4 flex flex-col justify-center">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm font-bold uppercase tracking-widest text-[#20c997]">New York</span>
+                                        <span class="text-[10px] font-bold uppercase text-tp-muted" id="session-status-newyork">Non Iniziata</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Bias Giornaliero -->
+                    <div>
+                        <div class="flex items-center justify-between border-b border-tp-border pb-2 mb-4">
+                            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i data-lucide="compass" class="w-5 h-5 text-tp-muted"></i> Bias Giornaliero
+                            </h2>
+                            <a id="btn-nuovo-bias" href="#" class="bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] px-3 py-1 text-xs font-bold uppercase rounded flex items-center gap-2 transition-colors shadow-sm">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Nuovo Bias
+                            </a>
+                        </div>
+                        <div id="bias-list" class="space-y-3">
+                            <p class="text-xs text-tp-muted italic text-center py-4">Caricamento bias...</p>
                         </div>
                     </div>
                 </div>
 
+                <!-- ==========================================
+                     RIGHT COLUMN (col-span-3)
+                     ========================================== -->
                 <div class="col-span-12 lg:col-span-3 flex flex-col gap-6">
-                    <!-- Alerts e Reminder -->
-                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 flex-1 min-h-[300px]">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-[#eab308] mb-4 flex items-center gap-2 border-b border-tp-border pb-2"><i data-lucide="bell-ring" class="w-4 h-4"></i> Allert di Oggi</h3>
-                        
-                        <div class="space-y-3">
-                            <div class="bg-[#0a0c10] border border-tp-border hover:border-[#eab308]/40 rounded-lg p-3 transition-all group shadow-sm relative overflow-hidden">
-                                <div class="absolute inset-y-0 left-0 w-1 bg-[#eab308]/80"></div>
-                                <div class="flex justify-between items-start pl-2">
-                                    <div class="flex flex-col gap-1 flex-1 pr-2">
-                                        <div class="flex items-center gap-2">
-                                            <span class="font-bold text-white text-sm group-hover:text-[#eab308] transition-colors">EURUSD</span>
-                                            <span class="text-xs text-tp-muted font-bold ml-1">1.08500</span>
-                                        </div>
-                                        <p class="text-[10px] text-tp-muted/80 line-clamp-1 italic">Breakout M15 test resistenza...</p>
-                                    </div>
-                                    <!-- Azioni -->
-                                    <div class="flex gap-1.5 mt-1 shrink-0">
-                                        <button onclick="document.getElementById('modal-analisi-alert').classList.add('open')" class="bg-tp-border hover:bg-[#eab308]/20 hover:text-[#eab308] text-tp-text rounded p-1.5 transition-colors border border-transparent hover:border-[#eab308]/30" title="Apri Controllo Alert">
-                                            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-                                        </button>
-                                        <button onclick="this.closest('.group').remove()" class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-1.5 transition-colors border border-transparent hover:border-tp-loss/30" title="Ignora Allert">
-                                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="bg-[#0a0c10] border border-purple-500/30 rounded-lg p-3 transition-all group shadow-sm relative overflow-hidden">
-                                <div class="absolute inset-y-0 left-0 w-1 bg-purple-500/80"></div>
-                                <div class="flex justify-between items-start pl-2">
-                                    <div class="flex flex-col gap-1 flex-1 pr-2">
-                                        <div class="flex items-center gap-2">
-                                            <span class="font-bold text-white text-sm group-hover:text-purple-400 transition-colors">Dato Macro</span>
-                                            <span class="text-xs text-tp-muted font-bold ml-1">NFP Rilasciato</span>
-                                        </div>
-                                        <p class="text-[10px] text-tp-muted/80 line-clamp-1 italic">Inserire Actual per archiviare andamento...</p>
-                                    </div>
-                                    <!-- Azioni -->
-                                    <div class="flex gap-1.5 mt-1 shrink-0">
-                                        <button onclick="document.getElementById('modal-news-alert').classList.add('open')" class="bg-tp-border hover:bg-purple-500/20 hover:text-purple-400 text-tp-text rounded p-1.5 transition-colors border border-transparent hover:border-purple-500/30" title="Apri Controllo Notizia">
-                                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-                                        </button>
-                                        <button onclick="this.closest('.group').remove()" class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-1.5 transition-colors border border-transparent hover:border-tp-loss/30" title="Ignora Allert">
-                                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- ROW 2: Reparto Sessioni & Bias Centrale | Extra Dx -->
-                <div class="col-span-12 lg:col-span-9 flex flex-col gap-6">
-                    
-                    <h2 class="text-lg font-bold border-b border-tp-border pb-2 mt-4 text-white">Analisi Sessioni</h2>
-                    <!-- Quadrati Sessione -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        
-                        <!-- Box Asia -->
-                        <div onclick="document.getElementById('modal-analisi-sessione').classList.add('open'); document.getElementById('session-title-modal').textContent = 'Analisi Sessione Asia';" class="bg-tp-bg/60 border border-tp-border rounded-xl p-5 hover:border-tp-accent transition-all cursor-pointer group flex flex-col items-center justify-center min-h-[160px] relative overflow-hidden">
-                            <div class="absolute inset-0 bg-gradient-to-br from-transparent to-tp-panel pointer-events-none"></div>
-                            <span class="text-xs font-bold uppercase tracking-widest text-tp-muted absolute top-4 left-4">Asia</span>
-                            
-                            <!-- Stato Empty -->
-                            <div class="bg-tp-border/30 rounded-full w-12 h-12 flex items-center justify-center group-hover:bg-tp-accent group-hover:text-[#0a0c10] transition-colors z-10 text-tp-muted">
-                                <i data-lucide="plus" class="w-6 h-6"></i>
-                            </div>
-                            <span class="text-xs mt-3 text-tp-muted group-hover:text-tp-text z-10 transition-colors">Aggiungi Input / Screenshot</span>
-                        </div>
-
-                        <!-- Box London (Compilato) -->
-                        <div onclick="document.getElementById('modal-analisi-sessione').classList.add('open'); document.getElementById('session-title-modal').textContent = 'Analisi Sessione London';" class="bg-tp-panel border border-tp-accent/40 rounded-xl p-5 hover:border-tp-accent transition-all cursor-pointer group flex flex-col min-h-[160px] relative">
-                            <div class="flex justify-between items-center mb-3">
-                                <span class="text-xs font-bold uppercase tracking-widest text-tp-accent">London</span>
-                                <i data-lucide="check-circle-2" class="w-4 h-4 text-tp-accent"></i>
-                            </div>
-                            <p class="text-sm text-tp-text/90 line-clamp-3">Manipolazione dei minimi di Asia avvenuta alle 09:15. Creata liquidità inducente sulla Supply M15.</p>
-                            <div class="mt-auto pt-3 flex gap-2">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#14231f] text-tp-accent">1 Screens</span>
-                            </div>
-                        </div>
-
-                        <!-- Box NY -->
-                        <div onclick="document.getElementById('modal-analisi-sessione').classList.add('open'); document.getElementById('session-title-modal').textContent = 'Analisi Sessione New York';" class="bg-tp-bg/60 border border-dash border-tp-border/70 rounded-xl p-5 hover:border-tp-accent transition-all cursor-pointer group flex flex-col items-center justify-center min-h-[160px] relative overflow-hidden">
-                            <span class="text-xs font-bold uppercase tracking-widest text-tp-muted absolute top-4 left-4">New York</span>
-                            <div class="bg-tp-border/30 rounded-full w-12 h-12 flex items-center justify-center group-hover:bg-tp-accent group-hover:text-[#0a0c10] transition-colors z-10 text-tp-muted">
-                                <i data-lucide="plus" class="w-6 h-6"></i>
-                            </div>
+                    <!-- 0. Allert di Oggi -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-[#eab308] mb-3 flex items-center gap-2 border-b border-tp-border pb-2">
+                            <i data-lucide="bell-ring" class="w-4 h-4"></i> Allert di Oggi
+                        </h3>
+                        <div id="allert-oggi-list" class="space-y-2 max-h-[200px] overflow-y-auto">
+                            <p class="text-xs text-tp-muted italic text-center py-2">Caricamento...</p>
                         </div>
                     </div>
 
-                    <!-- Bias della Giornata -->
-                    <div class="flex items-center justify-between border-b border-tp-border pb-2 mt-2 mb-4">
-                        <h2 class="text-lg font-bold text-white">Bias Giornaliero</h2>
-                        <button onclick="document.getElementById('modal-bias-reperto').classList.add('open')" class="bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] px-3 py-1 text-xs font-bold uppercase rounded flex items-center gap-2 transition-colors shadow-sm">
-                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Aggiungi Input / Reperto
-                        </button>
-                    </div>
-                    <div class="bg-tp-panel border border-tp-border rounded-xl p-5 w-full flex items-center gap-6 shadow-sm hover:border-tp-accent/30 transition-colors cursor-text">
-                        <div class="flex flex-col items-center justify-center bg-[#0a0c10] rounded-lg border border-tp-border w-24 h-24 shrink-0">
-                            <i data-lucide="trending-up" class="w-8 h-8 text-tp-accent mb-1"></i>
-                            <span class="text-xs font-bold text-tp-accent uppercase tracking-widest">Bullish</span>
-                        </div>
-                        <div class="flex-1">
-                            <textarea class="w-full bg-transparent resize-none border-none outline-none text-sm text-tp-text/90 h-20 placeholder-tp-muted" placeholder="Scrivi qui gli appunti sul Bias e motivazioni (HTF)...">Il Daily H4 è chiaramente bullish dopo aver rimbalzato sul FVG. Cerco long sui ritracciamenti nelle sessioni EU/NY.</textarea>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- ROW 2/3 RIGHT: Stats & Econ News -->
-                <div class="col-span-12 lg:col-span-3 flex flex-col gap-6 pt-[64px]">
-                    
-                    <!-- Box: Forza USD & Snapshot Log -->
+                    <!-- 1. Chart with Tabs -->
                     <div class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col shadow-lg">
                         <div class="flex items-center justify-between mb-2">
-                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2" id="live-chart-title"><i data-lucide="line-chart" class="w-4 h-4"></i> Forza USD (%)</h3>
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2" id="live-chart-title">
+                                <i data-lucide="line-chart" class="w-4 h-4"></i> Forza USD (%)
+                            </h3>
                             <div class="flex gap-1 bg-[#0a0c10] border border-tp-border p-1 rounded-lg">
                                 <button onclick="switchDailyChart('usd', this)" class="daily-chart-btn bg-tp-accent/20 text-tp-accent px-2 py-1 rounded text-[10px] font-bold uppercase transition-colors">USD</button>
                                 <button onclick="switchDailyChart('mindset', this)" class="daily-chart-btn text-tp-muted hover:text-white px-2 py-1 rounded text-[10px] font-bold uppercase transition-colors">Mind</button>
@@ -515,46 +478,29 @@
                             <canvas id="mindsetChart" style="display:none;"></canvas>
                             <canvas id="volChart" style="display:none;"></canvas>
                         </div>
-                        <div class="mt-4 border-t border-tp-border/50 pt-4">
-                            <button onclick="recordDollarStrength()" class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-bold bg-tp-accent/10 border border-tp-accent text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors">
-                                <i data-lucide="camera" class="w-3.5 h-3.5"></i> Registra Snapshot
-                            </button>
-                            <ul class="dollar-strength-log mt-3 space-y-1 max-h-32 overflow-y-auto custom-scroll">
-                                <!-- Log appariranno qui -->
-                            </ul>
-                        </div>
                     </div>
-                    <!-- Stats Recap -->
+
+                    <!-- 2. Stats -->
                     <div class="bg-tp-panel rounded-xl border border-tp-border p-5 grid grid-cols-2 gap-4 shadow-lg text-center relative overflow-hidden">
                         <div class="absolute inset-x-0 bottom-0 top-1/2 bg-gradient-to-t from-black/20 pointer-events-none"></div>
                         <div class="flex flex-col items-center p-3 border border-tp-border/50 bg-[#0a0c10] rounded-lg">
-                            <span class="text-2xl font-bold font-display text-tp-accent mb-0.5">2</span>
+                            <span class="text-2xl font-bold font-display text-tp-accent mb-0.5" id="stat-tp">0</span>
                             <span class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">TP Presi</span>
                         </div>
                         <div class="flex flex-col items-center p-3 border border-tp-border/50 bg-[#0a0c10] rounded-lg">
-                            <span class="text-2xl font-bold font-display text-tp-loss mb-0.5">1</span>
+                            <span class="text-2xl font-bold font-display text-tp-loss mb-0.5" id="stat-sl">0</span>
                             <span class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">Stop Loss</span>
                         </div>
                         <div class="col-span-2 flex items-center justify-between mt-2 pt-3 border-t border-tp-border/50">
                             <span class="text-xs font-bold text-tp-muted uppercase">P/L Lordo</span>
-                            <span class="text-sm font-bold text-tp-accent">+ $890.00</span>
+                            <span class="text-sm font-bold" id="stat-pnl">$0.00</span>
                         </div>
                     </div>
 
-                    <!-- Market Calendar Micro-Widget -->
-                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-4 border-b border-tp-border pb-2 flex items-center gap-2"><i data-lucide="rss" class="w-4 h-4"></i> Dati Economici</h3>
-                        <ul class="space-y-3">
-                            <li class="flex items-center justify-between text-xs">
-                                <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-tp-loss"></span><span class="font-bold text-tp-text">14:30</span></div>
-                                <span class="text-tp-muted">US NFP</span>
-                            </li>
-                            <li class="flex items-center justify-between text-xs">
-                                <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-tp-warning"></span><span class="font-bold text-tp-text">16:00</span></div>
-                                <span class="text-tp-muted">ISM PMI</span>
-                            </li>
-                        </ul>
-                    </div>
+                    <!-- 3. Save Button -->
+                    <button onclick="saveGiornata()" id="btn-save" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 transition-colors shadow-lg">
+                        <i data-lucide="save" class="w-4 h-4"></i> Salva Giornata
+                    </button>
                 </div>
 
             </div>
@@ -562,150 +508,505 @@
 
     </main>
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
-        // SIMULAZIONE TIMELINE PER CURSOR (Si muove basato sull'orologio, o fissa)
-        document.addEventListener('DOMContentLoaded', () => {
+        // ============================================
+        // STATE
+        // ============================================
+        const params = new URLSearchParams(window.location.search);
+        const giornataId = params.get('id');
+        let giornataData = null;
+        let giornataDate = null;
+
+        // Selected values
+        let selectedMindset = null;
+        let selectedVolatility = null;
+        let activeSessions = { AS: false, LO: false, NY: false };
+
+        // ============================================
+        // INIT
+        // ============================================
+        document.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
-            // Simulazione basica: Posiziona il pallino al centro (es. ore 11:30)
-            // Nel futuro Cursor può leggere new Date().getHours() e scalare la percentuale su 24h o sulle fasce 09-17
-            
-            const progress = document.getElementById('timeline-progress');
-            const dot = document.getElementById('timeline-dot');
-            
-            // Impostiamo al "45%" per demo visiva
-            if(progress && dot) {
-                progress.style.width = '45%';
-                dot.style.left = '45%';
+            if (!giornataId) {
+                console.error('No giornata ID in URL');
+                return;
             }
+            await loadGiornata();
+            await Promise.all([
+                loadAllertOggi(),
+                loadSessioniCards(),
+                loadBiasGiornaliero(),
+                loadTradeStats(),
+                loadCharts()
+            ]);
+            // Clock
+            updateClock();
+            setInterval(updateClock, 1000);
         });
 
-        // Orologio Digitale & Blinker Timeframes
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            
-            const clockEl = document.getElementById('digital-clock');
-            if(clockEl) clockEl.textContent = `${hours}:${minutes}:${seconds}`;
+        // ============================================
+        // LOAD GIORNATA
+        // ============================================
+        async function loadGiornata() {
+            const { data, error } = await db.from('giornate').select('*').eq('id', giornataId).single();
+            if (error || !data) { console.error('Giornata not found', error); return; }
+            giornataData = data;
+            giornataDate = data.data;
 
-            const m = now.getMinutes();
-            const s = now.getSeconds();
-            
-            // helper per far lampeggiare di giallo un elemento
-            const checkBlink = (id, isClosing) => {
-                const el = document.getElementById(id);
-                if(!el) return;
-                if(isClosing) {
-                    el.classList.add('bg-tp-warning', 'text-[#0a0c10]', 'animate-pulse');
-                    el.classList.remove('bg-tp-panel', 'text-tp-muted');
-                } else {
-                    el.classList.remove('bg-tp-warning', 'text-[#0a0c10]', 'animate-pulse');
-                    el.classList.add('bg-tp-panel', 'text-tp-muted');
-                }
-            };
+            // Set title
+            const titleEl = document.getElementById('page-global-title');
+            if (titleEl) {
+                const d = new Date(giornataDate + 'T00:00:00');
+                const days = ['Domenica','Luned\u00ec','Marted\u00ec','Mercoled\u00ec','Gioved\u00ec','Venerd\u00ec','Sabato'];
+                const months = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+                titleEl.textContent = `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+            }
 
-            // Lampeggiano negli ultimi 10 secondi della loro chiusura matematica:
-            checkBlink('tf-5m', (m % 5 === 4) && s >= 50);
-            checkBlink('tf-15m', (m % 15 === 14) && s >= 50);
-            checkBlink('tf-30m', (m % 30 === 29) && s >= 50);
-            checkBlink('tf-1h', (m === 59) && s >= 50);
-            checkBlink('tf-4h', ((now.getHours() % 4 === 3) && m === 59 && s >= 50));
+            // Restore mindset
+            if (data.mindset) {
+                selectedMindset = data.mindset;
+                const mindMap = { positive: 0, neutral: 1, negative: 2 };
+                const mindColors = { positive: 'text-[#20c997]', neutral: 'text-[#eab308]', negative: 'text-[#f43f5e]' };
+                document.querySelectorAll('.mind-btn').forEach(b => { b.classList.remove('text-[#20c997]','text-[#eab308]','text-[#f43f5e]'); b.classList.add('text-tp-muted'); });
+                const mbtn = document.querySelectorAll('.mind-btn')[mindMap[data.mindset]];
+                if (mbtn) { mbtn.classList.remove('text-tp-muted'); mbtn.classList.add(mindColors[data.mindset]); }
+            }
+
+            // Restore volatility
+            if (data.volatilita) {
+                selectedVolatility = data.volatilita;
+                const volMap = { low: 0, medium: 1, high: 2 };
+                const volColors = { low: 'text-[#f43f5e]', medium: 'text-[#eab308]', high: 'text-[#20c997]' };
+                document.querySelectorAll('.vol-btn').forEach(b => { b.classList.remove('text-[#f43f5e]','text-[#eab308]','text-[#20c997]'); b.classList.add('text-tp-muted'); });
+                const vbtn = document.querySelectorAll('.vol-btn')[volMap[data.volatilita]];
+                if (vbtn) { vbtn.classList.remove('text-tp-muted'); vbtn.classList.add(volColors[data.volatilita]); }
+            }
+
+            // Restore note domani
+            const noteDomani = document.getElementById('note-domani');
+            if (noteDomani && data.note) noteDomani.value = '';
+            // note_domani is stored separately
+            if (data.note_domani) document.getElementById('note-domani').value = data.note_domani;
+
+            // Restore fajr
+            if (data.fajr) {
+                const fajrBtn = document.getElementById('btn-fajr');
+                fajrBtn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i>';
+                fajrBtn.classList.add('text-tp-accent', 'border-tp-accent/50');
+                fajrBtn.classList.remove('text-tp-muted', 'border-tp-border');
+                fajrBtn.dataset.active = 'true';
+                lucide.createIcons();
+            }
+
+            // Restore marea
+            if (data.marea) document.getElementById('inp-marea').value = data.marea;
+
+            // Load note da ieri (previous day's note_domani)
+            const yesterday = new Date(new Date(giornataDate + 'T00:00:00').getTime() - 86400000).toISOString().split('T')[0];
+            const { data: prevDay } = await db.from('giornate').select('note_domani').eq('data', yesterday).single();
+            if (prevDay && prevDay.note_domani) {
+                document.getElementById('note-ieri').textContent = prevDay.note_domani;
+            }
+
+            // Load notizie di oggi
+            const { data: notizie } = await db.from('allert').select('titolo, ora_evento, impatto').eq('data_evento', giornataDate).order('ora_evento');
+            const notizieDiv = document.getElementById('notizie-oggi');
+            if (notizie && notizie.length) {
+                notizieDiv.innerHTML = notizie.map(n => {
+                    const ic = n.impatto === 'alto' ? 'bg-tp-loss' : n.impatto === 'medio' ? 'bg-tp-warning' : 'bg-tp-border';
+                    return '<div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full ' + ic + ' shrink-0"></span><span class="text-tp-muted font-bold">' + (n.ora_evento ? n.ora_evento.substring(0,5) : '') + '</span><span class="text-tp-text truncate">' + (n.titolo || '') + '</span></div>';
+                }).join('');
+            }
+
+            // Restore tags as session toggles
+            if (data.tags && Array.isArray(data.tags)) {
+                data.tags.forEach(t => {
+                    const key = t.toUpperCase();
+                    if (activeSessions.hasOwnProperty(key)) {
+                        activeSessions[key] = true;
+                        const btn = document.querySelector(`[data-session="${key}"]`);
+                        if (btn) applySessionToggleStyle(btn, key, true);
+                    }
+                });
+            }
+
+            // Nuovo Bias link
+            const biasLink = document.getElementById('btn-nuovo-bias');
+            if (biasLink) biasLink.href = `dettaglio_bias.html?date=${giornataDate}`;
         }
 
-        setInterval(updateClock, 1000);
-        updateClock();
+        // ============================================
+        // CHECKLIST
+        // ============================================
+        function toggleFajr(btn) {
+            const active = btn.dataset.active === 'true';
+            if (active) {
+                btn.innerHTML = '<i data-lucide="x" class="w-4 h-4"></i>';
+                btn.classList.remove('text-tp-accent', 'border-tp-accent/50');
+                btn.classList.add('text-tp-muted', 'border-tp-border');
+                btn.dataset.active = 'false';
+            } else {
+                btn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i>';
+                btn.classList.add('text-tp-accent', 'border-tp-accent/50');
+                btn.classList.remove('text-tp-muted', 'border-tp-border');
+                btn.dataset.active = 'true';
+            }
+            lucide.createIcons();
+        }
 
-        // CHATJS - Neon HUD Style
-        Chart.defaults.color = '#848d97';
-        Chart.defaults.font.family = 'Inter';
-        
-        const commonOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: { backgroundColor: '#161920', titleColor: '#fff', bodyColor: '#20c997', borderColor: '#252932', borderWidth: 1 }
-            },
-            scales: {
-                x: { grid: { display: false, drawBorder: false }, ticks: { font: { size: 9 } } },
-                y: { grid: { color: 'rgba(37, 41, 50, 0.4)', drawBorder: false, borderDash: [5, 5] }, ticks: { font: { size: 9 }, maxTicksLimit: 5 } }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index',
-            },
-        };
+        function toggleCheckLabel(checkbox) {
+            const label = checkbox.nextElementSibling;
+            label.classList.toggle('line-through');
+            label.classList.toggle('text-tp-muted');
+            label.classList.toggle('text-tp-text');
+        }
 
-        // USD Basket Line Chart
-        const ctxUSD = document.getElementById('paniereChart').getContext('2d');
-        const gradUSD = ctxUSD.createLinearGradient(0, 0, 0, 100);
-        gradUSD.addColorStop(0, 'rgba(32, 201, 151, 0.4)');
-        gradUSD.addColorStop(1, 'rgba(32, 201, 151, 0)');
+        // ============================================
+        // SESSION TOGGLES
+        // ============================================
+        function toggleSession(btn, key) {
+            activeSessions[key] = !activeSessions[key];
+            applySessionToggleStyle(btn, key, activeSessions[key]);
+        }
 
-        let usdChartObj = new Chart(ctxUSD, {
-            type: 'line',
-            data: {
-                labels: ['9:00', '11:00', '13:00', '15:00', '17:00'],
-                datasets: [{
-                    label: 'USD Index',
-                    data: [104.2, 104.5, 104.4, 105.1, 105.0],
-                    borderColor: '#20c997',
-                    backgroundColor: gradUSD,
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#0a0c10',
-                    pointBorderColor: '#20c997',
-                    pointBorderWidth: 2,
-                    pointRadius: 3
-                }]
-            },
-            options: commonOptions
-        });
+        function applySessionToggleStyle(btn, key, active) {
+            const colorMap = { AS: '#f43f5e', LO: '#eab308', NY: '#20c997' };
+            const color = colorMap[key];
+            if (active) {
+                btn.style.backgroundColor = color;
+                btn.style.color = '#0a0c10';
+                btn.style.borderColor = color;
+                btn.classList.add('font-black');
+            } else {
+                btn.style.backgroundColor = '#0a0c10';
+                btn.style.color = '#848d97';
+                btn.style.borderColor = 'transparent';
+                btn.classList.remove('font-black');
+            }
+        }
 
-        // Mindset Step Chart (Sad/Meh/Smile) mapped to -1, 0, 1
-        const ctxMindset = document.getElementById('mindsetChart').getContext('2d');
-        let mindChartObj = new Chart(ctxMindset, {
-            type: 'line',
-            data: {
-                labels: ['9:00', '11:00', '13:00', '15:00', '17:00'],
-                datasets: [{
-                    label: 'Stato Mentale',
-                    data: [1, 1, 0, -1, 1], // verde, verde, giallo, rosso, verde
-                    borderColor: '#9333ea',
-                    backgroundColor: 'rgba(147, 51, 234, 0.1)',
-                    borderWidth: 2,
-                    stepped: true,
-                    fill: true,
-                    pointRadius: 4,
-                    pointBackgroundColor: function(context) {
-                        var val = context.raw;
-                        if(val > 0) return '#20c997';
-                        if(val === 0) return '#eab308';
-                        return '#f43f5e';
+        // ============================================
+        // MINDSET
+        // ============================================
+        function setMindset(value, btn) {
+            selectedMindset = value;
+            document.querySelectorAll('.mind-btn').forEach(b => {
+                b.classList.remove('text-[#20c997]','text-[#eab308]','text-[#f43f5e]');
+                b.classList.add('text-tp-muted');
+            });
+            const colors = { positive: 'text-[#20c997]', neutral: 'text-[#eab308]', negative: 'text-[#f43f5e]' };
+            btn.classList.remove('text-tp-muted');
+            btn.classList.add(colors[value]);
+        }
+
+        // ============================================
+        // VOLATILITY
+        // ============================================
+        function setVolatility(value, btn) {
+            selectedVolatility = value;
+            document.querySelectorAll('.vol-btn').forEach(b => {
+                b.classList.remove('text-[#f43f5e]','text-[#eab308]','text-[#20c997]');
+                b.classList.add('text-tp-muted');
+            });
+            const colors = { low: 'text-[#f43f5e]', medium: 'text-[#eab308]', high: 'text-[#20c997]' };
+            btn.classList.remove('text-tp-muted');
+            btn.classList.add(colors[value]);
+        }
+
+        // ============================================
+        // ALLERT DI OGGI
+        // ============================================
+        async function loadAllertOggi() {
+            if (!giornataDate) return;
+            const container = document.getElementById('allert-oggi-list');
+            const { data, error } = await db.from('allert').select('*').eq('data_evento', giornataDate).order('ora_evento', { ascending: true });
+
+            if (error || !data || data.length === 0) {
+                container.innerHTML = '<p class="text-xs text-tp-muted italic text-center py-4">Nessun allert per oggi.</p>';
+                return;
+            }
+
+            container.innerHTML = data.map(a => {
+                const ora = a.ora_evento ? a.ora_evento.substring(0, 5) : '--:--';
+                const titolo = a.titolo || 'Allert';
+                const stato = a.stato || 'nuovo';
+                if (stato === 'completato' || stato === 'ignorato') {
+                    const badge = stato === 'completato'
+                        ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-tp-accent/10 text-tp-accent border border-tp-accent/20 font-bold uppercase">Fatto</span>'
+                        : '<span class="text-[9px] px-1.5 py-0.5 rounded bg-tp-border text-tp-muted font-bold uppercase">Ignorato</span>';
+                    return `<div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 opacity-50 relative overflow-hidden">
+                        <div class="absolute inset-y-0 left-0 w-1 bg-tp-border"></div>
+                        <div class="flex justify-between items-center pl-2">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-tp-muted text-xs">${ora}</span>
+                                <span class="text-xs text-tp-muted">${titolo}</span>
+                            </div>
+                            ${badge}
+                        </div>
+                    </div>`;
+                }
+                return `<div class="bg-[#0a0c10] border border-tp-border hover:border-[#eab308]/40 rounded-lg p-3 transition-all group shadow-sm relative overflow-hidden">
+                    <div class="absolute inset-y-0 left-0 w-1 bg-[#eab308]/80"></div>
+                    <div class="flex justify-between items-start pl-2">
+                        <div class="flex flex-col gap-1 flex-1 pr-2">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-white text-sm group-hover:text-[#eab308] transition-colors">${titolo}</span>
+                                <span class="text-xs text-tp-muted font-bold ml-1">${ora}</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-1.5 mt-0.5 shrink-0">
+                            <button onclick="updateAllertStato('${a.id}','completato')" class="bg-tp-border hover:bg-[#eab308]/20 hover:text-[#eab308] text-tp-text rounded p-1.5 transition-colors border border-transparent hover:border-[#eab308]/30 text-[10px] font-bold uppercase" title="Lavora">
+                                Lavora
+                            </button>
+                            <button onclick="updateAllertStato('${a.id}','ignorato')" class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-1.5 transition-colors border border-transparent hover:border-tp-loss/30 text-[10px] font-bold uppercase" title="Ignora">
+                                Ignora
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function updateAllertStato(id, stato) {
+            await db.from('allert').update({ stato }).eq('id', id);
+            await loadAllertOggi();
+        }
+
+        // ============================================
+        // SESSIONI CARDS
+        // ============================================
+        async function loadSessioniCards() {
+            if (!giornataDate) return;
+            const { data: sessioni } = await db.from('sessioni').select('*').eq('data', giornataDate);
+
+            const sessionNames = ['asia', 'london', 'newyork'];
+            for (const name of sessionNames) {
+                const session = sessioni ? sessioni.find(s => s.nome === name) : null;
+                const statusEl = document.getElementById(`session-status-${name}`);
+                const thumbEl = document.getElementById(`session-thumb-${name}`);
+
+                if (session) {
+                    if (statusEl) {
+                        statusEl.textContent = 'Compilata';
+                        statusEl.classList.remove('text-tp-muted');
+                        statusEl.classList.add('text-tp-accent');
                     }
-                }]
-            },
-            options: { ...commonOptions, scales: { x: commonOptions.scales.x, y: { ...commonOptions.scales.y, min: -1.5, max: 1.5, ticks: { callback: function(value) { if(value===1) return 'Smile'; if(value===0) return 'Meh'; if(value===-1) return 'Tired'; return ''; } } } } }
-        });
+                    // Load first coin screenshot from coin_data
+                    if (session.coin_data) {
+                        const firstScreen = Object.values(session.coin_data).find(c => c && c.screenshot);
+                        if (firstScreen && firstScreen.screenshot) {
+                            thumbEl.innerHTML = '<img src="' + firstScreen.screenshot + '" class="w-full h-full object-cover" alt="">';
+                        }
+                    }
+                    // Store session ID for navigation
+                    const card = thumbEl.closest('.session-card');
+                    if (card) card.dataset.sessionId = session.id;
+                }
+            }
+        }
 
-        // Volatility Bar Chart
-        const ctxVol = document.getElementById('volChart').getContext('2d');
-        let volChartObj = new Chart(ctxVol, {
-            type: 'bar',
-            data: {
-                labels: ['9:00', '11:00', '13:00', '15:00', '17:00'],
-                datasets: [{
-                    label: 'Volatilità ($)',
-                    data: [1, 2, 1, 3, 2],
-                    backgroundColor: '#eab308',
-                    borderRadius: 4,
-                    barPercentage: 0.4
-                }]
-            },
-            options: { ...commonOptions, scales: { x: commonOptions.scales.x, y: { ...commonOptions.scales.y, max: 3, ticks: { callback: function(value) { return '$'.repeat(value); } } } } }
-        });
+        function openSession(name) {
+            if (!giornataDate) return;
+            const card = document.querySelector('.session-card[data-session-name="' + name + '"]');
+            const existingId = card ? card.dataset.sessionId : null;
+            if (existingId) {
+                window.location.href = 'dettaglio_sessione.html?id=' + existingId;
+            } else {
+                window.location.href = 'dettaglio_sessione.html?session=' + name + '&date=' + giornataDate;
+            }
+        }
+
+        // ============================================
+        // BIAS GIORNALIERO
+        // ============================================
+        async function loadBiasGiornaliero() {
+            if (!giornataDate) return;
+            const container = document.getElementById('bias-list');
+            const { data, error } = await db.from('bias').select('*').eq('data', giornataDate).order('created_at', { ascending: true });
+
+            if (error || !data || data.length === 0) {
+                container.innerHTML = '<p class="text-xs text-tp-muted italic text-center py-4">Nessun bias registrato per oggi.</p>';
+                return;
+            }
+
+            container.innerHTML = data.map(b => {
+                const dirColor = b.direzione === 'LONG' ? 'text-tp-accent' : b.direzione === 'SHORT' ? 'text-tp-loss' : 'text-tp-muted';
+                const dirIcon = b.direzione === 'LONG' ? 'trending-up' : b.direzione === 'SHORT' ? 'trending-down' : 'minus';
+                const esitoTag = b.esito
+                    ? `<span class="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase ${b.esito === 'corretto' ? 'bg-tp-accent/10 text-tp-accent border border-tp-accent/20' : b.esito === 'sbagliato' ? 'bg-tp-loss/10 text-tp-loss border border-tp-loss/20' : 'bg-tp-warning/10 text-tp-warning border border-tp-warning/20'}">${b.esito}</span>`
+                    : '';
+                return `<a href="dettaglio_bias.html?id=${b.id}" class="bg-tp-panel border border-tp-border rounded-xl p-4 flex items-center gap-4 shadow-sm hover:border-tp-accent/30 transition-colors cursor-pointer block">
+                    <div class="flex flex-col items-center justify-center bg-[#0a0c10] rounded-lg border border-tp-border w-16 h-16 shrink-0">
+                        <i data-lucide="${dirIcon}" class="w-6 h-6 ${dirColor} mb-0.5"></i>
+                        <span class="text-[9px] font-bold ${dirColor} uppercase tracking-widest">${b.direzione || 'N/A'}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-sm font-bold text-white">${b.asset || ''}</span>
+                            ${esitoTag}
+                        </div>
+                        <p class="text-xs text-tp-muted truncate">${b.confluenze || b.note || ''}</p>
+                    </div>
+                </a>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        // ============================================
+        // TRADE STATS
+        // ============================================
+        async function loadTradeStats() {
+            if (!giornataId) return;
+            const { data: trades } = await db.from('trades').select('esito,pnl').eq('giornata_id', giornataId);
+            if (!trades || trades.length === 0) return;
+
+            let tp = 0, sl = 0, totalPnl = 0;
+            trades.forEach(t => {
+                if (t.esito === 'win') tp++;
+                if (t.esito === 'loss') sl++;
+                totalPnl += parseFloat(t.pnl || 0);
+            });
+
+            document.getElementById('stat-tp').textContent = tp;
+            document.getElementById('stat-sl').textContent = sl;
+            const pnlEl = document.getElementById('stat-pnl');
+            pnlEl.textContent = `${totalPnl >= 0 ? '+' : ''} $${totalPnl.toFixed(2)}`;
+            pnlEl.classList.add(totalPnl >= 0 ? 'text-tp-accent' : 'text-tp-loss');
+        }
+
+        // ============================================
+        // CHARTS
+        // ============================================
+        let usdChartObj, mindChartObj, volChartObj;
+
+        async function loadCharts() {
+            Chart.defaults.color = '#848d97';
+            Chart.defaults.font.family = 'Inter';
+
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { backgroundColor: '#161920', titleColor: '#fff', bodyColor: '#20c997', borderColor: '#252932', borderWidth: 1 }
+                },
+                scales: {
+                    x: { grid: { display: false, drawBorder: false }, ticks: { font: { size: 9 } } },
+                    y: { grid: { color: 'rgba(37, 41, 50, 0.4)', drawBorder: false, borderDash: [5, 5] }, ticks: { font: { size: 9 }, maxTicksLimit: 5 } }
+                },
+                interaction: { intersect: false, mode: 'index' }
+            };
+
+            // USD Chart - placeholder random line
+            const ctxUSD = document.getElementById('paniereChart').getContext('2d');
+            const gradUSD = ctxUSD.createLinearGradient(0, 0, 0, 100);
+            gradUSD.addColorStop(0, 'rgba(32, 201, 151, 0.4)');
+            gradUSD.addColorStop(1, 'rgba(32, 201, 151, 0)');
+
+            const usdLabels = ['9:00', '11:00', '13:00', '15:00', '17:00'];
+            const usdData = usdLabels.map(() => 103 + Math.random() * 3);
+
+            usdChartObj = new Chart(ctxUSD, {
+                type: 'line',
+                data: {
+                    labels: usdLabels,
+                    datasets: [{
+                        label: 'USD Index',
+                        data: usdData,
+                        borderColor: '#20c997',
+                        backgroundColor: gradUSD,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#0a0c10',
+                        pointBorderColor: '#20c997',
+                        pointBorderWidth: 2,
+                        pointRadius: 3
+                    }]
+                },
+                options: commonOptions
+            });
+
+            // Load monitora_smile data for Mindset and Vol charts
+            const { data: smileData } = await db.from('monitora_smile').select('*').order('created_at', { ascending: true });
+            const smileRows = smileData || [];
+
+            // Mindset chart
+            const mindLabels = smileRows.map((r, i) => {
+                const d = new Date(r.created_at);
+                return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+            });
+            const mindValues = smileRows.map(r => {
+                if (r.mindset === 'positive') return 1;
+                if (r.mindset === 'neutral') return 0;
+                if (r.mindset === 'negative') return -1;
+                return 0;
+            });
+
+            const ctxMindset = document.getElementById('mindsetChart').getContext('2d');
+            mindChartObj = new Chart(ctxMindset, {
+                type: 'line',
+                data: {
+                    labels: mindLabels.length > 0 ? mindLabels : ['--'],
+                    datasets: [{
+                        label: 'Stato Mentale',
+                        data: mindValues.length > 0 ? mindValues : [0],
+                        borderColor: '#9333ea',
+                        backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                        borderWidth: 2,
+                        stepped: true,
+                        fill: true,
+                        pointRadius: 4,
+                        pointBackgroundColor: function(context) {
+                            const val = context.raw;
+                            if (val > 0) return '#20c997';
+                            if (val === 0) return '#eab308';
+                            return '#f43f5e';
+                        }
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        x: commonOptions.scales.x,
+                        y: { ...commonOptions.scales.y, min: -1.5, max: 1.5, ticks: { callback: function(value) { if (value === 1) return 'Smile'; if (value === 0) return 'Meh'; if (value === -1) return 'Tired'; return ''; } } }
+                    }
+                }
+            });
+
+            // Volatility bar chart
+            const volValues = smileRows.map(r => {
+                if (r.volatilita === 'high') return 3;
+                if (r.volatilita === 'medium') return 2;
+                if (r.volatilita === 'low') return 1;
+                return 0;
+            });
+
+            const ctxVol = document.getElementById('volChart').getContext('2d');
+            volChartObj = new Chart(ctxVol, {
+                type: 'bar',
+                data: {
+                    labels: mindLabels.length > 0 ? mindLabels : ['--'],
+                    datasets: [{
+                        label: 'Volatilit\u00e0 ($)',
+                        data: volValues.length > 0 ? volValues : [0],
+                        backgroundColor: '#eab308',
+                        borderRadius: 4,
+                        barPercentage: 0.4
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        x: commonOptions.scales.x,
+                        y: { ...commonOptions.scales.y, max: 3, ticks: { callback: function(value) { return '$'.repeat(value); } } }
+                    }
+                }
+            });
+        }
 
         function switchDailyChart(type, btnObj) {
             document.querySelectorAll('.daily-chart-btn').forEach(b => {
@@ -719,747 +1020,107 @@
             document.getElementById('mindsetChart').style.display = 'none';
             document.getElementById('volChart').style.display = 'none';
 
-            let titleEl = document.getElementById('live-chart-title');
-            if(type === 'usd') { document.getElementById('paniereChart').style.display = 'block'; titleEl.innerHTML = '<i data-lucide="line-chart" class="w-4 h-4"></i> Forza USD (%)'; }
-            if(type === 'mindset') { document.getElementById('mindsetChart').style.display = 'block'; titleEl.innerHTML = '<i data-lucide="brain" class="w-4 h-4"></i> Mindset Track'; }
-            if(type === 'vol') { document.getElementById('volChart').style.display = 'block'; titleEl.innerHTML = '<i data-lucide="activity" class="w-4 h-4"></i> LiquiditÃ (Vol)'; }
-            lucide.createIcons({root: titleEl});
+            const titleEl = document.getElementById('live-chart-title');
+            if (type === 'usd') {
+                document.getElementById('paniereChart').style.display = 'block';
+                titleEl.innerHTML = '<i data-lucide="line-chart" class="w-4 h-4"></i> Forza USD (%)';
+            }
+            if (type === 'mindset') {
+                document.getElementById('mindsetChart').style.display = 'block';
+                titleEl.innerHTML = '<i data-lucide="brain" class="w-4 h-4"></i> Mindset Track';
+            }
+            if (type === 'vol') {
+                document.getElementById('volChart').style.display = 'block';
+                titleEl.innerHTML = '<i data-lucide="activity" class="w-4 h-4"></i> Liquidit\u00e0 (Vol)';
+            }
+            lucide.createIcons({ root: titleEl });
+        }
+
+        // ============================================
+        // SAVE GIORNATA
+        // ============================================
+        async function saveGiornata() {
+            if (!giornataId) return;
+
+            const tags = Object.entries(activeSessions).filter(([k, v]) => v).map(([k]) => k.toLowerCase());
+
+            const updatePayload = {
+                mindset: selectedMindset,
+                volatilita: selectedVolatility,
+                note_domani: document.getElementById('note-domani').value,
+                fajr: document.getElementById('btn-fajr').dataset.active === 'true',
+                marea: document.getElementById('inp-marea').value,
+                tags: tags,
+                stato: 'completato',
+                updated_at: new Date().toISOString()
+            };
+
+            const { error } = await db.from('giornate').update(updatePayload).eq('id', giornataId);
+
+            const btn = document.getElementById('btn-save');
+            if (!error) {
+                btn.textContent = 'Salvato!';
+                btn.classList.add('bg-tp-accent/60');
+                setTimeout(() => {
+                    btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Salva Giornata';
+                    btn.classList.remove('bg-tp-accent/60');
+                    lucide.createIcons({ root: btn });
+                }, 1500);
+            } else {
+                btn.textContent = 'Errore!';
+                btn.classList.add('bg-tp-loss');
+                setTimeout(() => {
+                    btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Salva Giornata';
+                    btn.classList.remove('bg-tp-loss');
+                    lucide.createIcons({ root: btn });
+                }, 2000);
+            }
+        }
+
+        // ============================================
+        // CLOCK
+        // ============================================
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            const clockEl = document.getElementById('digital-clock');
+            if (clockEl) clockEl.textContent = `${hours}:${minutes}:${seconds}`;
+
+            const m = now.getMinutes();
+            const s = now.getSeconds();
+
+            const checkBlink = (id, isClosing) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (isClosing) {
+                    el.classList.add('bg-tp-warning', 'text-[#0a0c10]', 'animate-pulse');
+                    el.classList.remove('bg-tp-panel', 'text-tp-muted');
+                } else {
+                    el.classList.remove('bg-tp-warning', 'text-[#0a0c10]', 'animate-pulse');
+                    el.classList.add('bg-tp-panel', 'text-tp-muted');
+                }
+            };
+
+            checkBlink('tf-5m', (m % 5 === 4) && s >= 50);
+            checkBlink('tf-15m', (m % 15 === 14) && s >= 50);
+            checkBlink('tf-30m', (m % 30 === 29) && s >= 50);
+            checkBlink('tf-1h', (m === 59) && s >= 50);
+            checkBlink('tf-4h', ((now.getHours() % 4 === 3) && m === 59 && s >= 50));
+
+            // Update timeline
+            const totalMinutes = now.getHours() * 60 + now.getMinutes();
+            const startMin = 2 * 60;   // 02:00 Asia
+            const endMin = 22 * 60;    // 22:00 End
+            const pct = Math.max(0, Math.min(100, ((totalMinutes - startMin) / (endMin - startMin)) * 100));
+            const progress = document.getElementById('timeline-progress');
+            const dot = document.getElementById('timeline-dot');
+            if (progress) progress.style.width = `${pct}%`;
+            if (dot) dot.style.left = `${pct}%`;
         }
     </script>
-    <!-- MODAL: BIAS / REPERTO (Input Giornaliero) -->
-    <div id="modal-bias-reperto" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="this.parentElement.classList.remove('open')"></div>
-        
-        <!-- Modal Content -->
-        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-2xl mx-4 relative transform scale-95 transition-transform duration-300 z-10 flex flex-col shadow-2xl overflow-hidden h-[90vh] md:h-auto max-h-[90vh]">
-            
-            <!-- Modal Header -->
-            <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-tp-panel relative overflow-hidden">
-                <div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-accent"></div>
-                <div class="flex items-center gap-3">
-                    <div class="bg-tp-accent/10 p-2 rounded-lg border border-tp-accent/20">
-                        <i data-lucide="microscope" class="w-5 h-5 text-tp-accent drop-shadow-[0_0_8px_rgba(32,201,151,0.5)]"></i>
-                    </div>
-                    <h2 class="text-xl font-bold flex gap-2 items-center">Archivia Reperto / Bias</h2>
-                </div>
-                <button onclick="document.getElementById('modal-bias-reperto').classList.remove('open')" class="text-tp-muted hover:text-tp-loss bg-tp-border/30 hover:bg-tp-loss/10 p-1.5 rounded-lg transition-colors border border-transparent hover:border-tp-loss/30">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
 
-            <!-- Modal Body -->
-            <div class="p-6 overflow-y-auto flex flex-col gap-6 custom-scroll">
-                
-                <div class="flex flex-col md:flex-row gap-6">
-                    <!-- Selettore Coin -->
-                    <div class="flex-1">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
-                            <i data-lucide="coins" class="w-4 h-4 text-tp-accent"></i> Asset
-                        </label>
-                        <select class="w-full bg-[#161920] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent transition-colors appearance-none">
-                            <option value="XAUUSD">XAUUSD (Gold)</option>
-                            <option value="EURUSD">EURUSD</option>
-                            <option value="US30">US30 (Dow Jones)</option>
-                            <option value="DXY">DXY (Dollar Index)</option>
-                        </select>
-                    </div>
-
-                    <!-- Destinazione Focus / Categorizzatore Esteso -->
-                    <div class="flex-1">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
-                            <i data-lucide="link" class="w-4 h-4 text-tp-accent"></i> Categorizzatore Universale
-                        </label>
-                        <div class="flex flex-col gap-2">
-                            <!-- Toggle Categorie -->
-                            <div class="flex gap-2">
-                                <button onclick="document.getElementById('c-cron-bias').style.display='block'; document.getElementById('c-strat-bias').style.display='none'; document.getElementById('c-trade-bias').style.display='none';" class="flex-1 px-2 py-1.5 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase transition-colors">Cronache</button>
-                                <button onclick="document.getElementById('c-cron-bias').style.display='none'; document.getElementById('c-strat-bias').style.display='block'; document.getElementById('c-trade-bias').style.display='none';" class="flex-1 px-2 py-1.5 rounded-lg text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase transition-colors">Strategia</button>
-                                <button onclick="document.getElementById('c-cron-bias').style.display='none'; document.getElementById('c-strat-bias').style.display='none'; document.getElementById('c-trade-bias').style.display='block';" class="flex-1 px-2 py-1.5 rounded-lg text-xs font-bold border border-blue-500 text-blue-400 bg-blue-500/10 uppercase transition-colors">Trade</button>
-                            </div>
-                            
-                            <!-- Selettori -->
-                            <div id="c-cron-bias" style="display: block;" class="mt-1">
-                                <select multiple class="w-full bg-[#0a0c10] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[80px] custom-scroll">
-                                    <option value="oggi">Oggi - Focus Sessione</option>
-                                    <option value="ieri">Ieri - Rilascio NFP</option>
-                                    <option value="altrieri">Lunedì - Apertura Mercati</option>
-                                </select>
-                            </div>
-
-                            <div id="c-strat-bias" style="display: none;" class="mt-1">
-                                <select multiple class="w-full bg-[#0a0c10] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none h-[80px] custom-scroll">
-                                    <option value="london">London Breakout</option>
-                                    <option value="asian">Asian Sweep</option>
-                                    <option value="news">News Scalping</option>
-                                    <option value="htf">Trend Continuation H4</option>
-                                </select>
-                            </div>
-                            
-                            <div id="c-trade-bias" style="display: none;" class="mt-1">
-                                <select multiple class="w-full bg-[#0a0c10] border border-blue-500/30 rounded-lg px-3 py-2 text-xs text-blue-400 font-bold outline-none h-[80px] custom-scroll">
-                                    <option value="104">Trade #TRD-104 (XAUUSD Long)</option>
-                                    <option value="103">Trade #TRD-103 (US30 Short)</option>
-                                    <option value="102">Trade #TRD-102 (EURUSD Long)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Screenshot Input -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
-                        <i data-lucide="image" class="w-4 h-4"></i> Reperto Grafico (Screen)
-                    </label>
-                    <div class="w-full flex items-center justify-center p-6 border-2 border-dashed border-tp-border/70 rounded-xl bg-[#161920] hover:border-tp-accent/50 hover:bg-tp-accent/5 transition-colors cursor-pointer group">
-                        <div class="text-center">
-                            <i data-lucide="upload-cloud" class="w-8 h-8 text-tp-muted group-hover:text-tp-accent mx-auto mb-2 transition-colors"></i>
-                            <span class="text-sm font-medium text-tp-muted group-hover:text-tp-text transition-colors">Trascina uno Screenshot o Clicca</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Analisi Bias -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
-                        <i data-lucide="align-left" class="w-4 h-4"></i> Motivazioni Logiche (Input)
-                    </label>
-                    <textarea placeholder="Descrivi il bias giornaliero, il pattern strutturale o l'inefficienza individuata da salvare come reperto..." class="w-full bg-[#161920] border border-tp-border rounded-lg px-3 py-3 text-sm focus:border-tp-accent outline-none text-white min-h-[120px] resize-none"></textarea>
-                </div>
-
-                <!-- Selettore Tags Archiviazione -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
-                        <i data-lucide="tags" class="w-4 h-4"></i> Tag Identificativi (Archiviazione)
-                    </label>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="this.classList.toggle('border-tp-accent'); this.classList.toggle('text-tp-accent'); this.classList.toggle('bg-tp-accent/10'); this.classList.toggle('border-tp-border'); this.classList.toggle('text-tp-muted');" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Struttura</button>
-                        <button onclick="this.classList.toggle('border-tp-accent'); this.classList.toggle('text-tp-accent'); this.classList.toggle('bg-tp-accent/10'); this.classList.toggle('border-tp-border'); this.classList.toggle('text-tp-muted');" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Liquidità </button>
-                        <button onclick="this.classList.toggle('border-[#eab308]'); this.classList.toggle('text-[#eab308]'); this.classList.toggle('bg-[#eab308]/10'); this.classList.toggle('border-tp-border'); this.classList.toggle('text-tp-muted');" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Evento Macro</button>
-                        <button onclick="this.classList.toggle('border-purple-500'); this.classList.toggle('text-purple-400'); this.classList.toggle('bg-purple-500/10'); this.classList.toggle('border-tp-border'); this.classList.toggle('text-tp-muted');" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Correlazione Setup</button>
-                        <button class="px-3 py-1.5 rounded-lg text-xs font-bold border border-dashed border-tp-border hover:border-tp-text text-tp-muted uppercase transition-colors bg-transparent">+ Custom Tag</button>
-                    </div>
-                </div>
-
-                <hr class="border-tp-border">
-
-                <!-- Mindset Live / Volatilita Toggles -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
-                        <i data-lucide="brain" class="w-4 h-4"></i> Mindset & Volatilità  (Traccia Aggiornamento)
-                    </label>
-                    <div class="flex flex-wrap items-center gap-6">
-                        <!-- Mindset -->
-                        <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
-                            <button onclick="selectMindset(this, 'positive')" class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors" title="Focussed / Positivo">
-                                <i data-lucide="smile" class="w-6 h-6"></i>
-                            </button>
-                            <button onclick="selectMindset(this, 'neutral')" class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors" title="Neutrale">
-                                <i data-lucide="meh" class="w-6 h-6"></i>
-                            </button>
-                            <button onclick="selectMindset(this, 'negative')" class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors" title="Revenge / Fomo / Stanco">
-                                <i data-lucide="frown" class="w-6 h-6"></i>
-                            </button>
-                        </div>
-                        
-                        <div class="hidden md:block w-px h-8 bg-tp-border"></div>
-                        
-                        <!-- Volatility -->
-                        <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
-                            <button onclick="selectVol(this, 'low')" class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors" title="Bassa Volatilità ">
-                                <div class="flex"><i data-lucide="dollar-sign" class="w-5 h-5"></i></div>
-                            </button>
-                            <button onclick="selectVol(this, 'med')" class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors" title="Media Volatilità ">
-                                <div class="flex"><i data-lucide="dollar-sign" class="w-5 h-5"></i><i data-lucide="dollar-sign" class="w-5 h-5 -ml-2"></i></div>
-                            </button>
-                            <button onclick="selectVol(this, 'high')" class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors" title="Alta Volatilità ">
-                                <div class="flex"><i data-lucide="dollar-sign" class="w-5 h-5"></i><i data-lucide="dollar-sign" class="w-5 h-5 -ml-2"></i><i data-lucide="dollar-sign" class="w-5 h-5 -ml-2"></i></div>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel">
-                <button onclick="document.getElementById('modal-bias-reperto').classList.remove('open')" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white transition-colors">Annulla</button>
-                <button onclick="document.getElementById('modal-bias-reperto').classList.remove('open')" class="bg-tp-accent text-[#0a0c10] px-6 py-2 rounded-lg text-sm font-black uppercase tracking-wider hover:bg-[#1bb887] transition-colors shadow-[0_0_15px_rgba(32,201,151,0.3)]">Archivia Reperto</button>
-            </div>
-            
-        </div>
-    </div>
-    
-    <!-- MODAL: ANALISI SESSIONE (Con Relazionatore Universale) -->
-    <div id="modal-analisi-sessione" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="this.parentElement.classList.remove('open')"></div>
-        
-        <!-- Modal Content -->
-        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-2xl mx-4 relative transform scale-95 transition-transform duration-300 z-10 flex flex-col shadow-2xl overflow-hidden h-[90vh] md:h-auto max-h-[90vh]">
-            
-            <!-- Modal Header -->
-            <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-tp-panel relative overflow-hidden">
-                <div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-accent"></div>
-                <div class="flex items-center gap-3">
-                    <div class="bg-tp-accent/10 p-2 rounded-lg border border-tp-accent/20">
-                        <i data-lucide="sun" class="w-5 h-5 text-tp-accent drop-shadow-[0_0_8px_rgba(32,201,151,0.5)]"></i>
-                    </div>
-                    <h2 id="session-title-modal" class="text-xl font-bold flex gap-2 items-center">Analisi Sessione</h2>
-                </div>
-                <button onclick="document.getElementById('modal-analisi-sessione').classList.remove('open')" class="text-tp-muted hover:text-tp-loss bg-tp-border/30 hover:bg-tp-loss/10 p-1.5 rounded-lg transition-colors border border-transparent hover:border-tp-loss/30">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <!-- Modal Body -->
-            <div class="p-6 overflow-y-auto flex flex-col gap-6 custom-scroll">
-                
-                <!-- TABS DELLE COIN PER MULTI-ANALISI -->
-                <div class="flex gap-2 border-b border-tp-border/50 pb-2">
-                    <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]', 'text-white', 'border-tp-border')); this.classList.add('bg-[#161920]', 'text-white', 'border-tp-border')" class="bg-[#161920] text-white border border-tp-border border-b-transparent rounded-t-lg px-4 py-2 text-xs font-bold uppercase tracking-widest">XAUUSD</button>
-                    <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]', 'text-white', 'border-tp-border')); this.classList.add('bg-[#161920]', 'text-white', 'border-tp-border')" class="text-tp-muted hover:text-white border border-transparent border-b-transparent rounded-t-lg px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors">EURUSD</button>
-                    <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]', 'text-white', 'border-tp-border')); this.classList.add('bg-[#161920]', 'text-white', 'border-tp-border')" class="text-tp-muted hover:text-white border border-transparent border-b-transparent rounded-t-lg px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors">US30</button>
-                    <button class="bg-tp-accent/10 text-tp-accent border border-tp-accent/20 rounded-t-lg px-3 py-2 text-xs font-bold uppercase tracking-widest hover:bg-tp-accent/20 transition-colors ml-auto"><i data-lucide="plus" class="w-4 h-4"></i></button>
-                </div>
-
-                <!-- ROW: Minimo e Massimo Sessione & Bias per la Coin corrente -->
-                <div class="flex flex-col md:flex-row gap-6 bg-[#0e1116] p-4 rounded-b-xl rounded-tr-xl border border-tp-border -mt-6 pt-6">
-                    <div class="flex-1 flex gap-4">
-                        <div class="flex-1">
-                            <label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-2">Massimo (High)</label>
-                            <input type="text" placeholder="Es. 2050.2" class="w-full bg-[#161920] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent transition-colors">
-                        </div>
-                        <div class="flex-1">
-                            <label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-2">Minimo (Low)</label>
-                            <input type="text" placeholder="Es. 2035.8" class="w-full bg-[#161920] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent transition-colors">
-                        </div>
-                    </div>
-
-                    <div class="flex-1">
-                        <label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-2">Bias Asset</label>
-                        <div class="flex bg-[#161920] rounded-lg p-1 border border-tp-border">
-                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b => {b.classList.remove('bg-tp-accent/20','text-tp-accent','border-none'); b.classList.add('text-tp-muted')}); this.classList.remove('text-tp-muted'); this.classList.add('bg-tp-accent/20','text-tp-accent')" class="flex-1 px-3 py-1.5 rounded-md text-xs font-bold uppercase transition-colors bg-tp-accent/20 text-tp-accent">Long</button>
-                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b => {b.classList.remove('bg-tp-accent/20','text-tp-accent','bg-tp-loss/20','text-tp-loss','border-none'); b.classList.add('text-tp-muted')}); this.classList.remove('text-tp-muted'); this.classList.add('bg-tp-loss/20','text-tp-loss')" class="flex-1 px-3 py-1.5 rounded-md text-xs font-bold uppercase transition-colors text-tp-muted hover:text-white">Short</button>
-                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b => {b.classList.remove('bg-tp-accent/20','text-tp-accent','bg-tp-loss/20','text-tp-loss','bg-tp-border/50','text-white','border-none'); b.classList.add('text-tp-muted')}); this.classList.remove('text-tp-muted'); this.classList.add('bg-tp-border/50','text-white')" class="flex-1 px-3 py-1.5 rounded-md text-xs font-bold uppercase transition-colors text-tp-muted hover:text-white">Neutro</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Commento -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
-                        <i data-lucide="align-left" class="w-4 h-4"></i> Analisi / Commento
-                    </label>
-                    <textarea placeholder="Inserisci i dettagli di come si è comportata la sessione..." class="w-full bg-[#161920] border border-tp-border rounded-lg px-3 py-3 text-sm focus:border-tp-accent outline-none text-white min-h-[80px] resize-none"></textarea>
-                </div>
-
-                <hr class="border-tp-border/50">
-
-                <!-- RELAZIONATORE DI CATEGORIA (MODULO UNIVERSALE) -->
-                <div class="border border-purple-500/30 bg-purple-500/5 rounded-xl p-4 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 bottom-0 w-1 bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]"></div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-purple-400 mb-3 flex items-center gap-2">
-                        <i data-lucide="link" class="w-4 h-4"></i> Relazionatore di Dati
-                    </label>
-                    <p class="text-[10px] text-tp-muted mb-4 -mt-1 w-5/6 leading-relaxed">Trasforma questi dati in un blocco unico e riportali nella finestra adiacente della categoria che selezioni.</p>
-                    
-                    <div class="flex flex-col md:flex-row gap-4 items-center">
-                        <div class="flex flex-col gap-2 flex-1 w-full">
-                            <div class="flex gap-2">
-                                <button onclick="this.parentElement.querySelectorAll('button').forEach(b => {b.classList.remove('border-[#eab308]','text-[#eab308]','bg-[#eab308]/10','border-purple-500','text-purple-400','bg-purple-500/10','border-[#20c997]','text-[#20c997]','bg-[#20c997]/10'); b.classList.add('border-tp-border','text-tp-muted','bg-[#0a0c10]')}); this.classList.remove('border-tp-border','text-tp-muted','bg-[#0a0c10]'); this.classList.add('border-[#eab308]','text-[#eab308]','bg-[#eab308]/10')" class="flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-[#eab308] text-[#eab308] bg-[#eab308]/10 uppercase transition-colors shadow-[0_0_10px_rgba(234,179,8,0.1)]">Cronaca</button>
-                                <button onclick="this.parentElement.querySelectorAll('button').forEach(b => {b.classList.remove('border-[#eab308]','text-[#eab308]','bg-[#eab308]/10','border-purple-500','text-purple-400','bg-purple-500/10','border-[#20c997]','text-[#20c997]','bg-[#20c997]/10'); b.classList.add('border-tp-border','text-tp-muted','bg-[#0a0c10]')}); this.classList.remove('border-tp-border','text-tp-muted','bg-[#0a0c10]'); this.classList.add('border-purple-500','text-purple-400','bg-purple-500/10')" class="flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-tp-border text-tp-muted bg-[#0a0c10] hover:text-white transition-colors">Strategia</button>
-                                <button onclick="this.parentElement.querySelectorAll('button').forEach(b => {b.classList.remove('border-[#eab308]','text-[#eab308]','bg-[#eab308]/10','border-purple-500','text-purple-400','bg-purple-500/10','border-[#20c997]','text-[#20c997]','bg-[#20c997]/10'); b.classList.add('border-tp-border','text-tp-muted','bg-[#0a0c10]')}); this.classList.remove('border-tp-border','text-tp-muted','bg-[#0a0c10]'); this.classList.add('border-[#20c997]','text-[#20c997]','bg-[#20c997]/10')" class="flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-tp-border text-tp-muted bg-[#0a0c10] hover:text-white transition-colors">Trade DB</button>
-                            </div>
-                        </div>
-
-                        <div class="flex-1 w-full">
-                            <select class="w-full bg-[#0a0c10] border border-purple-500/30 rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-purple-500 transition-colors appearance-none cursor-pointer">
-                                <option value="" disabled>Scegli la destinazione...</option>
-                                <option value="oggi" selected>Focus Attuale: 3 Aprile</option>
-                                <option value="ieri">NFP Event Page</option>
-                                <option value="nuova">+ Nuova Entità...</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <hr class="border-tp-border/50">
-
-                <!-- Mindset Live / Volatilita Toggles -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
-                        <i data-lucide="brain" class="w-4 h-4"></i> Mindset & Volatilità 
-                    </label>
-                    <div class="flex flex-wrap items-center gap-6">
-                        <!-- Mindset -->
-                        <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
-                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]')); this.classList.add('bg-[#161920]')" class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i data-lucide="smile" class="w-5 h-5 text-[#20c997]"></i></button>
-                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]')); this.classList.add('bg-[#161920]')" class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i data-lucide="meh" class="w-5 h-5 text-[#eab308]"></i></button>
-                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]')); this.classList.add('bg-[#161920]')" class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i data-lucide="frown" class="w-5 h-5 text-[#f43f5e]"></i></button>
-                        </div>
-                        <div class="hidden md:block w-px h-8 bg-tp-border"></div>
-                        <!-- Volatility -->
-                        <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
-                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]','text-white')); this.classList.add('bg-[#161920]','text-white')" class="vol-btn px-3 py-1.5 rounded-lg text-xs font-bold text-tp-muted hover:bg-[#161920] transition-colors">$</button>
-                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]','text-white')); this.classList.add('bg-[#161920]','text-white')" class="vol-btn px-3 py-1.5 rounded-lg text-xs font-bold text-tp-muted hover:bg-[#161920] transition-colors">$$</button>
-                            <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-[#161920]','text-white')); this.classList.add('bg-[#161920]','text-white')" class="vol-btn px-3 py-1.5 rounded-lg text-xs font-bold text-tp-muted hover:bg-[#161920] transition-colors">$$$</button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel">
-                <button onclick="document.getElementById('modal-analisi-sessione').classList.remove('open')" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white transition-colors">Annulla</button>
-                <button onclick="propagateSessionData()" class="bg-purple-500 text-white px-6 py-2 rounded-lg text-sm font-black uppercase tracking-wider hover:bg-purple-400 transition-colors shadow-[0_0_15px_rgba(168,85,247,0.3)]">Propaga Dati (Relaziona)</button>
-            </div>
-            
-        </div>
-    </div>
-
-    
-
-<div id="modal-analisi-alert"
-            class="fixed inset-0 z-[100] flex justify-center items-center bg-black/70 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
-            <!-- Click-away -->
-            <div class="absolute inset-0" onclick="this.parentElement.classList.remove('open')"></div>
-
-            <!-- Contenitore Due Colonne -->
-            <div class="relative w-full max-w-[1200px] h-[85vh] bg-[#0a0c10] border border-tp-border rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden transform scale-95 transition-transform duration-300"
-                id="modal-alert-content">
-
-                <!-- COLONNA SINISTRA: Form Box -->
-                <div class="w-full md:w-[450px] bg-tp-panel flex flex-col border-r border-tp-border z-10">
-                    <!-- Header -->
-                    <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-[#161920]">
-                        <div class="flex items-center gap-3">
-                            <i data-lucide="bell" class="w-5 h-5 text-[#eab308]"></i>
-                            <h2 class="text-base font-bold text-white uppercase tracking-widest">Validazione Allert</h2>
-                        </div>
-                        <button onclick="document.getElementById('modal-analisi-alert').classList.remove('open')"
-                            class="text-tp-muted hover:text-white bg-tp-border/20 p-1.5 rounded-lg transition-colors">
-                            <i data-lucide="x" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-
-                    <!-- Corpo Form Scrollabile -->
-                    <div class="p-6 overflow-y-auto flex-1 flex flex-col gap-6 custom-scroll">
-
-                        <!-- Dati Ricevuti -->
-                        <div class="bg-[#0e1116] border border-tp-border p-4 rounded-lg flex flex-col gap-3">
-                            <div class="flex justify-between items-center border-b border-tp-border/50 pb-2">
-                                <span class="text-[#eab308] font-bold text-lg leading-none">XAUUSD</span>
-                                <span
-                                    class="bg-[#eab308]/10 text-[#eab308] border border-[#eab308]/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase">14:30</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs text-tp-muted font-bold uppercase tracking-wider">Trigger
-                                    Prezzo</span>
-                                <span
-                                    class="font-display font-bold text-white text-base bg-[#161d24] px-2 rounded border border-tp-border">2045.50</span>
-                            </div>
-                            <p class="text-xs text-tp-muted italic mt-1 leading-relaxed">Alert triggerato livello
-                                resistenza chiave H4 identificato pre-market. Possibile reazione per storno intaday.</p>
-                        </div>
-
-                        <!-- Spazio Commento Aperto -->
-                        <div>
-                            <label
-                                class="block text-[10px] font-bold uppercase tracking-widest text-[#eab308] mb-2">Analisi
-                                e Commento</label>
-                            <textarea placeholder="Analisi strutturale e motivazioni del test al livello..."
-                                class="w-full bg-[#0e1116] border border-tp-border rounded-lg px-3 py-3 text-sm focus:border-[#eab308] outline-none text-white h-[100px] resize-none"></textarea>
-                        </div>
-
-                        <!-- Monitora Smile Esistente -->
-                        <div>
-                            <label
-                                class="block text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-2">Stato
-                                Operativo (Live)</label>
-                            <div
-                                class="flex flex-wrap items-center gap-4 bg-[#0e1116] p-2 rounded-xl border border-tp-border">
-                                <div class="flex items-center gap-1">
-                                    <button
-                                        class="p-1.5 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
-                                            data-lucide="smile" class="w-5 h-5"></i></button>
-                                    <button
-                                        class="p-1.5 rounded-lg text-[#20c997] bg-[#161920] border border-tp-border"><i
-                                            data-lucide="meh" class="w-5 h-5"></i></button>
-                                    <button
-                                        class="p-1.5 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
-                                            data-lucide="frown" class="w-5 h-5"></i></button>
-                                </div>
-                                <div class="w-px h-6 bg-tp-border hidden sm:block"></div>
-                                <div class="flex items-center gap-1">
-                                    <button
-                                        class="p-1.5 rounded-lg text-[#eab308] bg-[#161920] border border-tp-border"><i
-                                            data-lucide="dollar-sign" class="w-4 h-4"></i></button>
-                                    <button class="p-1.5 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
-                                        <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i
-                                                data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Categorizzatore Multiselect -->
-                        <div>
-                            <label class="block text-[10px] font-bold uppercase tracking-widest text-tp-accent mb-2"><i
-                                    data-lucide="tags" class="inline w-3 h-3 mb-0.5"></i> Categorizzatore</label>
-                            <div class="flex flex-col gap-3">
-                                <!-- Bottoni Destinazione -->
-                                <div class="flex gap-2">
-                                    <button
-                                        onclick="document.getElementById('cat-cron-alert').style.display='block'; document.getElementById('cat-strat-alert').style.display='none'; document.getElementById('cat-trade-alert').style.display='none';"
-                                        class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase transition-colors">Cronache</button>
-                                    <button
-                                        onclick="document.getElementById('cat-cron-alert').style.display='none'; document.getElementById('cat-strat-alert').style.display='block'; document.getElementById('cat-trade-alert').style.display='none';"
-                                        class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase transition-colors">Strategia</button>
-                                    <button
-                                        onclick="document.getElementById('cat-cron-alert').style.display='none'; document.getElementById('cat-strat-alert').style.display='none'; document.getElementById('cat-trade-alert').style.display='block';"
-                                        class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-blue-500 text-blue-400 bg-blue-500/10 uppercase transition-colors">Trade</button>
-                                </div>
-                                <!-- Multiselect Cronache -->
-                                <div id="cat-cron-alert" class="w-full">
-                                    <select multiple
-                                        class="w-full bg-[#0e1116] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[80px] custom-scroll">
-                                        <option value="oggi">Oggi - Focus Sessione</option>
-                                        <option value="ieri">Ieri - Rilascio NFP</option>
-                                        <option value="altrieri">Lunedì - Apertura Mercati</option>
-                                    </select>
-                                    <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione
-                                    </p>
-                                </div>
-                                <!-- Multiselect Strategie -->
-                                <div id="cat-strat-alert" class="w-full" style="display:none;">
-                                    <select multiple
-                                        class="w-full bg-[#0e1116] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none h-[80px] custom-scroll">
-                                        <option value="s1">London Breakout</option>
-                                        <option value="s2">Asian Sweep Liquidity</option>
-                                        <option value="s3">News Scalper</option>
-                                        <option value="s4">Trend Pullback H4</option>
-                                    </select>
-                                    <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione
-                                    </p>
-                                </div>
-                                <!-- Multiselect Trade Recenti -->
-                                <div id="cat-trade-alert" class="w-full" style="display:none;">
-                                    <select multiple
-                                        class="w-full bg-[#0e1116] border border-blue-500/30 rounded-lg px-3 py-2 text-xs text-blue-400 font-bold outline-none h-[80px] custom-scroll">
-                                        <option value="t1">XAUUSD - Eseguito (Buy @ 2045.50)</option>
-                                        <option value="t2">US30 - Eseguito (Sell @ 39800.0)</option>
-                                        <option value="t3">EURUSD - Pending (Buy @ 1.0850)</option>
-                                    </select>
-                                    <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- Footer Form Salva -->
-                    <div class="px-6 py-4 border-t border-tp-border bg-[#161920]">
-                        <button
-                            class="w-full flex justify-center items-center gap-2 px-6 py-3 rounded-lg text-xs font-black uppercase tracking-widest text-[#0e1116] bg-[#eab308] hover:bg-yellow-400 transition-colors shadow-[0_0_15px_rgba(234,179,8,0.3)]"
-                            onclick="document.getElementById('modal-analisi-alert').classList.remove('open')">
-                            Accetta & Salva in DB
-                        </button>
-                    </div>
-                </div>
-
-                <!-- COLONNA DESTRA: Upload Reperto Grafico -->
-                <div class="flex-1 bg-[#050608] flex items-center justify-center p-8 relative group">
-                    <div
-                        class="absolute inset-4 border-2 border-dashed border-tp-border/50 group-hover:border-[#eab308]/50 rounded-xl transition-colors pointer-events-none z-0">
-                    </div>
-                    <div class="text-center z-10 cursor-pointer">
-                        <div
-                            class="w-16 h-16 rounded-full bg-[#161920] flex items-center justify-center border border-tp-border mb-4 mx-auto group-hover:scale-110 transition-transform">
-                            <i data-lucide="camera"
-                                class="w-6 h-6 text-tp-muted group-hover:text-[#eab308] transition-colors"></i>
-                        </div>
-                        <h3 class="text-white font-bold text-lg mb-1">Carica Reperto Grafico</h3>
-                        <p class="text-tp-muted text-sm">Trascina qui lo screenshot o clicca per caricare</p>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- NOTION-STYLE MODAL: "News Validation" -->
-        <div id="modal-news-alert"
-            class="fixed inset-0 z-[100] flex justify-center items-start pt-20 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">
-            <div class="absolute inset-0"
-                onclick="document.getElementById('modal-news-alert').classList.remove('open')"></div>
-
-            <div class="relative w-full max-w-3xl bg-[#0e1116] border border-tp-border rounded-2xl shadow-2xl p-0 flex flex-col max-h-[85vh] overflow-hidden transform scale-95 transition-transform duration-200"
-                id="modal-news-content">
-
-                <!-- Modal Header -->
-                <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-[#161920]">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-purple-500/10 p-2 rounded-lg border border-purple-500/20">
-                            <i data-lucide="globe" class="w-5 h-5 text-purple-400"></i>
-                        </div>
-                        <h2 class="text-xl font-bold text-white">Validazione Post-Notizia: NFP</h2>
-                    </div>
-                    <button onclick="document.getElementById('modal-news-alert').classList.remove('open')"
-                        class="text-tp-muted hover:text-tp-text bg-tp-border/30 p-1.5 rounded-lg transition-colors">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                    </button>
-                </div>
-
-                <!-- Modal Body -->
-                <div class="p-6 overflow-y-auto flex flex-col gap-6 custom-scroll">
-
-                    <!-- Dati Importati N8N -->
-                    <div class="bg-tp-bg p-4 rounded-xl border border-tp-border flex flex-col gap-4">
-                        <div class="flex justify-between items-start border-b border-tp-border/50 pb-2">
-                            <span class="text-[10px] font-bold uppercase tracking-wide text-purple-400"><i
-                                    data-lucide="database" class="inline w-3 h-3"></i> Importato da AI Server
-                                (Pre-News)</span>
-                        </div>
-                        <div class="grid grid-cols-3 gap-4">
-                            <div>
-                                <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Evento</span>
-                                <span class="font-bold text-sm">Non-Farm Payrolls</span>
-                            </div>
-                            <div>
-                                <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Forecast /
-                                    Previous</span>
-                                <span class="font-bold text-sm text-tp-warning">205K <span
-                                        class="text-tp-muted font-normal text-xs ml-1">/ 275K</span></span>
-                            </div>
-                            <div>
-                                <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Impatto
-                                    Atteso</span>
-                                <span class="font-bold text-sm text-tp-loss">High (3 ðÅ¸â€Â¥)</span>
-                            </div>
-                        </div>
-                        <div>
-                            <span class="text-[10px] uppercase font-bold text-tp-muted block mb-1">Commento Intelligenza
-                                N8N</span>
-                            <p class="text-xs text-tp-muted bg-tp-panel p-3 rounded-lg border border-tp-border/50">Un
-                                NFP pià¹ alto del forecast rafforzerà  il dollaro, potenziale spinta ribassista su
-                                Gold (XAUUSD).</p>
-                        </div>
-                    </div>
-
-                    <!-- Dati Approvazione Utente -->
-                    <div class="flex gap-4">
-                        <div class="flex-1 shrink-0 w-1/3">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2"><i
-                                    data-lucide="edit" class="inline w-3 h-3"></i> Immetti Dati Usciti</label>
-                            <input type="text" placeholder="Es. 303K"
-                                class="w-full bg-[#0a0c10] border border-tp-border hover:border-tp-accent focus:border-tp-accent rounded-lg px-3 py-2 text-xl font-bold font-display text-white outline-none transition-colors">
-                        </div>
-                        <div class="flex-1 w-2/3">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2"><i
-                                    data-lucide="align-left" class="inline w-3 h-3"></i> Commento Utente
-                                Post-News</label>
-                            <textarea placeholder="Analisi dei minimi presi, comportamento del trend post spike..."
-                                class="w-full bg-[#0a0c10] border border-tp-border hover:border-tp-accent focus:border-tp-accent rounded-lg px-3 py-2 text-sm text-white outline-none h-[48px] resize-none transition-colors"></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Impact Widget (Grafico Freccie) -->
-                    <div class="bg-tp-bg p-4 rounded-xl border border-tp-border">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-4"><i
-                                data-lucide="trending-up" class="inline w-3 h-3"></i> Monitoratore Impatto Visivo
-                            Rapido</label>
-                        <div class="flex gap-4">
-                            <!-- XAUUSD -->
-                            <div
-                                class="flex items-center gap-3 bg-tp-panel px-3 py-1.5 rounded-lg border border-tp-border flex-1 justify-between group hover:border-tp-accent/30 transition-colors">
-                                <span class="font-bold text-sm tracking-wide">XAU/USD</span>
-                                <div class="flex gap-1 bg-[#0a0c10] rounded-md border border-tp-border p-1">
-                                    <button onclick="selectImpact(this)"
-                                        class="visual-impact hover:bg-tp-accent/20 hover:text-tp-accent px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
-                                            data-lucide="arrow-up" class="w-4 h-4"></i></button>
-                                    <button onclick="selectImpact(this)"
-                                        class="visual-impact hover:bg-tp-loss/20 hover:text-tp-loss px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
-                                            data-lucide="arrow-down" class="w-4 h-4"></i></button>
-                                </div>
-                            </div>
-                            <!-- USD INDEX -->
-                            <div
-                                class="flex items-center gap-3 bg-tp-panel px-3 py-1.5 rounded-lg border border-tp-border flex-1 justify-between group hover:border-tp-accent/30 transition-colors">
-                                <span class="font-bold text-sm tracking-wide">US DXY</span>
-                                <div class="flex gap-1 bg-[#0a0c10] rounded-md border border-tp-border p-1">
-                                    <button onclick="selectImpact(this)"
-                                        class="visual-impact hover:bg-tp-accent/20 hover:text-tp-accent px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
-                                            data-lucide="arrow-up" class="w-4 h-4"></i></button>
-                                    <button onclick="selectImpact(this)"
-                                        class="visual-impact hover:bg-tp-loss/20 hover:text-tp-loss px-2 py-0.5 rounded text-tp-muted text-xs transition-colors"><i
-                                            data-lucide="arrow-down" class="w-4 h-4"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Proprieta Strategie/Tag -->
-                    <div>
-                        <div class="flex flex-wrap gap-2">
-                            <button
-                                onclick="this.classList.toggle('border-purple-500'); this.classList.toggle('text-purple-400'); this.classList.toggle('bg-purple-500/10')"
-                                class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Tag:
-                                Manipolazione</button>
-                            <button
-                                onclick="this.classList.toggle('border-purple-500'); this.classList.toggle('text-purple-400'); this.classList.toggle('bg-purple-500/10')"
-                                class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Tag:
-                                Reversal</button>
-                            <button
-                                onclick="this.classList.toggle('border-purple-500'); this.classList.toggle('text-purple-400'); this.classList.toggle('bg-purple-500/10')"
-                                class="px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-colors bg-[#0a0c10]">Tag:
-                                Impulso Immediato</button>
-                        </div>
-                    </div>
-
-                    <hr class="border-tp-border/50">
-
-                    <!-- Categorizzatore Multiselect per Notizie -->
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-widest text-[#eab308] mb-2"><i
-                                data-lucide="tags" class="inline w-3 h-3 mb-0.5"></i> Categorizzatore Destinazione
-                            Focus</label>
-                        <div class="flex flex-col gap-3">
-                            <!-- Bottoni Destinazione -->
-                            <div class="flex gap-2">
-                                <button
-                                    onclick="document.getElementById('cat-cron-news').style.display='block'; document.getElementById('cat-strat-news').style.display='none'; document.getElementById('cat-trade-news').style.display='none';"
-                                    class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase transition-colors">Cronache</button>
-                                <button
-                                    onclick="document.getElementById('cat-cron-news').style.display='none'; document.getElementById('cat-strat-news').style.display='block'; document.getElementById('cat-trade-news').style.display='none';"
-                                    class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase transition-colors">Strategia</button>
-                                <button
-                                    onclick="document.getElementById('cat-cron-news').style.display='none'; document.getElementById('cat-strat-news').style.display='none'; document.getElementById('cat-trade-news').style.display='block';"
-                                    class="flex-1 px-2 py-1.5 rounded text-[10px] sm:text-xs font-bold border border-blue-500 text-blue-400 bg-blue-500/10 uppercase transition-colors">Trade</button>
-                            </div>
-                            <!-- Multiselect Cronache -->
-                            <div id="cat-cron-news" class="w-full">
-                                <select multiple
-                                    class="w-full bg-[#0a0c10] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[80px] custom-scroll">
-                                    <option value="oggi">Oggi - Focus Notizie Focus</option>
-                                    <option value="domani">Domani - Preparativa</option>
-                                    <option value="ieri">Ieri - Impatto NFP</option>
-                                </select>
-                                <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione</p>
-                            </div>
-                            <!-- Multiselect Strategie -->
-                            <div id="cat-strat-news" class="w-full" style="display:none;">
-                                <select multiple
-                                    class="w-full bg-[#0a0c10] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none h-[80px] custom-scroll">
-                                    <option value="s1">London Breakout</option>
-                                    <option value="s2">Asian Sweep Liquidity</option>
-                                    <option value="s3">News Scalper</option>
-                                    <option value="s4">Trend Pullback H4</option>
-                                </select>
-                                <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione</p>
-                            </div>
-                            <!-- Multiselect Trade Recenti -->
-                            <div id="cat-trade-news" class="w-full" style="display:none;">
-                                <select multiple
-                                    class="w-full bg-[#0a0c10] border border-blue-500/30 rounded-lg px-3 py-2 text-xs text-blue-400 font-bold outline-none h-[80px] custom-scroll">
-                                    <option value="t1">XAUUSD - Eseguito (Buy @ 2045.50)</option>
-                                    <option value="t2">US30 - Eseguito (Sell @ 39800.0)</option>
-                                    <option value="t3">EURUSD - Pending (Buy @ 1.0850)</option>
-                                </select>
-                                <p class="text-[9px] text-tp-muted mt-1 text-right">Hold CTRL per multi-selezione</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr class="border-tp-border/50">
-
-                    <!-- Condizionatore Faccina/Mindset (Uguale a Modale Trade) -->
-                    <div>
-                        <label
-                            class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
-                            <i data-lucide="brain" class="w-4 h-4"></i> Mindset Live & Volatilità 
-                        </label>
-                        <div class="flex items-center gap-4">
-                            <!-- Mindset -->
-                            <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
-                                <button onclick="selectMindset(this, 'positive')"
-                                    class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
-                                        data-lucide="smile" class="w-5 h-5"></i></button>
-                                <button onclick="selectMindset(this, 'neutral')"
-                                    class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
-                                        data-lucide="meh" class="w-5 h-5"></i></button>
-                                <button onclick="selectMindset(this, 'negative')"
-                                    class="mindset-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors"><i
-                                        data-lucide="frown" class="w-5 h-5"></i></button>
-                            </div>
-                            <div class="w-px h-6 bg-tp-border"></div>
-                            <!-- Volatility -->
-                            <div class="flex items-center gap-2 bg-[#0a0c10] p-1.5 rounded-xl border border-tp-border">
-                                <button onclick="selectVol(this, 'low')"
-                                    class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
-                                    <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i></div>
-                                </button>
-                                <button onclick="selectVol(this, 'med')"
-                                    class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
-                                    <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i
-                                            data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>
-                                </button>
-                                <button onclick="selectVol(this, 'high')"
-                                    class="vol-btn p-2 rounded-lg text-tp-muted hover:bg-[#161920] transition-colors">
-                                    <div class="flex"><i data-lucide="dollar-sign" class="w-4 h-4"></i><i
-                                            data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i><i
-                                            data-lucide="dollar-sign" class="w-4 h-4 -ml-2"></i></div>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="px-6 py-4 border-t border-tp-border bg-[#161920] flex justify-end gap-3 rounded-b-2xl">
-                    <button onclick="document.getElementById('modal-news-alert').classList.remove('open')"
-                        class="px-4 py-2 rounded-lg text-sm font-bold text-tp-text bg-tp-border/20 hover:bg-tp-border/50 border border-tp-border transition-colors">
-                        Ignora Notizia
-                    </button>
-                    <button onclick="document.getElementById('modal-news-alert').classList.remove('open')"
-                        class="flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold text-white bg-purple-600 hover:bg-purple-500 border border-transparent transition-all shadow-[0_0_15px_rgba(147,51,234,0.3)]"
-                        onclick="window.location.href='allert.html'">
-                        Invia a DB Notizie <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-    
-<style>
-        /* CSS per gestire l'apertura del modale da inline javascript */
-        #modal-analisi-alert.open,
-        #modal-news-alert.open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        #modal-analisi-alert.open #modal-alert-content,
-        #modal-news-alert.open #modal-news-content {
-            transform: scale(1);
-        }
-    </style>
-
-    <script src="app.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
