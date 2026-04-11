@@ -422,17 +422,42 @@
                 <div class="xl:col-span-3 flex flex-col gap-6">
 
                     <!-- Box 5: Watch List -->
-                    <div
-                        class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col h-auto min-h-[280px] shadow-lg">
-                        <div class="flex items-center justify-between mb-4 border-b border-tp-border/50 pb-3">
-                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted">Watchlist</h3>
-                            <button class="text-tp-muted hover:text-tp-text"><i data-lucide="settings-2"
-                                    class="w-4 h-4"></i></button>
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-4 flex flex-col shadow-lg">
+                        <div class="flex items-center justify-between mb-3 border-b border-tp-border/50 pb-2">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted">Watchlist Live</h3>
                         </div>
-
-                        <ul id="watchlist" class="space-y-1 mt-1">
-                            <!-- Populated by JS -->
-                        </ul>
+                        <style>
+                            .tv-watchlist-override iframe { pointer-events: none; }
+                            .tv-watchlist-override .tradingview-widget-copyright { display: none !important; }
+                        </style>
+                        <div class="tv-watchlist-override" style="pointer-events:none">
+                            <div class="tradingview-widget-container">
+                                <div class="tradingview-widget-container__widget"></div>
+                                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
+                                {
+                                    "width": "100%",
+                                    "height": "250",
+                                    "symbolsGroups": [
+                                        {
+                                            "name": "Preferite",
+                                            "symbols": [
+                                                {"name": "OANDA:XAUUSD", "displayName": "XAUUSD"},
+                                                {"name": "BLACKBULL:US30", "displayName": "US30"},
+                                                {"name": "PEPPERSTONE:GER40", "displayName": "GER30"},
+                                                {"name": "OANDA:NAS100USD", "displayName": "NAS100"},
+                                                {"name": "BITSTAMP:BTCUSD", "displayName": "BTCUSD"}
+                                            ]
+                                        }
+                                    ],
+                                    "showSymbolLogo": true,
+                                    "isTransparent": true,
+                                    "colorTheme": "dark",
+                                    "locale": "it",
+                                    "showFloatingTooltip": false
+                                }
+                                </script>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Box 6: Allert Non Lavorati -->
@@ -591,15 +616,28 @@
     }
 
     // --- Init Paniere USD Chart ---
-    function initPaniereChart() {
+    async function initPaniereChart() {
         const ctx = document.getElementById('dashPaniereChart');
         if (!ctx) return;
         Chart.defaults.color = '#848d97';
         Chart.defaults.font.family = 'Inter';
 
-        // Random placeholder data
-        const labels = ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', 'Now'];
-        const data = labels.map(() => (Math.random() * 4 - 1.5).toFixed(1));
+        // Load real data from Supabase
+        let labels = [];
+        let data = [];
+        try {
+            const { data: rows } = await db.from('forza_usd').select('usd_strength, created_at').order('created_at', { ascending: true }).limit(50);
+            if (rows && rows.length) {
+                labels = rows.map(r => new Date(r.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }));
+                data = rows.map(r => parseFloat(r.usd_strength));
+            } else {
+                labels = ['--'];
+                data = [0];
+            }
+        } catch(e) {
+            labels = ['--'];
+            data = [0];
+        }
 
         new Chart(ctx.getContext('2d'), {
             type: 'line',
@@ -633,9 +671,9 @@
                 scales: {
                     x: { display: true, grid: { display: false, drawBorder: false }, ticks: { font: { size: 9 }, color: '#848d97' } },
                     y: {
-                        display: true, position: 'right',
-                        grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
-                        ticks: { font: { size: 9 }, color: '#848d97', callback: v => v > 0 ? '+' + v + '%' : v + '%' }
+                        display: true, position: 'left',
+                        grid: { display: false, drawBorder: false },
+                        ticks: { font: { size: 9 }, color: '#848d97', callback: v => parseFloat(v).toFixed(2) + '%' }
                     }
                 },
                 interaction: { mode: 'index', intersect: false }
@@ -643,30 +681,7 @@
         });
     }
 
-    // --- Init Watchlist ---
-    function initWatchlist() {
-        const coins = [
-            { symbol: 'XAUUSD', price: '2,345.80', pct: '+1.2%', up: true },
-            { symbol: 'US30', price: '39,450.00', pct: '-0.5%', up: false },
-            { symbol: 'GER30', price: '18,210.50', pct: '+0.3%', up: true },
-            { symbol: 'NAS100', price: '17,890.25', pct: '+0.8%', up: true },
-            { symbol: 'BTCUSD', price: '68,420.00', pct: '-1.1%', up: false }
-        ];
-        const ul = document.getElementById('watchlist');
-        if (!ul) return;
-        ul.innerHTML = coins.map(c => `
-            <li class="flex justify-between items-center p-2 rounded hover:bg-[#1c212a] transition-colors cursor-pointer group hover:shadow-[0_0_10px_rgba(32,201,151,0.1)] border border-transparent hover:border-tp-accent/30">
-                <div class="flex items-center gap-3">
-                    <div class="w-2 h-2 rounded-full ${c.up ? 'bg-tp-accent' : 'bg-tp-loss'}"></div>
-                    <span class="font-bold tracking-wide group-hover:text-white transition-colors">${c.symbol}</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-tp-muted text-[10px] tabular-nums">${c.price}</span>
-                    <span class="${c.up ? 'text-tp-accent' : 'text-tp-loss'} text-xs font-bold tabular-nums">${c.pct}</span>
-                </div>
-            </li>
-        `).join('');
-    }
+    // Watchlist now uses TradingView widgets embedded in HTML
 
     // --- SUPABASE: Processi Attivi ---
     async function loadProcessiAttivi() {
@@ -996,7 +1011,6 @@
         lucide.createIcons();
         initNomiDiAllah99();
         initPaniereChart();
-        initWatchlist();
         setupCalendarFilters();
 
         // Load Supabase data
