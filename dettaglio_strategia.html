@@ -662,10 +662,7 @@
 
         // --- LOAD BIAS ---
         async function loadBias() {
-            // Carica bias che hanno questa strategia come riferimento
-            // Per ora cerchiamo bias con note che contengono il nome della strategia
-            // In futuro: campo strategia_id nella tabella bias
-            if (!currentStrategy) return;
+            if (!strategyId) return;
 
             const { data: biasEntries, error } = await db
                 .from('bias')
@@ -674,17 +671,36 @@
 
             if (error) { console.error(error); return; }
 
-            // Per ora mostra tutti i bias (il filtro per strategia_id verrà aggiunto quando si evolve lo schema)
             const container = document.getElementById('bias-container');
             const noMsg = document.getElementById('no-bias-msg');
 
-            if (!biasEntries || biasEntries.length === 0) {
+            // Filtra bias che hanno questa strategia nel categorizzatore
+            const linked = (biasEntries || []).filter(function(b) {
+                return b.categorizzatori && b.categorizzatori.strategie && b.categorizzatori.strategie.includes(strategyId);
+            });
+
+            if (linked.length === 0) {
                 noMsg.style.display = '';
                 return;
             }
 
-            // Per ora li nascondiamo finché non c'è il campo strategia_id nel bias
-            // Quando aggiungeremo strategia_id alla tabella bias, filtreremo qui
+            noMsg.style.display = 'none';
+            var html = linked.map(function(b) {
+                var dirColor = b.direzione === 'LONG' ? 'text-tp-accent' : b.direzione === 'SHORT' ? 'text-tp-loss' : 'text-tp-muted';
+                var barColor = b.direzione === 'LONG' ? 'bg-tp-accent' : b.direzione === 'SHORT' ? 'bg-tp-loss' : 'bg-tp-border';
+                var dateStr = b.data || '';
+                return '<div onclick="window.location.href=\'dettaglio_bias.html?id=' + b.id + '\'" class="bg-[#0a0c10] border border-l-4 border-l-' + (b.direzione === 'LONG' ? 'tp-accent' : 'tp-loss') + ' border-r-tp-border border-t-tp-border border-b-tp-border rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all">' +
+                    '<div class="flex items-center justify-between mb-1">' +
+                    '<span class="text-xs font-bold text-white">' + (b.asset || '--') + '</span>' +
+                    '<span class="text-[9px] text-tp-muted font-bold">' + dateStr + '</span>' +
+                    '</div>' +
+                    '<span class="text-[10px] ' + dirColor + ' font-bold uppercase">' + (b.direzione || '') + '</span>' +
+                    '<p class="text-[10px] text-tp-muted/80 line-clamp-2 mt-1">' + (b.commento || '') + '</p>' +
+                    '</div>';
+            }).join('');
+
+            container.innerHTML = '<div id="no-bias-msg" style="display:none"></div>' + html;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
     </script>
 </body>

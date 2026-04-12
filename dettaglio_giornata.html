@@ -276,28 +276,13 @@
                      ========================================== -->
                 <div class="col-span-12 lg:col-span-3 flex flex-col gap-6">
 
-                    <!-- 1. Checklist -->
+                    <!-- 1. Checklist (da localStorage td_checklist) -->
                     <div class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col shadow-lg">
                         <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-4 border-b border-tp-border pb-2 flex items-center gap-2">
                             <i data-lucide="check-square" class="w-4 h-4"></i> Checklist Base
                         </h3>
                         <ul id="checklist-items" class="space-y-4">
-                            <li class="flex items-start gap-3 group" data-key="review_macro">
-                                <input type="checkbox" class="tp-check mt-0.5" onchange="toggleCheckLabel(this)">
-                                <label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">Review Macro Calendario</label>
-                            </li>
-                            <li class="flex items-start gap-3 group" data-key="liquidita_asia">
-                                <input type="checkbox" class="tp-check mt-0.5" onchange="toggleCheckLabel(this)">
-                                <label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">Controllato liquidit&agrave; Asia</label>
-                            </li>
-                            <li class="flex items-start gap-3 group" data-key="verifica_marea">
-                                <input type="checkbox" class="tp-check mt-0.5" onchange="toggleCheckLabel(this)">
-                                <label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">Verifica Marea Attuale</label>
-                            </li>
-                            <li class="flex items-start gap-3 group" data-key="livelli_htf">
-                                <input type="checkbox" class="tp-check mt-0.5" onchange="toggleCheckLabel(this)">
-                                <label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">Aggiornare livelli HTF</label>
-                            </li>
+                            <!-- Caricata da localStorage -->
                         </ul>
                     </div>
 
@@ -313,15 +298,31 @@
                     <div class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
                         <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-4 border-b border-tp-border pb-2 flex items-center gap-2"><i data-lucide="sliders" class="w-4 h-4"></i> Dati Giornata</h3>
 
-                        <!-- Riga 1: Fajr + Marea -->
+                        <!-- Riga 1: Fajr + Hijri | Marea + Tags -->
                         <div class="grid grid-cols-2 gap-6 mb-4">
-                            <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
-                                <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="sunrise" class="w-3.5 h-3.5"></i> Fajr</span>
-                                <button onclick="toggleFajr(this)" id="btn-fajr" class="text-tp-muted text-sm px-2 py-0.5 rounded border border-tp-border hover:border-tp-accent/50 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+                            <div>
+                                <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
+                                    <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="sunrise" class="w-3.5 h-3.5"></i> Fajr</span>
+                                    <button onclick="toggleFajr(this)" id="btn-fajr" class="text-tp-muted text-sm px-2 py-0.5 rounded border border-tp-border hover:border-tp-accent/50 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                </div>
+                                <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
+                                    <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="moon" class="w-3.5 h-3.5"></i> Hijri</span>
+                                    <span id="hijri-date" class="text-xs text-white font-bold">--</span>
+                                </div>
                             </div>
-                            <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
-                                <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="waves" class="w-3.5 h-3.5"></i> Marea</span>
-                                <input id="inp-marea" type="text" placeholder="--:--" class="bg-[#0a0c10] border border-tp-border rounded px-2 py-0.5 text-sm text-white font-bold outline-none w-16 text-center focus:border-tp-accent">
+                            <div>
+                                <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
+                                    <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="waves" class="w-3.5 h-3.5"></i> Marea</span>
+                                    <input id="inp-marea" type="text" placeholder="--:--" class="bg-[#0a0c10] border border-tp-border rounded px-2 py-0.5 text-sm text-white font-bold outline-none w-16 text-center focus:border-tp-accent">
+                                </div>
+                                <div class="py-2 border-b border-tp-border/50">
+                                    <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2 mb-2"><i data-lucide="tag" class="w-3.5 h-3.5"></i> Note</span>
+                                    <div id="day-tags" class="flex flex-wrap gap-1.5 mb-2"></div>
+                                    <div class="relative">
+                                        <input id="tag-input" type="text" placeholder="Scrivi tag..." class="w-full bg-[#0a0c10] border border-tp-border rounded px-2 py-1 text-xs text-white outline-none focus:border-tp-accent" onkeydown="if(event.key==='Enter'){event.preventDefault();addDayTag()}" oninput="showTagSuggestions(this.value)">
+                                        <div id="tag-suggestions" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#161920] border border-tp-border rounded-lg shadow-xl z-20 max-h-[120px] overflow-y-auto"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -474,9 +475,7 @@
                             </div>
                         </div>
                         <div class="relative w-full h-32">
-                            <canvas id="paniereChart"></canvas>
-                            <canvas id="mindsetChart" style="display:none;"></canvas>
-                            <canvas id="volChart" style="display:none;"></canvas>
+                            <canvas id="dayMainChart"></canvas>
                         </div>
                     </div>
 
@@ -497,9 +496,12 @@
                         </div>
                     </div>
 
-                    <!-- 3. Save Button -->
+                    <!-- 3. Save + Chiudi -->
                     <button onclick="saveGiornata()" id="btn-save" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 transition-colors shadow-lg">
                         <i data-lucide="save" class="w-4 h-4"></i> Salva Giornata
+                    </button>
+                    <button onclick="openChiudiModal()" id="btn-chiudi" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-tp-bg border border-tp-loss/30 text-tp-loss hover:bg-tp-loss/10 transition-colors mt-2">
+                        <i data-lucide="lock" class="w-4 h-4"></i> Chiudi Giornata
                     </button>
                 </div>
 
@@ -507,6 +509,52 @@
         </div>
 
     </main>
+
+    <!-- MODAL: Chiudi Giornata -->
+    <div id="modal-chiudi" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeChiudiModal()"></div>
+        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-lg mx-4 relative z-10 shadow-2xl overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-tp-border bg-tp-panel relative">
+                <div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-loss"></div>
+                <div class="flex items-center gap-3">
+                    <div class="bg-tp-loss/10 p-2 rounded-lg border border-tp-loss/20"><i data-lucide="lock" class="w-5 h-5 text-tp-loss"></i></div>
+                    <h2 class="text-lg font-bold">Chiudi Giornata</h2>
+                </div>
+                <button onclick="closeChiudiModal()" class="text-tp-muted hover:text-tp-loss p-1.5 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-6 flex flex-col gap-5">
+                <p class="text-sm text-tp-muted">Sei sicuro di voler chiudere la giornata? Non sara piu modificabile.</p>
+
+                <!-- MonitoraSmile -->
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-2">Stato Emotivo Finale</label>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-1 bg-[#161920] p-1.5 rounded-lg border border-tp-border">
+                            <button onclick="setCloseMindset('positive')" class="close-mind p-2 rounded-md text-tp-muted hover:bg-[#0a0c10]"><i data-lucide="smile" class="w-5 h-5"></i></button>
+                            <button onclick="setCloseMindset('neutral')" class="close-mind p-2 rounded-md text-tp-muted hover:bg-[#0a0c10]"><i data-lucide="meh" class="w-5 h-5"></i></button>
+                            <button onclick="setCloseMindset('negative')" class="close-mind p-2 rounded-md text-tp-muted hover:bg-[#0a0c10]"><i data-lucide="frown" class="w-5 h-5"></i></button>
+                        </div>
+                        <div class="w-px h-8 bg-tp-border"></div>
+                        <div class="flex items-center gap-1 bg-[#161920] p-1.5 rounded-lg border border-tp-border">
+                            <button onclick="setCloseVol('low')" class="close-vol p-2 rounded-md text-tp-muted hover:bg-[#0a0c10]"><i data-lucide="dollar-sign" class="w-5 h-5"></i></button>
+                            <button onclick="setCloseVol('medium')" class="close-vol p-2 rounded-md text-tp-muted hover:bg-[#0a0c10]"><div class="flex"><i data-lucide="dollar-sign" class="w-5 h-5"></i><i data-lucide="dollar-sign" class="w-5 h-5 -ml-2"></i></div></button>
+                            <button onclick="setCloseVol('high')" class="close-vol p-2 rounded-md text-tp-muted hover:bg-[#0a0c10]"><div class="flex"><i data-lucide="dollar-sign" class="w-5 h-5"></i><i data-lucide="dollar-sign" class="w-5 h-5 -ml-2"></i><i data-lucide="dollar-sign" class="w-5 h-5 -ml-2"></i></div></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Commento domani -->
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-2">Commento per Domani</label>
+                    <textarea id="close-note-domani" class="w-full bg-[#161920] border border-tp-border rounded-lg px-3 py-3 text-sm text-tp-text outline-none min-h-[100px] resize-none focus:border-tp-accent" placeholder="Riflessioni, modifiche alla strategia..."></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel">
+                <button onclick="closeChiudiModal()" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white border border-tp-border rounded-lg">Annulla</button>
+                <button onclick="confirmChiudi()" class="bg-tp-loss hover:bg-tp-loss/80 text-white px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors">Chiudi Giornata</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -634,8 +682,44 @@
             }
 
             // Nuovo Bias link
+            // Hijri date
+            updateHijriDate();
+
+            // Restore day tags
+            if (data.day_tags && Array.isArray(data.day_tags)) {
+                dayTags = data.day_tags;
+                renderDayTags();
+            }
+
             const biasLink = document.getElementById('btn-nuovo-bias');
             if (biasLink) biasLink.href = `dettaglio_bias.html?date=${giornataDate}`;
+
+            // Se completato → readonly
+            if (data.stato === 'completato') {
+                lockPage();
+            }
+        }
+
+        function lockPage() {
+            // Disabilita tutti gli input, textarea, select, button interattivi
+            document.querySelectorAll('input, textarea, select').forEach(function(el) {
+                if (el.closest('#modal-chiudi')) return; // non toccare il modale
+                el.disabled = true;
+                el.classList.add('opacity-60', 'cursor-not-allowed');
+            });
+            // Disabilita bottoni interattivi (non nav)
+            document.querySelectorAll('.mind-btn, .vol-btn, .session-tog, .tp-check, [onclick*="toggleFajr"], [onclick*="setMindset"], [onclick*="setVolatility"], [onclick*="toggleSession"]').forEach(function(el) {
+                el.style.pointerEvents = 'none';
+                el.classList.add('opacity-50');
+            });
+            // Nascondi Salva e Chiudi
+            var saveBtn = document.getElementById('btn-save');
+            var chiudiBtn = document.getElementById('btn-chiudi');
+            if (saveBtn) saveBtn.style.display = 'none';
+            if (chiudiBtn) chiudiBtn.style.display = 'none';
+            // Mostra badge "Chiusa"
+            var titleEl = document.getElementById('page-global-title');
+            if (titleEl) titleEl.innerHTML = titleEl.textContent + ' <span class="text-xs bg-tp-loss/10 text-tp-loss border border-tp-loss/20 px-2 py-0.5 rounded ml-2 font-bold uppercase">Chiusa</span>';
         }
 
         // ============================================
@@ -656,6 +740,109 @@
             }
             lucide.createIcons();
         }
+
+        // ============================================
+        // DATA HIJRI
+        // ============================================
+        function updateHijriDate() {
+            var el = document.getElementById('hijri-date');
+            if (!el || !giornataDate) return;
+            try {
+                var d = new Date(giornataDate + 'T12:00:00');
+                var day = d.toLocaleDateString('en-US-u-ca-islamic-umalqura', { day: 'numeric' });
+                var month = d.toLocaleDateString('en-US-u-ca-islamic-umalqura', { month: 'long' });
+                var year = d.toLocaleDateString('en-US-u-ca-islamic-umalqura', { year: 'numeric' });
+                el.textContent = day + ' ' + month + ' ' + year;
+            } catch(e) {
+                el.textContent = '--';
+            }
+        }
+
+        // ============================================
+        // TAG NOTE (con autocompletamento)
+        // ============================================
+        var dayTags = [];
+
+        function renderDayTags() {
+            var container = document.getElementById('day-tags');
+            if (!container) return;
+            container.innerHTML = dayTags.map(function(tag, i) {
+                return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-tp-accent/10 border border-tp-accent/30 text-tp-accent text-[10px] font-bold">' +
+                    tag + '<button onclick="removeDayTag(' + i + ')" class="hover:text-tp-loss transition-colors ml-0.5"><i data-lucide="x" class="w-2.5 h-2.5"></i></button></span>';
+            }).join('');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function addDayTag() {
+            var input = document.getElementById('tag-input');
+            var val = input.value.trim();
+            if (!val || dayTags.includes(val)) return;
+            dayTags.push(val);
+            input.value = '';
+            renderDayTags();
+            hideTagSuggestions();
+            // Salva tag nella storia per autocompletamento futuro
+            saveTagHistory(val);
+        }
+
+        function removeDayTag(i) {
+            dayTags.splice(i, 1);
+            renderDayTags();
+        }
+
+        function getTagHistory() {
+            try { return JSON.parse(localStorage.getItem('td_tag_history')) || []; } catch(e) { return []; }
+        }
+
+        function saveTagHistory(tag) {
+            var history = getTagHistory();
+            if (!history.includes(tag)) {
+                history.push(tag);
+                localStorage.setItem('td_tag_history', JSON.stringify(history));
+            }
+        }
+
+        function showTagSuggestions(query) {
+            var container = document.getElementById('tag-suggestions');
+            if (!query || query.length < 1) { hideTagSuggestions(); return; }
+            var history = getTagHistory();
+            var matches = history.filter(function(t) { return t.toLowerCase().indexOf(query.toLowerCase()) !== -1 && !dayTags.includes(t); });
+            if (!matches.length) { hideTagSuggestions(); return; }
+            container.innerHTML = matches.map(function(m) {
+                return '<div onclick="selectTagSuggestion(\'' + m.replace(/'/g, "\\'") + '\')" class="px-3 py-1.5 text-xs text-tp-text hover:bg-tp-accent/10 hover:text-tp-accent cursor-pointer transition-colors">' + m + '</div>';
+            }).join('');
+            container.classList.remove('hidden');
+        }
+
+        function selectTagSuggestion(tag) {
+            dayTags.push(tag);
+            document.getElementById('tag-input').value = '';
+            renderDayTags();
+            hideTagSuggestions();
+        }
+
+        function hideTagSuggestions() {
+            var container = document.getElementById('tag-suggestions');
+            if (container) container.classList.add('hidden');
+        }
+
+        // Chiudi suggerimenti al click fuori
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#tag-input') && !e.target.closest('#tag-suggestions')) hideTagSuggestions();
+        });
+
+        // Carica checklist da localStorage
+        function loadChecklist() {
+            var ul = document.getElementById('checklist-items');
+            if (!ul) return;
+            var items;
+            try { items = JSON.parse(localStorage.getItem('td_checklist')); } catch(e) {}
+            if (!items || !items.length) items = ['Review Macro Calendario', 'Controllato liquidita Asia', 'Verifica Marea Attuale', 'Aggiornare livelli HTF'];
+            ul.innerHTML = items.map(function(text, i) {
+                return '<li class="flex items-start gap-3 group"><input type="checkbox" class="tp-check mt-0.5" onchange="toggleCheckLabel(this)"><label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">' + text + '</label></li>';
+            }).join('');
+        }
+        loadChecklist();
 
         function toggleCheckLabel(checkbox) {
             const label = checkbox.nextElementSibling;
@@ -813,9 +1000,9 @@
             const card = document.querySelector('.session-card[data-session-name="' + name + '"]');
             const existingId = card ? card.dataset.sessionId : null;
             if (existingId) {
-                window.location.href = 'dettaglio_sessione.html?id=' + existingId;
+                window.location.href = 'dettaglio_sessione.html?id=' + existingId + '&from=giornata&gid=' + giornataId;
             } else {
-                window.location.href = 'dettaglio_sessione.html?session=' + name + '&date=' + giornataDate;
+                window.location.href = 'dettaglio_sessione.html?session=' + name + '&date=' + giornataDate + '&from=giornata&gid=' + giornataId;
             }
         }
 
@@ -859,8 +1046,11 @@
         // TRADE STATS
         // ============================================
         async function loadTradeStats() {
-            if (!giornataId) return;
-            const { data: trades } = await db.from('trades').select('esito,pnl').eq('giornata_id', giornataId);
+            if (!giornataDate) return;
+            // Cerca trades per data della giornata (non per giornata_id che potrebbe non essere impostato)
+            const dayStart = giornataDate + 'T00:00:00';
+            const dayEnd = giornataDate + 'T23:59:59';
+            const { data: trades } = await db.from('trades').select('esito,pnl').gte('data', dayStart).lte('data', dayEnd);
             if (!trades || trades.length === 0) return;
 
             let tp = 0, sl = 0, totalPnl = 0;
@@ -1051,7 +1241,8 @@
                 fajr: document.getElementById('btn-fajr').dataset.active === 'true',
                 marea: document.getElementById('inp-marea').value,
                 tags: tags,
-                stato: 'completato',
+                day_tags: dayTags,
+                // stato rimane invariato — solo "Chiudi Giornata" lo cambia
                 updated_at: new Date().toISOString()
             };
 
@@ -1080,6 +1271,148 @@
         // ============================================
         // CLOCK
         // ============================================
+        // ============================================
+        // GRAFICI (Forza USD / Mindset / Vol)
+        // ============================================
+        var dayChartInstance = null;
+        var dayChartType = 'usd';
+
+        async function initDayChart() {
+            var ctx = document.getElementById('dayMainChart');
+            if (!ctx) return;
+            await loadDayChartData('usd');
+        }
+
+        async function switchDailyChart(type, btn) {
+            dayChartType = type;
+            document.querySelectorAll('.daily-chart-btn').forEach(function(b) {
+                b.classList.remove('bg-tp-accent/20', 'text-tp-accent');
+                b.classList.add('text-tp-muted');
+            });
+            if (btn) {
+                btn.classList.add('bg-tp-accent/20', 'text-tp-accent');
+                btn.classList.remove('text-tp-muted');
+            }
+            var titles = { usd: 'Forza USD (%)', mindset: 'Andamento Mindset', vol: 'Andamento Volatilita' };
+            var titleEl = document.getElementById('live-chart-title');
+            if (titleEl) titleEl.innerHTML = '<i data-lucide="line-chart" class="w-4 h-4"></i> ' + titles[type];
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            await loadDayChartData(type);
+        }
+
+        async function loadDayChartData(type) {
+            var ctx = document.getElementById('dayMainChart');
+            if (!ctx) return;
+            var labels = [];
+            var data = [];
+            var borderColor = '#f8fafc';
+
+            if (type === 'usd') {
+                try {
+                    var result = await db.from('forza_usd').select('usd_strength, created_at').order('created_at', { ascending: true }).limit(50);
+                    var rows = result.data;
+                    if (rows && rows.length) {
+                        labels = rows.map(function(r) { return new Date(r.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }); });
+                        data = rows.map(function(r) { return parseFloat(r.usd_strength); });
+                    }
+                } catch(e) {}
+                borderColor = '#f8fafc';
+            } else {
+                var field = type === 'mindset' ? 'mindset' : 'volatilita';
+                var map = type === 'mindset' ? { positive: 1, neutral: 0, negative: -1 } : { high: 3, medium: 2, low: 1 };
+                borderColor = type === 'mindset' ? '#eab308' : '#f43f5e';
+                try {
+                    var result = await db.from('monitora_smile').select('mindset, volatilita, created_at').order('created_at', { ascending: true }).limit(50);
+                    var rows = result.data;
+                    if (rows && rows.length) {
+                        labels = rows.map(function(r, i) { return i; });
+                        data = rows.map(function(r) { return map[r[field]] || 0; });
+                    }
+                } catch(e) {}
+            }
+
+            if (dayChartInstance) dayChartInstance.destroy();
+            dayChartInstance = new Chart(ctx.getContext('2d'), {
+                type: 'line',
+                data: { labels: labels, datasets: [{ data: data, borderColor: borderColor, borderWidth: 2, tension: 0.3, pointRadius: 0 }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: true, grid: { display: false, drawBorder: false }, ticks: { font: { size: 8 }, color: '#848d97', maxTicksLimit: 6 } },
+                        y: { display: true, position: 'left', grid: { display: false, drawBorder: false }, ticks: { font: { size: 9 }, color: '#848d97', callback: function(v) { return parseFloat(v).toFixed(2); } } }
+                    }
+                }
+            });
+        }
+
+        initDayChart();
+
+        // ============================================
+        // CHIUDI GIORNATA
+        // ============================================
+        var closeMindset = '';
+        var closeVol = '';
+
+        function openChiudiModal() {
+            // Pre-popola commento domani se gia scritto
+            var existing = document.getElementById('note-domani');
+            if (existing) document.getElementById('close-note-domani').value = existing.value || '';
+            document.getElementById('modal-chiudi').classList.add('open');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function closeChiudiModal() {
+            document.getElementById('modal-chiudi').classList.remove('open');
+        }
+
+        function setCloseMindset(type) {
+            closeMindset = type;
+            document.querySelectorAll('.close-mind').forEach(function(b) {
+                b.classList.remove('text-tp-accent', 'text-tp-warning', 'text-tp-loss');
+                b.classList.add('text-tp-muted');
+            });
+            var btns = document.querySelectorAll('.close-mind');
+            if (type === 'positive') { btns[0].classList.remove('text-tp-muted'); btns[0].classList.add('text-tp-accent'); }
+            if (type === 'neutral') { btns[1].classList.remove('text-tp-muted'); btns[1].classList.add('text-tp-warning'); }
+            if (type === 'negative') { btns[2].classList.remove('text-tp-muted'); btns[2].classList.add('text-tp-loss'); }
+        }
+
+        function setCloseVol(type) {
+            closeVol = type;
+            document.querySelectorAll('.close-vol').forEach(function(b) {
+                b.classList.remove('text-tp-accent', 'text-tp-warning', 'text-tp-loss');
+                b.classList.add('text-tp-muted');
+            });
+            var btns = document.querySelectorAll('.close-vol');
+            if (type === 'low') { btns[0].classList.remove('text-tp-muted'); btns[0].classList.add('text-tp-loss'); }
+            if (type === 'medium') { btns[1].classList.remove('text-tp-muted'); btns[1].classList.add('text-tp-warning'); }
+            if (type === 'high') { btns[2].classList.remove('text-tp-muted'); btns[2].classList.add('text-tp-accent'); }
+        }
+
+        async function confirmChiudi() {
+            // Salva MonitoraSmile finale
+            if (closeMindset || closeVol) {
+                await db.from('monitora_smile').insert({
+                    mindset: closeMindset || null,
+                    volatilita: closeVol || null,
+                    sorgente: 'chiusura_giornata'
+                });
+            }
+
+            // Aggiorna giornata
+            await db.from('giornate').update({
+                stato: 'completato',
+                note_domani: document.getElementById('close-note-domani').value,
+                mindset: closeMindset || selectedMindset,
+                updated_at: new Date().toISOString()
+            }).eq('id', giornataId);
+
+            closeChiudiModal();
+            // Redirect a giornaliero
+            window.location.href = 'giornaliero.html';
+        }
+
         function updateClock() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');

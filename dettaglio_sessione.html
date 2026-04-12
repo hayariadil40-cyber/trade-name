@@ -140,9 +140,9 @@
             <div class="max-w-[1600px] mx-auto pb-12">
 
                 <!-- Torna indietro -->
-                <div class="flex items-center gap-2 mb-6 text-tp-muted hover:text-white transition-colors cursor-pointer w-fit" onclick="window.location.href='sessioni.html'">
+                <div class="flex items-center gap-2 mb-6 text-tp-muted hover:text-white transition-colors cursor-pointer w-fit" id="back-btn" onclick="goBack()">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                    <span class="text-xs font-bold uppercase tracking-widest">Torna alle Sessioni</span>
+                    <span class="text-xs font-bold uppercase tracking-widest" id="back-label">Torna alle Sessioni</span>
                 </div>
 
                 <!-- Header: Sessione + Data -->
@@ -292,6 +292,22 @@
         // ============================================
 
         const COINS = ['XAUUSD', 'US30', 'GER30', 'NAS100', 'BTCUSD'];
+        const fromPage = new URLSearchParams(window.location.search).get('from');
+        const fromGid = new URLSearchParams(window.location.search).get('gid');
+
+        function goBack() {
+            if (fromPage === 'giornata' && fromGid) {
+                window.location.href = 'dettaglio_giornata.html?id=' + fromGid;
+            } else {
+                window.location.href = 'sessioni.html';
+            }
+        }
+
+        // Aggiorna label bottone indietro
+        if (fromPage === 'giornata') {
+            var lbl = document.getElementById('back-label');
+            if (lbl) lbl.textContent = 'Torna alla Giornata';
+        }
         const sessionId = new URLSearchParams(window.location.search).get('id');
         const presetSession = new URLSearchParams(window.location.search).get('session');
         const presetDate = new URLSearchParams(window.location.search).get('date');
@@ -321,14 +337,15 @@
                 try {
                     const nome = currentSessionType || 'asia';
                     const data = document.getElementById('sess-data').value;
+                    const fromParams = (fromPage && fromGid) ? '&from=' + fromPage + '&gid=' + fromGid : '';
                     const { data: existing } = await db.from('sessioni').select('id').eq('nome', nome).eq('data', data).single();
                     if (existing) {
-                        window.location.href = `dettaglio_sessione.html?id=${existing.id}`;
+                        window.location.href = 'dettaglio_sessione.html?id=' + existing.id + fromParams;
                         return;
                     }
                     const { data: newSess, error } = await db.from('sessioni').insert({ nome, data, coin_data: coinData }).select().single();
                     if (error) { alert('Errore: ' + error.message); return; }
-                    window.location.href = `dettaglio_sessione.html?id=${newSess.id}`;
+                    window.location.href = 'dettaglio_sessione.html?id=' + newSess.id + fromParams;
                 } catch (e) { alert('Errore: ' + e.message); }
                 return;
             }

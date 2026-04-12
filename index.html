@@ -215,10 +215,11 @@
                 <span id="digital-clock"
                     class="text-2xl font-display font-bold text-white tracking-widest tabular-nums leading-none">00:00:00</span>
                 <div class="flex gap-1 mt-2">
-                    <span id="tf-5m"
-                        class="px-1 py-0.5 text-[8px] font-bold bg-tp-bg border border-tp-border rounded text-tp-muted transition-colors">5m</span>
-                    <span id="tf-1h"
-                        class="px-1 py-0.5 text-[8px] font-bold bg-tp-bg border border-tp-border rounded text-tp-muted transition-colors">1H</span>
+                    <span id="tf-5m" class="px-1 py-0.5 text-[8px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">5m</span>
+                    <span id="tf-15m" class="px-1 py-0.5 text-[8px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">15m</span>
+                    <span id="tf-30m" class="px-1 py-0.5 text-[8px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">30m</span>
+                    <span id="tf-1h" class="px-1 py-0.5 text-[8px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">1h</span>
+                    <span id="tf-4h" class="px-1 py-0.5 text-[8px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">4h</span>
                 </div>
             </div>
 
@@ -714,15 +715,15 @@
             if (allerts) allerts.forEach(a => tickets.push({
                 type: 'allert', label: 'Notizia Da Validare', title: a.titolo || 'Notizia',
                 desc: 'L\'orario e scattato. Inserire dati per archiviare.', id: a.id,
-                link: 'allert.html', color: 'purple', table: 'allert'
+                link: 'allert.html?openNews=' + a.id, color: 'purple', table: 'allert'
             }));
 
             // Allert prezzo
-            const { data: allertPrezzo } = await db.from('allert_prezzo').select('id, coin, prezzo').eq('stato', 'nuovo');
+            const { data: allertPrezzo } = await db.from('allert_prezzo').select('id, coin, prezzo, ora, descrizione').eq('stato', 'nuovo');
             if (allertPrezzo) allertPrezzo.forEach(ap => tickets.push({
                 type: 'allert_prezzo', label: 'Allert Da Validare', title: (ap.coin || '') + ' @ ' + (ap.prezzo || ''),
-                desc: 'Alert prezzo triggerato. Validare e categorizzare.', id: ap.id,
-                link: 'allert.html', color: 'orange', table: 'allert_prezzo'
+                desc: (ap.descrizione || 'Alert prezzo triggerato') + (ap.ora ? ' - ' + ap.ora : ''), id: ap.id,
+                link: 'allert.html?openAllert=' + ap.id, color: 'tp-warning', table: 'allert_prezzo'
             }));
 
             // Cronache da compilare
@@ -751,7 +752,7 @@
             teal: { bar: 'bg-teal-500/80', badge: 'bg-teal-500/10 text-teal-400 border-teal-500/20', hover: 'hover:border-teal-500/40', btnHover: 'hover:bg-teal-500/20 hover:text-teal-400 hover:border-teal-500/30', txtHover: 'group-hover:text-teal-400' },
             warning: { bar: 'bg-tp-warning/80', badge: 'bg-tp-warning/10 text-tp-warning border-tp-warning/20', hover: 'hover:border-tp-warning/40', btnHover: 'hover:bg-tp-warning/20 hover:text-tp-warning hover:border-tp-warning/30', txtHover: 'group-hover:text-tp-warning' },
             purple: { bar: 'bg-purple-500/80', badge: 'bg-purple-500/10 text-purple-400 border-purple-500/20', hover: 'hover:border-purple-500/40', btnHover: 'hover:bg-purple-500/20 hover:text-purple-400 hover:border-purple-500/30', txtHover: 'group-hover:text-purple-400' },
-            orange: { bar: 'bg-orange-500/80', badge: 'bg-orange-500/10 text-orange-400 border-orange-500/20', hover: 'hover:border-orange-500/40', btnHover: 'hover:bg-orange-500/20 hover:text-orange-400 hover:border-orange-500/30', txtHover: 'group-hover:text-orange-400' }
+            'tp-warning': { bar: 'bg-tp-warning/80', badge: 'bg-tp-warning/10 text-tp-warning border-tp-warning/20', hover: 'hover:border-tp-warning/40', btnHover: 'hover:bg-tp-warning/20 hover:text-tp-warning hover:border-tp-warning/30', txtHover: 'group-hover:text-tp-warning' }
         };
 
         container.innerHTML = tickets.map(t => {
@@ -767,7 +768,7 @@
                         </div>
                         <p class="text-[10px] text-tp-muted leading-relaxed">${t.desc}</p>
                     </div>
-                    <div class="flex gap-1.5 mt-1 shrink-0">
+                    <div class="flex gap-1.5 mt-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button onclick="window.location.href='${t.link}'"
                             class="bg-tp-border ${c.btnHover} text-tp-text rounded p-2 transition-colors border border-transparent" title="Apri">
                             <i data-lucide="edit-3" class="w-4 h-4"></i>

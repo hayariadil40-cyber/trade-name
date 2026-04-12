@@ -367,7 +367,7 @@
             const today = new Date().toISOString().split('T')[0];
             const { data: existing } = await db.from('giornate').select('id').eq('data', today).single();
             if (existing) { window.location.href = `dettaglio_giornata.html?id=${existing.id}`; return; }
-            const { data, error } = await db.from('giornate').insert({ data: today }).select().single();
+            const { data, error } = await db.from('giornate').insert({ data: today, stato: 'nuovo' }).select().single();
             if (error) { alert('Errore: ' + error.message); return; }
             window.location.href = `dettaglio_giornata.html?id=${data.id}`;
         }

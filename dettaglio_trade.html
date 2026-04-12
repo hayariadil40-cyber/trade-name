@@ -66,7 +66,8 @@
                             <!-- Row 1: Asset, Posizione, Sorgente -->
                             <div class="flex gap-3">
                                 <div class="flex-1"><span class="text-[10px] text-tp-muted uppercase font-bold block mb-1">Asset</span>
-                                    <select id="tr-asset" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent"><option value="">--</option><option>XAUUSD</option><option>US30</option><option>GER30</option><option>NAS100</option><option>BTCUSD</option></select>
+                                    <input id="tr-asset" list="asset-list" type="text" placeholder="XAUUSD" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent">
+                                    <datalist id="asset-list"><option value="XAUUSD"><option value="US30"><option value="GER30"><option value="NAS100"><option value="BTCUSD"></datalist>
                                 </div>
                                 <div class="flex-1"><span class="text-[10px] text-tp-muted uppercase font-bold block mb-1">Posizione</span>
                                     <div class="flex gap-2">
@@ -93,14 +94,19 @@
                                 <div class="flex-1"><span class="text-[10px] text-tp-accent uppercase font-bold block mb-1">Take Profit</span><input id="tr-tp" type="text" placeholder="0.00" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent"></div>
                             </div>
 
-                            <!-- Row 4: Size, P/L, R:R, Esito -->
+                            <!-- Row 4: Size, P/L, Pips, Esito -->
                             <div class="flex gap-3">
                                 <div class="flex-1"><span class="text-[10px] text-tp-muted uppercase font-bold block mb-1">Lottaggio</span><input id="tr-size" type="text" placeholder="0.00" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent"></div>
                                 <div class="flex-1"><span class="text-[10px] text-tp-muted uppercase font-bold block mb-1">Profit ($)</span><input id="tr-pnl" type="text" placeholder="0.00" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent"></div>
-                                <div class="flex-1"><span class="text-[10px] text-tp-muted uppercase font-bold block mb-1">R:R</span><input id="tr-rr" type="text" placeholder="1:2" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent"></div>
+                                <div class="flex-1"><span class="text-[10px] text-tp-muted uppercase font-bold block mb-1">Pips</span><input id="tr-pips" type="text" placeholder="0.0" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent"></div>
                                 <div class="flex-1"><span class="text-[10px] text-tp-muted uppercase font-bold block mb-1">Esito</span>
                                     <select id="tr-esito" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent"><option value="">--</option><option value="win">Win</option><option value="loss">Loss</option><option value="breakeven">Breakeven</option></select>
                                 </div>
+                            </div>
+                            <!-- Row 5: R:R Teorico, R:R Reale -->
+                            <div class="flex gap-3">
+                                <div class="flex-1"><span class="text-[10px] text-tp-muted uppercase font-bold block mb-1">R:R Teorico</span><input id="tr-rr-teorico" type="text" placeholder="1:3" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent"></div>
+                                <div class="flex-1"><span class="text-[10px] text-tp-muted uppercase font-bold block mb-1">R:R Reale</span><input id="tr-rr-reale" type="text" placeholder="1:2.5" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent"></div>
                             </div>
                             <!-- Frattalita Candele -->
                             <div class="bg-[#0a0c10] border border-tp-border/50 rounded-xl p-4 mt-1">
@@ -150,7 +156,8 @@
 
                 <!-- Azioni -->
                 <div class="flex gap-3 mt-6 max-w-md">
-                    <button id="save-btn" onclick="saveTrade()" class="flex-1 bg-tp-accent hover:bg-tp-accent/80 text-[#0a0c10] font-bold text-sm py-3 rounded-lg transition-colors flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Completa</button>
+                    <button id="save-btn" onclick="saveTrade()" class="flex-1 bg-tp-accent hover:bg-tp-accent/80 text-[#0a0c10] font-bold text-sm py-3 rounded-lg transition-colors flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Salva</button>
+                    <button onclick="chiudiTrade()" class="flex-1 bg-tp-bg border border-tp-loss/30 hover:bg-tp-loss/10 text-tp-loss font-bold text-sm py-3 rounded-lg transition-colors flex items-center justify-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i> Chiudi Trade</button>
                     <button onclick="deleteTrade()" class="bg-tp-bg border border-tp-loss/30 hover:bg-tp-loss/10 text-tp-loss font-bold text-sm px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                 </div>
             </div>
@@ -193,13 +200,37 @@
             document.getElementById('tr-tp').value = t.take_profit || '';
             document.getElementById('tr-size').value = t.size || '';
             document.getElementById('tr-pnl').value = t.pnl || '';
-            document.getElementById('tr-rr').value = t.rr || '';
+            document.getElementById('tr-pips').value = t.pips || '';
+            document.getElementById('tr-rr-teorico').value = t.rr_teorico || t.rr || '';
+            document.getElementById('tr-rr-reale').value = t.rr_reale || '';
             document.getElementById('tr-esito').value = t.esito || '';
             screenshot = t.screenshot_url || '';
             renderScreen();
-            if (t.fractal_data) { fractalData = t.fractal_data; renderFractals(); }
+            // Frattalita: prima da colonne DB, poi fallback a fractal_data JSONB
+            if (t.candle_m15 || t.candle_h1 || t.candle_h4 || t.candle_d1) {
+                fractalData = { '15m': t.candle_m15, '1h': t.candle_h1, '4h': t.candle_h4, '1d': t.candle_d1 };
+            } else if (t.fractal_data) {
+                fractalData = t.fractal_data;
+            }
+            renderFractals();
             if (t.mood) setMood(t.mood);
             document.getElementById('page-global-title').textContent = `Trade: ${t.asset||''} ${t.direzione||''}`;
+
+            // Se completato → readonly
+            if (t.stato === 'completato') {
+                document.querySelectorAll('input, textarea, select').forEach(function(el) {
+                    el.disabled = true;
+                    el.classList.add('opacity-60', 'cursor-not-allowed');
+                });
+                document.querySelectorAll('.dir-btn, .bias-btn, .fractal-btn, .mood-btn, .vol-btn, .cat-tab, [onclick*="handleScreen"], [onclick*="removeScreen"]').forEach(function(el) {
+                    el.style.pointerEvents = 'none';
+                    el.classList.add('opacity-50');
+                });
+                document.getElementById('save-btn').style.display = 'none';
+                document.querySelector('[onclick*="chiudiTrade"]').style.display = 'none';
+                var titleEl = document.getElementById('page-global-title');
+                if (titleEl) titleEl.innerHTML = titleEl.textContent + ' <span class="text-xs bg-tp-loss/10 text-tp-loss border border-tp-loss/20 px-2 py-0.5 rounded ml-2 font-bold uppercase">Chiuso</span>';
+            }
         }
 
         function setDir(d) {
@@ -274,13 +305,9 @@
             if(linkedA.length) document.getElementById('linked-allert').innerHTML=linkedA.map(a=>`<div class="bg-[#0a0c10] border border-l-4 border-l-tp-warning border-r-tp-border border-t-tp-border border-b-tp-border rounded-lg p-3"><span class="text-xs font-bold text-white">${a.coin||''} ${a.prezzo||''}</span></div>`).join('');
         }
 
-        async function saveTrade() {
-            const btn=document.getElementById('save-btn');
-            btn.innerHTML='<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvando...'; btn.disabled=true;
-
+        function getTradePayload() {
             const strategiaId = Array.from(document.getElementById('sel-strategie').selectedOptions).map(o=>o.value)[0] || null;
-
-            const payload = {
+            return {
                 asset: document.getElementById('tr-asset').value,
                 direzione: currentDir,
                 sorgente: document.getElementById('tr-sorgente').value,
@@ -292,23 +319,58 @@
                 take_profit: parseFloat(document.getElementById('tr-tp').value) || null,
                 size: parseFloat(document.getElementById('tr-size').value) || null,
                 pnl: parseFloat(document.getElementById('tr-pnl').value) || null,
-                rr: document.getElementById('tr-rr').value,
+                pips: parseFloat(document.getElementById('tr-pips').value) || null,
+                rr_teorico: document.getElementById('tr-rr-teorico').value,
+                rr_reale: document.getElementById('tr-rr-reale').value,
                 esito: document.getElementById('tr-esito').value,
                 screenshot_url: screenshot,
-                fractal_data: fractalData,
+                candle_m15: fractalData['15m'] || null,
+                candle_h1: fractalData['1h'] || null,
+                candle_h4: fractalData['4h'] || null,
+                candle_d1: fractalData['1d'] || null,
                 mood: currentMood,
                 strategia_id: strategiaId,
-                stato: 'completato',
                 updated_at: new Date().toISOString()
             };
+        }
 
+        async function saveTrade() {
+            const btn=document.getElementById('save-btn');
+            btn.innerHTML='<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvando...'; btn.disabled=true;
+
+            const payload = getTradePayload();
             const{error}=await db.from('trades').update(payload).eq('id',tradeId);
-            if(error){btn.innerHTML='<i data-lucide="alert-circle" class="w-4 h-4"></i> Errore!';alert('Errore: '+error.message);setTimeout(()=>{btn.innerHTML='<i data-lucide="check" class="w-4 h-4"></i> Completa';btn.disabled=false;lucide.createIcons()},2000);return}
+            if(error){btn.innerHTML='<i data-lucide="alert-circle" class="w-4 h-4"></i> Errore!';alert('Errore: '+error.message);setTimeout(()=>{btn.innerHTML='<i data-lucide="save" class="w-4 h-4"></i> Salva';btn.disabled=false;lucide.createIcons()},2000);return}
 
-            btn.innerHTML='<i data-lucide="check" class="w-4 h-4"></i> Completato!';
+            btn.innerHTML='<i data-lucide="check" class="w-4 h-4"></i> Salvato!';
             document.getElementById('trade-canvas').classList.add('save-flash');
             setTimeout(()=>document.getElementById('trade-canvas').classList.remove('save-flash'),600);
-            setTimeout(()=>{btn.innerHTML='<i data-lucide="check" class="w-4 h-4"></i> Completa';btn.disabled=false;lucide.createIcons()},1500);
+            setTimeout(()=>{btn.innerHTML='<i data-lucide="save" class="w-4 h-4"></i> Salva';btn.disabled=false;lucide.createIcons()},1500);
+        }
+
+        async function chiudiTrade() {
+            // Valida campi obbligatori
+            const asset = document.getElementById('tr-asset').value;
+            const entry = document.getElementById('tr-entry').value;
+            const exit = document.getElementById('tr-exit').value;
+            const sl = document.getElementById('tr-sl').value;
+            const esito = document.getElementById('tr-esito').value;
+            const pnl = document.getElementById('tr-pnl').value;
+
+            if (!asset || !entry || !exit || !sl || !esito || !pnl || !currentDir) {
+                alert('Compila tutti i campi obbligatori prima di chiudere: Asset, Direzione, Entry, Exit, Stop Loss, Esito, Profit');
+                return;
+            }
+
+            if (!confirm('Chiudere questo trade? Non sara piu modificabile.')) return;
+
+            const payload = getTradePayload();
+            payload.stato = 'completato';
+
+            const{error}=await db.from('trades').update(payload).eq('id',tradeId);
+            if(error){alert('Errore: '+error.message);return}
+
+            window.location.href='tabella_trades.html';
         }
 
         async function deleteTrade() {
