@@ -627,7 +627,9 @@
         let labels = [];
         let data = [];
         try {
-            const { data: rows } = await db.from('forza_usd').select('usd_strength, created_at').order('created_at', { ascending: true }).limit(50);
+            // Prendi gli ultimi 50 (desc) e poi inverti per avere ordine cronologico
+            const { data: rowsRaw } = await db.from('forza_usd').select('usd_strength, created_at').order('created_at', { ascending: false }).limit(50);
+            const rows = rowsRaw ? rowsRaw.reverse() : [];
             if (rows && rows.length) {
                 labels = rows.map(r => new Date(r.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }));
                 data = rows.map(r => parseFloat(r.usd_strength));

@@ -153,9 +153,9 @@
             <div class="max-w-[1600px] mx-auto">
 
                 <!-- Torna indietro -->
-                <div class="flex items-center gap-2 mb-6 text-tp-muted hover:text-white transition-colors cursor-pointer w-fit" onclick="window.location.href='bias.html'">
+                <div class="flex items-center gap-2 mb-6 text-tp-muted hover:text-white transition-colors cursor-pointer w-fit" id="back-btn" onclick="goBack()">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                    <span class="text-xs font-bold uppercase tracking-widest">Torna ai Reperti</span>
+                    <span class="text-xs font-bold uppercase tracking-widest" id="back-label">Torna ai Reperti</span>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
@@ -312,6 +312,20 @@
         // ============================================
 
         const biasId = new URLSearchParams(window.location.search).get('id');
+        const fromPage = new URLSearchParams(window.location.search).get('from');
+        const fromGid = new URLSearchParams(window.location.search).get('gid');
+
+        function goBack() {
+            if (fromPage === 'giornata' && fromGid) {
+                window.location.href = 'dettaglio_giornata.html?id=' + fromGid;
+            } else {
+                window.location.href = 'bias.html';
+            }
+        }
+        if (fromPage === 'giornata') {
+            var lbl = document.getElementById('back-label');
+            if (lbl) lbl.textContent = 'Torna alla Giornata';
+        }
         let currentDirection = '';
         let screenshots = [];
 
@@ -330,7 +344,8 @@
                         .select()
                         .single();
                     if (error) { alert('Errore creazione: ' + error.message); return; }
-                    window.location.href = `dettaglio_bias.html?id=${data.id}`;
+                    var fromParams = (fromPage && fromGid) ? '&from=' + fromPage + '&gid=' + fromGid : '';
+                    window.location.href = 'dettaglio_bias.html?id=' + data.id + fromParams;
                 } catch (e) { alert('Errore: ' + e.message); }
                 return;
             }

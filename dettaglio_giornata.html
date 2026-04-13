@@ -294,6 +294,14 @@
                      ========================================== -->
                 <div class="col-span-12 lg:col-span-6 flex flex-col gap-6">
 
+                    <!-- Frase Disciplina -->
+                    <div class="bg-gradient-to-r from-[#161920] to-[#0a0c10] rounded-xl border border-tp-accent/20 p-4 shadow-lg flex items-center gap-4">
+                        <div class="bg-tp-accent/10 p-2 rounded-lg border border-tp-accent/20 shrink-0">
+                            <i data-lucide="flame" class="w-5 h-5 text-tp-accent"></i>
+                        </div>
+                        <p id="frase-disciplina" class="text-sm text-tp-text/90 italic leading-relaxed flex-1">--</p>
+                    </div>
+
                     <!-- 0. Dati Giornata -->
                     <div class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
                         <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-4 border-b border-tp-border pb-2 flex items-center gap-2"><i data-lucide="sliders" class="w-4 h-4"></i> Dati Giornata</h3>
@@ -556,6 +564,7 @@
         </div>
     </div>
 
+    <script src="app.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -692,7 +701,7 @@
             }
 
             const biasLink = document.getElementById('btn-nuovo-bias');
-            if (biasLink) biasLink.href = `dettaglio_bias.html?date=${giornataDate}`;
+            if (biasLink) biasLink.href = `dettaglio_bias.html?date=${giornataDate}&from=giornata&gid=${giornataId}`;
 
             // Se completato → readonly
             if (data.stato === 'completato') {
@@ -831,6 +840,27 @@
             if (!e.target.closest('#tag-input') && !e.target.closest('#tag-suggestions')) hideTagSuggestions();
         });
 
+        // ============================================
+        // FRASI DISCIPLINA (da localStorage)
+        // ============================================
+        function loadFraseDisciplina() {
+            var el = document.getElementById('frase-disciplina');
+            if (!el) return;
+            var frasi;
+            try { frasi = JSON.parse(localStorage.getItem('td_frasi_disciplina')); } catch(e) {}
+            if (!frasi || !frasi.length) {
+                frasi = [
+                    'Segui il piano. Non il mercato, non le emozioni, non il rumore. Il piano.',
+                    'Un trade perso con disciplina vale piu di un trade vinto per caso.',
+                    'La pazienza e il tuo edge piu potente. Aspetta il setup, non cercarlo.'
+                ];
+                localStorage.setItem('td_frasi_disciplina', JSON.stringify(frasi));
+            }
+            var index = Math.floor(Math.random() * frasi.length);
+            el.textContent = frasi[index];
+        }
+        loadFraseDisciplina();
+
         // Carica checklist da localStorage
         function loadChecklist() {
             var ul = document.getElementById('checklist-items');
@@ -887,6 +917,8 @@
             const colors = { positive: 'text-[#20c997]', neutral: 'text-[#eab308]', negative: 'text-[#f43f5e]' };
             btn.classList.remove('text-tp-muted');
             btn.classList.add(colors[value]);
+            // Salva in monitora_smile
+            db.from('monitora_smile').insert({mindset:value,volatilita:null,sorgente:'giornata'});
         }
 
         // ============================================
@@ -901,6 +933,8 @@
             const colors = { low: 'text-[#f43f5e]', medium: 'text-[#eab308]', high: 'text-[#20c997]' };
             btn.classList.remove('text-tp-muted');
             btn.classList.add(colors[value]);
+            // Salva in monitora_smile
+            db.from('monitora_smile').insert({mindset:null,volatilita:value,sorgente:'giornata'});
         }
 
         // ============================================
@@ -909,14 +943,24 @@
         async function loadAllertOggi() {
             if (!giornataDate) return;
             const container = document.getElementById('allert-oggi-list');
-            const { data, error } = await db.from('allert').select('*').eq('data_evento', giornataDate).order('ora_evento', { ascending: true });
 
-            if (error || !data || data.length === 0) {
+            // Carica notizie di oggi
+            const { data } = await db.from('allert').select('*').eq('data_evento', giornataDate).order('ora_evento', { ascending: true });
+
+            // Carica allert prezzo non lavorati (tutti, non solo di oggi)
+            const { data: prezzoData } = await db.from('allert_prezzo').select('*').in('stato', ['nuovo']);
+
+            var allItems = (data || []).concat((prezzoData || []).map(function(ap) {
+                return { id: ap.id, titolo: (ap.coin || '') + ' @ ' + (ap.prezzo || ''), ora_evento: ap.ora || '', stato: ap.stato, _type: 'prezzo' };
+            }));
+
+            if (!allItems.length) {
                 container.innerHTML = '<p class="text-xs text-tp-muted italic text-center py-4">Nessun allert per oggi.</p>';
                 return;
             }
 
-            container.innerHTML = data.map(a => {
+            container.innerHTML = allItems.map(a => {
+                var tbl = a._type === 'prezzo' ? 'allert_prezzo' : 'allert';
                 const ora = a.ora_evento ? a.ora_evento.substring(0, 5) : '--:--';
                 const titolo = a.titolo || 'Allert';
                 const stato = a.stato || 'nuovo';
@@ -1025,7 +1069,7 @@
                 const esitoTag = b.esito
                     ? `<span class="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase ${b.esito === 'corretto' ? 'bg-tp-accent/10 text-tp-accent border border-tp-accent/20' : b.esito === 'sbagliato' ? 'bg-tp-loss/10 text-tp-loss border border-tp-loss/20' : 'bg-tp-warning/10 text-tp-warning border border-tp-warning/20'}">${b.esito}</span>`
                     : '';
-                return `<a href="dettaglio_bias.html?id=${b.id}" class="bg-tp-panel border border-tp-border rounded-xl p-4 flex items-center gap-4 shadow-sm hover:border-tp-accent/30 transition-colors cursor-pointer block">
+                return `<a href="dettaglio_bias.html?id=${b.id}&from=giornata&gid=${giornataId}" class="bg-tp-panel border border-tp-border rounded-xl p-4 flex items-center gap-4 shadow-sm hover:border-tp-accent/30 transition-colors cursor-pointer block">
                     <div class="flex flex-col items-center justify-center bg-[#0a0c10] rounded-lg border border-tp-border w-16 h-16 shrink-0">
                         <i data-lucide="${dirIcon}" class="w-6 h-6 ${dirColor} mb-0.5"></i>
                         <span class="text-[9px] font-bold ${dirColor} uppercase tracking-widest">${b.direzione || 'N/A'}</span>
@@ -1309,7 +1353,8 @@
 
             if (type === 'usd') {
                 try {
-                    var result = await db.from('forza_usd').select('usd_strength, created_at').order('created_at', { ascending: true }).limit(50);
+                    var resultRaw = await db.from('forza_usd').select('usd_strength, created_at').order('created_at', { ascending: false }).limit(50);
+                    var result = { data: resultRaw.data ? resultRaw.data.reverse() : [] };
                     var rows = result.data;
                     if (rows && rows.length) {
                         labels = rows.map(function(r) { return new Date(r.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }); });

@@ -126,6 +126,11 @@
                             <div id="screen-empty" onclick="document.getElementById('screen-input').click()" class="border-2 border-dashed border-tp-border rounded-xl flex flex-col items-center justify-center cursor-pointer bg-[#0a0c10] hover:border-tp-accent/50 transition-all" style="aspect-ratio:16/9"><i data-lucide="upload-cloud" class="w-10 h-10 text-tp-muted/40 mx-auto mb-2"></i><span class="text-xs font-bold text-tp-muted uppercase tracking-widest">Screenshot Trade</span></div>
                             <div id="screen-filled" class="hidden rounded-xl overflow-hidden border border-tp-border bg-[#0a0c10] relative" style="aspect-ratio:16/9"><img id="screen-img" class="w-full h-full object-contain" alt=""><button onclick="removeScreen()" class="absolute top-2 right-2 bg-black/70 text-tp-loss p-1.5 rounded-lg z-10"><i data-lucide="x" class="w-4 h-4"></i></button></div>
                             <input type="file" accept="image/*" class="hidden" id="screen-input" onchange="handleScreen(this.files)">
+                            <!-- Commento Trade -->
+                            <div class="mt-4">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2"><i data-lucide="align-left" class="w-4 h-4"></i> Commento Trade</label>
+                                <textarea id="tr-note" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-4 py-3 text-sm outline-none text-tp-text/90 min-h-[80px] resize-none focus:border-tp-accent transition-colors leading-relaxed" placeholder="Note sul trade..."></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -206,6 +211,7 @@
             document.getElementById('tr-esito').value = t.esito || '';
             screenshot = t.screenshot_url || '';
             renderScreen();
+            document.getElementById('tr-note').value = t.note || '';
             // Frattalita: prima da colonne DB, poi fallback a fractal_data JSONB
             if (t.candle_m15 || t.candle_h1 || t.candle_h4 || t.candle_d1) {
                 fractalData = { '15m': t.candle_m15, '1h': t.candle_h1, '4h': t.candle_h4, '1d': t.candle_d1 };
@@ -270,6 +276,8 @@
             if(type==='positive'){btns[0].classList.remove('text-tp-muted');btns[0].classList.add('text-tp-accent')}
             if(type==='neutral'){btns[1].classList.remove('text-tp-muted');btns[1].classList.add('text-tp-warning')}
             if(type==='negative'){btns[2].classList.remove('text-tp-muted');btns[2].classList.add('text-tp-loss')}
+            // Salva in monitora_smile
+            db.from('monitora_smile').insert({mindset:type,volatilita:null,sorgente:'trade'});
         }
         function setVol(type) {
             currentVol=type;
@@ -278,6 +286,8 @@
             if(type==='low'){btns[0].classList.remove('text-tp-muted');btns[0].classList.add('text-tp-loss')}
             if(type==='medium'){btns[1].classList.remove('text-tp-muted');btns[1].classList.add('text-tp-warning')}
             if(type==='high'){btns[2].classList.remove('text-tp-muted');btns[2].classList.add('text-tp-accent')}
+            // Salva in monitora_smile
+            db.from('monitora_smile').insert({mindset:null,volatilita:type,sorgente:'trade'});
         }
 
         function switchCat(tab) {
@@ -328,6 +338,7 @@
                 candle_h1: fractalData['1h'] || null,
                 candle_h4: fractalData['4h'] || null,
                 candle_d1: fractalData['1d'] || null,
+                note: document.getElementById('tr-note').value,
                 mood: currentMood,
                 strategia_id: strategiaId,
                 updated_at: new Date().toISOString()

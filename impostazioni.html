@@ -226,8 +226,8 @@
                     </div>
                 </div>
 
-                <!-- Grid: 2 columns on lg -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Grid: 3 columns on xl -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
 
                     <!-- BOX 1: Checklist Base (Giornaliero) -->
                     <div class="bg-tp-panel rounded-xl border border-tp-border flex flex-col h-[450px] shadow-lg overflow-hidden">
@@ -265,6 +265,22 @@
                                 <!-- Blocks rendered by JS -->
                             </div>
                             <button id="timeline-save-btn" class="mt-4 w-full bg-tp-accent/10 border border-tp-accent/40 hover:bg-tp-accent hover:text-[#0a0c10] text-tp-accent text-xs font-bold py-2.5 rounded-lg transition-colors uppercase tracking-wider">Salva Blocchi</button>
+                        </div>
+                    </div>
+
+                    <!-- BOX 3: Frasi Disciplina -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border flex flex-col h-[450px] shadow-lg overflow-hidden">
+                        <div class="p-4 border-b border-tp-border/50 bg-[#0a0c10] flex justify-between items-center">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2">
+                                <i data-lucide="flame" class="w-4 h-4"></i> Frasi Disciplina
+                            </h3>
+                        </div>
+                        <div class="p-5 flex-1 overflow-y-auto">
+                            <div id="frasi-list" class="space-y-3"></div>
+                            <div class="flex items-center gap-3 p-3 bg-tp-bg/30 border border-dashed border-tp-border rounded-lg text-tp-muted mt-3">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <input type="text" id="new-frase-input" placeholder="Aggiungi nuova frase..." class="flex-1 bg-transparent border-none outline-none text-sm font-medium text-tp-text placeholder-tp-border" onkeydown="if(event.key==='Enter')addFrase()">
+                            </div>
                         </div>
                     </div>
 
@@ -504,6 +520,64 @@
 
         // Init lucide icons for static elements
         lucide.createIcons();
+
+        // =============================================
+        // BOX 3: Frasi Disciplina (localStorage)
+        // =============================================
+        const FRASI_KEY = 'td_frasi_disciplina';
+        const defaultFrasi = [
+            'Segui il piano. Non il mercato, non le emozioni, non il rumore. Il piano.',
+            'Un trade perso con disciplina vale piu di un trade vinto per caso.',
+            'La pazienza e il tuo edge piu potente. Aspetta il setup, non cercarlo.'
+        ];
+
+        function getFrasi() {
+            try { var f = JSON.parse(localStorage.getItem(FRASI_KEY)); if (f && f.length) return f; } catch(e) {}
+            return [...defaultFrasi];
+        }
+
+        function saveFrasi(items) {
+            localStorage.setItem(FRASI_KEY, JSON.stringify(items));
+        }
+
+        function renderFrasi() {
+            var items = getFrasi();
+            var container = document.getElementById('frasi-list');
+            container.innerHTML = items.map(function(frase, i) {
+                return '<div class="flex items-start gap-3 p-3 bg-tp-bg border border-tp-border rounded-lg group">' +
+                    '<i data-lucide="grip-vertical" class="w-4 h-4 text-tp-muted opacity-50 group-hover:opacity-100 mt-0.5 shrink-0"></i>' +
+                    '<input type="text" value="' + frase.replace(/"/g, '&quot;') + '" class="flex-1 bg-transparent border-none outline-none text-sm font-medium text-tp-text" onblur="updateFrase(' + i + ', this.value)">' +
+                    '<button onclick="deleteFrase(' + i + ')" class="text-tp-muted hover:text-tp-loss transition-colors opacity-0 group-hover:opacity-100 shrink-0"><i data-lucide="trash-2" class="w-4 h-4"></i></button>' +
+                    '</div>';
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function addFrase() {
+            var input = document.getElementById('new-frase-input');
+            var val = input.value.trim();
+            if (!val) return;
+            var items = getFrasi();
+            items.push(val);
+            saveFrasi(items);
+            input.value = '';
+            renderFrasi();
+        }
+
+        function updateFrase(i, val) {
+            var items = getFrasi();
+            items[i] = val;
+            saveFrasi(items);
+        }
+
+        function deleteFrase(i) {
+            var items = getFrasi();
+            items.splice(i, 1);
+            saveFrasi(items);
+            renderFrasi();
+        }
+
+        renderFrasi();
     })();
     </script>
 </body>

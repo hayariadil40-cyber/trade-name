@@ -365,6 +365,16 @@
             document.getElementById('page-global-title').textContent = `${capitalize(data.nome)} - ${data.data || ''}`;
 
             if (data.coin_data) coinData = { ...coinData, ...data.coin_data };
+            // Merge auto_data: se coin_data high/low sono vuoti, usa auto_data
+            if (data.auto_data) {
+                COINS.forEach(function(c) {
+                    var auto = data.auto_data[c];
+                    if (!auto) return;
+                    if (!coinData[c]) coinData[c] = { high:'', low:'', bias:'', commento:'', screenshot:'' };
+                    if (!coinData[c].high && auto.high) coinData[c].high = auto.high;
+                    if (!coinData[c].low && auto.low) coinData[c].low = auto.low;
+                });
+            }
             if (data.mood) setMindset(data.mood);
             if (data.categorizzatori) {
                 categorizzatori = data.categorizzatori;
@@ -452,12 +462,14 @@
         }
 
         function setCoinBias(bias) {
+            saveCoinToMemory();
             coinData[currentCoin].bias = bias;
             renderCoinData();
         }
 
         function handleCoinScreenshot(files) {
             if (!files.length) return;
+            saveCoinToMemory();
             const reader = new FileReader();
             reader.onload = (e) => {
                 coinData[currentCoin].screenshot = e.target.result;
@@ -468,6 +480,7 @@
         }
 
         function removeCoinScreenshot() {
+            saveCoinToMemory();
             coinData[currentCoin].screenshot = '';
             renderCoinData();
             lucide.createIcons();
