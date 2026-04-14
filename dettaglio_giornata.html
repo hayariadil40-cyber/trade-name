@@ -993,10 +993,10 @@
                             </div>
                         </div>
                         <div class="flex gap-1.5 mt-0.5 shrink-0">
-                            <button onclick="updateAllertStato('${a.id}','completato')" class="bg-tp-border hover:bg-[#eab308]/20 hover:text-[#eab308] text-tp-text rounded p-1.5 transition-colors border border-transparent hover:border-[#eab308]/30 text-[10px] font-bold uppercase" title="Lavora">
+                            <button onclick="lavoraAllert('${a.id}','${tbl}')" class="bg-tp-border hover:bg-[#eab308]/20 hover:text-[#eab308] text-tp-text rounded p-1.5 transition-colors border border-transparent hover:border-[#eab308]/30 text-[10px] font-bold uppercase" title="Lavora">
                                 Lavora
                             </button>
-                            <button onclick="updateAllertStato('${a.id}','ignorato')" class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-1.5 transition-colors border border-transparent hover:border-tp-loss/30 text-[10px] font-bold uppercase" title="Ignora">
+                            <button onclick="ignoraAllert('${a.id}','${tbl}')" class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-1.5 transition-colors border border-transparent hover:border-tp-loss/30 text-[10px] font-bold uppercase" title="Ignora">
                                 Ignora
                             </button>
                         </div>
@@ -1005,8 +1005,16 @@
             }).join('');
         }
 
-        async function updateAllertStato(id, stato) {
-            await db.from('allert').update({ stato }).eq('id', id);
+        function lavoraAllert(id, tbl) {
+            if (tbl === 'allert_prezzo') {
+                window.location.href = 'allert.html?openAllert=' + id;
+            } else {
+                window.location.href = 'allert.html?openNews=' + id;
+            }
+        }
+
+        async function ignoraAllert(id, tbl) {
+            await db.from(tbl).update({ stato: 'ignorato' }).eq('id', id);
             await loadAllertOggi();
         }
 

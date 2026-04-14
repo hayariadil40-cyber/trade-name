@@ -940,7 +940,7 @@
             container.innerHTML = items.map(a => {
                 const time = a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--';
                 return `
-                <div onclick="window.location.href='allert.html'"
+                <div onclick="window.location.href='allert.html?openAllert=${a.id}'"
                     class="p-3 bg-[#0a0c10] border border-tp-warning/40 hover:border-tp-warning/70 rounded-lg group transition-all relative overflow-hidden shadow-[0_0_15px_rgba(234,179,8,0.05)] cursor-pointer">
                     <div class="absolute left-0 top-0 bottom-0 w-1 bg-tp-warning shadow-[0_0_10px_rgba(234,179,8,0.8)]"></div>
                     <div class="flex justify-between items-center ml-2">

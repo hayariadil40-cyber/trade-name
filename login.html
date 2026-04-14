@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Desk - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { tp: { bg:'#0B0E14', panel:'#161920', border:'#252932', text:'#f8fafc', muted:'#848d97', accent:'#20c997', loss:'#f43f5e' }}, fontFamily: { sans:['Inter','sans-serif'] }}}}
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+</head>
+<body class="bg-tp-bg text-tp-text font-sans h-screen flex items-center justify-center">
+
+    <div class="w-full max-w-sm mx-4">
+        <!-- Logo -->
+        <div class="flex items-center justify-center gap-3 mb-8">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#161920] to-[#0a0c10] border border-[#20c997]/50 flex items-center justify-center shadow-[0_0_15px_rgba(32,201,151,0.2)]">
+                <span class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#20c997] to-white tracking-tighter">TD</span>
+            </div>
+            <span class="text-2xl font-extrabold tracking-tighter uppercase">Trade<span class="text-[#20c997] ml-1">Desk</span></span>
+        </div>
+
+        <!-- Login Form -->
+        <div class="bg-tp-panel border border-tp-border rounded-xl p-8 shadow-2xl">
+            <h2 class="text-lg font-bold mb-6 text-center">Accedi</h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-2">Email</label>
+                    <input id="login-email" type="email" placeholder="email@esempio.com" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-4 py-3 text-sm text-white outline-none focus:border-tp-accent transition-colors">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-2">Password</label>
+                    <input id="login-password" type="password" placeholder="Password" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-4 py-3 text-sm text-white outline-none focus:border-tp-accent transition-colors" onkeydown="if(event.key==='Enter')doLogin()">
+                </div>
+                <div id="login-error" class="hidden text-tp-loss text-xs font-bold text-center py-2"></div>
+                <button onclick="doLogin()" id="login-btn" class="w-full bg-tp-accent hover:bg-tp-accent/80 text-[#0a0c10] font-bold text-sm py-3 rounded-lg transition-colors">
+                    Accedi
+                </button>
+            </div>
+        </div>
+
+        <p class="text-center text-tp-muted text-[10px] mt-6 uppercase tracking-widest">Trade Desk v1.0</p>
+    </div>
+
+    <script>
+        // Check se gia autenticato
+        (async function() {
+            var { data } = await db.auth.getSession();
+            if (data.session) window.location.href = 'index.html';
+        })();
+
+        async function doLogin() {
+            var email = document.getElementById('login-email').value.trim();
+            var password = document.getElementById('login-password').value;
+            var errorEl = document.getElementById('login-error');
+            var btn = document.getElementById('login-btn');
+
+            if (!email || !password) {
+                errorEl.textContent = 'Inserisci email e password';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            btn.textContent = 'Accesso...';
+            btn.disabled = true;
+            errorEl.classList.add('hidden');
+
+            var { error } = await db.auth.signInWithPassword({ email: email, password: password });
+
+            if (error) {
+                errorEl.textContent = 'Credenziali non valide';
+                errorEl.classList.remove('hidden');
+                btn.textContent = 'Accedi';
+                btn.disabled = false;
+                return;
+            }
+
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

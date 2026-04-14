@@ -198,8 +198,9 @@
 
                 <!-- Azioni -->
                 <div class="flex gap-3 mt-6 max-w-md">
-                    <button id="save-btn" onclick="saveCronaca()" class="flex-1 bg-tp-accent hover:bg-tp-accent/80 text-[#0a0c10] font-bold text-sm py-3 rounded-lg transition-colors flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Salva Cronaca</button>
-                    <button onclick="deleteCronaca()" class="bg-tp-bg border border-tp-loss/30 hover:bg-tp-loss/10 text-tp-loss font-bold text-sm px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    <button id="save-btn" onclick="saveCronaca()" class="flex-1 bg-tp-accent hover:bg-tp-accent/80 text-[#0a0c10] font-bold text-sm py-3 rounded-lg transition-colors flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Salva</button>
+                    <button id="chiudi-btn" onclick="chiudiCronaca()" class="flex-1 bg-tp-bg border border-tp-loss/30 hover:bg-tp-loss/10 text-tp-loss font-bold text-sm py-3 rounded-lg transition-colors flex items-center justify-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i> Chiudi Cronaca</button>
+                    <button onclick="deleteCronaca()" class="bg-tp-bg border border-tp-border hover:bg-tp-loss/10 text-tp-muted hover:text-tp-loss font-bold text-sm px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                 </div>
 
             </div>
@@ -222,17 +223,13 @@
             if (!db) { alert('Supabase non inizializzato.'); return; }
 
             if (!cronacaId) {
-                try {
-                    const today = new Date().toISOString().split('T')[0];
-                    const { data, error } = await db.from('cronache').insert({ data: today, titolo: 'Cronaca ' + today }).select().single();
-                    if (error) { alert('Errore: ' + error.message); return; }
-                    window.location.href = `dettaglio_cronaca.html?id=${data.id}`;
-                } catch (e) { alert('Errore: ' + e.message); }
+                window.location.href = 'cronache.html';
                 return;
             }
 
             await loadCronaca();
             await loadLinkedItems();
+            await checkReadonly();
         });
 
         async function loadCronaca() {
@@ -420,6 +417,47 @@
             setTimeout(() => document.getElementById('cronaca-canvas').classList.remove('save-flash'), 600);
             setTimeout(() => { btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Salva Cronaca'; btn.disabled = false; lucide.createIcons(); }, 1500);
             document.getElementById('page-global-title').textContent = `Cronaca: ${payload.titolo}`;
+        }
+
+        async function chiudiCronaca() {
+            saveCoinToMemory();
+            // Verifica che almeno una coin abbia screenshot
+            var hasScreen = false;
+            COINS.forEach(function(c) {
+                if (coinData[c] && coinData[c].screenshot) hasScreen = true;
+            });
+            if (!hasScreen) {
+                showConfirm('Screenshot mancante', 'Inserisci almeno uno screenshot prima di chiudere la cronaca.', function(){});
+                return;
+            }
+
+            showConfirm('Chiudere questa cronaca?', 'Non sara piu modificabile.', async function() {
+                var payload = {
+                    titolo: document.getElementById('cr-titolo').value.trim(),
+                    data: document.getElementById('cr-data').value,
+                    coin_data: coinData,
+                    stato: 'completato'
+                };
+                var { error } = await db.from('cronache').update(payload).eq('id', cronacaId);
+                if (!error) window.location.href = 'cronache.html';
+            });
+        }
+
+        // Readonly se completata
+        async function checkReadonly() {
+            var { data } = await db.from('cronache').select('stato').eq('id', cronacaId).single();
+            if (data && data.stato === 'completato') {
+                document.querySelectorAll('input, textarea, select').forEach(function(el) {
+                    el.disabled = true; el.classList.add('opacity-60','cursor-not-allowed');
+                });
+                document.querySelectorAll('.coin-tab, [onclick*="addSbil"], [onclick*="addVolume"], [onclick*="handleCoinScreenshot"], [onclick*="removeCoinScreenshot"]').forEach(function(el) {
+                    el.style.pointerEvents = 'none'; el.classList.add('opacity-50');
+                });
+                document.getElementById('save-btn').style.display = 'none';
+                document.getElementById('chiudi-btn').style.display = 'none';
+                var titleEl = document.getElementById('page-global-title');
+                if (titleEl) titleEl.innerHTML = titleEl.textContent + ' <span class="text-xs bg-tp-loss/10 text-tp-loss border border-tp-loss/20 px-2 py-0.5 rounded ml-2 font-bold uppercase">Chiusa</span>';
+            }
         }
 
         async function deleteCronaca() {

@@ -64,7 +64,7 @@
                             <button onclick="setCoinFilter('BTCUSD')" class="filter-btn text-xs font-bold px-3 py-1 rounded text-tp-muted hover:text-white transition-colors">BTCUSD</button>
                         </div>
                     </div>
-                    <button onclick="window.location.href='dettaglio_cronaca.html'" class="bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 font-bold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition-colors">+ Nuova Cronaca</button>
+                    <!-- Cronache si auto-creano ogni giorno (lun-ven) -->
                 </div>
 
                 <!-- Labels giorni -->
@@ -100,8 +100,58 @@
             await loadCronache();
         });
 
+        // Auto-crea tutta la settimana lun-ven se non esiste
+        async function autoCreateSettimana() {
+            var today = new Date();
+            var dayOfWeek = today.getDay(); // 0=dom, 1=lun, ..., 6=sab
+
+            // Trova il lunedi di questa settimana
+            var monday = new Date(today);
+            var diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // dom = vai a lun precedente
+            monday.setDate(monday.getDate() + diff);
+
+            var giorni = ['','Lunedi','Martedi','Mercoledi','Giovedi','Venerdi'];
+            var mesi = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+
+            // Crea lun-ven
+            for (var i = 0; i < 5; i++) {
+                var d = new Date(monday);
+                d.setDate(d.getDate() + i);
+                var dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+
+                // Controlla se esiste gia
+                var { data: existing } = await db.from('cronache').select('id').eq('data', dateStr);
+                if (existing && existing.length > 0) continue;
+
+                var titolo = giorni[i+1] + ' ' + d.getDate() + ' ' + mesi[d.getMonth()];
+                await db.from('cronache').insert({ data: dateStr, titolo: titolo, stato: 'in_corso' });
+            }
+        }
+
         async function loadCronache() {
-            const { data, error } = await db.from('cronache').select('*').order('data', { ascending: false });
+            await autoCreateSettimana();
+            // Cronache passate non completate diventano "nuovo" (da lavorare)
+            var todayStr = new Date().getFullYear() + '-' + String(new Date().getMonth()+1).padStart(2,'0') + '-' + String(new Date().getDate()).padStart(2,'0');
+            await db.from('cronache').update({ stato: 'nuovo' }).lt('data', todayStr).neq('stato', 'completato').neq('stato', 'ignorato');
+            const { data: rawData, error } = await db.from('cronache').select('*').order('data', { ascending: true });
+            // Raggruppa per settimana (lun-ven), poi ordina settimane decrescenti
+            function getWeekMonday(dateStr) {
+                var d = new Date(dateStr + 'T12:00:00');
+                var day = d.getDay();
+                var diff = day === 0 ? -6 : 1 - day;
+                d.setDate(d.getDate() + diff);
+                return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+            }
+            var weeks = {};
+            (rawData || []).forEach(function(c) {
+                var mon = getWeekMonday(c.data);
+                if (!weeks[mon]) weeks[mon] = [];
+                weeks[mon].push(c);
+            });
+            // Ordina settimane decrescenti, giorni dentro ogni settimana crescenti
+            var sortedWeeks = Object.keys(weeks).sort().reverse();
+            var data = [];
+            sortedWeeks.forEach(function(w) { data = data.concat(weeks[w]); });
             if (error) { console.error(error); return; }
             allCronache = data || [];
             renderCards();
