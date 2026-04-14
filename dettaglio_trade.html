@@ -141,7 +141,12 @@
                         <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2"><i data-lucide="link" class="w-4 h-4 text-tp-accent"></i> Categorizzatore</label>
                         <div class="flex gap-2 mb-3"><button onclick="switchCat('cronache')" id="cat-tab-cronache" class="cat-tab active flex-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase">Cronache</button><button onclick="switchCat('strategie')" id="cat-tab-strategie" class="cat-tab flex-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase">Strategia</button></div>
                         <div id="cat-cronache" class="cat-panel"><select id="sel-cronache" multiple class="w-full bg-[#0a0c10] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[70px]"></select></div>
-                        <div id="cat-strategie" class="cat-panel hidden"><select id="sel-strategie" multiple class="w-full bg-[#0a0c10] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none h-[70px]"></select></div>
+                        <div id="cat-strategie" class="cat-panel hidden"><select id="sel-strategie" class="w-full bg-[#0a0c10] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none" onchange="loadStrategiaRegole(this.value)"><option value="">-- Seleziona Strategia --</option></select></div>
+                        <!-- Checklist Regole Strategia -->
+                        <div id="regole-checklist" class="hidden mt-3 bg-[#0a0c10] border border-purple-500/20 rounded-lg p-4">
+                            <h4 class="text-[10px] font-bold uppercase tracking-widest text-purple-400 mb-3 flex items-center gap-2"><i data-lucide="check-square" class="w-3.5 h-3.5"></i> Regole di Ingresso</h4>
+                            <div id="regole-list" class="space-y-2"></div>
+                        </div>
                     </div>
                     <div class="flex-1 bg-tp-panel border border-tp-border rounded-xl p-5">
                         <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2"><i data-lucide="brain" class="w-4 h-4 text-tp-accent"></i> Stato Emotivo & Volatilita</label>
@@ -174,6 +179,9 @@
         const tradeId = new URLSearchParams(window.location.search).get('id');
         let currentDir='', currentMood='', currentVol='', screenshot='';
         let fractalData = {};
+        let regoleChecked = {};
+        let strategieCache = [];
+        let tradeChiuso = false;
 
         document.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
@@ -212,6 +220,15 @@
             screenshot = t.screenshot_url || '';
             renderScreen();
             document.getElementById('tr-note').value = t.note || '';
+            // Ripristina regole spuntate
+            if (t.regole_rispettate) regoleChecked = t.regole_rispettate;
+            // Ripristina strategia selezionata e carica regole
+            if (t.strategia_id) {
+                setTimeout(function() {
+                    var sel = document.getElementById('sel-strategie');
+                    if (sel) { sel.value = t.strategia_id; loadStrategiaRegole(t.strategia_id); }
+                }, 600);
+            }
             // Frattalita: prima da colonne DB, poi fallback a fractal_data JSONB
             if (t.candle_m15 || t.candle_h1 || t.candle_h4 || t.candle_d1) {
                 fractalData = { '15m': t.candle_m15, '1h': t.candle_h1, '4h': t.candle_h4, '1d': t.candle_d1 };
@@ -220,10 +237,12 @@
             }
             renderFractals();
             if (t.mood) setMood(t.mood);
+            if (t.volatilita) setVol(t.volatilita);
             document.getElementById('page-global-title').textContent = `Trade: ${t.asset||''} ${t.direzione||''}`;
 
             // Se completato → readonly
-            if (t.stato === 'completato') {
+            tradeChiuso = (t.stato === 'completato');
+            if (tradeChiuso) {
                 document.querySelectorAll('input, textarea, select').forEach(function(el) {
                     el.disabled = true;
                     el.classList.add('opacity-60', 'cursor-not-allowed');
@@ -276,8 +295,7 @@
             if(type==='positive'){btns[0].classList.remove('text-tp-muted');btns[0].classList.add('text-tp-accent')}
             if(type==='neutral'){btns[1].classList.remove('text-tp-muted');btns[1].classList.add('text-tp-warning')}
             if(type==='negative'){btns[2].classList.remove('text-tp-muted');btns[2].classList.add('text-tp-loss')}
-            // Salva in monitora_smile
-            db.from('monitora_smile').insert({mindset:type,volatilita:null,sorgente:'trade'});
+            db.from('monitora_smile').insert({mindset:type,volatilita:null,sorgente:'trade'}).then(function(r){if(r.error)console.error('smile err:',r.error)});
         }
         function setVol(type) {
             currentVol=type;
@@ -286,8 +304,7 @@
             if(type==='low'){btns[0].classList.remove('text-tp-muted');btns[0].classList.add('text-tp-loss')}
             if(type==='medium'){btns[1].classList.remove('text-tp-muted');btns[1].classList.add('text-tp-warning')}
             if(type==='high'){btns[2].classList.remove('text-tp-muted');btns[2].classList.add('text-tp-accent')}
-            // Salva in monitora_smile
-            db.from('monitora_smile').insert({mindset:null,volatilita:type,sorgente:'trade'});
+            db.from('monitora_smile').insert({mindset:null,volatilita:type,sorgente:'trade'}).then(function(r){if(r.error)console.error('smile err:',r.error)});
         }
 
         function switchCat(tab) {
@@ -299,10 +316,34 @@
 
         async function loadCategorizers() {
             const{data:cr}=await db.from('cronache').select('id,data,titolo').order('data',{ascending:false}).limit(20);
-            const{data:st}=await db.from('strategie').select('id,nome').order('nome');
+            const{data:st}=await db.from('strategie').select('id,nome,regole_ingresso').order('nome');
+            strategieCache = st || [];
             const sc=document.getElementById('sel-cronache'), ss=document.getElementById('sel-strategie');
             (cr||[]).forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.data} - ${c.titolo}`;sc.appendChild(o)});
             (st||[]).forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.nome;ss.appendChild(o)});
+        }
+
+        async function loadStrategiaRegole(strategiaId) {
+            var container = document.getElementById('regole-checklist');
+            var list = document.getElementById('regole-list');
+            if (!strategiaId) { container.classList.add('hidden'); return; }
+
+            var strat = strategieCache.find(function(s) { return s.id === strategiaId; });
+            if (!strat || !strat.regole_ingresso || !strat.regole_ingresso.length) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            list.innerHTML = strat.regole_ingresso.map(function(regola, i) {
+                var checked = regoleChecked[regola] ? 'checked' : '';
+                var disabled = tradeChiuso ? 'disabled' : '';
+                var opacity = tradeChiuso ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer';
+                var checkColor = regoleChecked[regola] ? (tradeChiuso ? 'text-tp-accent' : '') : (tradeChiuso ? 'text-tp-muted' : '');
+                return '<label class="flex items-start gap-3 group ' + opacity + '">' +
+                    '<input type="checkbox" ' + checked + ' ' + disabled + ' class="w-4 h-4 accent-[#8b5cf6] mt-0.5 shrink-0" onchange="regoleChecked[\'' + regola.replace(/'/g, "\\'") + '\']=this.checked">' +
+                    '<span class="text-xs text-tp-text/80 ' + checkColor + '">' + regola + '</span></label>';
+            }).join('');
         }
 
         async function loadLinked() {
@@ -316,7 +357,7 @@
         }
 
         function getTradePayload() {
-            const strategiaId = Array.from(document.getElementById('sel-strategie').selectedOptions).map(o=>o.value)[0] || null;
+            const strategiaId = document.getElementById('sel-strategie').value || null;
             return {
                 asset: document.getElementById('tr-asset').value,
                 direzione: currentDir,
@@ -339,7 +380,9 @@
                 candle_h4: fractalData['4h'] || null,
                 candle_d1: fractalData['1d'] || null,
                 note: document.getElementById('tr-note').value,
+                regole_rispettate: regoleChecked,
                 mood: currentMood,
+                volatilita: currentVol,
                 strategia_id: strategiaId,
                 updated_at: new Date().toISOString()
             };

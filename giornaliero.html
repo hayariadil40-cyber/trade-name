@@ -320,6 +320,8 @@
         async function loadDays() {
             const { data, error } = await db.from('giornate').select('*').order('data', { ascending: false });
             if (error) { console.error(error); return; }
+            // Carica tutti i trades per calcolare P/L per giornata
+            const { data: allTrades } = await db.from('trades').select('data, pnl, esito');
             const list = document.getElementById('days-list');
             const empty = document.getElementById('days-empty');
             const count = document.getElementById('day-count');
@@ -335,7 +337,10 @@
                 const dateStr = `${dayName} ${dayNum} ${monthAbbr} ${d.getFullYear()}`;
                 const moodIcon = g.mindset === 'positive' ? 'smile' : g.mindset === 'negative' ? 'frown' : 'meh';
                 const moodColor = g.mindset === 'positive' ? 'text-tp-accent' : g.mindset === 'negative' ? 'text-tp-loss' : 'text-tp-warning';
-                const pnl = g.pnl || 0;
+                // Calcola P/L dai trades della giornata
+                const dayTrades = (allTrades || []).filter(t => t.data && t.data.substring(0,10) === g.data);
+                const pnl = dayTrades.reduce((sum, t) => sum + (parseFloat(t.pnl) || 0), 0);
+                const tradeCount = dayTrades.length;
                 const pnlColor = pnl >= 0 ? 'text-tp-accent' : 'text-tp-loss';
                 const pnlSign = pnl >= 0 ? '+' : '';
                 return `
@@ -347,7 +352,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-lg group-hover:text-tp-accent transition-colors">${dateStr}</h3>
-                                <span class="text-[10px] text-tp-muted font-bold">${g.n_trades || 0} trades</span>
+                                <span class="text-[10px] text-tp-muted font-bold">${tradeCount} trades</span>
                             </div>
                         </div>
                         <div class="hidden md:flex items-center gap-3 w-1/3">

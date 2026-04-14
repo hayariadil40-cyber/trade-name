@@ -481,6 +481,19 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Box 7: Articoli del Giorno -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col shadow-lg">
+                        <div class="flex items-center justify-between mb-3 border-b border-tp-border/50 pb-2">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="newspaper" class="w-4 h-4 text-tp-accent"></i>
+                                <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted">Letture del Giorno</h3>
+                            </div>
+                        </div>
+                        <div id="articoli-list" class="space-y-3">
+                            <p class="text-xs text-tp-muted/50 italic text-center py-4">Nessun articolo</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1020,7 +1033,32 @@
         loadProcessiAttivi();
         loadCalendarioNotizie();
         loadAllertNonLavorati();
+        loadArticoli();
     });
+
+    // --- SUPABASE: Articoli del Giorno ---
+    async function loadArticoli() {
+        var container = document.getElementById('articoli-list');
+        if (!container) return;
+        try {
+            var today = new Date().toISOString().split('T')[0];
+            var { data } = await db.from('articoli_daily').select('*').eq('data', today).order('created_at', { ascending: true });
+            if (!data || !data.length) {
+                container.innerHTML = '<p class="text-xs text-tp-muted/50 italic text-center py-4">Nessun articolo per oggi</p>';
+                return;
+            }
+            container.innerHTML = data.map(function(a) {
+                return '<div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 hover:border-tp-accent/30 transition-all group">' +
+                    '<div class="flex justify-between items-start mb-1">' +
+                    '<h4 class="text-xs font-bold text-white group-hover:text-tp-accent transition-colors flex-1 pr-2">' + (a.titolo || '') + '</h4>' +
+                    '<span class="text-[9px] text-tp-muted font-bold shrink-0">' + (a.fonte || '') + '</span>' +
+                    '</div>' +
+                    '<p class="text-[10px] text-tp-muted/80 line-clamp-2">' + (a.sommario || '') + '</p>' +
+                    (a.url ? '<a href="' + a.url + '" target="_blank" class="text-[9px] text-tp-accent hover:text-white mt-1 inline-block">Leggi →</a>' : '') +
+                    '</div>';
+            }).join('');
+        } catch(e) { console.warn('Articoli:', e); }
+    }
     </script>
 </body>
 

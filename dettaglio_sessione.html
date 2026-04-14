@@ -497,6 +497,7 @@
             if (type === 'positive') { btns[0].classList.remove('text-tp-muted'); btns[0].classList.add('text-tp-accent'); }
             if (type === 'neutral') { btns[1].classList.remove('text-tp-muted'); btns[1].classList.add('text-tp-warning'); }
             if (type === 'negative') { btns[2].classList.remove('text-tp-muted'); btns[2].classList.add('text-tp-loss'); }
+            db.from('monitora_smile').insert({mindset:type,volatilita:null,sorgente:'sessione'});
         }
 
         // --- VOLATILITY --- ($=rosso, $$=giallo, $$$=verde)
@@ -510,6 +511,7 @@
             if (type === 'low') { btns[0].classList.remove('text-tp-muted'); btns[0].classList.add('text-tp-loss'); }
             if (type === 'medium') { btns[1].classList.remove('text-tp-muted'); btns[1].classList.add('text-tp-warning'); }
             if (type === 'high') { btns[2].classList.remove('text-tp-muted'); btns[2].classList.add('text-tp-accent'); }
+            db.from('monitora_smile').insert({mindset:null,volatilita:type,sorgente:'sessione'});
         }
 
         // --- CATEGORIZER ---
