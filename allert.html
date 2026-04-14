@@ -145,12 +145,8 @@
             var openAllertId = params.get('openAllert');
             var openNewsId = params.get('openNews');
             if (openAllertId) {
-                // Switch alla tab allert
                 switchMainTab('allert');
-                document.querySelectorAll('.main-tab').forEach(function(t){t.classList.remove('active')});
-                document.querySelectorAll('.main-tab')[1].classList.add('active');
-                // Aspetta che i dati siano caricati poi apri popup
-                setTimeout(function(){ openAllertModal(openAllertId); }, 300);
+                setTimeout(function(){ openAllertModal(openAllertId); }, 500);
             }
             if (openNewsId) {
                 setTimeout(function(){ openNewsModal(openNewsId); }, 300);
@@ -158,9 +154,12 @@
         });
 
         function switchMainTab(tab) {
-            document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            event.target.closest('.main-tab').classList.add('active');
+            document.querySelectorAll('.main-tab').forEach(function(t) { t.classList.remove('active'); });
+            document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.add('hidden'); });
+            // Trova il tab button corretto e attivalo
+            var tabs = document.querySelectorAll('.main-tab');
+            var tabMap = { calendario: 0, allert: 1, smile: 2 };
+            if (tabs[tabMap[tab]]) tabs[tabMap[tab]].classList.add('active');
             document.getElementById('tab-' + tab).classList.remove('hidden');
         }
 
