@@ -596,8 +596,7 @@
                 loadAllertOggi(),
                 loadSessioniCards(),
                 loadBiasGiornaliero(),
-                loadTradeStats(),
-                loadCharts()
+                loadTradeStats()
             ]);
             // Clock
             updateClock();
@@ -661,12 +660,13 @@
             // Restore marea
             if (data.marea) document.getElementById('inp-marea').value = data.marea;
 
-            // Load note da ieri (previous day's note_domani)
-            const yesterday = new Date(new Date(giornataDate + 'T00:00:00').getTime() - 86400000).toISOString().split('T')[0];
-            const { data: prevDay } = await db.from('giornate').select('note_domani').eq('data', yesterday).single();
-            if (prevDay && prevDay.note_domani) {
-                document.getElementById('note-ieri').textContent = prevDay.note_domani;
-            }
+            // Load note dalla giornata precedente (non il giorno calendario, ma l'ultima giornata nel DB)
+            try {
+                var prevResult = await db.from('giornate').select('note_domani').lt('data', giornataDate).order('data', { ascending: false }).limit(1);
+                if (prevResult.data && prevResult.data.length > 0 && prevResult.data[0].note_domani) {
+                    document.getElementById('note-ieri').textContent = prevResult.data[0].note_domani;
+                }
+            } catch(e) { console.warn('Note ieri:', e); }
 
             // Load notizie di oggi
             const { data: notizie } = await db.from('allert').select('titolo, ora_evento, impatto').eq('data_evento', giornataDate).order('ora_evento');
@@ -690,9 +690,13 @@
                 });
             }
 
-            // Nuovo Bias link
             // Hijri date
             updateHijriDate();
+
+            // Note domani restore
+            if (data.note_domani) document.getElementById('note-domani').value = data.note_domani;
+
+            // (note ieri caricate sopra)
 
             // Restore day tags
             if (data.day_tags && Array.isArray(data.day_tags)) {
@@ -1112,210 +1116,6 @@
         }
 
         // ============================================
-        // CHARTS
-        // ============================================
-        let usdChartObj, mindChartObj, volChartObj;
-
-        async function loadCharts() {
-            Chart.defaults.color = '#848d97';
-            Chart.defaults.font.family = 'Inter';
-
-            const commonOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { backgroundColor: '#161920', titleColor: '#fff', bodyColor: '#20c997', borderColor: '#252932', borderWidth: 1 }
-                },
-                scales: {
-                    x: { grid: { display: false, drawBorder: false }, ticks: { font: { size: 9 } } },
-                    y: { grid: { color: 'rgba(37, 41, 50, 0.4)', drawBorder: false, borderDash: [5, 5] }, ticks: { font: { size: 9 }, maxTicksLimit: 5 } }
-                },
-                interaction: { intersect: false, mode: 'index' }
-            };
-
-            // USD Chart - placeholder random line
-            const ctxUSD = document.getElementById('paniereChart').getContext('2d');
-            const gradUSD = ctxUSD.createLinearGradient(0, 0, 0, 100);
-            gradUSD.addColorStop(0, 'rgba(32, 201, 151, 0.4)');
-            gradUSD.addColorStop(1, 'rgba(32, 201, 151, 0)');
-
-            const usdLabels = ['9:00', '11:00', '13:00', '15:00', '17:00'];
-            const usdData = usdLabels.map(() => 103 + Math.random() * 3);
-
-            usdChartObj = new Chart(ctxUSD, {
-                type: 'line',
-                data: {
-                    labels: usdLabels,
-                    datasets: [{
-                        label: 'USD Index',
-                        data: usdData,
-                        borderColor: '#20c997',
-                        backgroundColor: gradUSD,
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#0a0c10',
-                        pointBorderColor: '#20c997',
-                        pointBorderWidth: 2,
-                        pointRadius: 3
-                    }]
-                },
-                options: commonOptions
-            });
-
-            // Load monitora_smile data for Mindset and Vol charts
-            const { data: smileData } = await db.from('monitora_smile').select('*').order('created_at', { ascending: true });
-            const smileRows = smileData || [];
-
-            // Mindset chart
-            const mindLabels = smileRows.map((r, i) => {
-                const d = new Date(r.created_at);
-                return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-            });
-            const mindValues = smileRows.map(r => {
-                if (r.mindset === 'positive') return 1;
-                if (r.mindset === 'neutral') return 0;
-                if (r.mindset === 'negative') return -1;
-                return 0;
-            });
-
-            const ctxMindset = document.getElementById('mindsetChart').getContext('2d');
-            mindChartObj = new Chart(ctxMindset, {
-                type: 'line',
-                data: {
-                    labels: mindLabels.length > 0 ? mindLabels : ['--'],
-                    datasets: [{
-                        label: 'Stato Mentale',
-                        data: mindValues.length > 0 ? mindValues : [0],
-                        borderColor: '#9333ea',
-                        backgroundColor: 'rgba(147, 51, 234, 0.1)',
-                        borderWidth: 2,
-                        stepped: true,
-                        fill: true,
-                        pointRadius: 4,
-                        pointBackgroundColor: function(context) {
-                            const val = context.raw;
-                            if (val > 0) return '#20c997';
-                            if (val === 0) return '#eab308';
-                            return '#f43f5e';
-                        }
-                    }]
-                },
-                options: {
-                    ...commonOptions,
-                    scales: {
-                        x: commonOptions.scales.x,
-                        y: { ...commonOptions.scales.y, min: -1.5, max: 1.5, ticks: { callback: function(value) { if (value === 1) return 'Smile'; if (value === 0) return 'Meh'; if (value === -1) return 'Tired'; return ''; } } }
-                    }
-                }
-            });
-
-            // Volatility bar chart
-            const volValues = smileRows.map(r => {
-                if (r.volatilita === 'high') return 3;
-                if (r.volatilita === 'medium') return 2;
-                if (r.volatilita === 'low') return 1;
-                return 0;
-            });
-
-            const ctxVol = document.getElementById('volChart').getContext('2d');
-            volChartObj = new Chart(ctxVol, {
-                type: 'bar',
-                data: {
-                    labels: mindLabels.length > 0 ? mindLabels : ['--'],
-                    datasets: [{
-                        label: 'Volatilit\u00e0 ($)',
-                        data: volValues.length > 0 ? volValues : [0],
-                        backgroundColor: '#eab308',
-                        borderRadius: 4,
-                        barPercentage: 0.4
-                    }]
-                },
-                options: {
-                    ...commonOptions,
-                    scales: {
-                        x: commonOptions.scales.x,
-                        y: { ...commonOptions.scales.y, max: 3, ticks: { callback: function(value) { return '$'.repeat(value); } } }
-                    }
-                }
-            });
-        }
-
-        function switchDailyChart(type, btnObj) {
-            document.querySelectorAll('.daily-chart-btn').forEach(b => {
-                b.classList.remove('bg-tp-accent/20', 'text-tp-accent');
-                b.classList.add('text-tp-muted');
-            });
-            btnObj.classList.add('bg-tp-accent/20', 'text-tp-accent');
-            btnObj.classList.remove('text-tp-muted');
-
-            document.getElementById('paniereChart').style.display = 'none';
-            document.getElementById('mindsetChart').style.display = 'none';
-            document.getElementById('volChart').style.display = 'none';
-
-            const titleEl = document.getElementById('live-chart-title');
-            if (type === 'usd') {
-                document.getElementById('paniereChart').style.display = 'block';
-                titleEl.innerHTML = '<i data-lucide="line-chart" class="w-4 h-4"></i> Forza USD (%)';
-            }
-            if (type === 'mindset') {
-                document.getElementById('mindsetChart').style.display = 'block';
-                titleEl.innerHTML = '<i data-lucide="brain" class="w-4 h-4"></i> Mindset Track';
-            }
-            if (type === 'vol') {
-                document.getElementById('volChart').style.display = 'block';
-                titleEl.innerHTML = '<i data-lucide="activity" class="w-4 h-4"></i> Liquidit\u00e0 (Vol)';
-            }
-            lucide.createIcons({ root: titleEl });
-        }
-
-        // ============================================
-        // SAVE GIORNATA
-        // ============================================
-        async function saveGiornata() {
-            if (!giornataId) return;
-
-            const tags = Object.entries(activeSessions).filter(([k, v]) => v).map(([k]) => k.toLowerCase());
-
-            const updatePayload = {
-                mindset: selectedMindset,
-                volatilita: selectedVolatility,
-                note_domani: document.getElementById('note-domani').value,
-                fajr: document.getElementById('btn-fajr').dataset.active === 'true',
-                marea: document.getElementById('inp-marea').value,
-                tags: tags,
-                day_tags: dayTags,
-                // stato rimane invariato — solo "Chiudi Giornata" lo cambia
-                updated_at: new Date().toISOString()
-            };
-
-            const { error } = await db.from('giornate').update(updatePayload).eq('id', giornataId);
-
-            const btn = document.getElementById('btn-save');
-            if (!error) {
-                btn.textContent = 'Salvato!';
-                btn.classList.add('bg-tp-accent/60');
-                setTimeout(() => {
-                    btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Salva Giornata';
-                    btn.classList.remove('bg-tp-accent/60');
-                    lucide.createIcons({ root: btn });
-                }, 1500);
-            } else {
-                btn.textContent = 'Errore!';
-                btn.classList.add('bg-tp-loss');
-                setTimeout(() => {
-                    btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Salva Giornata';
-                    btn.classList.remove('bg-tp-loss');
-                    lucide.createIcons({ root: btn });
-                }, 2000);
-            }
-        }
-
-        // ============================================
-        // CLOCK
-        // ============================================
-        // ============================================
         // GRAFICI (Forza USD / Mindset / Vol)
         // ============================================
         var dayChartInstance = null;
@@ -1327,7 +1127,7 @@
             await loadDayChartData('usd');
         }
 
-        async function switchDailyChart(type, btn) {
+        function switchDailyChart(type, btn) {
             dayChartType = type;
             document.querySelectorAll('.daily-chart-btn').forEach(function(b) {
                 b.classList.remove('bg-tp-accent/20', 'text-tp-accent');
@@ -1341,7 +1141,7 @@
             var titleEl = document.getElementById('live-chart-title');
             if (titleEl) titleEl.innerHTML = '<i data-lucide="line-chart" class="w-4 h-4"></i> ' + titles[type];
             if (typeof lucide !== 'undefined') lucide.createIcons();
-            await loadDayChartData(type);
+            loadDayChartData(type);
         }
 
         async function loadDayChartData(type) {
@@ -1354,9 +1154,8 @@
             if (type === 'usd') {
                 try {
                     var resultRaw = await db.from('forza_usd').select('usd_strength, created_at').order('created_at', { ascending: false }).limit(50);
-                    var result = { data: resultRaw.data ? resultRaw.data.reverse() : [] };
-                    var rows = result.data;
-                    if (rows && rows.length) {
+                    var rows = resultRaw.data ? resultRaw.data.reverse() : [];
+                    if (rows.length) {
                         labels = rows.map(function(r) { return new Date(r.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }); });
                         data = rows.map(function(r) { return parseFloat(r.usd_strength); });
                     }
@@ -1368,8 +1167,8 @@
                 borderColor = type === 'mindset' ? '#eab308' : '#f43f5e';
                 try {
                     var result = await db.from('monitora_smile').select('mindset, volatilita, created_at').order('created_at', { ascending: true }).limit(50);
-                    var rows = result.data;
-                    if (rows && rows.length) {
+                    var rows = result.data || [];
+                    if (rows.length) {
                         labels = rows.map(function(r, i) { return i; });
                         data = rows.map(function(r) { return map[r[field]] || 0; });
                     }

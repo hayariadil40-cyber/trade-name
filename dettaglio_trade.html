@@ -174,6 +174,24 @@
         </div>
     </main>
 
+    <!-- Modal Conferma -->
+    <div id="modal-confirm" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeConfirm()"></div>
+        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-sm mx-4 relative z-10 shadow-2xl overflow-hidden flex flex-col">
+            <div class="px-6 py-4 border-b border-tp-border bg-tp-panel relative">
+                <div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-loss"></div>
+                <h2 id="confirm-title" class="text-lg font-bold">Conferma</h2>
+            </div>
+            <div class="p-6">
+                <p id="confirm-msg" class="text-sm text-tp-muted">Sei sicuro?</p>
+            </div>
+            <div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel">
+                <button onclick="closeConfirm()" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white border border-tp-border rounded-lg">Annulla</button>
+                <button id="confirm-action" class="bg-tp-loss hover:bg-tp-loss/80 text-white px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors">Conferma</button>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
     <script>
         const tradeId = new URLSearchParams(window.location.search).get('id');
@@ -416,22 +434,29 @@
                 return;
             }
 
-            if (!confirm('Chiudere questo trade? Non sara piu modificabile.')) return;
-
-            const payload = getTradePayload();
-            payload.stato = 'completato';
-
-            const{error}=await db.from('trades').update(payload).eq('id',tradeId);
-            if(error){alert('Errore: '+error.message);return}
-
-            window.location.href='tabella_trades.html';
+            showConfirm('Chiudere questo trade?', 'Non sara piu modificabile.', async function() {
+                const payload = getTradePayload();
+                payload.stato = 'completato';
+                const{error}=await db.from('trades').update(payload).eq('id',tradeId);
+                if(error){alert('Errore: '+error.message);return}
+                window.location.href='tabella_trades.html';
+            });
         }
 
         async function deleteTrade() {
-            if(!confirm('Eliminare questo trade?'))return;
-            await db.from('trades').delete().eq('id',tradeId);
-            window.location.href='tabella_trades.html';
+            showConfirm('Eliminare questo trade?', 'Questa azione non puo essere annullata.', async function() {
+                await db.from('trades').delete().eq('id',tradeId);
+                window.location.href='tabella_trades.html';
+            });
         }
+
+        function showConfirm(title, msg, callback) {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-msg').textContent = msg;
+            document.getElementById('confirm-action').onclick = function() { closeConfirm(); callback(); };
+            document.getElementById('modal-confirm').classList.add('open');
+        }
+        function closeConfirm() { document.getElementById('modal-confirm').classList.remove('open'); }
     </script>
 </body>
 </html>

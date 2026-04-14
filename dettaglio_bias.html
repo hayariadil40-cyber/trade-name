@@ -305,6 +305,9 @@
         </div>
     </main>
 
+    <!-- Modal Conferma -->
+    <div id="modal-confirm" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto"><div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeConfirm()"></div><div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-sm mx-4 relative z-10 shadow-2xl overflow-hidden flex flex-col"><div class="px-6 py-4 border-b border-tp-border bg-tp-panel relative"><div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-loss"></div><h2 id="confirm-title" class="text-lg font-bold">Conferma</h2></div><div class="p-6"><p id="confirm-msg" class="text-sm text-tp-muted">Sei sicuro?</p></div><div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel"><button onclick="closeConfirm()" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white border border-tp-border rounded-lg">Annulla</button><button id="confirm-action" class="bg-tp-loss hover:bg-tp-loss/80 text-white px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors">Conferma</button></div></div></div>
+
     <script src="app.js"></script>
     <script>
         // ============================================
@@ -542,9 +545,9 @@
 
         // --- DELETE ---
         async function deleteBias() {
-            if (!confirm('Eliminare questo reperto?')) return;
+            showConfirm('Eliminare questo reperto?','Questa azione non puo essere annullata.',async function(){
             const { error } = await db.from('bias').delete().eq('id', biasId);
-            if (!error) window.location.href = 'bias.html';
+            if(!error)window.location.href='bias.html';});
         }
     </script>
 </body>
