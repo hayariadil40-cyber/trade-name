@@ -73,12 +73,14 @@ function updateTimeline() {
     const dot = document.getElementById('timeline-dot');
     if (!progress || !dot) return;
 
-    // Leggi blocchi da localStorage
+    // Leggi blocchi da localStorage (cache di Supabase)
     var blocksJson = localStorage.getItem('td_timeline_blocks');
     var blocks;
     if (blocksJson) {
         try { blocks = JSON.parse(blocksJson); } catch(e) { blocks = null; }
     }
+    // Se il valore e wrappato in un oggetto (da settings.js), unwrap
+    if (blocks && !Array.isArray(blocks)) blocks = null;
     if (!blocks || !blocks.length) {
         blocks = [
             { start: '00:00', end: '09:00', title: 'Asia' },

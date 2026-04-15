@@ -38,7 +38,7 @@ serve(async (req) => {
 
     // --- TRADES ---
     let tradesQuery = supabase.from("trades")
-      .select("asset, direzione, esito, pnl, pips, rr_reale, rr_teorico, size, sorgente, data, candle_m15, candle_h1, candle_h4, candle_d1, mood, volatilita, note")
+      .select("asset, direzione, esito, pnl, pips, rr_reale, rr_teorico, size, sorgente, data, mood, volatilita, note")
       .order("data", { ascending: false });
 
     if (assistantMode === "giornaliero") {
@@ -46,12 +46,12 @@ serve(async (req) => {
     } else if (assistantMode === "coach") {
       tradesQuery = tradesQuery.gte("data", thirtyDaysAgo + "T00:00:00").limit(100);
     } else {
-      tradesQuery = tradesQuery.limit(500);
+      tradesQuery = tradesQuery.limit(150);
     }
 
     const { data: trades } = await tradesQuery;
     if (trades && trades.length) {
-      dbContext += "\n## TRADES (" + assistantMode.toUpperCase() + "):\n" + JSON.stringify(trades, null, 2);
+      dbContext += "\n## TRADES (" + assistantMode.toUpperCase() + "):\n" + JSON.stringify(trades);
       const completed = trades.filter((t: any) => t.esito === "win" || t.esito === "loss");
       const wins = completed.filter((t: any) => t.esito === "win").length;
       const totalPnl = trades.reduce((sum: number, t: any) => sum + (parseFloat(t.pnl) || 0), 0);
@@ -63,19 +63,19 @@ serve(async (req) => {
     const { data: giornata } = await supabase.from("giornate")
       .select("data, mindset, volatilita, note_domani, fajr, marea, tags, day_tags")
       .eq("data", today).single();
-    if (giornata) dbContext += "\n\n## GIORNATA DI OGGI:\n" + JSON.stringify(giornata, null, 2);
+    if (giornata) dbContext += "\n\n## GIORNATA DI OGGI:\n" + JSON.stringify(giornata);
 
     // --- MONITORASMILE ---
-    const smileLimit = assistantMode === "giornaliero" ? 10 : assistantMode === "coach" ? 50 : 200;
+    const smileLimit = assistantMode === "giornaliero" ? 10 : assistantMode === "coach" ? 30 : 60;
     const { data: smile } = await supabase.from("monitora_smile")
       .select("mindset, volatilita, sorgente, created_at")
       .order("created_at", { ascending: false }).limit(smileLimit);
-    if (smile && smile.length) dbContext += "\n\n## MONITORASMILE:\n" + JSON.stringify(smile, null, 2);
+    if (smile && smile.length) dbContext += "\n\n## MONITORASMILE:\n" + JSON.stringify(smile);
 
     // --- SESSIONI DI OGGI (sempre) ---
     const { data: sessioni } = await supabase.from("sessioni")
-      .select("nome, data, coin_data, mood").eq("data", today);
-    if (sessioni && sessioni.length) dbContext += "\n\n## SESSIONI DI OGGI:\n" + JSON.stringify(sessioni, null, 2);
+      .select("nome, data, mood").eq("data", today);
+    if (sessioni && sessioni.length) dbContext += "\n\n## SESSIONI DI OGGI:\n" + JSON.stringify(sessioni);
 
     // --- FORZA USD (sempre) ---
     const { data: usd } = await supabase.from("forza_usd")
@@ -86,30 +86,36 @@ serve(async (req) => {
     if (assistantMode === "coach" || assistantMode === "power") {
       const { data: strategie } = await supabase.from("strategie")
         .select("nome, ipotesi, regole_ingresso, gestione_rischio").limit(10);
-      if (strategie && strategie.length) dbContext += "\n\n## STRATEGIE:\n" + JSON.stringify(strategie, null, 2);
+      if (strategie && strategie.length) dbContext += "\n\n## STRATEGIE:\n" + JSON.stringify(strategie);
 
-      const biasLimit = assistantMode === "coach" ? 20 : 100;
+      const biasLimit = assistantMode === "coach" ? 20 : 40;
       const { data: bias } = await supabase.from("bias")
         .select("asset, direzione, commento, data").order("data", { ascending: false }).limit(biasLimit);
-      if (bias && bias.length) dbContext += "\n\n## BIAS:\n" + JSON.stringify(bias, null, 2);
+      if (bias && bias.length) dbContext += "\n\n## BIAS:\n" + JSON.stringify(bias);
     }
 
     // --- SOLO POWER ---
     if (assistantMode === "power") {
       const { data: cronache } = await supabase.from("cronache")
-        .select("data, titolo, coin_data").order("data", { ascending: false }).limit(30);
-      if (cronache && cronache.length) dbContext += "\n\n## CRONACHE:\n" + JSON.stringify(cronache, null, 2);
+        .select("data, titolo").order("data", { ascending: false }).limit(15);
+      if (cronache && cronache.length) dbContext += "\n\n## CRONACHE:\n" + JSON.stringify(cronache);
 
       const { data: settimane } = await supabase.from("settimane")
         .select("data_inizio, data_fine, review, note, pnl, winrate").order("data_inizio", { ascending: false }).limit(10);
-      if (settimane && settimane.length) dbContext += "\n\n## SETTIMANE:\n" + JSON.stringify(settimane, null, 2);
+      if (settimane && settimane.length) dbContext += "\n\n## SETTIMANE:\n" + JSON.stringify(settimane);
 
       const { data: giornate } = await supabase.from("giornate")
-        .select("data, mindset, volatilita, pnl, note_domani, day_tags").order("data", { ascending: false }).limit(60);
-      if (giornate && giornate.length) dbContext += "\n\n## STORICO GIORNATE:\n" + JSON.stringify(giornate, null, 2);
+        .select("data, mindset, volatilita, pnl, note_domani, day_tags").order("data", { ascending: false }).limit(30);
+      if (giornate && giornate.length) dbContext += "\n\n## STORICO GIORNATE:\n" + JSON.stringify(giornate);
     }
 
     if (context) dbContext += "\n\n## CONTESTO AGGIUNTIVO:\n" + context;
+
+    // Safety cap: tronca contesto se troppo lungo (~150k chars ≈ ~40k tokens)
+    const MAX_CONTEXT_CHARS = 150000;
+    if (dbContext.length > MAX_CONTEXT_CHARS) {
+      dbContext = dbContext.substring(0, MAX_CONTEXT_CHARS) + "\n\n[...contesto troncato per limiti token]";
+    }
 
     // System prompt
     const systemPrompt = `Agisci come un coach di trading e analista comportamentale specializzato in scalping.
@@ -187,7 +193,7 @@ Conferma sempre cosa hai fatto dopo l'azione.`;
         model: "claude-sonnet-4-20250514",
         max_tokens: 2048,
         system: systemPrompt,
-        messages: [...(history || []), { role: "user", content: message }],
+        messages: [...(history || []).slice(-20), { role: "user", content: message }],
       }),
     });
 

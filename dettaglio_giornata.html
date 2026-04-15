@@ -66,6 +66,7 @@
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
+    <script src="settings.js"></script>
     <script src="auth.js"></script>
 </head>
 <body class="bg-tp-bg text-tp-text font-sans h-screen flex overflow-hidden">
@@ -91,37 +92,15 @@
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span>
             </a>
-            
+
             <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span>
             </a>
-            
+
             <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span>
-            </a>
-
-            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span>
-            </a>
-            
-            <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span>
-            </a>
-            
-            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-            
-            <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span>
-            </a>
-
-            <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span>
             </a>
 
             <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
@@ -129,23 +108,49 @@
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span>
             </a>
 
-            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span>
-            </a>
-            
             <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span>
             </a>
-            
+
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
 
+            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span>
+            </a>
+
+            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span>
+            </a>
+
+            <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span>
+            </a>
+
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+
+            <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span>
+            </a>
+
+            <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span>
+            </a>
+
             <a href="assistente.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bot" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Assistente AI</span></a>
+
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+
             <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span>
             </a>
+
         </nav>
     </aside>
 
@@ -847,33 +852,30 @@
         });
 
         // ============================================
-        // FRASI DISCIPLINA (da localStorage)
+        // FRASI DISCIPLINA (da Supabase)
         // ============================================
-        function loadFraseDisciplina() {
+        async function loadFraseDisciplina() {
             var el = document.getElementById('frase-disciplina');
             if (!el) return;
-            var frasi;
-            try { frasi = JSON.parse(localStorage.getItem('td_frasi_disciplina')); } catch(e) {}
-            if (!frasi || !frasi.length) {
-                frasi = [
-                    'Segui il piano. Non il mercato, non le emozioni, non il rumore. Il piano.',
-                    'Un trade perso con disciplina vale piu di un trade vinto per caso.',
-                    'La pazienza e il tuo edge piu potente. Aspetta il setup, non cercarlo.'
-                ];
-                localStorage.setItem('td_frasi_disciplina', JSON.stringify(frasi));
-            }
+            var defaultFrasi = [
+                'Segui il piano. Non il mercato, non le emozioni, non il rumore. Il piano.',
+                'Un trade perso con disciplina vale piu di un trade vinto per caso.',
+                'La pazienza e il tuo edge piu potente. Aspetta il setup, non cercarlo.'
+            ];
+            var frasi = await getSetting('td_frasi_disciplina', defaultFrasi);
+            if (!frasi || !frasi.length) frasi = defaultFrasi;
             var index = Math.floor(Math.random() * frasi.length);
             el.textContent = frasi[index];
         }
         loadFraseDisciplina();
 
-        // Carica checklist da localStorage
-        function loadChecklist() {
+        // Carica checklist da Supabase
+        async function loadChecklist() {
             var ul = document.getElementById('checklist-items');
             if (!ul) return;
-            var items;
-            try { items = JSON.parse(localStorage.getItem('td_checklist')); } catch(e) {}
-            if (!items || !items.length) items = ['Review Macro Calendario', 'Controllato liquidita Asia', 'Verifica Marea Attuale', 'Aggiornare livelli HTF'];
+            var defaultItems = ['Review Macro Calendario', 'Controllato liquidita Asia', 'Verifica Marea Attuale', 'Aggiornare livelli HTF'];
+            var items = await getSetting('td_checklist', defaultItems);
+            if (!items || !items.length) items = defaultItems;
             ul.innerHTML = items.map(function(text, i) {
                 return '<li class="flex items-start gap-3 group"><input type="checkbox" class="tp-check mt-0.5" onchange="toggleCheckLabel(this)"><label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">' + text + '</label></li>';
             }).join('');
@@ -1163,7 +1165,8 @@
 
             if (type === 'usd') {
                 try {
-                    var resultRaw = await db.from('forza_usd').select('usd_strength, created_at').order('created_at', { ascending: false }).limit(50);
+                    var todayStart = new Date().toISOString().split('T')[0] + 'T00:00:00';
+                    var resultRaw = await db.from('forza_usd').select('usd_strength, created_at').gte('created_at', todayStart).order('created_at', { ascending: false }).limit(300);
                     var rows = resultRaw.data ? resultRaw.data.reverse() : [];
                     if (rows.length) {
                         labels = rows.map(function(r) { return new Date(r.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }); });
@@ -1207,6 +1210,49 @@
         // ============================================
         var closeMindset = '';
         var closeVol = '';
+
+        async function saveGiornata() {
+            if (!giornataId) return;
+            var btn = document.getElementById('btn-save');
+            var origText = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvataggio...';
+            btn.disabled = true;
+
+            // Raccogli sessioni attive come tags
+            var sessionTags = [];
+            for (var k in activeSessions) { if (activeSessions[k]) sessionTags.push(k); }
+
+            var updateData = {
+                mindset: selectedMindset,
+                volatilita: selectedVolatility,
+                note_domani: document.getElementById('note-domani') ? document.getElementById('note-domani').value : null,
+                fajr: document.getElementById('btn-fajr') ? document.getElementById('btn-fajr').dataset.active === 'true' : false,
+                marea: document.getElementById('inp-marea') ? document.getElementById('inp-marea').value : null,
+                tags: sessionTags,
+                day_tags: dayTags,
+                updated_at: new Date().toISOString()
+            };
+
+            var { error } = await db.from('giornate').update(updateData).eq('id', giornataId);
+
+            if (error) {
+                btn.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4"></i> Errore!';
+                btn.classList.remove('bg-tp-accent');
+                btn.classList.add('bg-tp-loss');
+                console.error('Save error:', error);
+            } else {
+                btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Salvato!';
+            }
+            lucide.createIcons();
+
+            setTimeout(function() {
+                btn.innerHTML = origText;
+                btn.disabled = false;
+                btn.classList.remove('bg-tp-loss');
+                btn.classList.add('bg-tp-accent');
+                lucide.createIcons();
+            }, 1500);
+        }
 
         function openChiudiModal() {
             // Pre-popola commento domani se gia scritto
