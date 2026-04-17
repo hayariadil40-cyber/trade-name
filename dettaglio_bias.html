@@ -48,6 +48,7 @@
         }
         .dir-btn.active-long { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
         .dir-btn.active-short { background: rgba(244,63,94,0.15); border-color: #f43f5e; color: #f43f5e; }
+        .dir-btn.active-neutral { background: rgba(234,179,8,0.15); border-color: #eab308; color: #eab308; }
         .cat-tab.active { opacity: 1; }
         .cat-tab:not(.active) { opacity: 0.5; }
     </style>
@@ -91,6 +92,8 @@
             <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span></a>
 
             <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span></a>
+
+            <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
 
             <a href="assistente.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bot" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Assistente AI</span></a>
 
@@ -233,6 +236,9 @@
                                         </button>
                                         <button onclick="setDirection('SHORT')" id="btn-short" class="dir-btn flex-1 px-4 py-3 rounded-lg text-sm font-bold border border-tp-border text-tp-muted uppercase transition-all flex items-center justify-center gap-2 hover:border-tp-loss/50">
                                             <i data-lucide="trending-down" class="w-5 h-5"></i> Short
+                                        </button>
+                                        <button onclick="setDirection('NEUTRAL')" id="btn-neutral" class="dir-btn flex-1 px-4 py-3 rounded-lg text-sm font-bold border border-tp-border text-tp-muted uppercase transition-all flex items-center justify-center gap-2 hover:border-tp-warning/50">
+                                            <i data-lucide="minus" class="w-5 h-5"></i> Neutro
                                         </button>
                                     </div>
                                 </div>
@@ -423,12 +429,15 @@
             currentDirection = dir;
             const btnLong = document.getElementById('btn-long');
             const btnShort = document.getElementById('btn-short');
+            const btnNeutral = document.getElementById('btn-neutral');
 
             btnLong.classList.remove('active-long');
             btnShort.classList.remove('active-short');
+            btnNeutral.classList.remove('active-neutral');
 
             if (dir === 'LONG') btnLong.classList.add('active-long');
             if (dir === 'SHORT') btnShort.classList.add('active-short');
+            if (dir === 'NEUTRAL') btnNeutral.classList.add('active-neutral');
         }
 
         // --- CATEGORIZER TABS ---
@@ -508,6 +517,21 @@
                 reader.readAsDataURL(file);
             });
         }
+
+        // Ctrl+V per incollare screenshot
+        document.addEventListener('paste', function(e) {
+            var items = e.clipboardData?.items;
+            if (!items) return;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    e.preventDefault();
+                    var dt = new DataTransfer();
+                    dt.items.add(items[i].getAsFile());
+                    handleScreenshots(dt.files);
+                    return;
+                }
+            }
+        });
 
         function removeScreenshot(index) {
             screenshots.splice(index, 1);

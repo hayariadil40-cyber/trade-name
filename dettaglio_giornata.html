@@ -142,6 +142,8 @@
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span>
             </a>
 
+            <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
+
             <a href="assistente.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bot" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Assistente AI</span></a>
 
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
@@ -605,6 +607,8 @@
                 loadBiasGiornaliero(),
                 loadTradeStats()
             ]);
+            // Carica checklist con stato ripristinato
+            await loadChecklist();
             // Clock
             updateClock();
             setInterval(updateClock, 1000);
@@ -879,14 +883,44 @@
             ul.innerHTML = items.map(function(text, i) {
                 return '<li class="flex items-start gap-3 group"><input type="checkbox" class="tp-check mt-0.5" onchange="toggleCheckLabel(this)"><label class="cursor-pointer select-none text-tp-text group-hover:text-white transition-colors text-sm">' + text + '</label></li>';
             }).join('');
+            // Ripristina stato dopo render
+            if (giornataData && giornataData.checklist_stato) {
+                restoreChecklistState(giornataData.checklist_stato);
+            }
         }
-        loadChecklist();
 
         function toggleCheckLabel(checkbox) {
             const label = checkbox.nextElementSibling;
             label.classList.toggle('line-through');
             label.classList.toggle('text-tp-muted');
             label.classList.toggle('text-tp-text');
+            saveChecklistState();
+        }
+
+        async function saveChecklistState() {
+            var checks = [];
+            document.querySelectorAll('#checklist-items input[type="checkbox"]').forEach(function(cb) {
+                checks.push(cb.checked);
+            });
+            console.log('Saving checklist:', checks, 'giornataId:', giornataId);
+            if (giornataId) {
+                var { error } = await db.from('giornate').update({ checklist_stato: checks }).eq('id', giornataId);
+                if (error) console.error('Checklist save error:', error);
+                else console.log('Checklist saved OK');
+            }
+        }
+
+        function restoreChecklistState(stato) {
+            if (!stato || !stato.length) return;
+            var checkboxes = document.querySelectorAll('#checklist-items input[type="checkbox"]');
+            checkboxes.forEach(function(cb, i) {
+                if (stato[i]) {
+                    cb.checked = true;
+                    var label = cb.nextElementSibling;
+                    label.classList.add('line-through', 'text-tp-muted');
+                    label.classList.remove('text-tp-text');
+                }
+            });
         }
 
         // ============================================
@@ -955,8 +989,8 @@
             // Carica notizie di oggi
             const { data } = await db.from('allert').select('*').eq('data_evento', giornataDate).order('ora_evento', { ascending: true });
 
-            // Carica allert prezzo non lavorati (tutti, non solo di oggi)
-            const { data: prezzoData } = await db.from('allert_prezzo').select('*').in('stato', ['nuovo']);
+            // Carica allert prezzo non lavorati di oggi
+            const { data: prezzoData } = await db.from('allert_prezzo').select('*').gte('created_at', giornataDate + 'T00:00:00').lte('created_at', giornataDate + 'T23:59:59').in('stato', ['nuovo']);
 
             var allItems = (data || []).concat((prezzoData || []).map(function(ap) {
                 return { id: ap.id, titolo: (ap.coin || '') + ' @ ' + (ap.prezzo || ''), ora_evento: ap.ora || '', stato: ap.stato, _type: 'prezzo' };
@@ -1036,10 +1070,18 @@
                 const thumbEl = document.getElementById(`session-thumb-${name}`);
 
                 if (session) {
+                    // Verifica se la sessione è effettivamente compilata
+                    // Serve: almeno una coin con screenshot O (high+low), E mood selezionato
+                    var coinData = session.coin_data || {};
+                    var hasCoinData = Object.values(coinData).some(function(c) {
+                        return c && (c.screenshot || (c.high && c.low));
+                    });
+                    var isCompiled = hasCoinData && session.mood;
+
                     if (statusEl) {
-                        statusEl.textContent = 'Compilata';
-                        statusEl.classList.remove('text-tp-muted');
-                        statusEl.classList.add('text-tp-accent');
+                        statusEl.textContent = isCompiled ? 'Compilata' : 'Aperta';
+                        statusEl.classList.remove('text-tp-muted', 'text-tp-accent', 'text-tp-warning');
+                        statusEl.classList.add(isCompiled ? 'text-tp-accent' : 'text-tp-warning');
                     }
                     // Load first coin screenshot from coin_data
                     if (session.coin_data) {

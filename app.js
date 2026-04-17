@@ -7,6 +7,12 @@
 // 1. INIT
 // ==========================================
 document.addEventListener('DOMContentLoaded', function() {
+    // Abilita correttore ortografico italiano su tutti i campi di testo
+    document.querySelectorAll('input[type="text"], textarea').forEach(function(el) {
+        el.setAttribute('spellcheck', 'true');
+        el.setAttribute('lang', 'it');
+    });
+
     // Clock & TF blink
     if (document.getElementById('digital-clock')) {
         setInterval(updateClock, 1000);
@@ -62,7 +68,7 @@ function updateClock() {
     checkBlink('tf-15m', (m % 15 === 14) && s >= 50);
     checkBlink('tf-30m', (m % 30 === 29) && s >= 50);
     checkBlink('tf-1h', (m === 59) && s >= 50);
-    checkBlink('tf-4h', ((now.getHours() % 4 === 3) && m === 59 && s >= 50));
+    checkBlink('tf-4h', ((now.getHours() % 4 === 1) && m === 59 && s >= 50));
 }
 
 // ==========================================
