@@ -1,0 +1,21 @@
+# Credenziali / secrets (mai committare)
+scripts/*.secrets.ps1
+scripts/logs/
+*.env
+.env.local
+
+# Output temporanei
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Claude Code runtime (settings personali, lock file)
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/scheduled_tasks.json

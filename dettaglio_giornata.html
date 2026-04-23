@@ -297,6 +297,19 @@
                         </ul>
                     </div>
 
+                    <!-- 2. Briefing Pre-sessione (popolato dalla routine cloud alle 07:00 Casablanca) -->
+                    <div class="bg-gradient-to-br from-[#0e1a18] via-tp-panel to-[#0a0c10] rounded-xl border border-tp-accent/30 p-5 flex flex-col shadow-[0_0_20px_rgba(32,201,151,0.06)]">
+                        <div class="flex items-center justify-between mb-3 border-b border-tp-border/50 pb-2">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-accent flex items-center gap-2">
+                                <i data-lucide="sunrise" class="w-4 h-4"></i> Briefing
+                            </h3>
+                            <span id="briefing-time" class="text-[9px] text-tp-muted"></span>
+                        </div>
+                        <div id="briefing-content" class="text-xs text-tp-text/85 leading-relaxed">
+                            <p class="text-tp-muted/50 italic">Nessun briefing salvato per questa giornata.</p>
+                        </div>
+                    </div>
+
                     <!-- (Allert spostati a destra) -->
                 </div>
 
@@ -690,6 +703,9 @@
                     return '<div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full ' + ic + ' shrink-0"></span><span class="text-tp-muted font-bold">' + (n.ora_evento ? n.ora_evento.substring(0,5) : '') + '</span><span class="text-tp-text truncate">' + (n.titolo || '') + '</span></div>';
                 }).join('');
             }
+
+            // Render briefing della giornata (se presente)
+            renderBriefing(data.briefing);
 
             // Restore tags as session toggles
             if (data.tags && Array.isArray(data.tags)) {
@@ -1396,6 +1412,38 @@
             const dot = document.getElementById('timeline-dot');
             if (progress) progress.style.width = `${pct}%`;
             if (dot) dot.style.left = `${pct}%`;
+        }
+
+        // Render briefing pre-sessione (popolato dalla routine cloud)
+        function renderBriefing(b) {
+            const content = document.getElementById('briefing-content');
+            const timeEl = document.getElementById('briefing-time');
+            if (!content) return;
+            if (!b) {
+                content.innerHTML = '<p class="text-tp-muted/50 italic">Nessun briefing salvato per questa giornata.</p>';
+                return;
+            }
+            if (timeEl && b.generato_alle) {
+                const t = new Date(b.generato_alle);
+                timeEl.textContent = 'generato ' + t.toLocaleString('it-IT', {dateStyle:'short', timeStyle:'short'});
+            }
+            const macro = (b.macro_oggi||[]).map(e => '<li>'+(e.ora||'')+' - <b>'+(e.titolo||'')+'</b> ['+(e.impatto||'')+' '+(e.valuta||'')+']</li>').join('');
+            const bias  = (b.bias_aperti||[]).map(e => '<li><b>'+(e.asset||'')+'</b> '+(e.direzione||'')+(e.commento? ' - '+e.commento.substring(0,80)+(e.commento.length>80?'...':'') : '')+'</li>').join('');
+            const trades= (b.ultimi_trade||[]).map(t => {
+                const c = (t.pnl>=0?'text-tp-accent':'text-tp-loss');
+                return '<li>'+(t.asset||'')+' '+(t.direzione||'')+' <span class="'+c+'">'+(t.pnl>=0?'+':'')+(Number(t.pnl)||0).toFixed(2)+'</span> ('+(t.esito||'')+')</li>';
+            }).join('');
+            const usd = b.usd_strength || {};
+            const watch = (b.watchlist||[]).map(w => '<li class="flex gap-2"><span class="text-tp-accent">▸</span>'+w+'</li>').join('');
+            content.innerHTML =
+                (b.narrativa ? '<div class="mb-3 leading-relaxed text-[11.5px]">'+b.narrativa.replace(/\n/g,'<br>')+'</div>' : '') +
+                '<div class="space-y-2.5">' +
+                    (macro  ? '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Macro oggi</p><ul class="space-y-0.5 text-[10.5px] text-tp-text/85">'+macro+'</ul></div>' : '') +
+                    (bias   ? '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Bias aperti</p><ul class="space-y-0.5 text-[10.5px] text-tp-text/85">'+bias+'</ul></div>' : '') +
+                    (trades ? '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Ultimi trade</p><ul class="space-y-0.5 text-[10.5px] text-tp-text/85">'+trades+'</ul></div>' : '') +
+                    '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2 flex items-center justify-between"><div><p class="text-[9px] uppercase font-bold text-tp-accent tracking-wider">Forza USD</p><p class="text-[10px] text-tp-muted">'+(usd.trend_24h||'--')+'</p></div><p class="text-base font-bold text-white">'+(usd.valore!==undefined?Number(usd.valore).toFixed(4):'--')+'</p></div>' +
+                    (watch ? '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Watchlist</p><ul class="space-y-0.5 text-[10.5px] text-tp-text/85">'+watch+'</ul></div>' : '') +
+                '</div>';
         }
     </script>
 
