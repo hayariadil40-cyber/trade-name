@@ -99,7 +99,7 @@
 
             <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Reperti</span>
             </a>
 
             <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
@@ -121,7 +121,7 @@
 
             <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
 
-            <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dede</span></a>
+            <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Peter</span></a>
 
             <a href="steve.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Steve</span></a>
 
@@ -204,7 +204,7 @@
                 <div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem] shadow-[0_0_15px_rgba(32,201,151,0.05)]">
                     <div class="flex flex-col">
                         <span class="text-[9px] text-tp-accent font-bold uppercase tracking-widest opacity-80">Win Rate</span>
-                        <span id="headerWinRate" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-tp-accent to-white drop-shadow-[0_0_8px_rgba(32,201,151,0.6)] leading-none mt-0.5">--</span>
+                        <span id="headerWinRate" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-tp-accent to-white drop-shadow-[0_0_8px_rgba(32,201,151,0.6)] leading-none mt-0.5">--%</span>
                     </div>
                     <div class="relative w-10 h-10 flex items-center justify-center">
                         <svg class="w-[120%] h-[120%] transform -rotate-90 overflow-visible absolute" viewBox="0 0 36 36">
@@ -435,14 +435,14 @@
                 pnlEl.classList.add('text-tp-loss');
             }
 
-            // --- KPI 2: Win Rate ---
-            const wins = trades.filter(t => (t.esito || '').toLowerCase() === 'win' || parseFloat(t.pnl) > 0).length;
-            const winRate = total > 0 ? ((wins / total) * 100) : 0;
-            document.getElementById('kpiWinRate').textContent = total > 0 ? winRate.toFixed(1) + '%' : '--';
+            // --- KPI 2: Win Rate — formula standard: win / (win + loss), breakeven neutro, running esclusi ---
+            const wins = trades.filter(t => (t.esito || '').toLowerCase() === 'win').length;
+            const losses = trades.filter(t => (t.esito || '').toLowerCase() === 'loss').length;
+            const decided = wins + losses;
+            const winRate = decided > 0 ? ((wins / decided) * 100) : 0;
+            document.getElementById('kpiWinRate').textContent = decided > 0 ? winRate.toFixed(1) + '%' : '--';
 
-            // Header win rate
-            document.getElementById('headerWinRate').textContent = total > 0 ? Math.round(winRate) + '%' : '--';
-            document.getElementById('headerWinRateArc').setAttribute('stroke-dasharray', Math.round(winRate) + ', 100');
+            // Nota: l'header winrate e gestito globalmente da app.js (updateHeaderWinRate) — non sovrascrivere con il filtro di questa pagina.
 
             // --- KPI 3: Average R:R ---
             let rrValues = [];

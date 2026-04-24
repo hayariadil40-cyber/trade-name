@@ -95,7 +95,7 @@
 
             <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Reperti</span>
             </a>
 
             <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
@@ -117,7 +117,7 @@
 
             <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
 
-            <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dede</span></a>
+            <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Peter</span></a>
 
             <a href="steve.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Steve</span></a>
 
@@ -211,6 +211,13 @@
 
         <!-- Content: 2-column layout -->
         <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
+            <div class="max-w-[1600px] mx-auto">
+                <!-- Torna indietro -->
+                <a href="settimanale.html" class="flex items-center gap-2 mb-6 text-tp-muted hover:text-white transition-colors cursor-pointer w-fit">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span class="text-xs font-bold uppercase tracking-widest">Torna alle Settimane</span>
+                </a>
+            </div>
             <div class="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 pb-10">
 
                 <!-- LEFT COLUMN: Flusso Operativo Giornaliero (col-span-5) -->
@@ -346,29 +353,31 @@
             .lte('data', week.data_fine)
             .order('data', { ascending: true });
 
-        // Load trades for this week
+        // Load trades for this week — 'data' è timestamp, va esteso a fine giornata per includere tutto il venerdi
         const { data: trades } = await db
             .from('trades')
             .select('data, pnl, esito')
-            .gte('data', week.data_inizio)
-            .lte('data', week.data_fine);
+            .gte('data', week.data_inizio + 'T00:00:00')
+            .lte('data', week.data_fine + 'T23:59:59');
 
         // Build giornate map by date
         const giornateMap = {};
         (giornate || []).forEach(g => { giornateMap[g.data] = g; });
 
-        // Build trades map by date
+        // Build trades map by date — la chiave deve essere YYYY-MM-DD, non il timestamp completo
         const tradesMap = {};
         (trades || []).forEach(t => {
-            if (!tradesMap[t.data]) tradesMap[t.data] = [];
-            tradesMap[t.data].push(t);
+            const dayKey = (t.data || '').slice(0, 10);
+            if (!tradesMap[dayKey]) tradesMap[dayKey] = [];
+            tradesMap[dayKey].push(t);
         });
 
-        // Calculate overall stats
+        // Calculate overall stats — winrate standard: win / (win + loss), breakeven neutro, running esclusi
         const allTrades = trades || [];
         const totalTrades = allTrades.length;
-        const wins = allTrades.filter(t => t.esito === 'win' || t.esito === 'tp').length;
-        const winRate = totalTrades > 0 ? Math.round((wins / totalTrades) * 100) : null;
+        const wins = allTrades.filter(t => t.esito === 'win').length;
+        const losses = allTrades.filter(t => t.esito === 'loss').length;
+        const winRate = (wins + losses) > 0 ? Math.round((wins / (wins + losses)) * 100) : null;
         const netProfit = allTrades.reduce((sum, t) => sum + (parseFloat(t.pnl) || 0), 0);
 
         // Update stats
@@ -380,11 +389,7 @@
             profitEl.className = `text-3xl font-black mt-1 ${netProfit > 0 ? 'text-tp-accent' : netProfit < 0 ? 'text-tp-loss' : 'text-tp-muted'}`;
         }
 
-        // Update header win rate
-        if (winRate !== null) {
-            document.getElementById('header-winrate').textContent = winRate + '%';
-            document.getElementById('header-winrate-ring').setAttribute('stroke-dasharray', `${winRate}, 100`);
-        }
+        // Nota: l'header winrate e gestito globalmente da app.js (updateHeaderWinRate) e deve mostrare sempre il totale.
 
         // Render days
         const weekDays = getWeekDays(week.data_inizio, week.data_fine);
@@ -398,8 +403,8 @@
             const dayName = DAY_NAMES[dt.getDay()];
             const dayNum = dt.getDate();
 
-            const tp = dayTrades.filter(t => t.esito === 'win' || t.esito === 'tp').length;
-            const sl = dayTrades.filter(t => t.esito === 'loss' || t.esito === 'sl').length;
+            const tp = dayTrades.filter(t => t.esito === 'win').length;
+            const sl = dayTrades.filter(t => t.esito === 'loss').length;
             const dayPnl = dayTrades.reduce((s, t) => s + (parseFloat(t.pnl) || 0), 0);
 
             if (giornata) {
@@ -466,13 +471,14 @@
         const { data: trades } = await db
             .from('trades')
             .select('pnl, esito')
-            .gte('data', weekData.data_inizio)
-            .lte('data', weekData.data_fine);
+            .gte('data', weekData.data_inizio + 'T00:00:00')
+            .lte('data', weekData.data_fine + 'T23:59:59');
 
         const allTrades = trades || [];
         const totalTrades = allTrades.length;
-        const wins = allTrades.filter(t => t.esito === 'win' || t.esito === 'tp').length;
-        const winRate = totalTrades > 0 ? Math.round((wins / totalTrades) * 100) : null;
+        const wins = allTrades.filter(t => t.esito === 'win').length;
+        const losses = allTrades.filter(t => t.esito === 'loss').length;
+        const winRate = (wins + losses) > 0 ? Math.round((wins / (wins + losses)) * 100) : null;
         const netProfit = allTrades.reduce((sum, t) => sum + (parseFloat(t.pnl) || 0), 0);
 
         const { error } = await db

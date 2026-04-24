@@ -109,6 +109,7 @@
     <script src="supabase-config.js"></script>
     <script src="settings.js"></script>
     <script src="auth.js"></script>
+    <script src="corano.js"></script>
 </head>
 
 <body class="bg-tp-bg text-tp-text font-sans h-screen w-screen flex overflow-hidden">
@@ -159,7 +160,7 @@
 
             <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Reperti</span>
             </a>
 
             <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
@@ -181,7 +182,7 @@
 
             <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
 
-            <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dede</span></a>
+            <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Peter</span></a>
 
             <a href="steve.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Steve</span></a>
 
@@ -303,6 +304,11 @@
         <!-- Grid Workspace (Scrollable Area) -->
         <div class="flex-1 overflow-y-auto p-8">
 
+            <!-- CORANO: versetti configurabili (edit in impostazioni) -->
+            <div id="corano-widget" class="mb-6 bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
+                <div class="text-xs text-tp-muted italic text-center py-4">Caricamento Corano...</div>
+            </div>
+
             <!-- HERO: Briefing del Giorno (generato ogni mattina alle 07:00 Casablanca dalla routine) -->
             <div id="briefing-hero" class="mb-6 bg-gradient-to-br from-[#0e1a18] via-tp-panel to-[#0e1a18] rounded-xl border border-tp-accent/30 shadow-[0_0_30px_rgba(32,201,151,0.08)] overflow-hidden">
                 <div class="p-5 border-b border-tp-border/50 flex items-center justify-between">
@@ -402,7 +408,7 @@
                         </div>
 
                         <!-- Lista dei Ticket/Flussi attivi -->
-                        <div id="processi-list" class="flex-1 overflow-y-auto space-y-3 pr-2 custom-scroll relative z-10">
+                        <div id="processi-list" class="space-y-3 pr-2 relative z-10 max-h-[450px] overflow-y-auto custom-scroll">
                             <!-- Populated by JS -->
                             <div class="flex items-center justify-center h-32 text-tp-muted text-sm">
                                 <i data-lucide="loader-2" class="w-5 h-5 animate-spin mr-2"></i> Caricamento...
@@ -487,7 +493,7 @@
                             <span id="allert-count-badge" class="text-tp-muted text-[10px] font-bold px-2 py-1 bg-tp-border/30 rounded border border-tp-border/50">0</span>
                         </div>
 
-                        <div id="allert-list" class="space-y-3 relative z-10 max-h-[350px] overflow-y-auto custom-scroll">
+                        <div id="allert-list" class="space-y-3 relative z-10 max-h-[450px] overflow-y-auto custom-scroll">
                             <div class="flex items-center justify-center h-20 text-tp-muted text-sm">
                                 <i data-lucide="loader-2" class="w-5 h-5 animate-spin mr-2"></i> Caricamento...
                             </div>
@@ -502,7 +508,7 @@
                                 <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted">Letture del Giorno</h3>
                             </div>
                         </div>
-                        <div id="articoli-list" class="space-y-3 flex flex-col gap-2">
+                        <div id="articoli-list" class="space-y-3 flex flex-col gap-2 max-h-[450px] overflow-y-auto custom-scroll pr-1">
                             <p class="text-xs text-tp-muted/50 italic text-center py-4">Nessun articolo</p>
                         </div>
                     </div>
@@ -811,22 +817,37 @@
                 link: 'dettaglio_trade.html?id=' + t.id, color: 'warning', table: 'trades'
             }));
 
-            // Allert notizie scadute
-            const today = new Date().toISOString().split('T')[0];
-            const { data: allerts } = await db.from('allert').select('id, titolo, data_evento').eq('stato', 'nuovo').lte('data_evento', today);
-            if (allerts) allerts.forEach(a => tickets.push({
+            // Allert notizie scadute — compaiono solo quando l'orario dell'evento e passato (non prima)
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const today = yyyy + '-' + mm + '-' + dd;
+            const nowHHMM = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+            const { data: allerts } = await db.from('allert').select('id, titolo, data_evento, ora_evento').eq('stato', 'nuovo').lte('data_evento', today);
+            const allertsDaMostrare = (allerts || []).filter(a => {
+                if (!a.data_evento) return false;
+                if (a.data_evento < today) return true;                      // giorni passati: sempre
+                const ora = (a.ora_evento || '').substring(0, 5);
+                if (!ora) return true;                                        // nessun orario: mostro comunque
+                return ora <= nowHHMM;                                        // oggi: solo se l'ora e passata
+            });
+            allertsDaMostrare.forEach(a => tickets.push({
                 type: 'allert', label: 'Notizia Da Validare', title: a.titolo || 'Notizia',
                 desc: 'L\'orario e scattato. Inserire dati per archiviare.', id: a.id,
                 link: 'allert.html?openNews=' + a.id, color: 'purple', table: 'allert'
             }));
 
             // Allert prezzo
-            const { data: allertPrezzo } = await db.from('allert_prezzo').select('id, coin, prezzo, ora, descrizione').eq('stato', 'nuovo');
-            if (allertPrezzo) allertPrezzo.forEach(ap => tickets.push({
-                type: 'allert_prezzo', label: 'Allert Da Validare', title: (ap.coin || '') + ' @ ' + (ap.prezzo || ''),
-                desc: (ap.descrizione || 'Alert prezzo triggerato') + (ap.ora ? ' - ' + ap.ora : ''), id: ap.id,
-                link: 'allert.html?openAllert=' + ap.id, color: 'tp-warning', table: 'allert_prezzo'
-            }));
+            const { data: allertPrezzo } = await db.from('allert_prezzo').select('id, coin, prezzo, ora, descrizione, created_at').eq('stato', 'nuovo');
+            if (allertPrezzo) allertPrezzo.forEach(ap => {
+                const oraStr = ap.ora ? ap.ora.substring(0,5) : (ap.created_at ? new Date(ap.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : '');
+                tickets.push({
+                    type: 'allert_prezzo', label: 'Allert Da Validare', title: (ap.coin || '') + ' @ ' + (ap.prezzo || ''),
+                    desc: (ap.descrizione || 'Alert prezzo triggerato') + (oraStr ? ' - ' + oraStr : ''), id: ap.id,
+                    link: 'allert.html?openAllert=' + ap.id, color: 'tp-warning', table: 'allert_prezzo'
+                });
+            });
 
             // Cronache da compilare
             try {
@@ -870,7 +891,7 @@
                         </div>
                         <p class="text-[10px] text-tp-muted leading-relaxed">${t.desc}</p>
                     </div>
-                    <div class="flex gap-1.5 mt-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="flex gap-1.5 mt-1 shrink-0">
                         <button onclick="window.location.href='${t.link}'"
                             class="bg-tp-border ${c.btnHover} text-tp-text rounded p-2 transition-colors border border-transparent" title="Apri">
                             <i data-lucide="edit-3" class="w-4 h-4"></i>
@@ -902,6 +923,21 @@
         }
     }
     window.ignoreTicket = ignoreTicket;
+
+    // Ignore allert card (widget dashboard)
+    async function ignoreAllertCard(btn, id) {
+        try {
+            await db.from('allert_prezzo').update({ stato: 'ignorato' }).eq('id', id);
+            const card = btn.closest('[data-allert-id]');
+            if (card) card.remove();
+            const countBadge = document.getElementById('allert-count-badge');
+            const remaining = document.querySelectorAll('#allert-list [data-allert-id]').length;
+            if (countBadge) countBadge.textContent = remaining;
+        } catch (err) {
+            console.error('Errore ignore allert:', err);
+        }
+    }
+    window.ignoreAllertCard = ignoreAllertCard;
 
     // --- SUPABASE: Calendario Notizie ---
     let calTimeFilter = 'oggi';
@@ -1025,20 +1061,23 @@
             }
 
             container.innerHTML = items.map(a => {
-                const time = a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--';
+                const time = a.ora ? a.ora.substring(0,5) : (a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--');
                 return `
-                <div onclick="window.location.href='allert.html?openAllert=${a.id}'"
-                    class="p-3 bg-[#0a0c10] border border-tp-warning/40 hover:border-tp-warning/70 rounded-lg group transition-all relative overflow-hidden shadow-[0_0_15px_rgba(234,179,8,0.05)] cursor-pointer">
+                <div data-allert-id="${a.id}"
+                    class="p-3 bg-[#0a0c10] border border-tp-warning/40 hover:border-tp-warning/70 rounded-lg group transition-all relative overflow-hidden shadow-[0_0_15px_rgba(234,179,8,0.05)]">
                     <div class="absolute left-0 top-0 bottom-0 w-1 bg-tp-warning shadow-[0_0_10px_rgba(234,179,8,0.8)]"></div>
                     <div class="flex justify-between items-center ml-2">
-                        <div class="flex flex-col">
+                        <div class="flex flex-col flex-1 cursor-pointer" onclick="window.location.href='allert.html?openAllert=${a.id}'">
                             <p class="text-tp-warning font-bold text-sm tracking-wide">${a.coin || 'N/A'}</p>
                             <p class="text-[10px] text-tp-muted mt-0.5 font-bold uppercase">
                                 <i data-lucide="target" class="inline w-3 h-3 text-tp-muted/70"></i> Prezzo a <span class="text-white">${a.prezzo || '--'}</span>
                                 <span class="ml-2 text-tp-muted/50">${time}</span>
                             </p>
                         </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-tp-muted opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        <button onclick="ignoreAllertCard(this, '${a.id}')"
+                            class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-2 transition-colors border border-transparent hover:border-tp-loss/30 shrink-0" title="Ignora">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
                     </div>
                 </div>`;
             }).join('');
@@ -1123,8 +1162,11 @@
         loadArticoli();
         loadWatchlist();
         loadBriefingHero();
+        loadCoranoWidget('corano-widget');
         // Refresh watchlist ogni 5 minuti
         setInterval(loadWatchlist, 5 * 60 * 1000);
+        // Refresh processi ogni 60s: cosi le notizie compaiono automaticamente quando scatta l'orario
+        setInterval(loadProcessiAttivi, 60 * 1000);
     });
 
     // --- SUPABASE: Briefing del Giorno (HERO) ---
@@ -1194,20 +1236,45 @@
         var container = document.getElementById('articoli-list');
         if (!container) return;
         try {
-            var today = new Date().toISOString().split('T')[0];
-            var { data } = await db.from('articoli_daily').select('*').eq('data', today).order('created_at', { ascending: true });
+            // Inizio di oggi nel fuso locale (Casablanca), convertito in UTC ISO per filtrare created_at.
+            // Cosi il widget mostra tutto il batch del mattino a prescindere da data pubblicazione articolo.
+            var todayStart = new Date(new Date().toDateString()).toISOString();
+            var { data } = await db.from('articoli_daily')
+                .select('*')
+                .gte('created_at', todayStart)
+                .order('rilevanza', { ascending: false })
+                .order('created_at', { ascending: true });
             if (!data || !data.length) {
                 container.innerHTML = '<p class="text-xs text-tp-muted/50 italic text-center py-4">Nessun articolo per oggi</p>';
                 return;
             }
+
+            var tagColors = {
+                'macro':        'bg-tp-accent/10 text-tp-accent border-tp-accent/30',
+                'forex_indici': 'bg-tp-warning/10 text-tp-warning border-tp-warning/30',
+                'geopolitica':  'bg-blue-500/10 text-blue-400 border-blue-500/30',
+                'ai_tech':      'bg-purple-500/10 text-purple-400 border-purple-500/30'
+            };
+
             container.innerHTML = data.map(function(a) {
+                var tags = Array.isArray(a.tag_tema) ? a.tag_tema : [];
+                var tagBadges = tags.map(function(t) {
+                    var c = tagColors[t] || 'bg-tp-border text-tp-muted border-tp-border';
+                    return '<span class="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ' + c + '">' + t.replace('_', '/') + '</span>';
+                }).join('');
+                var stars = a.rilevanza ? '<span class="text-[9px] text-tp-warning shrink-0">' + '*'.repeat(a.rilevanza) + '</span>' : '';
+                var ora = a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '';
                 return '<div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 hover:border-tp-accent/30 transition-all group">' +
-                    '<div class="flex justify-between items-start mb-1">' +
-                    '<h4 class="text-xs font-bold text-white group-hover:text-tp-accent transition-colors flex-1 pr-2">' + (a.titolo || '') + '</h4>' +
-                    '<span class="text-[9px] text-tp-muted font-bold shrink-0">' + (a.fonte || '') + '</span>' +
+                    '<div class="flex justify-between items-start gap-2 mb-1.5">' +
+                        '<div class="flex flex-wrap items-center gap-1 flex-1 min-w-0">' + tagBadges + stars + '</div>' +
+                        '<div class="flex items-center gap-2 shrink-0">' +
+                            '<span class="text-[9px] text-tp-muted font-bold">' + (a.fonte || '') + '</span>' +
+                            (ora ? '<span class="text-[9px] text-tp-muted/60 tabular-nums">' + ora + '</span>' : '') +
+                        '</div>' +
                     '</div>' +
-                    '<p class="text-[10px] text-tp-muted/80 line-clamp-2">' + (a.sommario || '') + '</p>' +
-                    (a.url ? '<a href="' + a.url + '" target="_blank" class="text-[9px] text-tp-accent hover:text-white mt-1 inline-block">Leggi →</a>' : '') +
+                    '<h4 class="text-xs font-bold text-white group-hover:text-tp-accent transition-colors leading-snug">' + (a.titolo || '') + '</h4>' +
+                    '<p class="text-[10px] text-tp-muted/80 line-clamp-2 mt-1">' + (a.sommario || '') + '</p>' +
+                    (a.url ? '<a href="' + a.url + '" target="_blank" class="text-[9px] text-tp-accent hover:text-white mt-1.5 inline-block">Leggi originale &rarr;</a>' : '') +
                     '</div>';
             }).join('');
         } catch(e) { console.warn('Articoli:', e); }

@@ -68,6 +68,7 @@
     <script src="supabase-config.js"></script>
     <script src="settings.js"></script>
     <script src="auth.js"></script>
+    <script src="corano.js"></script>
 </head>
 <body class="bg-tp-bg text-tp-text font-sans h-screen flex overflow-hidden">
 
@@ -122,7 +123,7 @@
 
             <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Reperti</span>
             </a>
 
             <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
@@ -144,7 +145,7 @@
 
             <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
 
-            <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dede</span></a>
+            <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Peter</span></a>
 
             <a href="steve.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Steve</span></a>
 
@@ -326,6 +327,11 @@
                         <p id="frase-disciplina" class="text-sm text-tp-text/90 italic leading-relaxed flex-1">--</p>
                     </div>
 
+                    <!-- CORANO: versetti configurabili (edit in impostazioni) -->
+                    <div id="corano-widget" class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
+                        <div class="text-xs text-tp-muted italic text-center py-4">Caricamento Corano...</div>
+                    </div>
+
                     <!-- 0. Dati Giornata -->
                     <div class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
                         <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-4 border-b border-tp-border pb-2 flex items-center gap-2"><i data-lucide="sliders" class="w-4 h-4"></i> Dati Giornata</h3>
@@ -335,7 +341,10 @@
                             <div>
                                 <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
                                     <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="sunrise" class="w-3.5 h-3.5"></i> Fajr</span>
-                                    <button onclick="toggleFajr(this)" id="btn-fajr" class="text-tp-muted text-sm px-2 py-0.5 rounded border border-tp-border hover:border-tp-accent/50 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                    <div class="flex gap-1">
+                                        <button onclick="setFajr(true)" id="btn-fajr-yes" class="text-tp-muted text-sm px-2 py-0.5 rounded border border-tp-border hover:border-tp-accent/50 transition-colors" title="Fatto"><i data-lucide="check" class="w-4 h-4"></i></button>
+                                        <button onclick="setFajr(false)" id="btn-fajr-no" class="text-tp-muted text-sm px-2 py-0.5 rounded border border-tp-border hover:border-tp-loss/50 transition-colors" title="Non fatto"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                    </div>
                                 </div>
                                 <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
                                     <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="moon" class="w-3.5 h-3.5"></i> Hijri</span>
@@ -390,11 +399,11 @@
                         <div class="grid grid-cols-2 gap-6 mb-4">
                             <div>
                                 <span class="text-[10px] text-tp-muted font-bold uppercase flex items-center gap-1.5 mb-1.5"><i data-lucide="history" class="w-3 h-3"></i> Commento Ieri</span>
-                                <div id="note-ieri" class="bg-[#0a0c10] border border-tp-border/50 rounded p-2 text-xs text-tp-muted italic h-[60px] overflow-y-auto">--</div>
+                                <div id="note-ieri" class="bg-[#0a0c10] border border-tp-border/50 rounded p-2 text-xs text-tp-muted italic h-[140px] overflow-y-auto">--</div>
                             </div>
                             <div>
                                 <span class="text-[10px] text-tp-muted font-bold uppercase flex items-center gap-1.5 mb-1.5"><i data-lucide="calendar-clock" class="w-3 h-3"></i> Commento Domani</span>
-                                <textarea id="note-domani" class="w-full bg-[#0a0c10] border border-tp-border/50 rounded p-2 text-xs text-tp-text h-[60px] outline-none focus:border-tp-accent resize-none placeholder-tp-muted/50" placeholder="Scrivi qui..."></textarea>
+                                <textarea id="note-domani" class="w-full bg-[#0a0c10] border border-tp-border/50 rounded p-2 text-xs text-tp-text h-[140px] outline-none focus:border-tp-accent resize-none placeholder-tp-muted/50" placeholder="Scrivi qui..."></textarea>
                             </div>
                         </div>
 
@@ -467,14 +476,14 @@
                     <div>
                         <div class="flex items-center justify-between border-b border-tp-border pb-2 mb-4">
                             <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                                <i data-lucide="compass" class="w-5 h-5 text-tp-muted"></i> Bias Giornaliero
+                                <i data-lucide="compass" class="w-5 h-5 text-tp-muted"></i> Reperti Giornalieri
                             </h2>
                             <a id="btn-nuovo-bias" href="#" class="bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] px-3 py-1 text-xs font-bold uppercase rounded flex items-center gap-2 transition-colors shadow-sm">
-                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Nuovo Bias
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Nuovo Reperto
                             </a>
                         </div>
                         <div id="bias-list" class="space-y-3">
-                            <p class="text-xs text-tp-muted italic text-center py-4">Caricamento bias...</p>
+                            <p class="text-xs text-tp-muted italic text-center py-4">Caricamento reperti...</p>
                         </div>
                     </div>
                 </div>
@@ -616,6 +625,7 @@
                 return;
             }
             await loadGiornata();
+            loadCoranoWidget('corano-widget');
             await Promise.all([
                 loadAllertOggi(),
                 loadSessioniCards(),
@@ -624,9 +634,6 @@
             ]);
             // Carica checklist con stato ripristinato
             await loadChecklist();
-            // Clock
-            updateClock();
-            setInterval(updateClock, 1000);
         });
 
         // ============================================
@@ -673,15 +680,9 @@
             // note_domani is stored separately
             if (data.note_domani) document.getElementById('note-domani').value = data.note_domani;
 
-            // Restore fajr
-            if (data.fajr) {
-                const fajrBtn = document.getElementById('btn-fajr');
-                fajrBtn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i>';
-                fajrBtn.classList.add('text-tp-accent', 'border-tp-accent/50');
-                fajrBtn.classList.remove('text-tp-muted', 'border-tp-border');
-                fajrBtn.dataset.active = 'true';
-                lucide.createIcons();
-            }
+            // Restore fajr (tri-stato: true=V, false=X, null=non scelto)
+            fajrState = (data.fajr === true || data.fajr === false) ? data.fajr : null;
+            renderFajr();
 
             // Restore marea
             if (data.marea) document.getElementById('inp-marea').value = data.marea;
@@ -750,7 +751,7 @@
                 el.classList.add('opacity-60', 'cursor-not-allowed');
             });
             // Disabilita bottoni interattivi (non nav)
-            document.querySelectorAll('.mind-btn, .vol-btn, .session-tog, .tp-check, [onclick*="toggleFajr"], [onclick*="setMindset"], [onclick*="setVolatility"], [onclick*="toggleSession"]').forEach(function(el) {
+            document.querySelectorAll('.mind-btn, .vol-btn, .session-tog, .tp-check, [onclick*="setFajr"], [onclick*="setMindset"], [onclick*="setVolatility"], [onclick*="toggleSession"]').forEach(function(el) {
                 el.style.pointerEvents = 'none';
                 el.classList.add('opacity-50');
             });
@@ -767,20 +768,32 @@
         // ============================================
         // CHECKLIST
         // ============================================
-        function toggleFajr(btn) {
-            const active = btn.dataset.active === 'true';
-            if (active) {
-                btn.innerHTML = '<i data-lucide="x" class="w-4 h-4"></i>';
-                btn.classList.remove('text-tp-accent', 'border-tp-accent/50');
-                btn.classList.add('text-tp-muted', 'border-tp-border');
-                btn.dataset.active = 'false';
-            } else {
-                btn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i>';
-                btn.classList.add('text-tp-accent', 'border-tp-accent/50');
-                btn.classList.remove('text-tp-muted', 'border-tp-border');
-                btn.dataset.active = 'true';
+        // Fajr: tri-stato (true=V fatto, false=X non fatto, null=non scelto)
+        let fajrState = null;
+
+        function setFajr(val) {
+            // Click sullo stato gia attivo => disattiva (torna a null)
+            fajrState = (fajrState === val) ? null : val;
+            renderFajr();
+        }
+
+        function renderFajr() {
+            const yes = document.getElementById('btn-fajr-yes');
+            const no = document.getElementById('btn-fajr-no');
+            if (!yes || !no) return;
+            // Reset stato neutro
+            yes.classList.remove('bg-tp-accent', 'text-[#0a0c10]', 'border-tp-accent');
+            yes.classList.add('text-tp-muted', 'border-tp-border');
+            no.classList.remove('bg-tp-loss', 'text-white', 'border-tp-loss');
+            no.classList.add('text-tp-muted', 'border-tp-border');
+            // Applica stato attivo
+            if (fajrState === true) {
+                yes.classList.add('bg-tp-accent', 'text-[#0a0c10]', 'border-tp-accent');
+                yes.classList.remove('text-tp-muted', 'border-tp-border');
+            } else if (fajrState === false) {
+                no.classList.add('bg-tp-loss', 'text-white', 'border-tp-loss');
+                no.classList.remove('text-tp-muted', 'border-tp-border');
             }
-            lucide.createIcons();
         }
 
         // ============================================
@@ -1132,31 +1145,30 @@
         async function loadBiasGiornaliero() {
             if (!giornataDate) return;
             const container = document.getElementById('bias-list');
-            const { data, error } = await db.from('bias').select('*').eq('data', giornataDate).order('created_at', { ascending: true });
+            const { data, error } = await db.from('bias').select('*').eq('data', giornataDate).order('created_at', { ascending: false });
 
             if (error || !data || data.length === 0) {
-                container.innerHTML = '<p class="text-xs text-tp-muted italic text-center py-4">Nessun bias registrato per oggi.</p>';
+                container.innerHTML = '<p class="text-xs text-tp-muted italic text-center py-4">Nessun reperto registrato per oggi.</p>';
                 return;
             }
 
+            const tipoColors = {
+                commento: 'bg-tp-accent/10 text-tp-accent border-tp-accent/30',
+                bias: 'bg-tp-warning/10 text-tp-warning border-tp-warning/30',
+                conformazione: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
+                appunto: 'bg-tp-muted/10 text-tp-muted border-tp-muted/30'
+            };
+
             container.innerHTML = data.map(b => {
-                const dirColor = b.direzione === 'LONG' ? 'text-tp-accent' : b.direzione === 'SHORT' ? 'text-tp-loss' : 'text-tp-muted';
-                const dirIcon = b.direzione === 'LONG' ? 'trending-up' : b.direzione === 'SHORT' ? 'trending-down' : 'minus';
-                const esitoTag = b.esito
-                    ? `<span class="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase ${b.esito === 'corretto' ? 'bg-tp-accent/10 text-tp-accent border border-tp-accent/20' : b.esito === 'sbagliato' ? 'bg-tp-loss/10 text-tp-loss border border-tp-loss/20' : 'bg-tp-warning/10 text-tp-warning border border-tp-warning/20'}">${b.esito}</span>`
-                    : '';
-                return `<a href="dettaglio_bias.html?id=${b.id}&from=giornata&gid=${giornataId}" class="bg-tp-panel border border-tp-border rounded-xl p-4 flex items-center gap-4 shadow-sm hover:border-tp-accent/30 transition-colors cursor-pointer block">
-                    <div class="flex flex-col items-center justify-center bg-[#0a0c10] rounded-lg border border-tp-border w-16 h-16 shrink-0">
-                        <i data-lucide="${dirIcon}" class="w-6 h-6 ${dirColor} mb-0.5"></i>
-                        <span class="text-[9px] font-bold ${dirColor} uppercase tracking-widest">${b.direzione || 'N/A'}</span>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-sm font-bold text-white">${b.asset || ''}</span>
-                            ${esitoTag}
-                        </div>
-                        <p class="text-xs text-tp-muted truncate">${b.confluenze || b.note || ''}</p>
-                    </div>
+                const tipi = Array.isArray(b.tipo) ? b.tipo : [];
+                const tipoBadges = tipi.length
+                    ? tipi.map(t => `<span class="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${tipoColors[t] || 'bg-tp-border text-tp-muted border-tp-border'}">${t}</span>`).join('')
+                    : '<span class="text-[9px] italic text-tp-muted/60">-- nessun tipo --</span>';
+                const ora = b.created_at ? new Date(b.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--';
+                return `<a href="dettaglio_bias.html?id=${b.id}&from=giornata&gid=${giornataId}" class="bg-tp-panel border border-tp-border rounded-lg p-3 flex items-center gap-3 hover:border-tp-accent/30 transition-colors cursor-pointer">
+                    <span class="text-sm font-bold text-white min-w-[72px] shrink-0">${b.asset || '--'}</span>
+                    <div class="flex-1 min-w-0 flex flex-wrap gap-1">${tipoBadges}</div>
+                    <span class="text-xs text-tp-muted font-bold tabular-nums shrink-0">${ora}</span>
                 </a>`;
             }).join('');
             lucide.createIcons();
@@ -1286,7 +1298,7 @@
                 mindset: selectedMindset,
                 volatilita: selectedVolatility,
                 note_domani: document.getElementById('note-domani') ? document.getElementById('note-domani').value : null,
-                fajr: document.getElementById('btn-fajr') ? document.getElementById('btn-fajr').dataset.active === 'true' : false,
+                fajr: fajrState, // tri-stato: true=V, false=X, null=non scelto
                 marea: document.getElementById('inp-marea') ? document.getElementById('inp-marea').value : null,
                 tags: sessionTags,
                 day_tags: dayTags,
@@ -1371,47 +1383,6 @@
             closeChiudiModal();
             // Redirect a giornaliero
             window.location.href = 'giornaliero.html';
-        }
-
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-
-            const clockEl = document.getElementById('digital-clock');
-            if (clockEl) clockEl.textContent = `${hours}:${minutes}:${seconds}`;
-
-            const m = now.getMinutes();
-            const s = now.getSeconds();
-
-            const checkBlink = (id, isClosing) => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                if (isClosing) {
-                    el.classList.add('bg-tp-warning', 'text-[#0a0c10]', 'animate-pulse');
-                    el.classList.remove('bg-tp-panel', 'text-tp-muted');
-                } else {
-                    el.classList.remove('bg-tp-warning', 'text-[#0a0c10]', 'animate-pulse');
-                    el.classList.add('bg-tp-panel', 'text-tp-muted');
-                }
-            };
-
-            checkBlink('tf-5m', (m % 5 === 4) && s >= 50);
-            checkBlink('tf-15m', (m % 15 === 14) && s >= 50);
-            checkBlink('tf-30m', (m % 30 === 29) && s >= 50);
-            checkBlink('tf-1h', (m === 59) && s >= 50);
-            checkBlink('tf-4h', ((now.getHours() % 4 === 3) && m === 59 && s >= 50));
-
-            // Update timeline
-            const totalMinutes = now.getHours() * 60 + now.getMinutes();
-            const startMin = 2 * 60;   // 02:00 Asia
-            const endMin = 22 * 60;    // 22:00 End
-            const pct = Math.max(0, Math.min(100, ((totalMinutes - startMin) / (endMin - startMin)) * 100));
-            const progress = document.getElementById('timeline-progress');
-            const dot = document.getElementById('timeline-dot');
-            if (progress) progress.style.width = `${pct}%`;
-            if (dot) dot.style.left = `${pct}%`;
         }
 
         // Render briefing pre-sessione (popolato dalla routine cloud)

@@ -30,7 +30,7 @@
 ### `settimanale.html`
 - **Scopo**: archivio settimane (Lun-Ven).
 - **UI**: grid card per settimana (numero, range date, win rate %, net profit, badge "corrente"); bordo teal se corrente, rosso se loss, verde se profit.
-- **Dati**: `settimane` + trades nel range `data_inizio..data_fine`; win rate = wins/total.
+- **Dati**: `settimane` + trades nel range `data_inizio..data_fine`; win rate = wins / (wins + losses) (breakeven neutro, running esclusi).
 - **JS**: `getCurrentWeekRange()`, `createCurrentWeek()`, apertura `dettaglio_settimana.html?id=<id>`.
 
 ### `sessioni.html`

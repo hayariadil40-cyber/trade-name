@@ -68,7 +68,8 @@ function updateClock() {
     checkBlink('tf-15m', (m % 15 === 14) && s >= 50);
     checkBlink('tf-30m', (m % 30 === 29) && s >= 50);
     checkBlink('tf-1h', (m === 59) && s >= 50);
-    checkBlink('tf-4h', ((now.getHours() % 4 === 1) && m === 59 && s >= 50));
+    // Broker 4H chiude 01/05/09/13/17/21 broker = 23/03/07/11/15/19 Casa (broker-2h): blink nell'ora precedente
+    checkBlink('tf-4h', ((now.getHours() % 4 === 2) && m === 59 && s >= 50));
 }
 
 // ==========================================
@@ -201,12 +202,12 @@ async function updateHeaderWinRate() {
         var trades = result.data;
         if (!trades || !trades.length) return;
 
-        // Conta solo trades con esito compilato
-        var completed = trades.filter(function(t) { return t.esito === 'win' || t.esito === 'loss' || t.esito === 'breakeven'; });
-        var total = completed.length;
-        if (total === 0) return;
-        var wins = completed.filter(function(t) { return t.esito === 'win'; }).length;
-        var winrate = Math.round((wins / total) * 100);
+        // Winrate standard: win / (win + loss). Breakeven neutro, running esclusi.
+        var wins = trades.filter(function(t) { return t.esito === 'win'; }).length;
+        var losses = trades.filter(function(t) { return t.esito === 'loss'; }).length;
+        var decided = wins + losses;
+        if (decided === 0) return;
+        var winrate = Math.round((wins / decided) * 100);
 
         // Aggiorna tutti gli elementi winrate nell'header
         document.querySelectorAll('header .text-2xl, header .text-xl').forEach(function(el) {
@@ -388,6 +389,64 @@ window.selectVol = function(btn, type) {
     var chatHistory = [];
     var chatMode = 'giornaliero';
     var isOpen = false;
+    var ASSISTANT = 'rodrigo';
+    var CUTOFF_KEY = 'td_chat_rodrigo_cutoff';
+
+    function _getCutoffIso() {
+        var c = localStorage.getItem(CUTOFF_KEY);
+        return c || new Date(Date.now() - 48 * 3600 * 1000).toISOString();
+    }
+    function _userBubble(content) {
+        return '<div class="ai-msg-user" style="border-radius:8px;padding:10px 12px;margin-left:auto;max-width:85%"><div style="font-size:12px;color:rgba(248,250,252,0.9);line-height:1.5;white-space:pre-wrap">' + aiEscape(content) + '</div></div>';
+    }
+    function _aiBubble(content, slotLabel, timestampIso) {
+        var badge = '';
+        if (slotLabel) {
+            var ora = timestampIso ? new Date(timestampIso).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : '';
+            badge = '<span style="font-size:9px;color:#a78bfa;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);border-radius:4px;padding:2px 6px;margin-left:8px;text-transform:uppercase;letter-spacing:0.05em;font-weight:700">' + slotLabel + (ora ? ' ' + ora : '') + '</span>';
+        }
+        return '<div class="ai-msg-ai" style="border-radius:8px;padding:10px 12px"><div style="display:flex;gap:8px;align-items:flex-start"><div style="background:rgba(139,92,246,0.1);padding:4px;border-radius:6px;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></div><div style="flex:1;font-size:12px;color:rgba(248,250,252,0.9);line-height:1.5;white-space:pre-wrap"><div style="margin-bottom:4px">' + badge + '</div>' + aiFormat(content) + '</div></div></div>';
+    }
+    async function _loadChatFromDb() {
+        if (typeof db === 'undefined' || !db) return;
+        try {
+            var res = await db.from('assistant_messages')
+                .select('created_at, ruolo, contenuto, sorgente, slot')
+                .eq('assistente', ASSISTANT)
+                .gt('created_at', _getCutoffIso())
+                .order('created_at', { ascending: true })
+                .limit(200);
+            if (res.error) return;
+            var rows = res.data || [];
+            chatHistory = [];
+            var container = document.getElementById('ai-chat-msgs');
+            if (!container) return;
+            if (rows.length === 0) return;
+            var html = '';
+            rows.forEach(function(m) {
+                if (m.ruolo === 'user') {
+                    chatHistory.push({ role: 'user', content: m.contenuto });
+                    html += _userBubble(m.contenuto);
+                } else {
+                    if (m.sorgente === 'chat') chatHistory.push({ role: 'assistant', content: m.contenuto });
+                    html += _aiBubble(m.contenuto, m.sorgente === 'routine' ? (m.slot || 'routine') : null, m.created_at);
+                }
+            });
+            container.innerHTML = html;
+            container.scrollTop = container.scrollHeight;
+        } catch(e) { console.warn('widget load:', e); }
+    }
+    async function _persistMessage(ruolo, contenuto) {
+        if (typeof db === 'undefined' || !db) return;
+        try {
+            await db.from('assistant_messages').insert({
+                assistente: ASSISTANT,
+                ruolo: ruolo,
+                sorgente: 'chat',
+                contenuto: contenuto
+            });
+        } catch(e) { console.warn('widget persist:', e); }
+    }
 
     // Inject CSS
     var style = document.createElement('style');
@@ -412,18 +471,18 @@ window.selectVol = function(btn, type) {
 
     var widgetHtml = '<div id="ai-chat-widget">' +
         '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #252932;background:#161920">' +
-            '<div style="display:flex;align-items:center;gap:8px"><div style="background:rgba(139,92,246,0.15);padding:6px;border-radius:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></div><span style="font-size:13px;font-weight:700;color:#f8fafc">Sofi</span></div>' +
+            '<div style="display:flex;align-items:center;gap:8px"><div style="background:rgba(139,92,246,0.15);padding:6px;border-radius:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></div><span style="font-size:13px;font-weight:700;color:#f8fafc">Rodrigo</span></div>' +
             '<div style="display:flex;gap:6px;align-items:center">' +
                 '<button onclick="clearAiChat()" style="background:none;border:1px solid #252932;border-radius:6px;padding:4px 8px;cursor:pointer;color:#848d97;font-size:9px;font-weight:700"">PULISCI</button>' +
                 '<button onclick="toggleAiChat()" style="background:none;border:none;cursor:pointer;color:#848d97;padding:4px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>' +
             '</div>' +
         '</div>' +
         '<div id="ai-chat-msgs" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:400px;max-height:calc(75vh - 120px)">' +
-            '<div class="ai-msg-ai" style="border-radius:8px;padding:10px 12px"><div style="display:flex;gap:8px;align-items:flex-start"><div style="background:rgba(139,92,246,0.1);padding:4px;border-radius:6px;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></div><span style="font-size:12px;color:rgba(248,250,252,0.9);line-height:1.5">Ciao! Sono Sofi, la tua assistente giornaliera. Come posso aiutarti?</span></div></div>' +
+            '<div class="ai-msg-ai" style="border-radius:8px;padding:10px 12px"><div style="display:flex;gap:8px;align-items:flex-start"><div style="background:rgba(139,92,246,0.1);padding:4px;border-radius:6px;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></div><span style="font-size:12px;color:rgba(248,250,252,0.9);line-height:1.5">Ciao! Sono Rodrigo, il tuo assistente giornaliero. Come posso aiutarti?</span></div></div>' +
         '</div>' +
         '<div style="padding:10px 12px;border-top:1px solid #252932;background:#161920">' +
             '<div style="display:flex;gap:8px;background:#0B0E14;border:1px solid #252932;border-radius:10px;padding:6px">' +
-                '<input id="ai-chat-input" type="text" placeholder="Scrivi..." style="flex:1;background:transparent;border:none;outline:none;font-size:13px;color:#f8fafc;padding:4px 8px" spellcheck="true" lang="it" onkeydown="if(event.key===\'Enter\'){event.preventDefault();sendAiChat()}">' +
+                '<textarea id="ai-chat-input" rows="1" placeholder="Scrivi..." style="flex:1;background:transparent;border:none;outline:none;font-size:13px;color:#f8fafc;padding:4px 8px;resize:none;line-height:1.5;max-height:40vh;overflow-y:auto;font-family:inherit" spellcheck="true" lang="it" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight, window.innerHeight*0.4)+\'px\'" onkeydown="if(event.key===\'Enter\' && !event.shiftKey){event.preventDefault();sendAiChat()}"></textarea>' +
                 '<button id="ai-send-btn" onclick="sendAiChat()" style="background:#20c997;border:none;border-radius:8px;padding:6px 14px;cursor:pointer;color:#0a0c10;font-weight:700;font-size:12px;white-space:nowrap">Invia</button>' +
             '</div>' +
         '</div>' +
@@ -434,16 +493,10 @@ window.selectVol = function(btn, type) {
         wrapper.innerHTML = fabHtml + widgetHtml;
         document.body.appendChild(wrapper);
 
-        // Restore chat
-        try {
-            var saved = JSON.parse(localStorage.getItem('td_chat'));
-            if (saved && saved.date === new Date().toISOString().split('T')[0]) {
-                chatHistory = saved.history || [];
-                if (saved.widgetHtml) {
-                    document.getElementById('ai-chat-msgs').innerHTML = saved.widgetHtml;
-                }
-            }
-        } catch(e) {}
+        // Carica da DB (routine + chat interattive)
+        _loadChatFromDb();
+        // Refresh silenzioso ogni 60s per catturare messaggi routine mentre il widget resta aperto
+        setInterval(_loadChatFromDb, 60 * 1000);
     });
 
     window.toggleAiChat = function() {
@@ -458,8 +511,9 @@ window.selectVol = function(btn, type) {
     };
 
     window.clearAiChat = function() {
+        // Imposta cutoff: i messaggi precedenti restano in DB ma non vengono mostrati
+        localStorage.setItem(CUTOFF_KEY, new Date().toISOString());
         chatHistory = [];
-        localStorage.removeItem('td_chat');
         document.getElementById('ai-chat-msgs').innerHTML = '<div class="ai-msg-ai" style="border-radius:8px;padding:10px 12px"><div style="display:flex;gap:8px;align-items:flex-start"><div style="background:rgba(139,92,246,0.1);padding:4px;border-radius:6px;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></div><span style="font-size:12px;color:rgba(248,250,252,0.9);line-height:1.5">Chat pulita. Come posso aiutarti?</span></div></div>';
     };
 
@@ -487,9 +541,11 @@ window.selectVol = function(btn, type) {
         var sendBtn = document.getElementById('ai-send-btn');
 
         // User msg
-        container.innerHTML += '<div class="ai-msg-user" style="border-radius:8px;padding:10px 12px;margin-left:auto;max-width:85%"><div style="font-size:12px;color:rgba(248,250,252,0.9);line-height:1.5">' + aiEscape(msg) + '</div></div>';
+        container.innerHTML += _userBubble(msg);
+        _persistMessage('user', msg);
 
         input.value = '';
+        input.style.height = 'auto';
         input.disabled = true;
         sendBtn.disabled = true;
         sendBtn.textContent = '...';
@@ -512,9 +568,10 @@ window.selectVol = function(btn, type) {
             if (data.error) {
                 container.innerHTML += '<div class="ai-msg-ai" style="border-radius:8px;padding:10px 12px"><span style="font-size:12px;color:#f43f5e">Errore: ' + aiEscape(data.error) + '</span></div>';
             } else {
-                container.innerHTML += '<div class="ai-msg-ai" style="border-radius:8px;padding:10px 12px"><div style="display:flex;gap:8px;align-items:flex-start"><div style="background:rgba(139,92,246,0.1);padding:4px;border-radius:6px;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></div><div style="font-size:12px;color:rgba(248,250,252,0.9);line-height:1.5;white-space:pre-wrap">' + aiFormat(data.reply) + '</div></div></div>';
+                container.innerHTML += _aiBubble(data.reply, null, null);
                 chatHistory.push({ role: 'user', content: msg });
                 chatHistory.push({ role: 'assistant', content: data.reply });
+                _persistMessage('assistant', data.reply);
             }
         } catch(e) {
             var typing = document.getElementById('ai-typing');
@@ -527,12 +584,5 @@ window.selectVol = function(btn, type) {
         sendBtn.disabled = false;
         sendBtn.textContent = 'Invia';
         input.focus();
-
-        // Salva
-        localStorage.setItem('td_chat', JSON.stringify({
-            date: new Date().toISOString().split('T')[0],
-            history: chatHistory,
-            widgetHtml: container.innerHTML
-        }));
     };
 })();

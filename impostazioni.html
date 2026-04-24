@@ -94,7 +94,7 @@
 
             <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Reperti</span>
             </a>
 
             <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
@@ -116,7 +116,7 @@
 
             <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
 
-            <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dede</span></a>
+            <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Peter</span></a>
 
             <a href="steve.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Steve</span></a>
 
@@ -290,6 +290,57 @@
                             <div class="flex items-center gap-3 p-3 bg-tp-bg/30 border border-dashed border-tp-border rounded-lg text-tp-muted mt-3">
                                 <i data-lucide="plus" class="w-4 h-4"></i>
                                 <input type="text" id="new-frase-input" placeholder="Aggiungi nuova frase..." class="flex-1 bg-transparent border-none outline-none text-sm font-medium text-tp-text placeholder-tp-border" onkeydown="if(event.key==='Enter')addFrase()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOX 5: Versetti Corano -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border flex flex-col h-[450px] shadow-lg overflow-hidden">
+                        <div class="p-4 border-b border-tp-border/50 bg-[#0a0c10] flex justify-between items-center">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2">
+                                <i data-lucide="book-open-text" class="w-4 h-4"></i> Versetti Corano
+                            </h3>
+                        </div>
+                        <div class="p-5 flex-1 overflow-y-auto">
+                            <p class="text-[11px] text-tp-muted leading-tight mb-4">Configura il range di versetti mostrati nel widget Corano (dashboard + dettaglio giornaliero). Testo arabo + traduzione Piccardo via alquran.cloud.</p>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-1.5">Sura (1-114)</label>
+                                    <input id="corano-sura" type="number" min="1" max="114" class="w-full bg-tp-bg border border-tp-border rounded px-3 py-2 text-sm text-tp-text outline-none focus:border-tp-accent">
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-1.5">Versetto da</label>
+                                        <input id="corano-da" type="number" min="1" class="w-full bg-tp-bg border border-tp-border rounded px-3 py-2 text-sm text-tp-text outline-none focus:border-tp-accent">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold uppercase tracking-wider text-tp-muted mb-1.5">Versetto a</label>
+                                        <input id="corano-a" type="number" min="1" class="w-full bg-tp-bg border border-tp-border rounded px-3 py-2 text-sm text-tp-text outline-none focus:border-tp-accent">
+                                    </div>
+                                </div>
+                                <button id="corano-save-btn" class="w-full bg-tp-accent/10 border border-tp-accent/40 hover:bg-tp-accent hover:text-[#0a0c10] text-tp-accent text-xs font-bold py-2.5 rounded-lg transition-colors uppercase tracking-wider mt-2">Salva</button>
+                                <p id="corano-preview" class="text-[11px] text-tp-muted/70 italic text-center mt-2">--</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOX 4: Tipi Reperto -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border flex flex-col h-[450px] shadow-lg overflow-hidden">
+                        <div class="p-4 border-b border-tp-border/50 bg-[#0a0c10] flex justify-between items-center">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2">
+                                <i data-lucide="tags" class="w-4 h-4"></i> Tipi Reperto
+                            </h3>
+                        </div>
+                        <div class="p-5 flex-1 overflow-y-auto">
+                            <p class="text-[11px] text-tp-muted leading-tight mb-4">Questi tipi appaiono come multi-select nel dettaglio reperto. Rinomina o elimina qui per personalizzarli.</p>
+                            <div class="space-y-3" id="tipi-reperto-items">
+                                <!-- Items rendered by JS -->
+                            </div>
+                            <div class="flex items-center gap-3 p-3 bg-tp-bg/30 border border-dashed border-tp-border rounded-lg text-tp-muted mt-3">
+                                <i data-lucide="plus" class="w-4 h-4 shrink-0"></i>
+                                <input type="text" id="tipi-reperto-new-input" placeholder="Aggiungi nuovo tipo..." class="flex-1 bg-transparent border-none outline-none text-sm font-medium text-tp-text placeholder-tp-border">
+                                <button id="tipi-reperto-add-btn" class="px-3 py-1 bg-tp-accent/10 border border-tp-accent/40 text-tp-accent text-[10px] font-bold uppercase rounded hover:bg-tp-accent hover:text-[#0a0c10] transition-colors shrink-0">Aggiungi</button>
                             </div>
                         </div>
                     </div>
@@ -593,6 +644,117 @@
         }
 
         renderFrasi();
+
+        // =============================================
+        // BOX 4: Tipi Reperto (Supabase)
+        // =============================================
+        const TIPI_REPERTO_KEY = 'td_tipi_reperto';
+        const defaultTipi = ['commento', 'bias', 'conformazione', 'appunto'];
+
+        var tipiData = await getSetting(TIPI_REPERTO_KEY, defaultTipi);
+
+        function getTipi() { return tipiData; }
+        function saveTipi(items) {
+            tipiData = items;
+            saveSetting(TIPI_REPERTO_KEY, items);
+        }
+
+        function renderTipi() {
+            const items = getTipi();
+            const container = document.getElementById('tipi-reperto-items');
+            container.innerHTML = '';
+            items.forEach((tipo, i) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-3 p-3 bg-tp-bg border border-tp-border rounded-lg group';
+                row.innerHTML = `
+                    <i data-lucide="tag" class="w-4 h-4 text-tp-accent shrink-0"></i>
+                    <input type="text" value="${tipo.replace(/"/g, '&quot;')}" class="flex-1 bg-transparent border-none outline-none text-sm font-medium text-tp-text tipo-input" data-idx="${i}">
+                    <button class="text-tp-muted hover:text-tp-loss transition-colors opacity-0 group-hover:opacity-100 tipo-delete shrink-0" data-idx="${i}" title="Elimina"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                `;
+                container.appendChild(row);
+            });
+            lucide.createIcons({ nodes: [container] });
+
+            // Inline edit on blur
+            container.querySelectorAll('.tipo-input').forEach(inp => {
+                inp.addEventListener('blur', () => {
+                    const idx = parseInt(inp.dataset.idx);
+                    const val = inp.value.trim();
+                    const items = getTipi();
+                    if (!val) {
+                        // rimuove se svuotato
+                        items.splice(idx, 1);
+                    } else {
+                        items[idx] = val.toLowerCase();
+                    }
+                    saveTipi(items);
+                    renderTipi();
+                });
+                inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') inp.blur(); });
+            });
+
+            container.querySelectorAll('.tipo-delete').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const items = getTipi();
+                    items.splice(parseInt(btn.dataset.idx), 1);
+                    saveTipi(items);
+                    renderTipi();
+                });
+            });
+        }
+
+        function addTipo() {
+            const input = document.getElementById('tipi-reperto-new-input');
+            const val = input.value.trim().toLowerCase();
+            if (!val) return;
+            const items = getTipi();
+            if (items.indexOf(val) >= 0) { input.value = ''; return; } // no duplicati
+            items.push(val);
+            saveTipi(items);
+            input.value = '';
+            renderTipi();
+        }
+
+        document.getElementById('tipi-reperto-add-btn').addEventListener('click', addTipo);
+        document.getElementById('tipi-reperto-new-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') addTipo();
+        });
+
+        renderTipi();
+
+        // =============================================
+        // BOX 5: Versetti Corano (Supabase)
+        // =============================================
+        const CORANO_KEY = 'td_corano_config';
+        const defaultCorano = { sura: 18, ayah_da: 1, ayah_a: 4 };
+        var coranoData = await getSetting(CORANO_KEY, defaultCorano);
+
+        function renderCoranoConfig() {
+            document.getElementById('corano-sura').value = coranoData.sura || 1;
+            document.getElementById('corano-da').value = coranoData.ayah_da || 1;
+            document.getElementById('corano-a').value = coranoData.ayah_a || 1;
+            document.getElementById('corano-preview').textContent = 'Attuale: Sura ' + coranoData.sura + ' - versetti ' + coranoData.ayah_da + '-' + coranoData.ayah_a;
+        }
+
+        document.getElementById('corano-save-btn').addEventListener('click', async () => {
+            const sura = Math.max(1, Math.min(114, parseInt(document.getElementById('corano-sura').value) || 1));
+            const da   = Math.max(1, parseInt(document.getElementById('corano-da').value) || 1);
+            const a    = Math.max(da, parseInt(document.getElementById('corano-a').value) || da);
+            coranoData = { sura, ayah_da: da, ayah_a: a };
+            await saveSetting(CORANO_KEY, coranoData);
+            // Invalida cache locale di quella sura cosi al prossimo render si rifetcha
+            localStorage.removeItem('td_corano_cache_' + sura);
+            renderCoranoConfig();
+
+            // Feedback visivo
+            const btn = document.getElementById('corano-save-btn');
+            const orig = btn.textContent;
+            btn.textContent = 'Salvato!';
+            btn.classList.add('bg-tp-accent', 'text-[#0a0c10]');
+            setTimeout(() => { btn.textContent = orig; btn.classList.remove('bg-tp-accent', 'text-[#0a0c10]'); }, 1500);
+        });
+
+        renderCoranoConfig();
     })();
     </script>
 </body>

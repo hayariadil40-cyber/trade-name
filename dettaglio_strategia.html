@@ -100,7 +100,7 @@
 
             <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Reperti</span>
             </a>
 
             <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
@@ -122,7 +122,7 @@
 
             <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
 
-            <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dede</span></a>
+            <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Peter</span></a>
 
             <a href="steve.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Steve</span></a>
 
@@ -301,8 +301,8 @@
                                 <!-- Bias caricati dinamicamente -->
                                 <div id="no-bias-msg" class="col-span-full text-center py-8 text-tp-muted">
                                     <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
-                                    <p class="text-xs font-bold uppercase tracking-widest">Nessun bias collegato</p>
-                                    <p class="text-[10px] mt-1 opacity-60">I bias con questa strategia come categorizzatore appariranno qui</p>
+                                    <p class="text-xs font-bold uppercase tracking-widest">Nessun reperto collegato</p>
+                                    <p class="text-[10px] mt-1 opacity-60">I reperti con questa strategia come categorizzatore appariranno qui</p>
                                 </div>
                             </div>
                         </div>
@@ -611,16 +611,24 @@
         }
 
         // --- DELETE ---
-        async function deleteStrategy() {
-            showConfirm('Eliminare questa strategia?','Questa azione non puo essere annullata.',async function(){
-
-            const { error } = await db
-                .from('strategie')
-                .delete()
-                .eq('id', strategyId);
-
-            if(!error)window.location.href='strategie.html';});
+        function deleteStrategy() {
+            showConfirm('Eliminare questa strategia?', 'Questa azione non puo essere annullata.', async function() {
+                const { error } = await db
+                    .from('strategie')
+                    .delete()
+                    .eq('id', strategyId);
+                if (!error) window.location.href = 'strategie.html';
+                else alert('Errore eliminazione: ' + error.message);
+            });
         }
+
+        function showConfirm(title, msg, callback) {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-msg').textContent = msg;
+            document.getElementById('confirm-action').onclick = function() { closeConfirm(); callback(); };
+            document.getElementById('modal-confirm').classList.add('open');
+        }
+        function closeConfirm() { document.getElementById('modal-confirm').classList.remove('open'); }
 
         // --- LOAD TRADES ---
         async function loadTrades() {
@@ -676,10 +684,12 @@
         function updateMetrics(trades) {
             const total = trades.length;
             const wins = trades.filter(t => t.esito === 'win').length;
-            const winrate = total > 0 ? Math.round((wins / total) * 100) : 0;
+            const losses = trades.filter(t => t.esito === 'loss').length;
+            const decided = wins + losses;
+            const winrate = decided > 0 ? Math.round((wins / decided) * 100) : 0;
 
             // Win Rate
-            document.getElementById('winrate-value').textContent = total > 0 ? winrate + '%' : '--';
+            document.getElementById('winrate-value').textContent = decided > 0 ? winrate + '%' : '--';
             document.getElementById('winrate-ring').setAttribute('stroke-dasharray', `${winrate}, 100`);
 
             // R:R Medio - calcolato da entry, exit, stop_loss
