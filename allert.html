@@ -245,7 +245,7 @@
             document.getElementById('mn-previsto').textContent=n.valore_atteso||'--';
             document.getElementById('mn-analisi-ai').textContent=n.note||'Nessuna analisi AI';
             document.getElementById('mn-effettivo').value=n.valore_effettivo||'';
-            document.getElementById('mn-commento').value='';
+            document.getElementById('mn-commento').value=n.commento_rodrigo||'';
             document.getElementById('modal-news-title').textContent=`Validazione: ${n.titolo||'Notizia'}`;
             newsImpact={xau:'',indici:''};
             document.querySelectorAll('.impact-xau,.impact-indici').forEach(b=>{b.classList.remove('border-tp-accent','text-tp-accent','bg-tp-accent/10','border-tp-loss','text-tp-loss','bg-tp-loss/10');b.classList.add('border-tp-border','text-tp-muted')});
@@ -266,6 +266,7 @@
             var catTrades = Array.from(document.getElementById('msel-trades').selectedOptions).map(function(o){return o.value});
             await db.from('allert').update({
                 valore_effettivo: document.getElementById('mn-effettivo').value,
+                commento_rodrigo: document.getElementById('mn-commento').value,
                 stato: 'completato',
                 categorizzatori: { cronache: catCronache, strategie: catStrategie, trades: catTrades }
             }).eq('id', currentNewsId);
