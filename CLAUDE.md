@@ -8,7 +8,7 @@ Benvenuto. Questo file ti racconta cos'è il Trade Desk, perché esiste, come è
 
 Il proprietario è uno **scalper retail con base a Casablanca** (timezone Africa/Casablanca, UTC+1, niente ora legale). Lavora principalmente sulle sessioni di **Londra e New York**, con asset preferiti **XAU/USD, US30, NASDAQ, GER40** e in subordine **EUR/USD, USD/JPY**. La sua giornata operativa è scandita da regole di rischio precise: massimo 2-3 stop loss per sessione, 0.5% di perdita massima per sessione, 0.75-1% rischio massimo giornaliero.
 
-Il Trade Desk è il suo **diario di trading personale**, evoluto in qualcosa di più: una dashboard operativa che lo accompagna **prima**, **durante** e **dopo** ogni sessione. Tre layer convivono nel sistema: la **registrazione manuale** dei trade e degli stati emotivi, le **routine automatiche** che gli mandano briefing e debrief su Telegram, e un set di **assistenti AI** dedicati (Sofi per il real-time, Peter per la disciplina, Steve per le strategie, Rodrigo per le notizie macro) ognuno con personalità e dati a disposizione diversi.
+Il Trade Desk è il suo **diario di trading personale**, evoluto in qualcosa di più: una dashboard operativa che lo accompagna **prima**, **durante** e **dopo** ogni sessione. Tre layer convivono nel sistema: la **registrazione manuale** dei trade e degli stati emotivi, le **routine automatiche** che gli mandano ordine del giorno e debrief su Telegram, e un set di **assistenti AI** dedicati (Rodrigo operativo giornaliero e notizie macro, Peter per la disciplina, Steve per le strategie) ognuno con personalità e dati a disposizione diversi.
 
 L'obiettivo non è prevedere il mercato — è **mantenere disciplina e processo costanti**, vedere dove si rompono, e correggere prima che diventino abitudini.
 
@@ -115,9 +115,9 @@ Le tabelle e le colonne chiave: `allert.ff_id` (UNIQUE, dedup ForexFactory), `al
 
 Le routine sono i **messaggi pianificati** che arrivano sul Telegram dell'utente nei momenti critici della giornata. Oggi alcune sono PowerShell (in `scripts/`), altre sono già edge function Supabase. La direzione è migrare tutto su cloud.
 
-**07:00 Casablanca — `briefing-pre-sessione.ps1`** raccoglie macro del giorno, bias aperti da rivalutare, ultimi 5 trade, forza USD calcolata sui movimenti DXY. Salva in `giornate.briefing` (JSONB) e manda Telegram.
+**07:00 Casablanca — `ordine-del-giorno.ps1`** raccoglie macro del giorno, bias aperti da rivalutare, ultimi 5 trade, forza USD calcolata sui movimenti DXY. Salva in `giornate.ordine_del_giorno` (JSONB) e manda Telegram con header "Ordine del Giorno".
 
-**07:30 Casablanca — `routine-rodrigo-morning.ps1`** legge stato giornata, checklist, briefing, reperti, allert ad alto impatto del giorno, e produce un messaggio operativo firmato Rodrigo.
+**07:30 Casablanca — `routine-rodrigo-morning.ps1`** legge stato giornata, checklist, ordine del giorno, reperti, allert ad alto impatto del giorno, e produce un messaggio operativo firmato Rodrigo.
 
 **11:15 e 16:45 Casablanca — `routine-peter-session-debrief.ps1`** debrief di fine sessione (Londra alle 11:15, NY alle 16:45). Conta trade, calcola win rate di sessione, P/L, dà un voto disciplina. Firmato Peter.
 
@@ -133,7 +133,7 @@ Ogni esecuzione viene loggata in `routine_events` con `slot`, `tipo`, `payload`,
 
 `trades` è il cuore — ogni riga è un'operazione. Collegata a `giornate`, `sessioni`, `strategie` via FK opzionali. Contiene entry/exit/SL/TP, P/L, pips, R:R teorico e reale, screenshot URL, mood, candle context (m15/h1/h4/d1), regole rispettate (JSONB checklist).
 
-`giornate` è una riga per data, stato emotivo, mercato, volatilità, P/L aggregato, n_trades, win rate, briefing JSONB.
+`giornate` è una riga per data, stato emotivo, mercato, volatilità, P/L aggregato, n_trades, win rate, ordine_del_giorno JSONB.
 
 `sessioni` è una riga per ogni sessione operata (Asia/London/NY in una data), con `coin_data` JSONB che contiene i dati per coin (high/low/screenshot/sentiment).
 
@@ -209,7 +209,7 @@ Non lasciare console.log dimenticati in produzione, ma in fase dev sono benvenut
 
 ## Il prossimo passo tipico di una sessione
 
-L'utente apre la dashboard, dà un'occhiata al briefing che Rodrigo ha mandato la mattina, controlla i bias aperti, segna lo stato emotivo iniziale, opera, riceve i debrief di sessione di Peter, valida le notizie macro che escono compilando l'attuale (Rodrigo genera il commento), chiude la giornata con il digest EOD di Peter, e la sera Rodrigo gli ricorda cosa lo aspetta domani.
+L'utente apre la dashboard, dà un'occhiata all'ordine del giorno che Rodrigo ha mandato la mattina, controlla i bias aperti, segna lo stato emotivo iniziale, opera, riceve i debrief di sessione di Peter, valida le notizie macro che escono compilando l'attuale (Rodrigo genera il commento), chiude la giornata con il digest EOD di Peter, e la sera Rodrigo gli ricorda cosa lo aspetta domani.
 
 Tu, Claude, sei il **collaboratore di sviluppo** che lo aiuta a far evolvere questo sistema. Quando ti chiede qualcosa, prima capisci dove si inserisce nel flusso descritto sopra, e poi proponi la soluzione — facendo le domande giuste invece di andare a colpo sicuro.
 

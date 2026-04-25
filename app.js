@@ -586,3 +586,112 @@ window.selectVol = function(btn, type) {
         input.focus();
     };
 })();
+
+// ==========================================
+// 9. LOSS ALERT POPUP (Realtime)
+// ==========================================
+(function() {
+    var STORAGE_KEY = 'td_dismissed_loss_alerts';
+    var dismissedLocal;
+    try { dismissedLocal = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); }
+    catch (e) { dismissedLocal = new Set(); }
+
+    function injectStyles() {
+        if (document.getElementById('loss-alert-styles')) return;
+        var style = document.createElement('style');
+        style.id = 'loss-alert-styles';
+        style.textContent = [
+            '.loss-alert-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;animation:lossAlertFadeIn 0.3s ease}',
+            '@keyframes lossAlertFadeIn{from{opacity:0}to{opacity:1}}',
+            '.loss-alert-card{background:linear-gradient(135deg,#1a0e0e 0%,#161920 100%);border:2px solid #f43f5e;border-radius:16px;padding:40px;max-width:640px;width:100%;box-shadow:0 0 80px rgba(244,63,94,0.45);text-align:center;animation:lossAlertScale 0.4s cubic-bezier(0.34,1.56,0.64,1)}',
+            '@keyframes lossAlertScale{from{transform:scale(0.85);opacity:0}to{transform:scale(1);opacity:1}}',
+            '.loss-alert-badge{display:inline-block;background:rgba(244,63,94,0.12);color:#f43f5e;border:1px solid rgba(244,63,94,0.4);border-radius:999px;padding:6px 14px;font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:24px}',
+            '.loss-alert-frase{font-size:18px;line-height:1.65;color:#f8fafc;font-weight:500;font-style:italic;margin:0 0 32px 0}',
+            '.loss-alert-btn{background:linear-gradient(135deg,#f43f5e 0%,#dc2626 100%);color:white;border:none;padding:14px 36px;border-radius:10px;font-size:13px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;font-family:inherit}',
+            '.loss-alert-btn:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(244,63,94,0.4)}',
+            '.loss-alert-btn:active{transform:translateY(0)}'
+        ].join('\n');
+        document.head.appendChild(style);
+    }
+
+    function persistDismissed() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify([].slice.call(dismissedLocal))); } catch (e) {}
+    }
+
+    function showAlert(alert) {
+        if (!alert || !alert.id) return;
+        if (dismissedLocal.has(alert.id)) return;
+        // Evita duplicati: se gia mostrato in questa pagina
+        if (document.getElementById('loss-alert-' + alert.id)) return;
+        injectStyles();
+
+        var overlay = document.createElement('div');
+        overlay.className = 'loss-alert-overlay';
+        overlay.id = 'loss-alert-' + alert.id;
+
+        var sessione = (alert.sessione || '').toUpperCase();
+        var count = alert.count_in_sessione || 0;
+        var frase = alert.frase || '';
+
+        overlay.innerHTML =
+            '<div class="loss-alert-card">' +
+                '<div class="loss-alert-badge">Stop Loss #' + count + ' &mdash; sessione ' + sessione + '</div>' +
+                '<p class="loss-alert-frase">' + frase + '</p>' +
+                '<button class="loss-alert-btn" type="button">Ho capito</button>' +
+            '</div>';
+        document.body.appendChild(overlay);
+
+        var btn = overlay.querySelector('.loss-alert-btn');
+        btn.addEventListener('click', async function() {
+            dismissedLocal.add(alert.id);
+            persistDismissed();
+            try {
+                if (typeof db !== 'undefined' && db) {
+                    await db.from('loss_alerts').update({ dismissed_at: new Date().toISOString() }).eq('id', alert.id);
+                }
+            } catch (e) { console.warn('loss_alert dismiss:', e); }
+            overlay.style.animation = 'lossAlertFadeIn 0.2s ease reverse';
+            setTimeout(function() { overlay.remove(); }, 200);
+        });
+
+        // ESC per chiudere
+        document.addEventListener('keydown', function escHandler(ev) {
+            if (ev.key === 'Escape' && document.body.contains(overlay)) {
+                btn.click();
+                document.removeEventListener('keydown', escHandler);
+            }
+        });
+    }
+
+    async function loadPending() {
+        if (typeof db === 'undefined' || !db) return;
+        try {
+            // Solo non-dismissed di oggi (Casablanca date) - per non mostrare alert vecchi
+            var todayCasa = new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Casablanca' });
+            var res = await db.from('loss_alerts')
+                .select('*')
+                .is('dismissed_at', null)
+                .eq('data_casa', todayCasa)
+                .order('created_at', { ascending: true });
+            if (res.error || !res.data) return;
+            res.data.forEach(function(a) { showAlert(a); });
+        } catch (e) { console.warn('loss_alerts loadPending:', e); }
+    }
+
+    function subscribe() {
+        if (typeof db === 'undefined' || !db) return;
+        try {
+            db.channel('loss_alerts_realtime')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'loss_alerts' }, function(payload) {
+                    showAlert(payload['new']);
+                })
+                .subscribe();
+        } catch (e) { console.warn('loss_alerts subscribe:', e); }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() { loadPending(); subscribe(); });
+    } else {
+        loadPending(); subscribe();
+    }
+})();

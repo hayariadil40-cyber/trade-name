@@ -1,5 +1,5 @@
 # Routine Rodrigo Morning — 07:30 Casablanca
-# Legge stato giornata, checklist, briefing, reperti; invia su Telegram un messaggio operativo firmato Rodrigo.
+# Legge stato giornata, checklist, ordine del giorno, reperti; invia su Telegram un messaggio operativo firmato Rodrigo.
 
 . "$PSScriptRoot\routine-common.ps1"
 
@@ -7,7 +7,7 @@ $today = Get-TodayCasaIso
 Write-RoutineLog 'rodrigo-morning' "===== Run per $today ====="
 
 # ===== Raccolta dati =====
-$giornata = Invoke-SbGet "giornate?select=stato,mindset,note_domani,fajr,briefing,checklist_stato&data=eq.$today&limit=1"
+$giornata = Invoke-SbGet "giornate?select=stato,mindset,note_domani,fajr,ordine_del_giorno,checklist_stato&data=eq.$today&limit=1"
 $giornata = if ($giornata -and $giornata.Count -gt 0) { $giornata[0] } else { $null }
 
 $reperti = Invoke-SbGet "bias?select=asset,direzione,tipo,created_at&data=eq.$today&order=created_at.desc"
@@ -53,7 +53,7 @@ $payload = @{
     giornata_stato = if ($giornata) { $giornata.stato } else { 'NON_APERTA' }
     fajr = if ($giornata) { $giornata.fajr } else { $null }
     note_domani_ieri = if ($giornata) { $giornata.note_domani } else { $null }
-    briefing_disponibile = ($giornata -and $giornata.briefing)
+    ordine_del_giorno_disponibile = ($giornata -and $giornata.ordine_del_giorno)
     reperti_oggi = @($reperti | ForEach-Object { @{ asset = $_.asset; direzione = $_.direzione; tipo = $_.tipo } })
     macro_high_impact_oggi = @($allertOggi | ForEach-Object { @{ ora = $_.ora_evento; titolo = $_.titolo; valuta = $_.valuta } })
     top_articoli = @($articoli | ForEach-Object { @{ titolo = $_.titolo; tema = $_.tag_tema; rilevanza = $_.rilevanza } })

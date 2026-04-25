@@ -1,15 +1,15 @@
-# Briefing pre-sessione Trade Desk
+# Ordine del giorno — Trade Desk
 # Esegue ogni mattina alle 07:00 Casablanca via Task Scheduler:
 # 1) Legge da Supabase: macro oggi, bias aperti, ultimi 5 trade, forza USD
-# 2) Compone briefing JSON + narrativa template-based
-# 3) Salva su giornate.briefing (UPSERT)
+# 2) Compone ordine del giorno JSON + narrativa template-based
+# 3) Salva su giornate.ordine_del_giorno (UPSERT)
 # 4) Manda messaggio Telegram
 
 $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 # ===== Carica secrets (gitignored) =====
-$secretsPath = Join-Path $PSScriptRoot 'briefing-pre-sessione.secrets.ps1'
+$secretsPath = Join-Path $PSScriptRoot 'ordine-del-giorno.secrets.ps1'
 if (-not (Test-Path $secretsPath)) {
     throw "Secrets non trovati: $secretsPath"
 }
@@ -18,7 +18,7 @@ if (-not (Test-Path $secretsPath)) {
 # ===== Logging =====
 $logDir = Join-Path $PSScriptRoot 'logs'
 if (-not (Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir | Out-Null }
-$logFile = Join-Path $logDir ("briefing-$(Get-Date -Format 'yyyy-MM-dd').log")
+$logFile = Join-Path $logDir ("ordine-del-giorno-$(Get-Date -Format 'yyyy-MM-dd').log")
 function Log($msg) {
     $line = "[$(Get-Date -Format 'HH:mm:ss')] $msg"
     Write-Host $line
@@ -33,7 +33,7 @@ $today = $todayCasa.ToString('yyyy-MM-dd')
 $nowIso = $nowUtc.ToString('yyyy-MM-ddTHH:mm:ssZ')
 $yesterdayIso = $nowUtc.AddHours(-24).ToString('yyyy-MM-ddTHH:mm:ssZ')
 
-Log "===== Briefing per $today (now=$nowIso UTC) ====="
+Log "===== Ordine del giorno per $today (now=$nowIso UTC) ====="
 
 # ===== Headers Supabase =====
 $sbHeaders = @{
@@ -138,8 +138,8 @@ if ($macroHigh.Count -gt 0) {
     $watchlist.Add("Volatilita attesa intorno a: $orari") | Out-Null
 }
 
-# ===== 6. Costruisci JSON briefing =====
-$briefing = [ordered]@{
+# ===== 6. Costruisci JSON ordine_del_giorno =====
+$ordineDelGiorno = [ordered]@{
     generato_alle = $nowIso
     macro_oggi = @(
         $macro | ForEach-Object {
@@ -190,19 +190,19 @@ $writeHeaders = @{
     'Prefer'        = 'return=representation'
 }
 
-$patchBody = @{ briefing = $briefing } | ConvertTo-Json -Depth 10 -Compress
+$patchBody = @{ ordine_del_giorno = $ordineDelGiorno } | ConvertTo-Json -Depth 10 -Compress
 $patchBytes = [System.Text.Encoding]::UTF8.GetBytes($patchBody)
 
 try {
     $patchResp = Invoke-RestMethod -Method Patch -Uri "$SUPABASE_URL/rest/v1/giornate?data=eq.$today" -Headers $writeHeaders -Body $patchBytes
     if ($null -eq $patchResp -or $patchResp.Count -eq 0) {
         Log "Nessun record per oggi, creo nuovo."
-        $postBody = @{ data = $today; stato = 'nuovo'; briefing = $briefing } | ConvertTo-Json -Depth 10 -Compress
+        $postBody = @{ data = $today; stato = 'nuovo'; ordine_del_giorno = $ordineDelGiorno } | ConvertTo-Json -Depth 10 -Compress
         $postBytes = [System.Text.Encoding]::UTF8.GetBytes($postBody)
         $postResp = Invoke-RestMethod -Method Post -Uri "$SUPABASE_URL/rest/v1/giornate" -Headers $writeHeaders -Body $postBytes
         Log "Record creato id=$($postResp[0].id)"
     } else {
-        Log "Briefing salvato su record id=$($patchResp[0].id)"
+        Log "Ordine del giorno salvato su record id=$($patchResp[0].id)"
     }
 } catch {
     Log "ERRORE salvataggio Supabase: $_"
@@ -243,7 +243,7 @@ $watchLines = if ($watchlist.Count -gt 0) {
 
 $usdValStr = if ($null -ne $usdVal) { [Math]::Round($usdVal, 4).ToString() } else { 'n/d' }
 
-$msg = "$EM_SUNRISE <b>Briefing del Giorno</b> - <i>$today</i>`n`n"
+$msg = "$EM_SUNRISE <b>Ordine del Giorno</b> - <i>$today</i>`n`n"
 $msg += "$narrativaText`n`n"
 $msg += "$EM_CHART <b>Macro Oggi</b>: $($macro.Count) eventi`n"
 $msg += "$macroLines`n`n"
@@ -270,4 +270,4 @@ try {
     throw
 }
 
-Log "===== Briefing completato ====="
+Log "===== Ordine del giorno completato ====="

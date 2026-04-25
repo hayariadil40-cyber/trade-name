@@ -298,16 +298,16 @@
                         </ul>
                     </div>
 
-                    <!-- 2. Briefing Pre-sessione (popolato dalla routine cloud alle 07:00 Casablanca) -->
+                    <!-- 2. Ordine del Giorno (popolato dalla routine cloud alle 07:00 Casablanca) -->
                     <div class="bg-gradient-to-br from-[#0e1a18] via-tp-panel to-[#0a0c10] rounded-xl border border-tp-accent/30 p-5 flex flex-col shadow-[0_0_20px_rgba(32,201,151,0.06)]">
                         <div class="flex items-center justify-between mb-3 border-b border-tp-border/50 pb-2">
                             <h3 class="text-xs font-bold uppercase tracking-widest text-tp-accent flex items-center gap-2">
-                                <i data-lucide="sunrise" class="w-4 h-4"></i> Briefing
+                                <i data-lucide="sunrise" class="w-4 h-4"></i> Ordine del Giorno
                             </h3>
-                            <span id="briefing-time" class="text-[9px] text-tp-muted"></span>
+                            <span id="odg-time" class="text-[9px] text-tp-muted"></span>
                         </div>
-                        <div id="briefing-content" class="text-xs text-tp-text/85 leading-relaxed">
-                            <p class="text-tp-muted/50 italic">Nessun briefing salvato per questa giornata.</p>
+                        <div id="odg-content" class="text-xs text-tp-text/85 leading-relaxed">
+                            <p class="text-tp-muted/50 italic">Nessun ordine del giorno salvato per questa giornata.</p>
                         </div>
                     </div>
 
@@ -705,8 +705,8 @@
                 }).join('');
             }
 
-            // Render briefing della giornata (se presente)
-            renderBriefing(data.briefing);
+            // Render ordine del giorno (se presente)
+            renderOrdineDelGiorno(data.ordine_del_giorno);
 
             // Restore tags as session toggles
             if (data.tags && Array.isArray(data.tags)) {
@@ -1385,13 +1385,13 @@
             window.location.href = 'giornaliero.html';
         }
 
-        // Render briefing pre-sessione (popolato dalla routine cloud)
-        function renderBriefing(b) {
-            const content = document.getElementById('briefing-content');
-            const timeEl = document.getElementById('briefing-time');
+        // Render ordine del giorno (popolato dalla routine cloud)
+        function renderOrdineDelGiorno(b) {
+            const content = document.getElementById('odg-content');
+            const timeEl = document.getElementById('odg-time');
             if (!content) return;
             if (!b) {
-                content.innerHTML = '<p class="text-tp-muted/50 italic">Nessun briefing salvato per questa giornata.</p>';
+                content.innerHTML = '<p class="text-tp-muted/50 italic">Nessun ordine del giorno salvato per questa giornata.</p>';
                 return;
             }
             if (timeEl && b.generato_alle) {
@@ -1399,21 +1399,31 @@
                 timeEl.textContent = 'generato ' + t.toLocaleString('it-IT', {dateStyle:'short', timeStyle:'short'});
             }
             const macro = (b.macro_oggi||[]).map(e => '<li>'+(e.ora||'')+' - <b>'+(e.titolo||'')+'</b> ['+(e.impatto||'')+' '+(e.valuta||'')+']</li>').join('');
-            const bias  = (b.bias_aperti||[]).map(e => '<li><b>'+(e.asset||'')+'</b> '+(e.direzione||'')+(e.commento? ' - '+e.commento.substring(0,80)+(e.commento.length>80?'...':'') : '')+'</li>').join('');
             const trades= (b.ultimi_trade||[]).map(t => {
                 const c = (t.pnl>=0?'text-tp-accent':'text-tp-loss');
                 return '<li>'+(t.asset||'')+' '+(t.direzione||'')+' <span class="'+c+'">'+(t.pnl>=0?'+':'')+(Number(t.pnl)||0).toFixed(2)+'</span> ('+(t.esito||'')+')</li>';
             }).join('');
             const usd = b.usd_strength || {};
-            const watch = (b.watchlist||[]).map(w => '<li class="flex gap-2"><span class="text-tp-accent">▸</span>'+w+'</li>').join('');
+            const usdValStr = (usd.attuale!==undefined&&usd.attuale!==null) ? Number(usd.attuale).toFixed(4) : (usd.valore!==undefined?Number(usd.valore).toFixed(4):'--');
+            const usdTrendStr = usd.trend_intraday || usd.trend_24h || '--';
+            const letture = b.letture || { count: 0, commento: '' };
+            const allertPrezzo = b.allert_prezzo || { count: 0, commento: '' };
+            const asia = b.sessione_asia || { ranges_today: {}, commento: '' };
+            const reminder = b.reminder || [];
+            const asiaCoins = Object.keys(asia.ranges_today || {});
+            const asiaRangeHtml = asiaCoins.length > 0
+                ? '<ul class="space-y-0.5 text-[10.5px] text-tp-text/85">'+asiaCoins.map(c => {const v=asia.ranges_today[c]; const ratio=(v.ratio!=null)?' <span class="text-tp-muted">('+(v.ratio*100).toFixed(0)+'%)</span>':''; return '<li><b>'+c+'</b>: '+v.range.toFixed(2)+' pts'+ratio+'</li>';}).join('')+'</ul>'
+                : '<p class="text-[10.5px] text-tp-muted/60 italic">nessun dato MT4</p>';
             content.innerHTML =
                 (b.narrativa ? '<div class="mb-3 leading-relaxed text-[11.5px]">'+b.narrativa.replace(/\n/g,'<br>')+'</div>' : '') +
                 '<div class="space-y-2.5">' +
                     (macro  ? '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Macro oggi</p><ul class="space-y-0.5 text-[10.5px] text-tp-text/85">'+macro+'</ul></div>' : '') +
-                    (bias   ? '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Bias aperti</p><ul class="space-y-0.5 text-[10.5px] text-tp-text/85">'+bias+'</ul></div>' : '') +
+                    '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Sessione asiatica</p>'+asiaRangeHtml+(asia.commento?'<p class="text-[10.5px] text-tp-text/85 leading-relaxed mt-1.5 pt-1.5 border-t border-tp-border/40">'+asia.commento+'</p>':'')+'</div>' +
                     (trades ? '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Ultimi trade</p><ul class="space-y-0.5 text-[10.5px] text-tp-text/85">'+trades+'</ul></div>' : '') +
-                    '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2 flex items-center justify-between"><div><p class="text-[9px] uppercase font-bold text-tp-accent tracking-wider">Forza USD</p><p class="text-[10px] text-tp-muted">'+(usd.trend_24h||'--')+'</p></div><p class="text-base font-bold text-white">'+(usd.valore!==undefined?Number(usd.valore).toFixed(4):'--')+'</p></div>' +
-                    (watch ? '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Watchlist</p><ul class="space-y-0.5 text-[10.5px] text-tp-text/85">'+watch+'</ul></div>' : '') +
+                    '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><div class="flex items-center justify-between mb-1"><p class="text-[9px] uppercase font-bold text-tp-accent tracking-wider">Forza USD intraday</p><p class="text-base font-bold text-white">'+usdValStr+'</p></div><p class="text-[10.5px] text-tp-text/85 leading-relaxed">'+(usd.descrizione||usdTrendStr)+'</p></div>' +
+                    '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Letture del giorno ('+letture.count+')</p><p class="text-[10.5px] text-tp-text/85 leading-relaxed">'+(letture.commento||'<i class="text-tp-muted/60">--</i>')+'</p></div>' +
+                    '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Allert prezzo (24h, '+allertPrezzo.count+')</p><p class="text-[10.5px] text-tp-text/85 leading-relaxed">'+(allertPrezzo.commento||'<i class="text-tp-muted/60">--</i>')+'</p></div>' +
+                    (reminder.length > 0 ? '<div class="bg-[#0a0c10] border border-tp-warning/30 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-warning mb-1 tracking-wider">Promemoria Rodrigo</p><ul class="space-y-0.5 text-[10.5px] text-tp-text/85">'+reminder.map(r=>'<li class="flex gap-1"><span class="text-tp-warning">▢</span>'+r+'</li>').join('')+'</ul></div>' : '') +
                 '</div>';
         }
     </script>
