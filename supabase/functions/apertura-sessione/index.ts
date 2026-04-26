@@ -14,8 +14,10 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+// IMPORTANTE: nomeDb deve allinearsi allo schema canonico ('asia','london','newyork')
+// usato dall'EA MT4 e dal resto del codice (sessioni.html, ordine-del-giorno, chat-ai).
 const SESSIONE_INFO: Record<string, { label: string; emoji: string; nomeDb: string }> = {
-  londra: { label: "Londra", emoji: "🇬🇧", nomeDb: "londra" },
+  londra: { label: "Londra", emoji: "🇬🇧", nomeDb: "london" },
   ny:     { label: "New York", emoji: "🇺🇸", nomeDb: "newyork" },
 };
 
@@ -86,33 +88,40 @@ serve(async (req) => {
     const nowIso = new Date().toISOString();
     const startOfDayIso = startOfDayCasablancaIso(today);
 
-    // ===== 1. Reperti (bias) - tutti, ordinati data desc =====
+    // ===== 1. Reperti (bias) - SOLO della giornata di oggi, tutti gli stati =====
+    // Un reperto e una lettura di mercato dell'utente per la giornata: aperto/chiuso indica
+    // se ha finito di aggiornarlo, ma per Rodrigo conta comunque.
     const { data: biasRaw } = await supabase
       .from("bias")
-      .select("asset, direzione, tipo, data, commento, confluenze, created_at")
-      .order("data", { ascending: false })
-      .limit(15);
+      .select("asset, direzione, tipo, data, commento, confluenze, esito, stato, created_at")
+      .eq("data", today)
+      .order("created_at", { ascending: true });
     const bias = biasRaw || [];
 
-    let repertiBlock = { count: bias.length, commento: "Nessun reperto disponibile." };
+    let repertiBlock = { count: bias.length, commento: "Nessun reperto registrato per oggi." };
     if (bias.length > 0) {
       try {
         const biasText = bias.map((b, i) => {
-          const com = b.commento ? (b.commento.length > 200 ? b.commento.substring(0, 200) + "..." : b.commento) : "";
+          const com = b.commento ? (b.commento.length > 250 ? b.commento.substring(0, 250) + "..." : b.commento) : "";
           const conf = b.confluenze ? (b.confluenze.length > 150 ? b.confluenze.substring(0, 150) + "..." : b.confluenze) : "";
-          return `${i + 1}. [${b.data}] ${b.asset} ${b.direzione || ""}${b.tipo && Array.isArray(b.tipo) ? " (" + b.tipo.join(",") + ")" : ""}${com ? " - " + com : ""}${conf ? " | conf: " + conf : ""}`;
+          const tipoStr = b.tipo && Array.isArray(b.tipo) && b.tipo.length ? " (" + b.tipo.join(",") + ")" : "";
+          return `${i + 1}. ${b.asset || "?"} ${b.direzione || ""}${tipoStr}${com ? " - " + com : ""}${conf ? " | conf: " + conf : ""}`;
         }).join("\n");
         const prompt = `Sei Rodrigo, assistente operativo del Trade Desk per uno scalper su XAU/USD, US30, NASDAQ, GER40.
 
-Tra pochi minuti apre la sessione di ${info.label} (${today}). L'utente deve sapere quali REPERTI tenere a mente per questa sessione.
+Sta per aprire la sessione di ${info.label} (${today}).
 
-REPERTI (input strategici permanenti, ordinati per data desc, non hanno stato di lavorazione):
+I REPERTI qui sotto sono OSSERVAZIONI e LETTURE DI MERCATO che l'utente stesso ha annotato per la giornata di oggi. NON sono task da eseguire, NON sono cose da fare: sono cio che lui percepisce del mercato in questo momento.
+
+REPERTI di oggi:
 ${biasText}
 
-Struttura in 2-4 punti CONCRETI cosa l'utente deve attenzionare nelle prossime ore di ${info.label}.
-- Filtra fuori reperti vecchi/obsoleti (es. piu di 30 giorni o gia palesemente invalidati dal prezzo).
-- Per ogni punto: 1 riga, asset + condizione da osservare.
-- Italiano. Asciutto. Zero parolacce. Zero motivational speech. Niente segnali operativi.`;
+Restituisci una sintesi (2-4 punti, una riga per punto) che RISPECCHI la lettura dell'utente per la sessione di ${info.label}. Esempio di tono: "Vedi XAU long: la sessione di ${info.label} e il primo banco di prova per questa lettura" oppure "Hai annotato compressione su NAS in pre-NY: osserva come si scarica all'apertura".
+
+Regole:
+- NON dire "verifica se ancora valido", "monitorare X", "attenzionare Y" - non sono task.
+- Riferisciti alla lettura come se fosse SUA, perche lo e.
+- Asciutto, italiano, zero motivational speech, zero parolacce, niente segnali operativi.`;
         repertiBlock.commento = (await callClaude(prompt, ANTHROPIC_API_KEYS, 450)).trim();
       } catch (e) { repertiBlock.commento = `Errore commento reperti: ${(e as Error).message}`; }
     }
@@ -219,7 +228,7 @@ Struttura in 2-4 punti CONCRETI cosa l'utente deve attenzionare nelle prossime o
 
     const msg =
       `${info.emoji} <b>Apertura ${info.label}</b> - <i>${today}</i>\n\n` +
-      `🧠 <b>Reperti da attenzionare</b>\n${repertiBlock.commento}\n\n` +
+      `🧠 <b>Reperti di oggi</b>\n${repertiBlock.commento}\n\n` +
       `💵 <b>Forza USD</b> (intraday)\n${usdBlock.descrizione}\n\n` +
       `🚨 <b>Allert Prezzo non lavorati</b> (${allertBlock.count})\n${allertLines}\n\n` +
       `🔔 <b>Promemoria Rodrigo</b>\n${reminderLines}`;

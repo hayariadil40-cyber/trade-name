@@ -52,6 +52,13 @@
         .tipo-btn.active { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
         .cat-tab.active { opacity: 1; }
         .cat-tab:not(.active) { opacity: 0.5; }
+        .esito-btn.active-corretto { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
+        .esito-btn.active-parziale { background: rgba(234,179,8,0.15); border-color: #eab308; color: #eab308; }
+        .esito-btn.active-sbagliato { background: rgba(244,63,94,0.15); border-color: #f43f5e; color: #f43f5e; }
+        .stato-badge-aperto { background: rgba(32,201,151,0.1); border: 1px solid rgba(32,201,151,0.4); color: #20c997; }
+        .stato-badge-chiuso { background: rgba(132,141,151,0.15); border: 1px solid rgba(132,141,151,0.4); color: #848d97; }
+        .bias-readonly input, .bias-readonly select, .bias-readonly textarea { pointer-events: none; opacity: 0.65; }
+        .bias-readonly button:not(.cat-tab):not(#back-btn):not([data-allow-readonly]) { pointer-events: none; opacity: 0.4; }
     </style>
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -188,16 +195,23 @@
                     <!-- SINISTRA: Dati Reperto -->
                     <div id="bias-canvas" class="flex flex-col gap-6">
 
+                        <!-- Banner readonly (visibile solo se stato=chiuso) -->
+                        <div id="bias-readonly-banner" class="hidden bg-tp-warning/5 border border-tp-warning/30 text-tp-warning rounded-lg px-4 py-3 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                            <i data-lucide="lock" class="w-4 h-4"></i>
+                            Reperto chiuso - non modificabile ne eliminabile
+                        </div>
+
                         <!-- Header Reperto -->
                         <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
                             <div class="flex items-center gap-3 mb-6 pb-4 border-b border-tp-border/50">
                                 <div class="bg-tp-accent/10 p-2.5 rounded-lg border border-tp-accent/20">
                                     <i data-lucide="microscope" class="w-6 h-6 text-tp-accent"></i>
                                 </div>
-                                <div>
+                                <div class="flex-1">
                                     <h2 class="text-xl font-bold text-white">Reperto</h2>
                                     <span id="bias-id-display" class="text-[10px] font-bold text-tp-muted uppercase tracking-widest"></span>
                                 </div>
+                                <span id="bias-stato-badge" class="stato-badge-aperto text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded">Aperto</span>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -259,6 +273,25 @@
                             </div>
                         </div>
 
+                        <!-- Esito a posteriori (richiesto per chiudere) -->
+                        <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-tp-accent"></i> Esito a posteriori
+                                <span class="text-[10px] font-normal text-tp-muted/70 normal-case tracking-normal">(richiesto per chiudere il reperto)</span>
+                            </label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button type="button" onclick="setEsito('corretto')" id="esito-corretto" class="esito-btn px-4 py-3 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-accent/50 flex items-center justify-center gap-2">
+                                    <i data-lucide="check" class="w-4 h-4"></i> Corretto
+                                </button>
+                                <button type="button" onclick="setEsito('parziale')" id="esito-parziale" class="esito-btn px-4 py-3 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-warning/50 flex items-center justify-center gap-2">
+                                    <i data-lucide="circle-dot" class="w-4 h-4"></i> Parziale
+                                </button>
+                                <button type="button" onclick="setEsito('sbagliato')" id="esito-sbagliato" class="esito-btn px-4 py-3 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-loss/50 flex items-center justify-center gap-2">
+                                    <i data-lucide="x" class="w-4 h-4"></i> Sbagliato
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- Commento -->
                         <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
                             <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
@@ -302,11 +335,14 @@
                         </div>
 
                         <!-- Azioni -->
-                        <div class="flex gap-3">
+                        <div class="flex gap-3" id="bias-actions">
                             <button id="save-btn" onclick="saveBias()" class="flex-1 bg-tp-accent hover:bg-tp-accent/80 text-[#0a0c10] font-bold text-sm py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
                                 <i data-lucide="save" class="w-4 h-4"></i> Salva Reperto
                             </button>
-                            <button onclick="deleteBias()" class="bg-tp-bg border border-tp-loss/30 hover:bg-tp-loss/10 text-tp-loss font-bold text-sm px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                            <button id="close-btn" onclick="closeBias()" disabled class="flex-1 bg-tp-warning/10 border border-tp-warning/30 text-tp-warning hover:bg-tp-warning hover:text-[#0a0c10] font-bold text-sm py-3 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-tp-warning/10 disabled:hover:text-tp-warning">
+                                <i data-lucide="lock" class="w-4 h-4"></i> Chiudi Reperto
+                            </button>
+                            <button id="delete-btn" onclick="deleteBias()" class="bg-tp-bg border border-tp-loss/30 hover:bg-tp-loss/10 text-tp-loss font-bold text-sm px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                             </button>
                         </div>
@@ -369,6 +405,8 @@
             if (lbl) lbl.textContent = 'Torna alla Giornata';
         }
         let currentDirection = '';
+        let currentEsito = '';
+        let currentStato = 'aperto';
         let screenshots = [];
         let selectedTipi = [];
         let availableTipi = ['commento', 'bias', 'conformazione', 'appunto']; // default, sovrascritto da settings
@@ -465,6 +503,12 @@
             selectedTipi = Array.isArray(data.tipo) ? data.tipo.slice() : [];
             buildTipoButtons(); // include eventuali tipi legacy e marca quelli attivi
 
+            currentEsito = data.esito || '';
+            currentStato = data.stato || 'aperto';
+            renderEsitoButtons();
+            applyStatoUI();
+            updateCloseButton();
+
             screenshots = data.screenshots || [];
             renderScreenshots();
 
@@ -504,6 +548,78 @@
             if (dir === 'LONG') btnLong.classList.add('active-long');
             if (dir === 'SHORT') btnShort.classList.add('active-short');
             if (dir === 'NEUTRAL') btnNeutral.classList.add('active-neutral');
+        }
+
+        // --- ESITO (corretto / parziale / sbagliato) ---
+        function setEsito(value) {
+            // toggle: re-click sullo stesso azzera
+            currentEsito = (currentEsito === value) ? '' : value;
+            renderEsitoButtons();
+            updateCloseButton();
+        }
+
+        function renderEsitoButtons() {
+            ['corretto','parziale','sbagliato'].forEach(v => {
+                const btn = document.getElementById('esito-' + v);
+                if (!btn) return;
+                btn.classList.remove('active-corretto','active-parziale','active-sbagliato');
+                if (currentEsito === v) btn.classList.add('active-' + v);
+            });
+        }
+
+        function updateCloseButton() {
+            const closeBtn = document.getElementById('close-btn');
+            if (!closeBtn) return;
+            closeBtn.disabled = !currentEsito || currentStato === 'chiuso';
+        }
+
+        // --- STATO (aperto / chiuso) ---
+        function applyStatoUI() {
+            const badge = document.getElementById('bias-stato-badge');
+            const banner = document.getElementById('bias-readonly-banner');
+            const canvas = document.getElementById('bias-canvas');
+            const closeBtn = document.getElementById('close-btn');
+            const saveBtn = document.getElementById('save-btn');
+            const deleteBtn = document.getElementById('delete-btn');
+
+            if (currentStato === 'chiuso') {
+                badge.textContent = 'Chiuso';
+                badge.className = 'stato-badge-chiuso text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded';
+                banner.classList.remove('hidden');
+                canvas.classList.add('bias-readonly');
+                if (saveBtn) saveBtn.classList.add('hidden');
+                if (closeBtn) closeBtn.classList.add('hidden');
+                if (deleteBtn) deleteBtn.classList.add('hidden');
+            } else {
+                badge.textContent = 'Aperto';
+                badge.className = 'stato-badge-aperto text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded';
+                banner.classList.add('hidden');
+                canvas.classList.remove('bias-readonly');
+                if (saveBtn) saveBtn.classList.remove('hidden');
+                if (closeBtn) closeBtn.classList.remove('hidden');
+                if (deleteBtn) deleteBtn.classList.remove('hidden');
+            }
+        }
+
+        async function closeBias() {
+            if (!currentEsito) {
+                alert('Seleziona prima un esito (corretto / parziale / sbagliato).');
+                return;
+            }
+            showConfirm(
+                'Chiudere il reperto?',
+                'Una volta chiuso non sara piu modificabile ne eliminabile. Conferma solo se hai finito di aggiornarlo.',
+                async function() {
+                    // Salva eventuali modifiche pending + chiudi in un solo update
+                    const payload = collectPayload();
+                    payload.stato = 'chiuso';
+                    payload.esito = currentEsito;
+                    const { error } = await db.from('bias').update(payload).eq('id', biasId);
+                    if (error) { alert('Errore chiusura: ' + error.message); return; }
+                    currentStato = 'chiuso';
+                    applyStatoUI();
+                }
+            );
         }
 
         // --- CATEGORIZER TABS ---
@@ -604,18 +720,15 @@
             renderScreenshots();
         }
 
-        // --- SAVE ---
-        async function saveBias() {
-            const btn = document.getElementById('save-btn');
-            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvando...';
-            btn.disabled = true;
-
-            const payload = {
+        // --- COLLECT PAYLOAD (riusato da save e close) ---
+        function collectPayload() {
+            return {
                 asset: document.getElementById('bias-asset').value,
                 data: document.getElementById('bias-data').value,
                 direzione: currentDirection,
                 tipo: selectedTipi,
                 commento: document.getElementById('bias-commento').value,
+                esito: currentEsito || null,
                 screenshots: screenshots,
                 categorizzatori: {
                     cronache: getSelectedValues('sel-cronache'),
@@ -623,6 +736,16 @@
                     trades: getSelectedValues('sel-trades')
                 }
             };
+        }
+
+        // --- SAVE (NON tocca stato) ---
+        async function saveBias() {
+            if (currentStato === 'chiuso') return;
+            const btn = document.getElementById('save-btn');
+            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvando...';
+            btn.disabled = true;
+
+            const payload = collectPayload();
 
             const { error } = await db
                 .from('bias')
@@ -655,10 +778,20 @@
 
         // --- DELETE ---
         async function deleteBias() {
+            if (currentStato === 'chiuso') return;
             showConfirm('Eliminare questo reperto?','Questa azione non puo essere annullata.',async function(){
             const { error } = await db.from('bias').delete().eq('id', biasId);
             if(!error)window.location.href='bias.html';});
         }
+
+        // --- MODAL CONFIRM ---
+        function showConfirm(title, msg, callback) {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-msg').textContent = msg;
+            document.getElementById('confirm-action').onclick = function() { closeConfirm(); callback(); };
+            document.getElementById('modal-confirm').classList.add('open');
+        }
+        function closeConfirm() { document.getElementById('modal-confirm').classList.remove('open'); }
     </script>
 </body>
 </html>

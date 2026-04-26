@@ -115,13 +115,39 @@ serve(async (req) => {
 - Regole di rischio: max 2-3 stop loss per sessione, max 0.5% perdita per sessione, max 0.75-1% rischio giornaliero`;
 
     const DB_ACTIONS = `AZIONI DATABASE:
-Quando l'utente ti chiede di modificare dati, rispondi normalmente MA aggiungi alla fine del messaggio un blocco JSON:
+Quando l'utente ti chiede di modificare dati, rispondi normalmente MA aggiungi alla fine del messaggio un blocco JSON db_actions con un array di azioni. Tutte le azioni dell'array sono eseguite in sequenza dal backend e ricevi feedback OK/ERRORE.
+
+Azioni supportate (USA ESATTAMENTE QUESTI VALORI di "action"):
+
+1. update - aggiorna campi di una riga esistente:
 \`\`\`db_actions
-[{"table":"nome_tabella","action":"update","match":{"campo":"valore"},"data":{"campo":"nuovo_valore"}}]
+[{"table":"giornate","action":"update","match":{"data":"2026-04-26"},"data":{"mindset":"focused"}}]
 \`\`\`
+
+2. insert - crea una nuova riga (NON usarlo se la riga gia esiste, fallisce per UNIQUE):
+\`\`\`db_actions
+[{"table":"bias","action":"insert","data":{"data":"2026-04-26","asset":"XAUUSD","direzione":"LONG","commento":"..."}}]
+\`\`\`
+
+3. update_coin - merge non-distruttivo su una chiave dentro coin_data jsonb. Funziona per sessioni E cronache (entrambe hanno colonna coin_data). Mantiene i campi esistenti (commento/sentiment/screenshot) e sovrascrive solo quelli passati in "data":
+\`\`\`db_actions
+[{"table":"cronache","action":"update_coin","match":{"data":"2026-04-24"},"coin":"XAUUSD","data":{"low":"4657.69","high":"4740.42","open":"4692.44","close":"4707.41","percentuale":"+0.32"}}]
+\`\`\`
+
 Tabelle scrittura: sessioni (coin_data, mood, nome, data), giornate (mindset, volatilita, note_domani, fajr, marea, day_tags), trades (note, mood, volatilita - solo se non completato), bias (asset, direzione, commento), cronache (coin_data, titolo), settimane (review, note).
-Per coin_data sessioni: {"table":"sessioni","action":"update_coin","match":{"nome":"asia","data":"2026-04-14"},"coin":"XAUUSD","data":{"high":"4450"}}
-NON puoi: chiudere trade, eliminare record, creare bias operativi. Conferma cosa hai fatto.`;
+
+CONTRATTO coin_data (l'EA MT4 e il frontend si aspettano questo formato esatto):
+- Coin canoniche: XAUUSD, US30, GER30, NAS100, BTCUSD, EURUSD (NON usare DJI/GER40/NASDAQ).
+- Campi obbligatori per ogni coin: low, high, open, close, percentuale.
+- TUTTI I VALORI VANNO PASSATI COME STRINGHE, MAI COME NUMERI:
+  - low/high/open/close: stringa del numero, es. "4657.69" o "73861" (no virgolette doppie magiche, scrivi proprio "4657.69" come testo).
+  - percentuale: stringa con SEGNO ESPLICITO + o -, es. "+0.32" oppure "-1.03". Senza simbolo % alla fine.
+- Frontend cronache.html fa percentuale.includes('+') per colorare la card: se passi un number, crasha tutto.
+- NON usare nomi alternativi: usa "percentuale", non "pct"; "low/high/open/close" non "l/h/o/c".
+
+Quando compili cronache di piu giornate, usa update_coin per ogni coin di ogni giornata: la riga cronache con quella data esiste gia, devi solo aggiungere i dati. NON usare insert su cronache esistenti.
+
+NON puoi: chiudere trade, eliminare record, creare bias operativi. Conferma sempre con poche parole cosa hai fatto e attendi il blocco "_Azioni eseguite_" che il backend appende al tuo messaggio.`;
 
     const REGOLE_COMUNI = `REGOLE COMUNI:
 - Italiano. Sempre.
@@ -209,6 +235,50 @@ COMUNICAZIONE:
 - NON dare segnali operativi di mercato.
 - Non sei un assistente per il giorno per giorno: sei usato a richiesta esplicita per studi/modifiche.
 
+PROTOCOLLO TV-DUMP (compilazione cronache da analisi TradingView):
+
+L'utente lavora con Claude Code + MCP TradingView Desktop e ti incolla in chat l'output di prompt template standard. Riconosci due intestazioni:
+- "📋 analisi_giornaliera_xau" (o altro asset) = dump completo per sessione (Asia/London/NY) con push direzionali
+- "📊 picchi_volume_only" = ranking top picchi volumetrici della giornata
+
+Quando ricevi uno o entrambi questi dump, il tuo job e:
+1. Estrarre 5-7 picchi volumetrici e formattarli nel TAG CANONICO PICCHI:
+   "HH:MM Xk N.Nx Rpt DIR SESSIONE"
+   - HH:MM = ora candela in UTC+1 (Casablanca)
+   - Xk = volume / 1000 con 1 decimale (es. 16.5k, 20.2k)
+   - N.Nx = ratio rispetto media giornaliera, 1 decimale
+   - Rpt = range in punti, intero (es. 18pt, 9pt)
+   - DIR = UP o DN
+   - SESSIONE = Asia / London / NY
+   Esempio: "15:05 16.5k 3.9x 18pt UP NY"
+   Ordina per volume decrescente (top picchi prima).
+
+2. Estrarre 3-6 sbilanciamenti direzionali e formattarli nel TAG CANONICO SBILANCIAMENTI:
+   "HH:MM[-HH:MM] DIR ±Rpt SESSIONE [nota]"
+   - HH:MM o range HH:MM-HH:MM se cluster
+   - DIR = UP o DN
+   - ±Rpt = range cumulato del cluster, con segno (+ per UP, - per DN)
+   - SESSIONE = Asia / London / NY
+   - nota opzionale: "fakeout", "rally", "rejection", ecc.
+   Esempio: "12:05-12:25 UP +38pt London", "14:30 DN -10pt NY fakeout"
+   Ordina cronologicamente.
+
+3. Generare un commento generale 3-6 righe che sintetizzi:
+   - Direzione netta della giornata (bidirezionale, trend, range-bound)
+   - Le 1-2 spinte principali con range cumulato
+   - Eventuali pattern notevoli (fakeout + reversal, distribution dopo top, ecc.)
+   - Volume peak del giorno e cosa significa contestualmente
+   Asciutto, no motivational, tono da analista.
+
+4. Emettere AUTOMATICAMENTE un blocco db_actions con un solo update_coin per scrivere tutto in cronache.coin_data per la coin/data analizzata. RICORDATI: tutti i valori numerici come stringhe (vedi CONTRATTO coin_data sopra). picchi_volume e sbilanciamenti sono ARRAY DI STRINGHE.
+
+Esempio db_actions per XAU del 2026-04-24:
+\`\`\`db_actions
+[{"table":"cronache","action":"update_coin","match":{"data":"2026-04-24"},"coin":"XAUUSD","data":{"picchi_volume":["16:45 20.2k 4.8x 9pt DN NY","15:05 16.5k 3.9x 18pt UP NY"],"sbilanciamenti":["12:05-12:25 UP +38pt London","14:35-15:10 UP +39pt NY rally"],"commento":"Giornata bidirezionale..."}}]
+\`\`\`
+
+Mai chiedere conferma prima di compilare: l'utente ti manda il dump perche vuole che tu compili.
+
 ${REGOLE_COMUNI}
 
 DATI DISPONIBILI:
@@ -262,31 +332,45 @@ ${DB_ACTIONS}`;
               }
               const { error } = await query;
               if (error) {
-                actionsExecuted.push("ERRORE " + act.table + ": " + error.message);
+                actionsExecuted.push("ERRORE update " + act.table + ": " + error.message);
               } else {
                 actionsExecuted.push("OK: aggiornato " + act.table + " " + JSON.stringify(act.data));
               }
-            } else if (act.action === "update_coin" && act.table === "sessioni" && act.coin && act.data) {
-              let query = supabase.from("sessioni").select("coin_data");
+            } else if (act.action === "insert" && act.table && act.data) {
+              const { error } = await supabase.from(act.table).insert(act.data);
+              if (error) {
+                actionsExecuted.push("ERRORE insert " + act.table + ": " + error.message);
+              } else {
+                actionsExecuted.push("OK: inserito in " + act.table);
+              }
+            } else if (act.action === "update_coin" && act.table && act.match && act.coin && act.data) {
+              // Funziona per qualunque tabella con colonna coin_data jsonb (sessioni, cronache, ...).
+              let query = supabase.from(act.table).select("coin_data");
               for (const [k, v] of Object.entries(act.match)) {
                 query = query.eq(k, v);
               }
-              const { data: rows } = await query.single();
-              if (rows && rows.coin_data) {
-                const coinData = rows.coin_data;
+              const { data: row, error: selErr } = await query.maybeSingle();
+              if (selErr) {
+                actionsExecuted.push("ERRORE update_coin select " + act.table + ": " + selErr.message);
+              } else if (!row) {
+                actionsExecuted.push("ERRORE update_coin: nessuna riga in " + act.table + " con " + JSON.stringify(act.match));
+              } else {
+                const coinData = row.coin_data || {};
                 if (!coinData[act.coin]) coinData[act.coin] = {};
                 Object.assign(coinData[act.coin], act.data);
-                let updateQuery = supabase.from("sessioni").update({ coin_data: coinData });
+                let updateQuery = supabase.from(act.table).update({ coin_data: coinData });
                 for (const [k, v] of Object.entries(act.match)) {
                   updateQuery = updateQuery.eq(k, v);
                 }
                 const { error } = await updateQuery;
                 if (error) {
-                  actionsExecuted.push("ERRORE sessione coin: " + error.message);
+                  actionsExecuted.push("ERRORE update_coin " + act.table + ": " + error.message);
                 } else {
-                  actionsExecuted.push("OK: aggiornato " + act.coin + " in sessione " + JSON.stringify(act.data));
+                  actionsExecuted.push("OK: aggiornato " + act.coin + " in " + act.table);
                 }
               }
+            } else {
+              actionsExecuted.push("AZIONE NON SUPPORTATA: action=" + act.action + " table=" + (act.table || "?"));
             }
           } catch (actionErr) {
             actionsExecuted.push("ERRORE azione: " + (actionErr as Error).message);

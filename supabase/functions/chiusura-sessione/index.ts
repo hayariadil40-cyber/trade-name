@@ -269,7 +269,7 @@ Italiano. Una frase. Niente motivazione vuota, niente parolacce, niente formule 
       // Sessioni di oggi
       const { data: sessioniOggi } = await supabase.from("sessioni").select("nome, mood").eq("data", today);
       const nomi = (sessioniOggi || []).map((s) => (s.nome || "").toLowerCase());
-      if (!nomi.some((n) => n.startsWith("londra"))) todo.push({ ok: false, label: "Compilare sessione Londra" });
+      if (!nomi.some((n) => n.startsWith("london"))) todo.push({ ok: false, label: "Compilare sessione Londra" });
       if (!nomi.some((n) => n.startsWith("newyork"))) todo.push({ ok: false, label: "Compilare sessione New York" });
       const sessioniSenzaMood = (sessioniOggi || []).filter((s) => !s.mood);
       if (sessioniSenzaMood.length > 0) todo.push({ ok: false, label: `${sessioniSenzaMood.length} sessioni senza mood` });
