@@ -142,6 +142,7 @@ CONTRATTO coin_data (l'EA MT4 e il frontend si aspettano questo formato esatto):
 - TUTTI I VALORI VANNO PASSATI COME STRINGHE, MAI COME NUMERI:
   - low/high/open/close: stringa del numero, es. "4657.69" o "73861" (no virgolette doppie magiche, scrivi proprio "4657.69" come testo).
   - percentuale: stringa con SEGNO ESPLICITO + o -, es. "+0.32" oppure "-1.03". Senza simbolo % alla fine.
+- sentiment (opzionale): stringa ENUM ESATTA, valori ammessi SOLO: "rialzista" | "laterale" | "ribassista". TUTTO LOWERCASE, NIENTE qualificatori (NO "RIALZISTA FORTE", NO "rialzista_moderato", NO "RIBASSISTA"). Il select del frontend ha solo questi 3 valori: se ne salvi un altro il dropdown si svuota.
 - Frontend cronache.html fa percentuale.includes('+') per colorare la card: se passi un number, crasha tutto.
 - NON usare nomi alternativi: usa "percentuale", non "pct"; "low/high/open/close" non "l/h/o/c".
 
@@ -300,7 +301,7 @@ ${DB_ACTIONS}`;
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 2048,
+        max_tokens: 4096,
         system: systemPrompt,
         messages: [...(history || []).slice(-20), { role: "user", content: message }],
       }),

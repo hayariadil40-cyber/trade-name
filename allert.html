@@ -354,20 +354,37 @@
         }
 
         async function saveAllert(){
-            var catCronache = Array.from(document.getElementById('asel-cronache').selectedOptions).map(function(o){return o.value});
-            var catStrategie = Array.from(document.getElementById('asel-strategie').selectedOptions).map(function(o){return o.value});
-            var catTrades = Array.from(document.getElementById('asel-trades').selectedOptions).map(function(o){return o.value});
-            await db.from('allert_prezzo').update({
-                commento: document.getElementById('ma-commento').value,
-                screenshot: allertScreenshot,
-                stato: 'completato',
-                categorizzatori: { cronache: catCronache, strategie: catStrategie, trades: catTrades }
-            }).eq('id', currentAllertId);
-            closeModal('modal-allert'); await loadAllerts();
+            try {
+                var catCronache = Array.from(document.getElementById('asel-cronache').selectedOptions).map(function(o){return o.value});
+                var catStrategie = Array.from(document.getElementById('asel-strategie').selectedOptions).map(function(o){return o.value});
+                var catTrades = Array.from(document.getElementById('asel-trades').selectedOptions).map(function(o){return o.value});
+                var screenshotBytes = allertScreenshot ? allertScreenshot.length : 0;
+                console.log('[saveAllert]', { id: currentAllertId, commento_len: document.getElementById('ma-commento').value.length, screenshot_bytes: screenshotBytes, cat: { cronache: catCronache, strategie: catStrategie, trades: catTrades } });
+                var { error } = await db.from('allert_prezzo').update({
+                    commento: document.getElementById('ma-commento').value,
+                    screenshot: allertScreenshot,
+                    stato: 'completato',
+                    categorizzatori: { cronache: catCronache, strategie: catStrategie, trades: catTrades }
+                }).eq('id', currentAllertId);
+                if (error) {
+                    console.error('[saveAllert] Supabase error', error);
+                    alert('Errore salvataggio: ' + error.message);
+                    return;
+                }
+                closeModal('modal-allert');
+                await loadAllerts();
+            } catch (e) {
+                console.error('[saveAllert] exception', e);
+                alert('Errore JS: ' + e.message);
+            }
         }
         async function ignoreAllert(){
-            await db.from('allert_prezzo').update({stato:'ignorato'}).eq('id',currentAllertId);
-            closeModal('modal-allert'); await loadAllerts();
+            try {
+                var { error } = await db.from('allert_prezzo').update({stato:'ignorato'}).eq('id',currentAllertId);
+                if (error) { console.error('[ignoreAllert]', error); alert('Errore: ' + error.message); return; }
+                closeModal('modal-allert');
+                await loadAllerts();
+            } catch (e) { console.error(e); alert('Errore JS: ' + e.message); }
         }
 
         // === MONITORASMILE ===
