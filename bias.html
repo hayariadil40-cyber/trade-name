@@ -106,7 +106,7 @@
     <main class="flex-1 flex flex-col h-full bg-[#0e1116] relative overflow-hidden">
 
         <!-- Header Universale -->
-        <header class="flex justify-between items-center px-8 py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
+        <header class="flex justify-between items-center px-4 py-3 lg:px-8 lg:py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
             <div class="flex items-center gap-4 w-auto min-w-max">
                 <div>
                     <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Reperti</h1>
@@ -170,7 +170,7 @@
         <!-- ============================================ -->
         <!-- LISTA REPERTI                                -->
         <!-- ============================================ -->
-        <div class="flex-1 overflow-y-auto p-8 scroll-smooth">
+        <div class="flex-1 overflow-y-auto p-3 lg:p-8 scroll-smooth">
             <div class="max-w-7xl mx-auto">
                 <div class="flex items-center justify-between mb-6">
                     <div>
@@ -281,29 +281,29 @@
                         <div class="w-1 absolute left-0 top-0 bottom-0 ${barColor}"></div>
 
                         <!-- Riga 1: info -->
-                        <div class="flex items-center p-4 pl-5">
-                            <div class="flex items-center w-1/5 gap-3">
-                                <span class="text-xs font-bold text-tp-muted uppercase tracking-widest bg-tp-bg px-2 py-1 rounded">${b.id.substring(0, 8)}</span>
-                                <span class="font-bold text-lg ${nameColor} transition-colors">${b.asset || '--'}</span>
+                        <div class="grid grid-cols-2 gap-y-2 lg:flex lg:items-center p-3 lg:p-4 pl-5">
+                            <div class="flex items-center lg:w-1/5 gap-2 lg:gap-3">
+                                <span class="text-[10px] lg:text-xs font-bold text-tp-muted uppercase tracking-widest bg-tp-bg px-2 py-1 rounded">${b.id.substring(0, 8)}</span>
+                                <span class="font-bold text-base lg:text-lg ${nameColor} transition-colors">${b.asset || '--'}</span>
                             </div>
 
-                            <div class="w-1/5 flex flex-col justify-center">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs font-bold ${dirColor} border px-2 py-0.5 rounded uppercase">${dirText}</span>
-                                    <span class="text-xs font-bold text-tp-text">${dateStr}</span>
-                                </div>
-                            </div>
-
-                            <div class="w-2/5 flex flex-col text-sm text-tp-muted justify-center px-2">
-                                <p class="text-xs text-tp-muted/80 line-clamp-1">${preview || 'Nessun commento'}</p>
-                            </div>
-
-                            <div class="w-1/5 flex items-center justify-end gap-4 pr-2">
+                            <div class="lg:w-1/5 flex items-center justify-end lg:justify-start gap-2">
                                 <span class="${statoBadgeClass} text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded">${statoLabel}</span>
-                                <div class="flex items-center gap-2 text-tp-muted text-xs font-bold">
+                                <div class="flex items-center gap-1 text-tp-muted text-xs font-bold">
                                     <i data-lucide="image" class="w-4 h-4 ${hasScreens ? '' : 'opacity-30'}"></i> ${hasScreens}
                                 </div>
-                                <i data-lucide="chevron-right" class="w-5 h-5 text-tp-muted group-hover:text-tp-accent transition-colors"></i>
+                                <i data-lucide="chevron-right" class="hidden lg:inline w-5 h-5 text-tp-muted group-hover:text-tp-accent transition-colors"></i>
+                            </div>
+
+                            <div class="lg:w-1/5 flex flex-col justify-center">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] lg:text-xs font-bold ${dirColor} border px-2 py-0.5 rounded uppercase">${dirText}</span>
+                                    <span class="text-[10px] lg:text-xs font-bold text-tp-text">${dateStr}</span>
+                                </div>
+                            </div>
+
+                            <div class="col-span-2 lg:w-2/5 flex flex-col text-sm text-tp-muted justify-center lg:px-2">
+                                <p class="text-[11px] lg:text-xs text-tp-muted/80 line-clamp-2 lg:line-clamp-1">${preview || 'Nessun commento'}</p>
                             </div>
                         </div>
 

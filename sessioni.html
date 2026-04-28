@@ -71,7 +71,7 @@
 
     <main class="flex-1 flex flex-col h-full bg-[#0e1116] relative overflow-hidden">
         <!-- Header -->
-        <header class="flex justify-between items-center px-8 py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
+        <header class="flex justify-between items-center px-4 py-3 lg:px-8 lg:py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
             <div class="flex items-center gap-4 w-auto min-w-max">
                 <div>
                     <h1 class="text-xl font-bold tracking-tight text-white mb-1">Sessioni</h1>
@@ -119,7 +119,7 @@
         </header>
 
         <!-- Lista Sessioni -->
-        <div class="flex-1 overflow-y-auto p-8 scroll-smooth">
+        <div class="flex-1 overflow-y-auto p-3 lg:p-8 scroll-smooth">
             <div class="max-w-5xl mx-auto">
                 <div class="flex items-center justify-between mb-6">
                     <div>
@@ -188,25 +188,26 @@
                 const moodColor = s.mood === 'positive' ? 'text-tp-accent' : s.mood === 'negative' ? 'text-tp-loss' : 'text-tp-warning';
 
                 return `
-                    <div onclick="window.location.href='dettaglio_sessione.html?id=${s.id}'" data-session="${s.nome}" class="session-row group flex items-center p-4 bg-tp-panel border border-tp-border ${borderColor} rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
+                    <div onclick="window.location.href='dettaglio_sessione.html?id=${s.id}'" data-session="${s.nome}" class="session-row group flex items-center flex-wrap lg:flex-nowrap gap-y-2 p-3 lg:p-4 pl-5 lg:pl-2 bg-tp-panel border border-tp-border ${borderColor} rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
                         <div class="w-1 absolute left-0 top-0 bottom-0 ${barColor}"></div>
-                        <div class="flex items-center gap-4 w-1/4 pl-2">
-                            <div class="w-10 h-10 rounded-lg bg-tp-bg flex items-center justify-center border border-tp-border shrink-0">
+                        <div class="flex items-center gap-3 lg:gap-4 w-1/2 lg:w-1/4">
+                            <div class="w-9 h-9 lg:w-10 lg:h-10 rounded-lg bg-tp-bg flex items-center justify-center border border-tp-border shrink-0">
                                 <i data-lucide="${icon}" class="w-5 h-5 text-${color}"></i>
                             </div>
-                            <div class="flex flex-col">
+                            <div class="flex flex-col min-w-0">
                                 <span class="text-sm font-bold text-white group-hover:text-${color} transition-colors capitalize">${s.nome}</span>
-                                <span class="text-[10px] text-tp-muted font-bold tracking-widest">${dateStr}</span>
+                                <span class="text-[10px] text-tp-muted font-bold tracking-widest truncate">${dateStr}</span>
                             </div>
                         </div>
-                        <div class="w-1/4 flex gap-1.5 flex-wrap">
+                        <div class="w-1/2 lg:w-1/4 flex justify-end lg:justify-start items-center gap-2">
+                            <i data-lucide="${moodIcon}" class="w-5 h-5 ${moodColor}"></i>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-tp-muted group-hover:text-${color} transition-colors lg:hidden"></i>
+                        </div>
+                        <div class="w-full lg:w-1/4 flex gap-1.5 flex-wrap">
                             ${coins.map(c => `<span class="text-[10px] font-bold px-1.5 py-0.5 bg-tp-bg rounded border border-tp-border text-tp-muted">${c}</span>`).join('')}
                             ${!coins.length ? '<span class="text-[10px] text-tp-muted/50">Nessun dato</span>' : ''}
                         </div>
-                        <div class="w-1/4 text-center">
-                            <i data-lucide="${moodIcon}" class="w-5 h-5 ${moodColor} inline"></i>
-                        </div>
-                        <div class="w-1/4 flex justify-end pr-2">
+                        <div class="hidden lg:block lg:w-1/4 lg:flex lg:justify-end pr-2">
                             <i data-lucide="chevron-right" class="w-5 h-5 text-tp-muted group-hover:text-${color} transition-colors"></i>
                         </div>
                     </div>

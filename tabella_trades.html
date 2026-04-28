@@ -166,7 +166,7 @@
                 <!-- ==============================================
              HEADER UNIVERSALE
              ============================================== -->
-        <header class="flex justify-between items-center px-8 py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
+        <header class="flex justify-between items-center px-4 py-3 lg:px-8 lg:py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
             
             <!-- 1. LEFT: Page Title & Quick Actions -->
             <div class="flex items-center gap-4 w-auto min-w-max">
@@ -277,7 +277,7 @@
 
 
         <!-- List View -->
-        <div class="flex-1 overflow-y-auto p-8 scroll-smooth">
+        <div class="flex-1 overflow-y-auto p-3 lg:p-8 scroll-smooth">
             <div class="max-w-7xl mx-auto">
                 <div class="flex items-center justify-between mb-6">
                     <div class="text-sm text-tp-muted font-medium" id="trade-count">Caricamento...</div>
@@ -324,13 +324,13 @@
                 const statoBadge = stato === 'completato' ? '<span class="text-[9px] px-2 py-0.5 rounded bg-tp-accent/10 text-tp-accent border border-tp-accent/20 font-bold uppercase">Completato</span>' : '<span class="text-[9px] px-2 py-0.5 rounded bg-tp-warning/10 text-tp-warning border border-tp-warning/20 font-bold uppercase">Da lavorare</span>';
                 const dateStr = t.data ? new Date(t.data).toLocaleDateString('it-IT', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '--';
 
-                return `<div onclick="window.location.href='dettaglio_trade.html?id=${t.id}'" class="group flex items-center p-4 bg-tp-panel border border-tp-border ${hoverColor} rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
+                return `<div onclick="window.location.href='dettaglio_trade.html?id=${t.id}'" class="group grid grid-cols-2 gap-y-2 lg:flex lg:items-center p-3 lg:p-4 pl-5 lg:pl-4 bg-tp-panel border border-tp-border ${hoverColor} rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
                     <div class="w-1 absolute left-0 top-0 bottom-0 ${barColor}"></div>
-                    <div class="flex items-center w-1/5 pl-3 gap-3"><span class="text-xs font-bold text-tp-muted bg-tp-bg px-2 py-1 rounded">${t.id.substring(0,8)}</span><span class="font-bold text-lg ${nameColor} transition-colors">${t.asset||'--'}</span></div>
-                    <div class="w-1/5 flex items-center gap-2"><span class="text-xs font-bold ${dirColor} border px-2 py-0.5 rounded uppercase">${t.direzione||'--'}</span><span class="text-xs font-bold text-tp-muted">${t.size||''} L</span></div>
-                    <div class="w-1/5 flex items-center gap-2"><span class="bg-blue-500/10 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase">${t.sorgente||'--'}</span>${statoBadge}</div>
-                    <div class="w-1/5 text-xs text-tp-muted">${dateStr}</div>
-                    <div class="w-1/5 flex items-center justify-end gap-4 pr-4"><span class="text-sm font-bold ${pnlColor}">${pnlSign}$${Math.abs(t.pnl||0).toFixed(0)}</span><i data-lucide="chevron-right" class="w-4 h-4 text-tp-muted"></i></div>
+                    <div class="flex items-center lg:w-1/5 lg:pl-3 gap-2 lg:gap-3"><span class="text-[10px] lg:text-xs font-bold text-tp-muted bg-tp-bg px-2 py-1 rounded">${t.id.substring(0,8)}</span><span class="font-bold text-base lg:text-lg ${nameColor} transition-colors">${t.asset||'--'}</span></div>
+                    <div class="lg:w-1/5 flex items-center justify-end lg:justify-start gap-2 pr-2 lg:pr-0"><span class="text-sm lg:text-base font-bold ${pnlColor}">${pnlSign}$${Math.abs(t.pnl||0).toFixed(0)}</span><i data-lucide="chevron-right" class="hidden lg:inline w-4 h-4 text-tp-muted"></i></div>
+                    <div class="lg:w-1/5 flex items-center gap-2"><span class="text-[10px] lg:text-xs font-bold ${dirColor} border px-2 py-0.5 rounded uppercase">${t.direzione||'--'}</span><span class="text-[10px] lg:text-xs font-bold text-tp-muted">${t.size||''} L</span></div>
+                    <div class="lg:w-1/5 flex items-center gap-2 justify-end lg:justify-start"><span class="bg-blue-500/10 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded text-[9px] lg:text-[10px] font-bold uppercase">${t.sorgente||'--'}</span>${statoBadge}</div>
+                    <div class="col-span-2 lg:w-1/5 text-[10px] lg:text-xs text-tp-muted">${dateStr}</div>
                 </div>`;
             }).join('');
             lucide.createIcons();

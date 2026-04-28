@@ -66,6 +66,20 @@
             transform: scale(1) translateY(0);
             opacity: 1;
         }
+
+        /* Mobile sidebar drawer (< lg) */
+        @media (max-width: 1023px) {
+            #td-sidebar {
+                transform: translateX(-100%);
+                width: 16rem !important;
+                transition: transform 0.25s ease;
+            }
+            #td-sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            #td-sidebar.mobile-open .opacity-0 { opacity: 1 !important; }
+            #td-sidebar.mobile-open a { width: calc(100% - 2rem) !important; }
+        }
     </style>
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -81,7 +95,10 @@
         <!-- Sidebar Universale -->
         <!-- Sidebar Universale -->
         <!-- Sidebar Universale -->
-    <aside class="w-16 hover:w-64 border-r border-tp-border flex flex-col flex-shrink-0 bg-tp-bg transition-all duration-300 z-50 absolute h-full lg:relative group">
+    <!-- Backdrop for mobile sidebar -->
+    <div id="td-backdrop" onclick="toggleMobileSidebar()" class="hidden fixed inset-0 bg-black/60 z-40 lg:hidden"></div>
+
+    <aside id="td-sidebar" class="w-16 hover:w-64 border-r border-tp-border flex flex-col flex-shrink-0 bg-tp-bg transition-all duration-300 z-50 absolute h-full lg:relative group">
         <!-- Logo Area Team Design -->
         <div class="h-24 flex items-center justify-center lg:justify-start px-3 gap-4 border-b border-tp-border/50 overflow-hidden cursor-default w-full">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#161920] to-[#0a0c10] border border-[#20c997]/50 flex items-center justify-center shadow-[0_0_10px_rgba(32,201,151,0.2)] shrink-0 group-hover:rotate-3 transition-transform duration-300 mx-auto group-hover:mx-0">
@@ -193,11 +210,14 @@
                 <!-- ==============================================
              HEADER UNIVERSALE
              ============================================== -->
-        <header class="flex justify-between items-center px-8 py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
-            
+        <header class="flex justify-between items-center px-4 py-3 lg:px-8 lg:py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
+
             <!-- 1. LEFT: Page Title & Quick Actions -->
-            <div class="flex items-center gap-4 w-auto min-w-max">
-                <div>
+            <div class="flex items-center gap-3 lg:gap-4 w-auto min-w-0 lg:min-w-max">
+                <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 -ml-2 text-tp-muted hover:text-white flex-shrink-0" aria-label="Apri menu">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <div class="min-w-0">
                     <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Database Giornaliero</h1>
                     <div class="flex gap-2.5 mt-1">
                         <a href="analisi.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Trade Analisi</a>
@@ -305,7 +325,7 @@
 
         <!-- Database List View -->
         <!-- Database List View -->
-        <div class="flex-1 overflow-y-auto p-8">
+        <div class="flex-1 overflow-y-auto p-3 lg:p-8">
             <div class="max-w-7xl mx-auto">
                 <div class="flex items-center justify-between mb-6">
                     <div class="text-sm text-tp-muted font-medium" id="day-count">Caricamento...</div>

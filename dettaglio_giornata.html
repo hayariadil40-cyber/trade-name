@@ -200,7 +200,7 @@
                 <!-- ==============================================
              HEADER UNIVERSALE
              ============================================== -->
-        <header class="flex justify-between items-center px-8 py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
+        <header class="flex justify-between items-center px-4 py-3 lg:px-8 lg:py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
             
             <!-- 1. LEFT: Page Title & Quick Actions -->
             <div class="flex items-center gap-4 w-auto min-w-max">
@@ -289,7 +289,7 @@
         <!-- ==============================================
              BODY: PANNELLO DI CONTROLLO GIORNATA
              ============================================== -->
-        <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
+        <div class="flex-1 overflow-y-auto p-3 lg:p-6 scroll-smooth">
             <div class="max-w-[1600px] mx-auto grid grid-cols-12 gap-6 pb-20">
 
                 <!-- ==========================================
@@ -362,7 +362,7 @@
                             </div>
                             <div>
                                 <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
-                                    <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="waves" class="w-3.5 h-3.5"></i> Marea</span>
+                                    <span class="text-xs text-tp-muted font-bold uppercase flex items-center gap-2"><i data-lucide="waves" class="w-3.5 h-3.5"></i> Bassa Marea</span>
                                     <input id="inp-marea" type="text" placeholder="--:--" class="bg-[#0a0c10] border border-tp-border rounded px-2 py-0.5 text-sm text-white font-bold outline-none w-16 text-center focus:border-tp-accent">
                                 </div>
                                 <div class="py-2 border-b border-tp-border/50">
@@ -1191,7 +1191,7 @@
                 const tipoBadges = tipi.length
                     ? tipi.map(t => `<span class="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${tipoColors[t] || 'bg-tp-border text-tp-muted border-tp-border'}">${t}</span>`).join('')
                     : '<span class="text-[9px] italic text-tp-muted/60">-- nessun tipo --</span>';
-                const ora = b.created_at ? new Date(b.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--';
+                const ora = b.created_at ? new Date(b.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' }) : '--:--';
 
                 const isLong = b.direzione === 'LONG';
                 const isShort = b.direzione === 'SHORT';
@@ -1336,7 +1336,7 @@
                     var resultRaw = await db.from('forza_usd').select('usd_strength, created_at').gte('created_at', todayStart).order('created_at', { ascending: false }).limit(300);
                     var rows = resultRaw.data ? resultRaw.data.reverse() : [];
                     if (rows.length) {
-                        labels = rows.map(function(r) { return new Date(r.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }); });
+                        labels = rows.map(function(r) { return new Date(r.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' }); });
                         data = rows.map(function(r) { return parseFloat(r.usd_strength); });
                     }
                 } catch(e) {}

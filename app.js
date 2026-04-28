@@ -455,7 +455,7 @@ window.selectVol = function(btn, type) {
         #ai-fab:hover { transform:scale(1.08); box-shadow:0 6px 28px rgba(139,92,246,0.6); }
         #ai-fab.has-chat { animation: fab-pulse 2s infinite; }
         @keyframes fab-pulse { 0%,100%{box-shadow:0 4px 20px rgba(139,92,246,0.4)} 50%{box-shadow:0 4px 28px rgba(139,92,246,0.7)} }
-        #ai-chat-widget { position:fixed; bottom:88px; right:24px; z-index:9998; width:400px; max-height:75vh; background:#0a0c10; border:1px solid #252932; border-radius:16px; box-shadow:0 8px 40px rgba(0,0,0,0.6); display:none; flex-direction:column; overflow:hidden; }
+        #ai-chat-widget { position:fixed; bottom:88px; right:24px; z-index:9998; width:400px; max-width:calc(100vw - 48px); max-height:75vh; background:#0a0c10; border:1px solid #252932; border-radius:16px; box-shadow:0 8px 40px rgba(0,0,0,0.6); display:none; flex-direction:column; overflow:hidden; }
         #ai-chat-widget.open { display:flex; }
         #ai-chat-widget .ai-msg-user { background:rgba(32,201,151,0.08); border-left:3px solid #20c997; }
         #ai-chat-widget .ai-msg-ai { background:rgba(22,25,32,0.8); border-left:3px solid #8b5cf6; }
@@ -498,6 +498,63 @@ window.selectVol = function(btn, type) {
         // Refresh silenzioso ogni 60s per catturare messaggi routine mentre il widget resta aperto
         setInterval(_loadChatFromDb, 60 * 1000);
     });
+
+    // --- Mobile sidebar drawer (cross-page auto-injection) ---
+    window.toggleMobileSidebar = function() {
+        var sb = document.getElementById('td-sidebar');
+        var bd = document.getElementById('td-backdrop');
+        if (!sb || !bd) return;
+        sb.classList.toggle('mobile-open');
+        bd.classList.toggle('hidden');
+    };
+
+    function initMobileSidebar() {
+        // Trova la sidebar standard e assegna l'id se manca (per pagine non ancora taggate)
+        var aside = document.querySelector('aside.w-16');
+        if (!aside) return; // pagine senza sidebar (login)
+        if (!aside.id) aside.id = 'td-sidebar';
+
+        // Inietta CSS responsive una sola volta
+        if (!document.getElementById('td-mobile-css')) {
+            var s = document.createElement('style');
+            s.id = 'td-mobile-css';
+            s.textContent = '@media (max-width:1023px){' +
+                '#td-sidebar{transform:translateX(-100%);width:16rem !important;transition:transform .25s ease}' +
+                '#td-sidebar.mobile-open{transform:translateX(0)}' +
+                '#td-sidebar.mobile-open .opacity-0{opacity:1 !important}' +
+                '#td-sidebar.mobile-open a{width:calc(100% - 2rem) !important}' +
+                '#td-mobile-fab{position:fixed;top:10px;left:10px;z-index:60;width:40px;height:40px;border-radius:10px;background:rgba(22,25,32,0.92);border:1px solid #252932;color:#f8fafc;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(8px)}' +
+            '}' +
+            '@media (min-width:1024px){#td-mobile-fab{display:none !important}}';
+            document.head.appendChild(s);
+        }
+
+        // Backdrop
+        if (!document.getElementById('td-backdrop')) {
+            var bd = document.createElement('div');
+            bd.id = 'td-backdrop';
+            bd.className = 'hidden fixed inset-0 bg-black/60 z-40 lg:hidden';
+            bd.addEventListener('click', window.toggleMobileSidebar);
+            document.body.appendChild(bd);
+        }
+
+        // Hamburger floating: solo se nessun bottone inline gia chiama toggleMobileSidebar
+        var inline = document.querySelector('button[onclick*="toggleMobileSidebar"]');
+        if (!inline && !document.getElementById('td-mobile-fab')) {
+            var fab = document.createElement('button');
+            fab.id = 'td-mobile-fab';
+            fab.setAttribute('aria-label', 'Apri menu');
+            fab.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+            fab.addEventListener('click', window.toggleMobileSidebar);
+            document.body.appendChild(fab);
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initMobileSidebar);
+    } else {
+        initMobileSidebar();
+    }
 
     window.toggleAiChat = function() {
         isOpen = !isOpen;
