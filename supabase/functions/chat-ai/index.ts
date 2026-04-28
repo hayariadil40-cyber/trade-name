@@ -67,7 +67,7 @@ serve(async (req) => {
     if (smile && smile.length) dbContext += "\n\n## MONITORASMILE:\n" + JSON.stringify(smile);
 
     const { data: sessioni } = await supabase.from("sessioni")
-      .select("nome, data, mood").eq("data", today);
+      .select("nome, data, mood, coin_data").eq("data", today);
     if (sessioni && sessioni.length) dbContext += "\n\n## SESSIONI DI OGGI:\n" + JSON.stringify(sessioni);
 
     const { data: usd } = await supabase.from("forza_usd")
@@ -143,9 +143,13 @@ CONTRATTO coin_data (l'EA MT4 e il frontend si aspettano questo formato esatto):
 
 Campi per tabella (DIVERSI tra sessioni e cronache):
 
-(A) sessioni.coin_data → SOLO low e high (range della sessione):
-  Esempio: {"XAUUSD":{"low":"4666.55","high":"4701.08"}}
-  NON aggiungere open/close/percentuale: nelle sessioni si registra solo il range min/max.
+(A) sessioni.coin_data → low, high (obbligatori per range), + bias/commento/screenshot opzionali:
+  - low/high: stringhe del numero (range min/max della sessione), es. "4666.55".
+  - bias: ENUM "LONG" | "SHORT" | "NEUTRAL" (uppercase) — bias direzionale dell'utente sulla coin in quella sessione.
+  - commento: stringa libera.
+  - screenshot: URL stringa.
+  Esempio completo: {"XAUUSD":{"low":"4666.55","high":"4701.08","bias":"LONG","commento":"reattivo a 4680"}}
+  NON aggiungere open/close/percentuale: quelli sono solo per cronache.
 
 (B) cronache.coin_data → low, high, open, close, percentuale (giornaliero completo):
   - low/high/open/close: stringa del numero, es. "4657.69" o "73861".
@@ -153,7 +157,7 @@ Campi per tabella (DIVERSI tra sessioni e cronache):
   - Frontend cronache.html fa percentuale.includes('+') per colorare la card: se passi un number, crasha tutto.
 
 Campi opzionali validi su entrambe:
-- sentiment: stringa ENUM ESATTA, valori ammessi SOLO: "rialzista" | "laterale" | "ribassista". TUTTO LOWERCASE, NIENTE qualificatori (NO "RIALZISTA FORTE", NO "rialzista_moderato", NO "RIBASSISTA").
+- sentiment: stringa ENUM ESATTA, valori ammessi SOLO: "rialzista" | "laterale" | "ribassista". TUTTO LOWERCASE, NIENTE qualificatori (NO "RIALZISTA FORTE", NO "rialzista_moderato", NO "RIBASSISTA"). NB: per sessioni si usa "bias" (LONG/SHORT/NEUTRAL), non "sentiment".
 - screenshot, commento: stringhe libere.
 
 NON usare nomi alternativi: usa "percentuale", non "pct"; "low/high/open/close" non "l/h/o/c".
