@@ -128,6 +128,7 @@ Azioni supportate (USA ESATTAMENTE QUESTI VALORI di "action"):
 \`\`\`db_actions
 [{"table":"bias","action":"insert","data":{"data":"2026-04-26","asset":"XAUUSD","direzione":"LONG","commento":"..."}}]
 \`\`\`
+IMPORTANTE: NON usare MAI insert su "sessioni". Le 3 righe (asia, london, newyork) sono create automaticamente quando l'utente apre la giornata (trigger su giornate) o dal cron apertura-sessione. Se devi compilare dati di sessione usa SEMPRE update o update_coin con match {"data":"YYYY-MM-DD","nome":"london|newyork|asia"}. Il backend rifiuta gli insert su sessioni.
 
 3. update_coin - merge non-distruttivo su una chiave dentro coin_data jsonb. Funziona per sessioni E cronache (entrambe hanno colonna coin_data). Mantiene i campi esistenti (commento/sentiment/screenshot) e sovrascrive solo quelli passati in "data":
 \`\`\`db_actions
@@ -138,13 +139,24 @@ Tabelle scrittura: sessioni (coin_data, mood, nome, data), giornate (mindset, vo
 
 CONTRATTO coin_data (l'EA MT4 e il frontend si aspettano questo formato esatto):
 - Coin canoniche: XAUUSD, US30, GER30, NAS100, BTCUSD, EURUSD (NON usare DJI/GER40/NASDAQ).
-- Campi obbligatori per ogni coin: low, high, open, close, percentuale.
-- TUTTI I VALORI VANNO PASSATI COME STRINGHE, MAI COME NUMERI:
-  - low/high/open/close: stringa del numero, es. "4657.69" o "73861" (no virgolette doppie magiche, scrivi proprio "4657.69" come testo).
+- TUTTI I VALORI VANNO PASSATI COME STRINGHE, MAI COME NUMERI.
+
+Campi per tabella (DIVERSI tra sessioni e cronache):
+
+(A) sessioni.coin_data → SOLO low e high (range della sessione):
+  Esempio: {"XAUUSD":{"low":"4666.55","high":"4701.08"}}
+  NON aggiungere open/close/percentuale: nelle sessioni si registra solo il range min/max.
+
+(B) cronache.coin_data → low, high, open, close, percentuale (giornaliero completo):
+  - low/high/open/close: stringa del numero, es. "4657.69" o "73861".
   - percentuale: stringa con SEGNO ESPLICITO + o -, es. "+0.32" oppure "-1.03". Senza simbolo % alla fine.
-- sentiment (opzionale): stringa ENUM ESATTA, valori ammessi SOLO: "rialzista" | "laterale" | "ribassista". TUTTO LOWERCASE, NIENTE qualificatori (NO "RIALZISTA FORTE", NO "rialzista_moderato", NO "RIBASSISTA"). Il select del frontend ha solo questi 3 valori: se ne salvi un altro il dropdown si svuota.
-- Frontend cronache.html fa percentuale.includes('+') per colorare la card: se passi un number, crasha tutto.
-- NON usare nomi alternativi: usa "percentuale", non "pct"; "low/high/open/close" non "l/h/o/c".
+  - Frontend cronache.html fa percentuale.includes('+') per colorare la card: se passi un number, crasha tutto.
+
+Campi opzionali validi su entrambe:
+- sentiment: stringa ENUM ESATTA, valori ammessi SOLO: "rialzista" | "laterale" | "ribassista". TUTTO LOWERCASE, NIENTE qualificatori (NO "RIALZISTA FORTE", NO "rialzista_moderato", NO "RIBASSISTA").
+- screenshot, commento: stringhe libere.
+
+NON usare nomi alternativi: usa "percentuale", non "pct"; "low/high/open/close" non "l/h/o/c".
 
 Quando compili cronache di piu giornate, usa update_coin per ogni coin di ogni giornata: la riga cronache con quella data esiste gia, devi solo aggiungere i dati. NON usare insert su cronache esistenti.
 
@@ -338,11 +350,17 @@ ${DB_ACTIONS}`;
                 actionsExecuted.push("OK: aggiornato " + act.table + " " + JSON.stringify(act.data));
               }
             } else if (act.action === "insert" && act.table && act.data) {
-              const { error } = await supabase.from(act.table).insert(act.data);
-              if (error) {
-                actionsExecuted.push("ERRORE insert " + act.table + ": " + error.message);
+              // sessioni: la riga la crea sempre la edge function apertura-sessione (cron 08:00/14:30 Casa).
+              // Bloccare insert qui evita duplicati: l'assistente deve usare update / update_coin.
+              if (act.table === "sessioni") {
+                actionsExecuted.push("ERRORE insert sessioni: NON consentito, usa update_coin (riga creata da apertura-sessione)");
               } else {
-                actionsExecuted.push("OK: inserito in " + act.table);
+                const { error } = await supabase.from(act.table).insert(act.data);
+                if (error) {
+                  actionsExecuted.push("ERRORE insert " + act.table + ": " + error.message);
+                } else {
+                  actionsExecuted.push("OK: inserito in " + act.table);
+                }
               }
             } else if (act.action === "update_coin" && act.table && act.match && act.coin && act.data) {
               // Funziona per qualunque tabella con colonna coin_data jsonb (sessioni, cronache, ...).

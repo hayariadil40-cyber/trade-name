@@ -190,13 +190,17 @@ Regole:
     };
 
     // ===== UPSERT su sessioni =====
-    // Cerca sessione con data=today AND nome=info.nomeDb
-    const { data: existingSession } = await supabase
+    // Vincolo UNIQUE (data, nome) garantisce dedup a livello DB.
+    // Match esatto su (data, nome): niente ilike+wildcard.
+    // Logica: se la riga esiste aggiorno SOLO apertura_brief (preservando stato/coin_data/etc.);
+    // se non esiste la creo con stato="nuovo".
+    const { data: existingSession, error: selErr } = await supabase
       .from("sessioni")
       .select("id")
       .eq("data", today)
-      .ilike("nome", `${info.nomeDb}%`)
+      .eq("nome", info.nomeDb)
       .maybeSingle();
+    if (selErr) throw selErr;
 
     let sessioneId: string | null = null;
     if (existingSession) {
@@ -206,7 +210,6 @@ Regole:
       if (error) throw error;
       sessioneId = existingSession.id;
     } else {
-      // Crea sessione minimal
       const { data: created, error } = await supabase.from("sessioni")
         .insert({ data: today, nome: info.nomeDb, stato: "nuovo", apertura_brief: aperturaBrief })
         .select("id").single();
