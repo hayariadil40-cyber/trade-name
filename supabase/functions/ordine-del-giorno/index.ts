@@ -43,23 +43,34 @@ function hhmmCasablanca(iso: string): string {
   return fmt.format(new Date(iso));
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 async function callClaude(prompt: string, apiKey: string, maxTokens = 400): Promise<string> {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-6",
-      max_tokens: maxTokens,
-      messages: [{ role: "user", content: prompt }],
-    }),
-  });
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.content?.[0]?.text || "";
+  // Retry su 429 (rate limit org tpm). Backoff: 5s, 15s, 30s.
+  const backoffMs = [5000, 15000, 30000];
+  for (let attempt = 0; attempt <= backoffMs.length; attempt++) {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: maxTokens,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+    if (response.status === 429 && attempt < backoffMs.length) {
+      await sleep(backoffMs[attempt]);
+      continue;
+    }
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.content?.[0]?.text || "";
+  }
+  throw new Error("rate limit dopo retry");
 }
 
 async function sendTelegram(text: string, botToken: string, chatId: string): Promise<{ ok: boolean; messageId?: number; error?: string }> {
@@ -144,31 +155,10 @@ serve(async (req) => {
       .ilike("nome", "asia%");
     const asiaToday = asiaTodayRaw || [];
 
-    // Storico ultime 10 asia (esclusa oggi) per confronto range
-    const { data: asiaHistRaw } = await supabase
-      .from("sessioni")
-      .select("data, coin_data, auto_data")
-      .ilike("nome", "asia%")
-      .lt("data", today)
-      .order("data", { ascending: false })
-      .limit(10);
-    const asiaHist = asiaHistRaw || [];
-
-    // Cronaca di ieri (per contesto)
-    const yyyyMMddYesterday = (() => {
-      const [y, m, d] = today.split("-").map(Number);
-      const yest = new Date(Date.UTC(y, m - 1, d - 1));
-      return yest.toISOString().split("T")[0];
-    })();
-    const { data: cronacaIeriRaw } = await supabase
-      .from("cronache")
-      .select("titolo, sentiment, eventi_chiave")
-      .eq("data", yyyyMMddYesterday)
-      .limit(5);
-    const cronacaIeri = cronacaIeriRaw || [];
-
-    // Estrai range per coin da auto_data e coin_data (auto_data prevale)
-    function extractRanges(session: { coin_data?: Record<string, unknown>; auto_data?: Record<string, unknown> }): Record<string, { high: number; low: number; range: number }> {
+    // Estrai range high/low/pips per coin (auto_data prevale su coin_data)
+    function extractRanges(
+      session: { coin_data?: Record<string, unknown>; auto_data?: Record<string, unknown> },
+    ): Record<string, { high: number; low: number; range: number }> {
       const result: Record<string, { high: number; low: number; range: number }> = {};
       const sources = [session.auto_data, session.coin_data].filter((s): s is Record<string, unknown> => !!s && typeof s === "object" && Object.keys(s).length > 0);
       for (const src of sources) {
@@ -196,61 +186,10 @@ serve(async (req) => {
       }
     }
 
-    // Calcola media range per coin sull'historico
-    const histRangesByCoin: Record<string, number[]> = {};
-    for (const sess of asiaHist) {
-      const r = extractRanges(sess);
-      for (const [coin, v] of Object.entries(r)) {
-        if (!histRangesByCoin[coin]) histRangesByCoin[coin] = [];
-        histRangesByCoin[coin].push(v.range);
-      }
-    }
-
-    let asiaBlock: { count_today: number; ranges_today: Record<string, { high: number; low: number; range: number; avg_range: number | null; ratio: number | null }>; commento: string } = {
+    const asiaBlock: { count_today: number; ranges_today: Record<string, { high: number; low: number; range: number }> } = {
       count_today: asiaToday.length,
-      ranges_today: {},
-      commento: "Sessione asiatica non ancora disponibile.",
+      ranges_today: todayRanges,
     };
-
-    if (Object.keys(todayRanges).length > 0) {
-      // Costruisci ranges_today con media storica
-      for (const [coin, v] of Object.entries(todayRanges)) {
-        const hist = histRangesByCoin[coin] || [];
-        const avg = hist.length > 0 ? hist.reduce((a, b) => a + b, 0) / hist.length : null;
-        const ratio = avg != null && avg > 0 ? v.range / avg : null;
-        asiaBlock.ranges_today[coin] = { ...v, avg_range: avg, ratio };
-      }
-
-      // Prompt Claude
-      try {
-        const rangeLines = Object.entries(asiaBlock.ranges_today).map(([coin, v]) => {
-          const ratioStr = v.ratio != null
-            ? ` (ratio vs media ${v.avg_range != null ? v.avg_range.toFixed(2) : "n.d."}: ${(v.ratio * 100).toFixed(0)}%)`
-            : "";
-          return `- ${coin}: range ${v.range.toFixed(2)} (low ${v.low.toFixed(2)} / high ${v.high.toFixed(2)})${ratioStr}`;
-        }).join("\n");
-
-        const cronacaText = cronacaIeri.length > 0
-          ? cronacaIeri.map((c) => `- "${c.titolo}" (sentiment: ${c.sentiment || "n.d."})${c.eventi_chiave ? " - " + c.eventi_chiave : ""}`).join("\n")
-          : "(nessuna cronaca ieri)";
-
-        const prompt = `Sei Rodrigo, assistente operativo del Trade Desk per uno scalper su XAU/USD, US30, NASDAQ, GER40.
-
-SESSIONE ASIATICA DI STANOTTE (range high/low per coin, da MT4):
-${rangeLines}
-
-MEDIA RANGE ULTIME 10 SESSIONI ASIATICHE: vedi il "ratio %" tra parentesi (100% = in linea con media; >130% = piu ampio; <70% = piu ristretto).
-
-CRONACA DI IERI:
-${cronacaText}
-
-Genera un commento di 2-3 righe (italiano, asciutto, niente parolacce) che metta in relazione: range Asia di stanotte vs media storica + sentiment di ieri + cosa aspettarsi sulle aperture Londra/NY oggi. NON dare segnali operativi. Concentrati su volatilita attesa e asset piu reattivi.`;
-
-        asiaBlock.commento = (await callClaude(prompt, ANTHROPIC_API_KEYS, 350)).trim();
-      } catch (e) {
-        asiaBlock.commento = `Errore commento Asia: ${(e as Error).message}`;
-      }
-    }
 
     // ===== Checklist Reminder Rodrigo (statica) =====
     const reminderRodrigo = [
@@ -361,6 +300,8 @@ Genera un commento generale (2-3 righe, italiano, asciutto, niente motivazione v
     };
 
     if (allertPrezzo.length > 0) {
+      // Spalma le 2 chiamate Claude per non saturare il limite tpm dell'org.
+      await sleep(2000);
       try {
         const apText = allertPrezzo.map((a, i) =>
           `${i + 1}. ${a.coin || "?"} a ${a.prezzo || "?"} (${a.descrizione || "n.d."})${a.commento ? " — note: " + a.commento : ""}`
@@ -473,10 +414,9 @@ Genera un commento generale (2-3 righe, italiano, asciutto, niente parolacce) su
       : "<i>nessun trade</i>";
 
     const asiaRangeLines = Object.keys(asiaBlock.ranges_today).length > 0
-      ? Object.entries(asiaBlock.ranges_today).map(([coin, v]) => {
-          const ratioStr = v.ratio != null ? ` <i>(${(v.ratio * 100).toFixed(0)}% vs media)</i>` : "";
-          return `- <b>${coin}</b>: ${v.range.toFixed(2)} pts${ratioStr} | L ${v.low.toFixed(2)} / H ${v.high.toFixed(2)}`;
-        }).join("\n")
+      ? Object.entries(asiaBlock.ranges_today).map(([coin, v]) =>
+          `- <b>${coin}</b>: ${v.range.toFixed(2)} pts | L ${v.low.toFixed(2)} / H ${v.high.toFixed(2)}`
+        ).join("\n")
       : "<i>nessun dato MT4</i>";
 
     const reminderLines = reminderRodrigo.map((r) => `▢ ${r}`).join("\n");
@@ -487,8 +427,7 @@ Genera un commento generale (2-3 righe, italiano, asciutto, niente parolacce) su
       `📊 <b>Macro Oggi</b>: ${macro.length} eventi\n` +
       `${macroLines}\n\n` +
       `🌏 <b>Sessione Asiatica</b>\n` +
-      `${asiaRangeLines}\n` +
-      `${asiaBlock.commento}\n\n` +
+      `${asiaRangeLines}\n\n` +
       `💵 <b>Forza USD</b> (intraday)\n` +
       `${usdBlock.descrizione}\n\n` +
       `📈 <b>Ultimi 5 trade</b>: net PnL <b>${tradeNetPnl}</b>\n` +

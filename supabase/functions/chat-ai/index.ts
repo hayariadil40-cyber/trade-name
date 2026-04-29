@@ -31,7 +31,7 @@ serve(async (req) => {
 
     let dbContext = "";
     const today = new Date().toISOString().split("T")[0];
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().split("T")[0];
+    const fourteenDaysAgo = new Date(Date.now() - 14 * 86400000).toISOString().split("T")[0];
 
     let tradesQuery = supabase.from("trades")
       .select("asset, direzione, esito, pnl, pips, rr_reale, rr_teorico, size, sorgente, data, mood, volatilita, note")
@@ -40,9 +40,9 @@ serve(async (req) => {
     if (assistantMode === "giornaliero") {
       tradesQuery = tradesQuery.gte("data", today + "T00:00:00").lte("data", today + "T23:59:59");
     } else if (assistantMode === "coach") {
-      tradesQuery = tradesQuery.gte("data", thirtyDaysAgo + "T00:00:00").limit(100);
+      tradesQuery = tradesQuery.gte("data", fourteenDaysAgo + "T00:00:00").limit(60);
     } else {
-      tradesQuery = tradesQuery.limit(150);
+      tradesQuery = tradesQuery.limit(60);
     }
 
     const { data: trades } = await tradesQuery;
@@ -60,7 +60,7 @@ serve(async (req) => {
       .eq("data", today).single();
     if (giornata) dbContext += "\n\n## GIORNATA DI OGGI:\n" + JSON.stringify(giornata);
 
-    const smileLimit = assistantMode === "giornaliero" ? 10 : assistantMode === "coach" ? 30 : 60;
+    const smileLimit = assistantMode === "giornaliero" ? 10 : assistantMode === "coach" ? 20 : 40;
     const { data: smile } = await supabase.from("monitora_smile")
       .select("mindset, volatilita, sorgente, created_at")
       .order("created_at", { ascending: false }).limit(smileLimit);
@@ -74,7 +74,7 @@ serve(async (req) => {
       .select("usd_strength, created_at").order("created_at", { ascending: false }).limit(1);
     if (usd && usd.length) dbContext += `\n\n## FORZA USD ATTUALE: ${usd[0].usd_strength}`;
 
-    const biasLimit = assistantMode === "giornaliero" ? 5 : assistantMode === "coach" ? 20 : 40;
+    const biasLimit = assistantMode === "giornaliero" ? 5 : assistantMode === "coach" ? 12 : 25;
     const { data: bias } = await supabase.from("bias")
       .select("asset, direzione, commento, data").order("data", { ascending: false }).limit(biasLimit);
     if (bias && bias.length) dbContext += "\n\n## BIAS:\n" + JSON.stringify(bias);
@@ -87,15 +87,15 @@ serve(async (req) => {
 
     if (assistantMode === "power") {
       const { data: cronache } = await supabase.from("cronache")
-        .select("data, titolo").order("data", { ascending: false }).limit(15);
+        .select("data, titolo").order("data", { ascending: false }).limit(10);
       if (cronache && cronache.length) dbContext += "\n\n## CRONACHE:\n" + JSON.stringify(cronache);
 
       const { data: settimane } = await supabase.from("settimane")
-        .select("data_inizio, data_fine, review, note, pnl, winrate").order("data_inizio", { ascending: false }).limit(10);
+        .select("data_inizio, data_fine, review, note, pnl, winrate").order("data_inizio", { ascending: false }).limit(6);
       if (settimane && settimane.length) dbContext += "\n\n## SETTIMANE:\n" + JSON.stringify(settimane);
 
       const { data: giornate } = await supabase.from("giornate")
-        .select("data, mindset, volatilita, pnl, note_domani, day_tags").order("data", { ascending: false }).limit(30);
+        .select("data, mindset, volatilita, pnl, note_domani, day_tags").order("data", { ascending: false }).limit(20);
       if (giornate && giornate.length) dbContext += "\n\n## STORICO GIORNATE:\n" + JSON.stringify(giornate);
     }
 
@@ -135,7 +135,9 @@ IMPORTANTE: NON usare MAI insert su "sessioni". Le 3 righe (asia, london, newyor
 [{"table":"cronache","action":"update_coin","match":{"data":"2026-04-24"},"coin":"XAUUSD","data":{"low":"4657.69","high":"4740.42","open":"4692.44","close":"4707.41","percentuale":"+0.32"}}]
 \`\`\`
 
-Tabelle scrittura: sessioni (coin_data, mood, nome, data), giornate (mindset, volatilita, note_domani, fajr, marea, day_tags), trades (note, mood, volatilita - solo se non completato), bias (asset, direzione, commento), cronache (coin_data, titolo), settimane (review, note).
+Tabelle scrittura: sessioni (coin_data, mood, nome, data), giornate (mindset, volatilita, note_domani, fajr, marea, day_tags), trades (note, mood, volatilita - solo se non completato), bias (asset, direzione, commento), cronache (coin_data, titolo), settimane (review, note), strategie (nome, ipotesi, regole_ingresso, gestione_rischio, asset, tipo, timeframe, note, stato, winrate).
+
+NOTA strategie.regole_ingresso e' un ARRAY JSONB di stringhe. Per modificarlo via update, includi nell'UPDATE l'array INTERO con la modifica applicata: leggi l'array dal contesto sopra, ricostruiscilo con la modifica e passalo per intero. Esempio: per aggiungere "EURUSD" alla riga "Strumenti ammessi: XAU, BTC" della strategia "Chiusura FVG", invia un update con il nuovo array completo che include la riga modificata "Strumenti ammessi: XAU, BTC, EURUSD". MAI passare un array parziale, sovrascrive tutto.
 
 CONTRATTO coin_data (l'EA MT4 e il frontend si aspettano questo formato esatto):
 - Coin canoniche: XAUUSD, US30, GER30, NAS100, BTCUSD, EURUSD (NON usare DJI/GER40/NASDAQ).
@@ -212,7 +214,7 @@ REGOLE CRITICHE DI POSTURA (l'utente le ha richieste esplicitamente):
 - Sei un analista clinico, obiettivo, distaccato. NON sei un coach motivazionale da palestra. Niente "credi in te stesso", niente Mr. Miyagi, niente frasi fatte motivazionali.
 - NON presumere pattern. Se un pattern emerge dai dati, segnalalo SEMPRE con livello di confidenza statistica esplicito (es. "n=4, campione debole, possibile rumore" oppure "n=23 su 3 mesi, segnale robusto"). L'utente e consapevole che tendi a presumere pattern e vuole correggere verso l'oggettivita.
 - Vedi tutti i dati (trade, bias, sessioni, giornate, mindset, forza USD, cronache) ma filtri attraverso la lente del trading performance. Non commenti la vita, commenti come si opera.
-- Output con metriche precise, confronto vs baseline 30gg, segnali su compilazione incompleta (screenshot mancanti, strategia non collegata, note vuote).
+- Output con metriche precise, confronto vs baseline (finestra dati = ultimi 14gg, dichiara la finestra esplicitamente), segnali su compilazione incompleta (screenshot mancanti, strategia non collegata, note vuote).
 
 QUANDO L'UTENTE TI CHIEDE UN REPORT/DEBRIEF:
 - Voto 0-10 basato su disciplina e processo, NON sul PnL.
