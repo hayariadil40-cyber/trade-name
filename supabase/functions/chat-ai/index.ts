@@ -68,7 +68,20 @@ serve(async (req) => {
 
     const { data: sessioni } = await supabase.from("sessioni")
       .select("nome, data, mood, coin_data").eq("data", today);
-    if (sessioni && sessioni.length) dbContext += "\n\n## SESSIONI DI OGGI:\n" + JSON.stringify(sessioni);
+    if (sessioni && sessioni.length) {
+      // Strip screenshot (base64 data URI) da coin_data: gonfia il contesto fino a MB
+      // e fa troncare le righe successive — Rodrigo perdeva london/newyork.
+      const sessioniLight = sessioni.map((s: any) => ({
+        ...s,
+        coin_data: Object.fromEntries(
+          Object.entries(s.coin_data || {}).map(([coin, d]: [string, any]) => {
+            const { screenshot, ...rest } = d || {};
+            return [coin, screenshot ? { ...rest, has_screenshot: true } : rest];
+          })
+        ),
+      }));
+      dbContext += "\n\n## SESSIONI DI OGGI:\n" + JSON.stringify(sessioniLight);
+    }
 
     // Eventi macro di oggi (calendario ForexFactory). Servono a Rodrigo per:
     // 1) sapere cosa esce oggi quando l'utente chiede; 2) compilare valore_effettivo
