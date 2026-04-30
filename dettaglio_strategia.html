@@ -242,6 +242,14 @@
                             <textarea id="strat-ipotesi" class="notion-textarea w-full bg-[#0a0c10] border border-tp-border rounded-lg p-4 text-base text-tp-text/90 leading-relaxed outline-none min-h-[120px]" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="Descrivi l'ipotesi alla base di questa strategia..."></textarea>
                         </div>
 
+                        <!-- Sessione -->
+                        <div class="mb-8 group">
+                            <h3 class="text-sm font-bold text-tp-muted mb-2 flex items-center gap-2 group-hover:text-white transition-colors">
+                                <i data-lucide="clock" class="w-4 h-4 text-tp-accent"></i> Sessione
+                            </h3>
+                            <input id="strat-sessione" type="text" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg p-3 text-sm text-tp-text/90 outline-none" placeholder="es. 08:00-17:00 Casablanca">
+                        </div>
+
                         <!-- Regole di Ingresso -->
                         <div class="mb-8">
                             <h3 class="text-sm font-bold text-tp-muted mb-4 flex items-center gap-2">
@@ -259,12 +267,40 @@
                             </div>
                         </div>
 
-                        <!-- Gestione del Rischio -->
+                        <!-- Gestione Operazione -->
                         <div class="mb-8 group">
                             <h3 class="text-sm font-bold text-tp-muted mb-2 flex items-center gap-2 group-hover:text-white transition-colors">
-                                <i data-lucide="shield-alert" class="w-4 h-4 text-tp-loss"></i> Gestione del Rischio
+                                <i data-lucide="shield-alert" class="w-4 h-4 text-tp-loss"></i> Gestione Operazione
+                                <span class="text-[9px] font-normal text-tp-muted/70 ml-2 normal-case tracking-normal">SL, rischio max, modulatore size, circuit breaker</span>
                             </h3>
-                            <textarea id="strat-rischio" class="notion-textarea w-full bg-[#0a0c10] border border-tp-border rounded-lg p-4 text-sm text-tp-text/90 leading-relaxed outline-none min-h-[100px]" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="Definisci le regole di gestione del rischio..."></textarea>
+                            <textarea id="strat-gestione-operazione" class="notion-textarea w-full bg-[#0a0c10] border border-tp-border rounded-lg p-4 text-sm text-tp-text/90 leading-relaxed outline-none min-h-[100px]" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="SL operativo, rischio max, modulatore size, circuit breaker..."></textarea>
+                        </div>
+
+                        <!-- Take Profit -->
+                        <div class="mb-8 group">
+                            <h3 class="text-sm font-bold text-tp-muted mb-2 flex items-center gap-2 group-hover:text-white transition-colors">
+                                <i data-lucide="trending-up" class="w-4 h-4 text-tp-accent"></i> Take Profit & Trail
+                                <span class="text-[9px] font-normal text-tp-muted/70 ml-2 normal-case tracking-normal">Filtro RR, stati TP, BE, trail</span>
+                            </h3>
+                            <textarea id="strat-take-profit" class="notion-textarea w-full bg-[#0a0c10] border border-tp-border rounded-lg p-4 text-sm text-tp-text/90 leading-relaxed outline-none min-h-[100px]" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="Filtro RR minimo, stati TP, BE, trail..."></textarea>
+                        </div>
+
+                        <!-- Da Osservare -->
+                        <div class="mb-8 group">
+                            <h3 class="text-sm font-bold text-tp-muted mb-2 flex items-center gap-2 group-hover:text-white transition-colors">
+                                <i data-lucide="eye" class="w-4 h-4 text-tp-warning"></i> Da Osservare
+                                <span class="text-[9px] font-normal text-tp-muted/70 ml-2 normal-case tracking-normal">Cose da monitorare nei primi N trade</span>
+                            </h3>
+                            <textarea id="strat-da-osservare" class="notion-textarea w-full bg-[#0a0c10] border border-tp-border rounded-lg p-4 text-sm text-tp-text/90 leading-relaxed outline-none min-h-[100px]" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="Lista cose da monitorare/calibrare..."></textarea>
+                        </div>
+
+                        <!-- Gestione del Rischio (LEGACY) -->
+                        <div id="strat-rischio-legacy-wrapper" class="mb-8 group" style="display:none">
+                            <h3 class="text-sm font-bold text-tp-muted mb-2 flex items-center gap-2 group-hover:text-white transition-colors">
+                                <i data-lucide="archive" class="w-4 h-4 text-tp-muted"></i> Gestione Rischio (Legacy)
+                                <span class="text-[9px] font-normal text-tp-muted/70 ml-2 normal-case tracking-normal">Vecchio campo unico — splittalo nei tre nuovi sopra</span>
+                            </h3>
+                            <textarea id="strat-rischio" class="notion-textarea w-full bg-[#0a0c10] border border-tp-border/50 rounded-lg p-4 text-sm text-tp-muted leading-relaxed outline-none min-h-[80px]" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder=""></textarea>
                         </div>
 
                         <!-- Screenshot -->
@@ -338,6 +374,18 @@
                         <!-- Contatore trades -->
                         <div class="mt-3 text-center">
                             <span id="trades-count" class="text-[10px] text-tp-muted font-bold uppercase tracking-widest">0 trade registrati</span>
+                        </div>
+                    </div>
+
+                    <!-- Momenti di Spinta (aggregato tag dei trade collegati) -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted border-b border-tp-border/50 pb-3 mb-4 flex items-center gap-2">
+                            <i data-lucide="flame" class="w-4 h-4 text-tp-warning"></i> Momenti di Spinta
+                        </h3>
+                        <div id="tag-aggregati" class="space-y-2">
+                            <div id="no-tag-msg" class="text-center py-4 text-tp-muted">
+                                <p class="text-[10px] opacity-60">Aggregati dai tag dei trade collegati</p>
+                            </div>
                         </div>
                     </div>
 
@@ -445,7 +493,15 @@
             document.getElementById('strat-nome').value = data.nome || '';
             document.getElementById('page-global-title').textContent = `Playbook: ${data.nome || 'Strategia'}`;
             document.getElementById('strat-ipotesi').value = data.ipotesi || '';
+            document.getElementById('strat-sessione').value = data.sessione || '';
+            document.getElementById('strat-gestione-operazione').value = data.gestione_operazione || '';
+            document.getElementById('strat-take-profit').value = data.take_profit || '';
+            document.getElementById('strat-da-osservare').value = data.da_osservare || '';
             document.getElementById('strat-rischio').value = data.gestione_rischio || '';
+            // Mostra il blocco Legacy solo se ha contenuto: per le strategie nuove resta nascosto.
+            if (data.gestione_rischio && data.gestione_rischio.trim()) {
+                document.getElementById('strat-rischio-legacy-wrapper').style.display = '';
+            }
 
             // Auto-resize textareas
             document.querySelectorAll('.notion-textarea').forEach(ta => {
@@ -567,7 +623,11 @@
             const payload = {
                 nome: document.getElementById('strat-nome').value.trim() || 'Senza Nome',
                 ipotesi: document.getElementById('strat-ipotesi').value,
+                sessione: document.getElementById('strat-sessione').value,
                 regole_ingresso: rules,
+                gestione_operazione: document.getElementById('strat-gestione-operazione').value,
+                take_profit: document.getElementById('strat-take-profit').value,
+                da_osservare: document.getElementById('strat-da-osservare').value,
                 gestione_rischio: document.getElementById('strat-rischio').value,
                 screenshots: screenshots,
                 updated_at: new Date().toISOString()
@@ -678,6 +738,31 @@
             }).join('') + '</ul>';
 
             updateMetrics(trades);
+            renderTagAggregati(trades);
+        }
+
+        // --- TAG AGGREGATI (Momenti di Spinta) ---
+        function renderTagAggregati(trades) {
+            const container = document.getElementById('tag-aggregati');
+            const counts = {};
+            (trades || []).forEach(function(t) {
+                (t.tag || []).forEach(function(tag) {
+                    if (!tag) return;
+                    counts[tag] = (counts[tag] || 0) + 1;
+                });
+            });
+            const sorted = Object.entries(counts).sort(function(a,b){return b[1]-a[1];});
+            if (sorted.length === 0) {
+                container.innerHTML = '<div class="text-center py-4 text-tp-muted"><p class="text-[10px] opacity-60">Nessun tag sui trade collegati</p></div>';
+                return;
+            }
+            container.innerHTML = sorted.slice(0, 8).map(function(entry) {
+                var tag = entry[0], n = entry[1];
+                return '<div class="flex items-center justify-between bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2">' +
+                    '<span class="text-xs font-bold text-white truncate">' + tag + '</span>' +
+                    '<span class="text-[10px] font-bold text-tp-warning bg-tp-warning/10 px-2 py-0.5 rounded">' + n + '</span>' +
+                    '</div>';
+            }).join('');
         }
 
         // --- METRICS ---

@@ -181,6 +181,18 @@
                     </div>
                 </div>
 
+                <!-- Tag (momenti di spinta) -->
+                <div class="bg-tp-panel border border-tp-border rounded-xl p-5 mt-6">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
+                        <i data-lucide="flame" class="w-4 h-4 text-tp-warning"></i> Tag — Momenti di Spinta
+                        <span class="text-[9px] font-normal text-tp-muted/70 ml-1 normal-case tracking-normal">aggregati per strategia</span>
+                    </label>
+                    <div id="tag-chips" class="flex flex-wrap gap-2 mb-3"></div>
+                    <input id="tag-input" type="text" placeholder="aggiungi tag (Invio per confermare) — es. spinta_apertura_ny, rejection_pdh"
+                        class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-xs text-tp-text outline-none focus:border-tp-warning"
+                        onkeydown="if(event.key==='Enter'){event.preventDefault();addTag();}">
+                </div>
+
                 <!-- Elementi collegati -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                     <div class="bg-tp-panel border border-tp-border rounded-xl p-5"><h3 class="text-[10px] font-bold uppercase tracking-widest text-tp-warning mb-3 flex items-center gap-2"><i data-lucide="microscope" class="w-3.5 h-3.5"></i> Bias Collegati</h3><div id="linked-bias" class="space-y-2"><p class="text-xs text-tp-muted/50 italic">Nessuno</p></div></div>
@@ -241,6 +253,35 @@
         let regoleChecked = {};
         let strategieCache = [];
         let tradeChiuso = false;
+        let currentTags = [];
+
+        function renderTags() {
+            const wrap = document.getElementById('tag-chips');
+            if (!wrap) return;
+            if (!currentTags.length) {
+                wrap.innerHTML = '<span class="text-[10px] text-tp-muted/50 italic">Nessun tag</span>';
+                return;
+            }
+            wrap.innerHTML = currentTags.map(function(t, i) {
+                return '<span class="inline-flex items-center gap-1.5 bg-tp-warning/10 border border-tp-warning/40 text-tp-warning text-[11px] font-bold rounded-full px-2.5 py-1">' +
+                    t.replace(/</g,'&lt;') +
+                    '<button onclick="removeTag(' + i + ')" class="hover:text-white" title="rimuovi"><i data-lucide="x" class="w-3 h-3"></i></button>' +
+                    '</span>';
+            }).join('');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+        function addTag() {
+            const input = document.getElementById('tag-input');
+            const raw = (input.value || '').trim().toLowerCase().replace(/\s+/g, '_');
+            if (!raw) return;
+            if (currentTags.indexOf(raw) === -1) currentTags.push(raw);
+            input.value = '';
+            renderTags();
+        }
+        function removeTag(i) {
+            currentTags.splice(i, 1);
+            renderTags();
+        }
 
         document.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
@@ -297,6 +338,8 @@
             renderFractals();
             if (t.mood) setMood(t.mood);
             if (t.volatilita) setVol(t.volatilita);
+            currentTags = Array.isArray(t.tag) ? t.tag.slice() : [];
+            renderTags();
             document.getElementById('page-global-title').textContent = `Trade: ${t.asset||''} ${t.direzione||''}`;
 
             // Se completato → readonly
@@ -458,6 +501,7 @@
                 mood: currentMood,
                 volatilita: currentVol,
                 strategia_id: strategiaId,
+                tag: currentTags,
                 updated_at: new Date().toISOString()
             };
         }

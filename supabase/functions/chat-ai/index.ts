@@ -34,7 +34,7 @@ serve(async (req) => {
     const fourteenDaysAgo = new Date(Date.now() - 14 * 86400000).toISOString().split("T")[0];
 
     let tradesQuery = supabase.from("trades")
-      .select("asset, direzione, esito, pnl, pips, rr_reale, rr_teorico, size, sorgente, data, mood, volatilita, note")
+      .select("id, asset, direzione, esito, pnl, pips, rr_reale, rr_teorico, size, sorgente, data, mood, volatilita, note, tag")
       .order("data", { ascending: false });
 
     if (assistantMode === "giornaliero") {
@@ -103,7 +103,8 @@ serve(async (req) => {
 
     if (assistantMode === "coach" || assistantMode === "power") {
       const { data: strategie } = await supabase.from("strategie")
-        .select("nome, ipotesi, regole_ingresso, gestione_rischio").limit(10);
+        .select("id, nome, stato, sessione, ipotesi, regole_ingresso, gestione_operazione, take_profit, da_osservare, gestione_rischio, note, asset, tipo, timeframe, winrate")
+        .limit(10);
       if (strategie && strategie.length) dbContext += "\n\n## STRATEGIE:\n" + JSON.stringify(strategie);
     }
 
@@ -157,7 +158,27 @@ IMPORTANTE: NON usare MAI insert su "sessioni". Le 3 righe (asia, london, newyor
 [{"table":"cronache","action":"update_coin","match":{"data":"2026-04-24"},"coin":"XAUUSD","data":{"low":"4657.69","high":"4740.42","open":"4692.44","close":"4707.41","percentuale":"+0.32"}}]
 \`\`\`
 
-Tabelle scrittura: sessioni (coin_data, mood, nome, data), giornate (mindset, volatilita, note_domani, fajr, marea, day_tags), trades (note, mood, volatilita - solo se non completato), bias (asset, direzione, commento), cronache (coin_data, titolo), settimane (review, note), strategie (nome, ipotesi, regole_ingresso, gestione_rischio, asset, tipo, timeframe, note, stato, winrate), allert (SOLO valore_effettivo, screenshot).
+Tabelle scrittura: sessioni (coin_data, mood, nome, data), giornate (mindset, volatilita, note_domani, fajr, marea, day_tags), trades (note, mood, volatilita, tag - solo se non completato), bias (asset, direzione, commento), cronache (coin_data, titolo), settimane (review, note), strategie (nome, ipotesi, regole_ingresso, sessione, gestione_operazione, take_profit, da_osservare, asset, tipo, timeframe, note, stato, winrate, gestione_rischio[LEGACY]), allert (SOLO valore_effettivo, screenshot).
+
+REGOLE STRATEGIE (split campi):
+- ipotesi: cosa vede il setup, perche dovrebbe funzionare (testo libero, 3-8 righe).
+- regole_ingresso: ARRAY JSONB di stringhe-checklist ordinato (1 riga = 1 condizione strict, prefisso "☐ " ammesso).
+- sessione: finestra oraria operativa (es. "08:00-17:00 Casablanca").
+- gestione_operazione: SL operativo, rischio max per fase, modulatore size, circuit breaker. SOLO regole pre-trade / di sopravvivenza.
+- take_profit: filtro RR minimo, TP base, trail, BE, stati 1-N. SOLO regole post-entry.
+- da_osservare: checklist cose da monitorare/calibrare nei primi N trade (lista con "- " all'inizio di ogni riga).
+- note: appunti generici e contestuali, NON sostitutivo di da_osservare.
+- gestione_rischio: LEGACY. NON scrivere qui per nuove strategie. Se trovi una strategia vecchia con tutto qui dentro e l'utente chiede di "splittare" o "ripulire", dividi i contenuti tra gestione_operazione + take_profit + da_osservare con un singolo update e svuota gestione_rischio mettendolo a "".
+- nome: SE l'utente cambia il nome della strategia includilo nel data dell'update. Non assumere mai il vecchio nome se nel testo nuovo c'e' un titolo diverso.
+
+REGOLE TRADES.tag:
+- Array di stringhe libere snake_case_lower (es. "spinta_apertura_ny", "rejection_pdh", "fakeout_london").
+- Servono per riconoscere "momenti di spinta" aggregando i trade collegati a una strategia.
+- L'utente puo' chiederti "metti tag X sul trade Y": passa l'array INTERO con il tag aggiunto/rimosso. Mai append parziale.
+
+REGOLA NO-OP (importante):
+- Prima di chiamare action=update su strategie/giornate/etc, confronta i valori che stai per passare con quelli gia' presenti nel contesto. Se TUTTI i campi del payload sono identici a quelli in DB, NON emettere il db_actions: rispondi "Nessuna modifica: i valori sono gia' identici a quelli in DB" e elenca brevemente cosa hai confrontato.
+- Il backend comunque blocca gli UPDATE no-op e te lo segnala con "NO-OP", ma e' meglio se lo rilevi prima tu.
 
 NOTIZIE MACRO (tabella allert):
 - Quando l'utente ti dice il valore attuale di una notizia uscita ("Advance GDP attuale 2.0%", "il PCE e' stato 0.3%", "Unemployment Claims 189K"), DEVI aggiornare valore_effettivo della riga in allert.
@@ -379,15 +400,41 @@ ${DB_ACTIONS}`;
         for (const act of actions) {
           try {
             if (act.action === "update" && act.table && act.match && act.data) {
-              let query = supabase.from(act.table).update(act.data);
+              // SELECT pre-update: solo i campi che stiamo per scrivere, per diff.
+              // Se tutti i valori sono gia' identici a quelli in DB blocchiamo l'UPDATE
+              // (no-op): evita di sporcare assistant_messages con echi inutili e
+              //  fa capire a Steve quando non c'e' nulla da fare.
+              const fieldsToCheck = Object.keys(act.data);
+              let preQuery = supabase.from(act.table).select(fieldsToCheck.join(","));
               for (const [k, v] of Object.entries(act.match)) {
-                query = query.eq(k, v);
+                preQuery = preQuery.eq(k, v);
               }
-              const { error } = await query;
-              if (error) {
-                actionsExecuted.push("ERRORE update " + act.table + ": " + error.message);
+              const { data: preRow, error: preErr } = await preQuery.maybeSingle();
+              if (preErr) {
+                actionsExecuted.push("ERRORE update " + act.table + " (select pre): " + preErr.message);
+              } else if (!preRow) {
+                actionsExecuted.push("ERRORE update " + act.table + ": nessuna riga con " + JSON.stringify(act.match));
               } else {
-                actionsExecuted.push("OK: aggiornato " + act.table + " " + JSON.stringify(act.data));
+                const changedFields: string[] = [];
+                for (const k of fieldsToCheck) {
+                  const a = (preRow as any)[k];
+                  const b = act.data[k];
+                  if (JSON.stringify(a) !== JSON.stringify(b)) changedFields.push(k);
+                }
+                if (changedFields.length === 0) {
+                  actionsExecuted.push("NO-OP " + act.table + ": valori gia' identici (" + fieldsToCheck.join(", ") + ")");
+                } else {
+                  let query = supabase.from(act.table).update(act.data);
+                  for (const [k, v] of Object.entries(act.match)) {
+                    query = query.eq(k, v);
+                  }
+                  const { error } = await query;
+                  if (error) {
+                    actionsExecuted.push("ERRORE update " + act.table + ": " + error.message);
+                  } else {
+                    actionsExecuted.push("OK: aggiornato " + act.table + " [" + changedFields.join(", ") + "]");
+                  }
+                }
               }
             } else if (act.action === "insert" && act.table && act.data) {
               // sessioni: la riga la crea sempre la edge function apertura-sessione (cron 08:00/14:30 Casa).
