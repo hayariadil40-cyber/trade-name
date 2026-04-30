@@ -70,6 +70,15 @@ serve(async (req) => {
       .select("nome, data, mood, coin_data").eq("data", today);
     if (sessioni && sessioni.length) dbContext += "\n\n## SESSIONI DI OGGI:\n" + JSON.stringify(sessioni);
 
+    // Eventi macro di oggi (calendario ForexFactory). Servono a Rodrigo per:
+    // 1) sapere cosa esce oggi quando l'utente chiede; 2) compilare valore_effettivo
+    //    quando l'utente glielo dice (il trigger Postgres genera poi commento_rodrigo).
+    const { data: allert } = await supabase.from("allert")
+      .select("id, titolo, valuta, ora_evento, impatto, valore_atteso, valore_precedente, valore_effettivo")
+      .eq("data_evento", today)
+      .order("ora_evento", { ascending: true });
+    if (allert && allert.length) dbContext += "\n\n## EVENTI MACRO DI OGGI (allert):\n" + JSON.stringify(allert);
+
     const { data: usd } = await supabase.from("forza_usd")
       .select("usd_strength, created_at").order("created_at", { ascending: false }).limit(1);
     if (usd && usd.length) dbContext += `\n\n## FORZA USD ATTUALE: ${usd[0].usd_strength}`;
@@ -135,7 +144,19 @@ IMPORTANTE: NON usare MAI insert su "sessioni". Le 3 righe (asia, london, newyor
 [{"table":"cronache","action":"update_coin","match":{"data":"2026-04-24"},"coin":"XAUUSD","data":{"low":"4657.69","high":"4740.42","open":"4692.44","close":"4707.41","percentuale":"+0.32"}}]
 \`\`\`
 
-Tabelle scrittura: sessioni (coin_data, mood, nome, data), giornate (mindset, volatilita, note_domani, fajr, marea, day_tags), trades (note, mood, volatilita - solo se non completato), bias (asset, direzione, commento), cronache (coin_data, titolo), settimane (review, note), strategie (nome, ipotesi, regole_ingresso, gestione_rischio, asset, tipo, timeframe, note, stato, winrate).
+Tabelle scrittura: sessioni (coin_data, mood, nome, data), giornate (mindset, volatilita, note_domani, fajr, marea, day_tags), trades (note, mood, volatilita - solo se non completato), bias (asset, direzione, commento), cronache (coin_data, titolo), settimane (review, note), strategie (nome, ipotesi, regole_ingresso, gestione_rischio, asset, tipo, timeframe, note, stato, winrate), allert (SOLO valore_effettivo, screenshot).
+
+NOTIZIE MACRO (tabella allert):
+- Quando l'utente ti dice il valore attuale di una notizia uscita ("Advance GDP attuale 2.0%", "il PCE e' stato 0.3%", "Unemployment Claims 189K"), DEVI aggiornare valore_effettivo della riga in allert.
+- Trovi gli eventi del giorno nel blocco "## EVENTI MACRO DI OGGI (allert)" qui sopra: ognuno ha id, titolo, valuta, ora_evento.
+- USA SEMPRE l'id come match (titolo + valuta non sono unique tra date diverse).
+- valore_effettivo deve essere una STRINGA con il formato del feed: "2.0%", "0.3%", "189K", "2.15%". Non rimuovere il simbolo % o la K.
+- NON serve scrivere commento_rodrigo: un trigger Postgres lo genera in automatico ~5-10 secondi dopo l'update.
+- NON modificare data_evento, ora_evento, ff_id, impatto, titolo, valuta, valore_atteso, valore_precedente.
+Esempio:
+\`\`\`db_actions
+[{"table":"allert","action":"update","match":{"id":"2b6f4d0a-d293-4a95-8daf-e85cfda9b0e8"},"data":{"valore_effettivo":"2.0%"}}]
+\`\`\`
 
 NOTA strategie.regole_ingresso e' un ARRAY JSONB di stringhe. Per modificarlo via update, includi nell'UPDATE l'array INTERO con la modifica applicata: leggi l'array dal contesto sopra, ricostruiscilo con la modifica e passalo per intero. Esempio: per aggiungere "EURUSD" alla riga "Strumenti ammessi: XAU, BTC" della strategia "Chiusura FVG", invia un update con il nuovo array completo che include la riga modificata "Strumenti ammessi: XAU, BTC, EURUSD". MAI passare un array parziale, sovrascrive tutto.
 
