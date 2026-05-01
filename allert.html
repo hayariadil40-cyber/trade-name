@@ -85,6 +85,7 @@
             <div class="flex border-b border-tp-border px-8 bg-tp-panel/50 flex-shrink-0">
                 <button onclick="switchMainTab('calendario')" class="main-tab active px-6 py-3 text-sm font-bold uppercase tracking-widest border-b-2 transition-all flex items-center gap-2"><i data-lucide="globe" class="w-4 h-4"></i> Calendario</button>
                 <button onclick="switchMainTab('allert')" class="main-tab px-6 py-3 text-sm font-bold uppercase tracking-widest border-b-2 transition-all flex items-center gap-2"><i data-lucide="bell" class="w-4 h-4"></i> Allert</button>
+                <button onclick="switchMainTab('allertperc')" class="main-tab px-6 py-3 text-sm font-bold uppercase tracking-widest border-b-2 transition-all flex items-center gap-2"><i data-lucide="percent" class="w-4 h-4"></i> Allertpercentuali</button>
                 <button onclick="switchMainTab('smile')" class="main-tab px-6 py-3 text-sm font-bold uppercase tracking-widest border-b-2 transition-all flex items-center gap-2"><i data-lucide="heart" class="w-4 h-4"></i> MonitoraSmile</button>
             </div>
 
@@ -105,13 +106,19 @@
                     <div id="cal-empty" class="hidden text-center py-16 text-tp-muted"><i data-lucide="globe" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm font-bold">Nessuna notizia</p></div>
                 </div>
 
-                <!-- TAB 2: ALLERT -->
+                <!-- TAB 2: ALLERT (manuali da TV) -->
                 <div id="tab-allert" class="tab-content hidden max-w-7xl mx-auto">
                     <div id="allert-list" class="space-y-2"></div>
                     <div id="allert-empty" class="hidden text-center py-16 text-tp-muted"><i data-lucide="bell" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm font-bold">Nessun allert</p></div>
                 </div>
 
-                <!-- TAB 3: MONITORASMILE -->
+                <!-- TAB 3: ALLERTPERCENTUALI (automatici da EA MT4) -->
+                <div id="tab-allertperc" class="tab-content hidden max-w-7xl mx-auto">
+                    <div id="allertperc-list" class="space-y-2"></div>
+                    <div id="allertperc-empty" class="hidden text-center py-16 text-tp-muted"><i data-lucide="percent" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm font-bold">Nessun allert percentuale</p></div>
+                </div>
+
+                <!-- TAB 4: MONITORASMILE -->
                 <div id="tab-smile" class="tab-content hidden max-w-7xl mx-auto">
                     <div id="smile-list" class="space-y-2"></div>
                     <div id="smile-empty" class="hidden text-center py-16 text-tp-muted"><i data-lucide="heart" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm font-bold">Nessun record</p></div>
@@ -181,9 +188,15 @@
             document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.add('hidden'); });
             // Trova il tab button corretto e attivalo
             var tabs = document.querySelectorAll('.main-tab');
-            var tabMap = { calendario: 0, allert: 1, smile: 2 };
+            var tabMap = { calendario: 0, allert: 1, allertperc: 2, smile: 3 };
             if (tabs[tabMap[tab]]) tabs[tabMap[tab]].classList.add('active');
             document.getElementById('tab-' + tab).classList.remove('hidden');
+        }
+
+        // Discrimina allert automatici EA MT4 (descrizione "Superato +X.X% | Attuale: ...")
+        // dagli allert manuali TV inseriti dall'utente.
+        function isPercAllert(a) {
+            return /^Superato\s*[+-]?[0-9]+(?:\.[0-9]+)?%/.test(a && a.descrizione || '');
         }
 
         // === CALENDARIO ===
@@ -286,7 +299,15 @@
         }
 
         function renderAllerts(items) {
-            const list=document.getElementById('allert-list'),empty=document.getElementById('allert-empty');
+            const tv = items.filter(a => !isPercAllert(a));
+            const ea = items.filter(a => isPercAllert(a));
+            renderAllertList(tv, 'allert-list', 'allert-empty');
+            renderAllertList(ea, 'allertperc-list', 'allertperc-empty');
+            lucide.createIcons();
+        }
+
+        function renderAllertList(items, listId, emptyId) {
+            const list=document.getElementById(listId),empty=document.getElementById(emptyId);
             if(!items.length){empty.classList.remove('hidden');list.innerHTML='';return}
             empty.classList.add('hidden');
             list.innerHTML=items.map(a=>{
@@ -295,7 +316,6 @@
                 const t=a.ora?a.ora.substring(0,5):new Date(a.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Casablanca'});
                 return `<div onclick="openAllertModal('${a.id}')" class="group grid grid-cols-2 gap-y-2 lg:flex lg:items-center p-3 lg:p-4 pl-5 lg:pl-4 bg-tp-panel border border-tp-border hover:border-tp-warning/50 rounded-lg cursor-pointer shadow-sm relative overflow-hidden"><div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-warning"></div><div class="lg:w-1/4 lg:pl-3 flex items-center gap-2 lg:gap-3"><span class="font-bold text-sm text-white group-hover:text-tp-warning">${a.coin||'--'}</span><span class="text-xs font-bold text-tp-warning">${a.prezzo||''}</span></div><div class="lg:w-1/4 flex justify-end lg:justify-start">${badge}</div><div class="col-span-2 lg:w-1/4 text-[11px] lg:text-xs text-tp-muted">${t} - ${a.descrizione||''}</div><div class="hidden lg:flex lg:w-1/4 lg:justify-end"><i data-lucide="chevron-right" class="w-4 h-4 text-tp-muted group-hover:text-tp-warning"></i></div></div>`;
             }).join('');
-            lucide.createIcons();
         }
 
         function openAllertModal(id) {
