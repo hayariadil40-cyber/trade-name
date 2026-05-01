@@ -193,10 +193,11 @@
             document.getElementById('tab-' + tab).classList.remove('hidden');
         }
 
-        // Discrimina allert automatici EA MT4 (descrizione "Superato +X.X% | Attuale: ...")
-        // dagli allert manuali TV inseriti dall'utente.
+        // Discrimina allert automatici EA MT4 dagli allert manuali TV.
+        // L'EA usa due pattern: "Superato +X.X% | Attuale: ..." (soglia raggiunta)
+        // e "Si avvicina a +X.X% | Attuale: ..." (soglia in approccio).
         function isPercAllert(a) {
-            return /^Superato\s*[+-]?[0-9]+(?:\.[0-9]+)?%/.test(a && a.descrizione || '');
+            return /^(?:Superato|Si avvicina a)\s*[+-]?[0-9]+(?:\.[0-9]+)?%/.test(a && a.descrizione || '');
         }
 
         // === CALENDARIO ===
