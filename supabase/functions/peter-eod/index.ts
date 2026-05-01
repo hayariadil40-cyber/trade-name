@@ -1,7 +1,6 @@
 // Peter EOD - Edge Function
 // Schedule: pg_cron `15 16 * * *` UTC = 17:15 Casablanca
 // Digest fine giornata Peter con metriche oggi + baseline 30gg per confronto.
-// Output: messaggio Telegram firmato Peter + INSERT su routine_events e assistant_messages.
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -29,7 +28,6 @@ function startOfDayCasablancaIso(today: string): string {
 
 function endOfDayCasablancaIso(today: string): string {
   const [y, m, d] = today.split("-").map(Number);
-  // Fine giornata Casablanca = 23:00 UTC dello stesso giorno
   return new Date(Date.UTC(y, m - 1, d, 22, 59, 59, 999)).toISOString();
 }
 
@@ -38,9 +36,7 @@ async function callClaude(systemPrompt: string, userPrompt: string, apiKey: stri
     method: "POST",
     headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
     body: JSON.stringify({
-      model: "claude-sonnet-4-6",
-      max_tokens: maxTokens,
-      system: systemPrompt,
+      model: "claude-sonnet-4-6", max_tokens: maxTokens, system: systemPrompt,
       messages: [{ role: "user", content: userPrompt }],
     }),
   });
@@ -68,14 +64,17 @@ Commenti i FATTI. Non presumere pattern. Se suggerisci una tendenza, cita il cam
 
 CONTESTO: chiusura giornata (17:15 Casablanca). Ti do i dati di oggi + baseline ultimi 30 giorni (escluso oggi) per confronto oggettivo.
 
+DATI DEI TRADE: per ogni trade di oggi ricevi anche il campo 'note' (il commento dell'utente sul trade: razionale, contesto, autovalutazione) e 'mood' (stato emotivo registrato). Usali per identificare giustificazioni, auto-inganni, FOMO, revenge, forcing, narrazione retroattiva. Sono il cuore dell'analisi disciplinare: senza incrociarli con i risultati il debrief e' inutile.
+
 OUTPUT:
 - 8-14 righe. HTML Telegram: <b>, <i>. Max 1 emoji all'inizio se serve.
 - Struttura:
   1) Riepilogo numerico giornata (n trade, WR, net PnL).
   2) Confronto con baseline 30gg (solo se n >= 10, altrimenti salta il confronto).
-  3) Compilazione: screenshot/strategia mancanti. Segnalali.
-  4) Coerenza con reperti/bias scritti oggi.
-  5) 1 riga operativa finale (es. "prima di chiudere: completa giornaliero e note domani"). Neutra, non motivazionale.
+  3) Analisi note dei trade: cita testualmente parti rilevanti (max 1 frase per trade) se contengono giustificazioni o segnali comportamentali. Se le note sono assenti o vuote, segnalalo come compilazione mancante.
+  4) Compilazione: screenshot/strategia/note mancanti. Segnalali.
+  5) Coerenza con reperti/bias scritti oggi.
+  6) 1 riga operativa finale (es. "prima di chiudere: completa giornaliero e note domani"). Neutra, non motivazionale.
 
 Se nOggi = 0: riconoscilo e chiedi riflessione breve (senza giudizio).
 Se baseline n < 10: nota che il confronto non e ancora statisticamente robusto.`;
@@ -101,7 +100,7 @@ serve(async (req) => {
 
     const { data: tradesOggiRaw } = await supabase
       .from("trades")
-      .select("asset, direzione, esito, pnl, pips, screenshot_url, strategia_id, data")
+      .select("asset, direzione, esito, pnl, pips, screenshot_url, strategia_id, note, mood, volatilita, tag, data")
       .gte("data", startToday).lte("data", endToday)
       .order("data", { ascending: true });
     const tradesOggi = tradesOggiRaw || [];
@@ -115,7 +114,6 @@ serve(async (req) => {
       .from("bias").select("asset, direzione, tipo").eq("data", today);
     const reperti = repertiRaw || [];
 
-    // Baseline 30gg (escluso oggi) - dal -30 a startToday
     const inizio30gg = new Date(Date.now() - 30 * 86400000).toISOString();
     const { data: trades30Raw } = await supabase
       .from("trades").select("esito, pnl")
@@ -130,11 +128,11 @@ serve(async (req) => {
     const pnlOggi = nOggi > 0 ? Math.round(tradesOggi.reduce((s, t) => s + (Number(t.pnl) || 0), 0) * 100) / 100 : 0;
     const noScrOggi = tradesOggi.filter((t) => !t.screenshot_url).length;
     const noStratOggi = tradesOggi.filter((t) => !t.strategia_id).length;
+    const noNoteOggi = tradesOggi.filter((t) => !t.note || !t.note.trim()).length;
 
     const n30 = trades30.length;
     const wins30 = trades30.filter((t) => t.esito === "win").length;
-    const loss30 = trades30.filter((t) => t.esito === "loss").length;
-    const dec30 = wins30 + loss30;
+    const dec30 = wins30 + trades30.filter((t) => t.esito === "loss").length;
     const wr30 = dec30 > 0 ? Math.round((wins30 / dec30) * 1000) / 10 : null;
     const pnl30 = n30 > 0 ? Math.round(trades30.reduce((s, t) => s + (Number(t.pnl) || 0), 0) * 100) / 100 : 0;
     const avgPnl30 = n30 > 0 ? Math.round((pnl30 / n30) * 100) / 100 : 0;
@@ -143,14 +141,24 @@ serve(async (req) => {
       data: today,
       oggi: {
         n_trade: nOggi, wins: winsOggi, losses: lossOggi, winrate_pct: wrOggi, net_pnl: pnlOggi,
-        senza_screenshot: noScrOggi, senza_strategia: noStratOggi,
+        senza_screenshot: noScrOggi, senza_strategia: noStratOggi, senza_note: noNoteOggi,
         mindset: giornata?.mindset ?? null,
         stato_giornata: giornata?.stato ?? "non_aperta",
         note_domani_scritte: !!(giornata?.note_domani),
         reperti_creati: reperti.length,
       },
       baseline_30gg: { n_trade: n30, winrate_pct: wr30, net_pnl: pnl30, pnl_medio_per_trade: avgPnl30 },
-      trade_dettaglio_oggi: tradesOggi.map((t) => ({ asset: t.asset, direzione: t.direzione, esito: t.esito, pnl: t.pnl, pips: t.pips })),
+      trade_dettaglio_oggi: tradesOggi.map((t) => ({
+        asset: t.asset,
+        direzione: t.direzione,
+        esito: t.esito,
+        pnl: t.pnl,
+        pips: t.pips,
+        mood: t.mood ?? null,
+        volatilita: t.volatilita ?? null,
+        tag: Array.isArray(t.tag) && t.tag.length > 0 ? t.tag : null,
+        note: t.note && t.note.trim() ? t.note : null,
+      })),
     };
 
     const text = await callClaude(SYSTEM_PROMPT, `Dati in JSON:\n${JSON.stringify(payload)}`, ANTHROPIC_API_KEYS, 1800);

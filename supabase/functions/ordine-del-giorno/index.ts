@@ -5,7 +5,7 @@
 // 2) Ultimi 5 trade
 // 3) Forza USD intraday (apertura giornata Casablanca → ora)
 // 4) Letture del giorno (commento Claude/Rodrigo se gia disponibili)
-// 5) Allert prezzo recenti (commento Claude/Rodrigo)
+// 5) Allert prezzo dall'apertura giornata Casablanca (commento Claude/Rodrigo)
 // Output: UPSERT su giornate.ordine_del_giorno + Telegram
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
@@ -129,7 +129,6 @@ serve(async (req) => {
     const today = todayCasablanca();
     const nowIso = new Date().toISOString();
     const startOfDayIso = startOfDayCasablancaIso(today);
-    const last24hIso = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
     // ===== 1. Macro eventi oggi =====
     const { data: macroRaw } = await supabase
@@ -285,18 +284,18 @@ Genera un commento generale (2-3 righe, italiano, asciutto, niente motivazione v
       }
     }
 
-    // ===== 5. Allert prezzo recenti (ultime 24h) =====
+    // ===== 5. Allert prezzo dall'apertura giornata Casablanca =====
     const { data: allertPrezzoRaw } = await supabase
       .from("allert_prezzo")
       .select("coin, prezzo, ora, descrizione, commento, stato, created_at")
-      .gte("created_at", last24hIso)
+      .gte("created_at", startOfDayIso)
       .order("created_at", { ascending: false })
-      .limit(20);
+      .limit(40);
     const allertPrezzo = allertPrezzoRaw || [];
 
     let allertPrezzoBlock: { count: number; commento: string } = {
       count: allertPrezzo.length,
-      commento: "Nessun allert prezzo nelle ultime 24h.",
+      commento: "Nessun allert prezzo dall'apertura della giornata.",
     };
 
     if (allertPrezzo.length > 0) {
@@ -306,7 +305,7 @@ Genera un commento generale (2-3 righe, italiano, asciutto, niente motivazione v
         const apText = allertPrezzo.map((a, i) =>
           `${i + 1}. ${a.coin || "?"} a ${a.prezzo || "?"} (${a.descrizione || "n.d."})${a.commento ? " — note: " + a.commento : ""}`
         ).join("\n");
-        const prompt = `Sei Rodrigo, assistente operativo del Trade Desk. Ecco gli allert di prezzo registrati nelle ultime 24h:
+        const prompt = `Sei Rodrigo, assistente operativo del Trade Desk. Ecco gli allert di prezzo registrati dall'apertura della giornata corrente (00:00 Casablanca a ora):
 
 ${apText}
 
@@ -434,7 +433,7 @@ Genera un commento generale (2-3 righe, italiano, asciutto, niente parolacce) su
       `${tradeLines}\n\n` +
       `📰 <b>Letture del Giorno</b> (${lettureBlock.count})\n` +
       `${lettureBlock.commento}\n\n` +
-      `🚨 <b>Allert Prezzo</b> (${allertPrezzoBlock.count} ultime 24h)\n` +
+      `🚨 <b>Allert Prezzo</b> (${allertPrezzoBlock.count} dall'apertura giornata)\n` +
       `${allertPrezzoBlock.commento}\n\n` +
       `🔔 <b>Promemoria Rodrigo</b>\n` +
       `${reminderLines}`;
