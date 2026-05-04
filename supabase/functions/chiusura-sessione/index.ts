@@ -198,15 +198,18 @@ ${allertPrezzoLines}
 STRATEGIE COLLEGATE AI TRADE DELLA SESSIONE:
 ${strategieLines}
 
-Genera un commento disciplinare di 5-7 righe (italiano, asciutto, no parolacce, no motivational) che:
-1. Incrocia trade fatti con strategie utilizzate (regole rispettate?)
-2. Verifica se le confluenze dei reperti erano allineate con i trade presi
-3. Identifica deviazioni o errori cognitivi (FOMO, revenge, forcing) — solo se evidenti dai dati
-4. Da' un voto 0-10 di disciplina del processo (NON di PnL)
-5. Una sola regola operativa concreta per la prossima sessione
+Genera un commento disciplinare ASCIUTTO (italiano, no parolacce, no motivational) che copra in ordine, ognuno UNA RIGA:
+1. Trade vs strategie: regole rispettate? (1 riga)
+2. Confluenze reperti vs trade presi: allineamento? (1 riga)
+3. Deviazioni cognitive (FOMO, revenge, forcing) SOLO se evidenti — altrimenti "nessuna" (1 riga)
+4. Voto disciplina 0-10 + 1 motivazione tecnica (1 riga)
+5. Una regola operativa concreta per la prossima sessione (1 riga)
 
-Se i trade della sessione sono insufficienti per pattern (n<3), dichiaralo esplicitamente e limita le conclusioni.`;
-        peterCommento = (await callClaude(prompt, ANTHROPIC_API_KEYS, 600)).trim();
+VINCOLI HARD:
+- Massimo 5 righe totali, NIENTE intro, NIENTE conclusioni, NIENTE markdown bold/italic.
+- Se i trade < 3: dichiaralo nella riga 1, riduci a 3 righe totali (no pattern stat).
+- Output deve stare sotto i 700 caratteri per leggibilità Telegram.`;
+        peterCommento = (await callClaude(prompt, ANTHROPIC_API_KEYS, 1000)).trim();
       } catch (e) {
         peterCommento = `Errore commento Peter: ${(e as Error).message}`;
       }

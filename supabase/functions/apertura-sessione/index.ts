@@ -2,7 +2,13 @@
 // Schedule:
 //   pg_cron `0 7 * * *` UTC  = 08:00 Casablanca (Londra)   body: { sessione: "londra" }
 //   pg_cron `30 13 * * *` UTC = 14:30 Casablanca (New York) body: { sessione: "ny" }
-// Blocchi: reperti da attenzionare (Claude), forza USD intraday, allert prezzo non lavorati, promemoria Rodrigo
+// Blocchi:
+//   1. reperti da attenzionare (Claude)
+//   2. forza USD intraday
+//   3. allert prezzo non lavorati (lista cruda manuali) — sempre nel JSON
+//   3b. allert EA — sintesi narrativa Claude (SOLO NY: a 14:30 abbiamo flusso Asia+London;
+//       per London troppo poco materiale, lì resta la lista cruda)
+//   4. promemoria Rodrigo
 // Output: UPSERT sessioni.apertura_brief + Telegram
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
@@ -47,6 +53,15 @@ async function callClaude(prompt: string, apiKey: string, maxTokens = 500): Prom
   const data = await response.json();
   if (data.error) throw new Error(data.error.message);
   return data.content?.[0]?.text || "";
+}
+
+// Riconosce gli allert prodotti dall'EA MT4 dal prefisso della descrizione (% / FVG / EMA).
+// Identica a isEaAllert() in index.html / allert.html / dettaglio_giornata.html.
+function isEaAllert(a: { descrizione?: string | null }): boolean {
+  const d = a?.descrizione || "";
+  return /^(?:Superato|Si avvicina a)\s*[+-]?[0-9]+(?:\.[0-9]+)?%/.test(d)
+    || /^FVG\s+(?:long|short)\s/i.test(d)
+    || /^EMA\d+\s/i.test(d);
 }
 
 async function sendTelegram(text: string, botToken: string, chatId: string): Promise<{ ok: boolean; messageId?: number; error?: string }> {
@@ -154,7 +169,7 @@ Regole:
       usdBlock = { apertura, attuale, max, min, max_ora: maxOra, min_ora: minOra, trend_intraday: trend, descrizione: descr };
     }
 
-    // ===== 3. Allert prezzo NON lavorati (stato=nuovo) =====
+    // ===== 3. Allert prezzo NON lavorati (stato=nuovo) — lista cruda manuali, persistita in apertura_brief =====
     const { data: allertRaw } = await supabase
       .from("allert_prezzo")
       .select("coin, prezzo, ora, descrizione, created_at")
@@ -163,7 +178,7 @@ Regole:
       .limit(20);
     const allertNuovi = allertRaw || [];
 
-    // raggruppa per coin
+    // raggruppa per coin (per il JSON apertura_brief e per il fallback London)
     const byCoin: Record<string, Array<{ prezzo: string; ora: string; descrizione: string }>> = {};
     for (const a of allertNuovi) {
       const c = a.coin || "?";
@@ -171,6 +186,52 @@ Regole:
       byCoin[c].push({ prezzo: a.prezzo || "", ora: a.ora || hhmmCasablanca(a.created_at), descrizione: a.descrizione || "" });
     }
     const allertBlock = { count: allertNuovi.length, by_coin: byCoin };
+
+    // ===== 3b. Allert EA — sintesi narrativa (SOLO per NY: alle 14:30 Casa abbiamo accumulato
+    // tutto il flusso Asia+London e ha senso analizzare il pattern. Per London troppo poco materiale). =====
+    let allertEaSintesi = "";
+    if (sessione === "ny") {
+      const { data: eaRaw } = await supabase
+        .from("allert_prezzo")
+        .select("coin, prezzo, ora, descrizione, created_at")
+        .gte("created_at", startOfDayIso)
+        .order("created_at", { ascending: true })
+        .limit(500);
+      const eaToday = (eaRaw || []).filter(isEaAllert);
+
+      if (eaToday.length > 0) {
+        // Compatto in righe testuali per il prompt
+        const eaLines = eaToday.map((a) => {
+          const ora = a.ora || hhmmCasablanca(a.created_at);
+          return `${ora} ${a.coin || "?"} @ ${a.prezzo || "?"} | ${a.descrizione || ""}`;
+        }).join("\n");
+
+        const prompt = `Sei un analista di flusso ordini. Riceverai la lista cronologica di ${eaToday.length} allert generati oggi (${today}, fino all'apertura NY) da un EA MT4 su 6 asset (XAUUSD, US30, GER30, NAS100, BTCUSD, EURUSD).
+
+I 3 tipi di allert che vedi:
+- "Superato +/-X.X% | Attuale: ..." = soglie percentuali daily superate.
+- "FVG long M15 | gap ..." / "FVG short M15 | gap ..." = Fair Value Gap M15 (segnali di flusso).
+- "EMA60 M15 touch | dist ..." = il prezzo ha toccato l'EMA60 a 15min.
+
+Restituisci una sintesi tattica in italiano, asciutta, leggibile su Telegram. Vincoli STRICT:
+- **1 bullet per asset attivo** (max 6 asset). Ogni bullet UNA SOLA RIGA, max ~200 caratteri.
+- Formato per asset: "• <ASSET> — <momentum 1-2 parole>: <dato chiave da percentuali, es. da +0.5% a +2% in 3h>; FVG <X long Y short>; EMA60 touch <N>x. <Osservazione tattica 1 riga>."
+- Momentum etichette: accelerazione / consolidamento / esaurimento / lateralità / reversal.
+- Aggiungi MAX 1 bullet finale "⚠️ <divergenza cross-asset>" SOLO se ne vedi una rilevante.
+- NIENTE preamboli, NIENTE motivational, NIENTE segnali operativi, NIENTE markdown bold/italic. Solo i bullet.
+
+DATI:
+${eaLines}`;
+
+        try {
+          const reply = await callClaude(prompt, ANTHROPIC_API_KEYS, 1000);
+          allertEaSintesi = (reply || "").trim();
+        } catch (e) {
+          console.error("[apertura-ny] sintesi allert EA fallita:", (e as Error).message);
+          allertEaSintesi = ""; // fallback: lista cruda usata sotto
+        }
+      }
+    }
 
     // ===== 4. Promemoria Rodrigo (statico) =====
     const reminderRodrigo = [
@@ -186,6 +247,7 @@ Regole:
       reperti: repertiBlock,
       usd_strength: usdBlock,
       allert_prezzo_nuovi: allertBlock,
+      allert_ea_sintesi: allertEaSintesi || null, // popolato solo per NY se Claude ok
       reminder: reminderRodrigo,
     };
 
@@ -218,13 +280,22 @@ Regole:
     }
 
     // ===== Telegram =====
-    let allertLines = "<i>nessun allert non lavorato</i>";
-    if (allertNuovi.length > 0) {
-      allertLines = Object.entries(byCoin).map(([coin, entries]) => {
-        const list = entries.slice(0, 3).map((e) => `${e.ora} a <b>${e.prezzo}</b>${e.descrizione ? " (" + e.descrizione + ")" : ""}`).join(", ");
-        const extra = entries.length > 3 ? ` (+${entries.length - 3} altri)` : "";
-        return `- <b>${coin}</b>: ${list}${extra}`;
-      }).join("\n");
+    // Per NY: sintesi narrativa Claude sugli allert EA della giornata (sostituisce la lista cruda).
+    // Per London o se la sintesi fallisce: fallback alla lista raggruppata per coin.
+    let allertSezione = "";
+    if (sessione === "ny" && allertEaSintesi) {
+      allertSezione =
+        `🚨 <b>Allert EA - sintesi flusso</b>\n${allertEaSintesi}`;
+    } else {
+      let allertLines = "<i>nessun allert non lavorato</i>";
+      if (allertNuovi.length > 0) {
+        allertLines = Object.entries(byCoin).map(([coin, entries]) => {
+          const list = entries.slice(0, 3).map((e) => `${e.ora} a <b>${e.prezzo}</b>${e.descrizione ? " (" + e.descrizione + ")" : ""}`).join(", ");
+          const extra = entries.length > 3 ? ` (+${entries.length - 3} altri)` : "";
+          return `- <b>${coin}</b>: ${list}${extra}`;
+        }).join("\n");
+      }
+      allertSezione = `🚨 <b>Allert Prezzo non lavorati</b> (${allertBlock.count})\n${allertLines}`;
     }
 
     const reminderLines = reminderRodrigo.map((r) => `▢ ${r}`).join("\n");
@@ -233,7 +304,7 @@ Regole:
       `${info.emoji} <b>Apertura ${info.label}</b> - <i>${today}</i>\n\n` +
       `🧠 <b>Reperti di oggi</b>\n${repertiBlock.commento}\n\n` +
       `💵 <b>Forza USD</b> (intraday)\n${usdBlock.descrizione}\n\n` +
-      `🚨 <b>Allert Prezzo non lavorati</b> (${allertBlock.count})\n${allertLines}\n\n` +
+      `${allertSezione}\n\n` +
       `🔔 <b>Promemoria Rodrigo</b>\n${reminderLines}`;
 
     const tg = await sendTelegram(msg, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID);
