@@ -221,7 +221,7 @@ NON usare nomi alternativi: usa "percentuale", non "pct"; "low/high/open/close" 
 
 Quando compili cronache di piu giornate, usa update_coin per ogni coin di ogni giornata: la riga cronache con quella data esiste gia, devi solo aggiungere i dati. NON usare insert su cronache esistenti.
 
-NON puoi: chiudere trade, eliminare record, creare bias operativi. Conferma sempre con poche parole cosa hai fatto e attendi il blocco "_Azioni eseguite_" che il backend appende al tuo messaggio.`;
+NON puoi: chiudere trade, eliminare record. Su bias con stato='chiuso' puoi correggere SOLO asset/screenshot/screenshots (campi non analitici); per modifiche operative duplica il reperto. Conferma sempre con poche parole cosa hai fatto e attendi il blocco "_Azioni eseguite_" che il backend appende al tuo messaggio.`;
 
     const REGOLE_COMUNI = `REGOLE COMUNI:
 - Italiano. Sempre.
