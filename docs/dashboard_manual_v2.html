@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trade Desk · Manuale · Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400;1,9..144,500&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #07090b;
+  --ink-2: #0d1115;
+  --ink-3: #141a20;
+  --line: #1c242c;
+  --line-2: #2a3540;
+  --paper: #ece4d3;
+  --text: #e6ecf1;
+  --dim: #8693a0;
+  --muted: #4d5965;
+  --mint: #6ee0a5;
+  --amber: #f5c878;
+  --crimson: #ff7770;
+  --azure: #6ec5f4;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ink);
+  background-image:
+    radial-gradient(circle at 20% -8%, rgba(110,224,165,0.06), transparent 55%),
+    radial-gradient(circle at 92% 8%, rgba(245,200,120,0.045), transparent 55%);
+  color: var(--text);
+  font-family: 'Inter Tight', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+  padding: 56px 24px 96px;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1080px; margin: 0 auto; }
+
+/* MASTHEAD */
+.masthead {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 24px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 64px;
+}
+.mast-side {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.mast-side.right { text-align: right; }
+.mast-side .accent { color: var(--mint); }
+.mast-stamp {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  color: var(--mint);
+  text-transform: uppercase;
+  padding: 7px 18px;
+  border: 1px solid rgba(110,224,165,0.28);
+  border-radius: 4px;
+  background: rgba(110,224,165,0.04);
+}
+@media(max-width: 720px) {
+  .masthead { grid-template-columns: 1fr; text-align: center; gap: 14px; }
+  .mast-side.right { text-align: center; }
+}
+
+/* HERO */
+.hero {
+  text-align: center;
+  margin-bottom: 64px;
+}
+.hero h1 {
+  font-family: 'Fraunces', serif;
+  font-variation-settings: 'opsz' 144, 'SOFT' 30;
+  font-size: clamp(48px, 8vw, 84px);
+  font-weight: 400;
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+  margin-bottom: 24px;
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--paper);
+  font-weight: 300;
+}
+.hero h1 .dot {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--mint);
+  vertical-align: 0.32em;
+  margin: 0 14px 0 18px;
+  box-shadow: 0 0 28px rgba(110,224,165,0.7);
+}
+.hero p {
+  font-family: 'Fraunces', serif;
+  font-variation-settings: 'opsz' 14;
+  font-size: 17px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--dim);
+  max-width: 560px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* META BAR */
+.meta-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 64px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--ink-2), var(--ink));
+}
+.meta-cell { padding: 20px 24px; border-right: 1px solid var(--line); }
+.meta-cell:last-child { border-right: none; }
+.meta-key {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.meta-val {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.012em;
+}
+.meta-val.mint { color: var(--mint); }
+@media(max-width: 720px) {
+  .meta-bar { grid-template-columns: 1fr 1fr; }
+  .meta-cell { border-bottom: 1px solid var(--line); }
+  .meta-cell:nth-child(even) { border-right: none; }
+  .meta-cell:nth-last-child(-n+2) { border-bottom: none; }
+}
+
+/* SECTION LABEL */
+.sect-label {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+.sect-label .num {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--mint);
+  letter-spacing: -0.02em;
+}
+.sect-label .text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.sect-label .rule { flex: 1; height: 1px; background: var(--line); }
+
+/* SCREENSHOT BOARD */
+.shot-board {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  background: #000;
+  margin-bottom: 64px;
+  cursor: zoom-in;
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,0.6);
+}
+.shot-board img { width: 100%; display: block; transition: transform 0.4s ease; }
+.shot-board:hover img { transform: scale(1.005); }
+
+/* CALLOUT PINS */
+.pin-layer { position: absolute; inset: 0; pointer-events: none; }
+.pin {
+  position: absolute;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 600;
+  pointer-events: auto;
+  cursor: pointer;
+  background: rgba(7,9,11,0.88);
+  border: 1.5px solid var(--mint);
+  color: var(--mint);
+  backdrop-filter: blur(4px);
+  transition: transform 0.2s, background 0.2s, color 0.2s;
+  box-shadow: 0 0 0 4px rgba(7,9,11,0.55), 0 4px 14px rgba(0,0,0,0.5);
+  transform: translate(-50%, -50%);
+}
+.pin::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  opacity: 0.25;
+  animation: ping 2.4s cubic-bezier(0,0,0.2,1) infinite;
+  pointer-events: none;
+}
+@keyframes ping {
+  0%   { transform: scale(0.7); opacity: 0.5; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+.pin:hover, .pin.is-active {
+  transform: translate(-50%, -50%) scale(1.18);
+  background: var(--mint);
+  color: var(--ink);
+}
+.pin.c-amber   { border-color: var(--amber);   color: var(--amber); }
+.pin.c-azure   { border-color: var(--azure);   color: var(--azure); }
+.pin.c-crimson { border-color: var(--crimson); color: var(--crimson); }
+.pin.c-amber:hover,   .pin.c-amber.is-active   { background: var(--amber);   color: var(--ink); }
+.pin.c-azure:hover,   .pin.c-azure.is-active   { background: var(--azure);   color: var(--ink); }
+.pin.c-crimson:hover, .pin.c-crimson.is-active { background: var(--crimson); color: var(--ink); }
+
+/* NOTES (annotations grid) */
+.notes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--ink-2);
+  margin-bottom: 72px;
+}
+.note {
+  padding: 24px 28px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 20px;
+  transition: background 0.2s;
+  position: relative;
+}
+.note:nth-child(2n) { border-right: none; }
+.note:nth-last-child(-n+2) { border-bottom: none; }
+.note::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: transparent;
+  transition: background 0.2s;
+}
+.note:hover, .note.is-active { background: var(--ink-3); }
+.note.is-active::before          { background: var(--mint); }
+.note.c-amber.is-active::before  { background: var(--amber); }
+.note.c-azure.is-active::before  { background: var(--azure); }
+.note.c-crimson.is-active::before{ background: var(--crimson); }
+.note-num {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 42px;
+  line-height: 0.9;
+  color: var(--mint);
+  flex-shrink: 0;
+  width: 48px;
+  letter-spacing: -0.05em;
+}
+.note.c-amber   .note-num { color: var(--amber); }
+.note.c-azure   .note-num { color: var(--azure); }
+.note.c-crimson .note-num { color: var(--crimson); }
+.note-body { flex: 1; min-width: 0; }
+.note-title {
+  font-family: 'Fraunces', serif;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+.note-desc {
+  font-size: 13px;
+  color: var(--dim);
+  line-height: 1.55;
+}
+.note-desc strong { color: var(--text); font-weight: 600; }
+@media(max-width: 720px) {
+  .notes { grid-template-columns: 1fr; }
+  .note { border-right: none; }
+  .note:last-child { border-bottom: none; }
+  .note:nth-last-child(2) { border-bottom: 1px solid var(--line); }
+}
+
+/* DUAL COLUMN */
+.dual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  margin-bottom: 72px;
+}
+.dual h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin-bottom: 20px;
+}
+.dual h3 em { font-style: italic; font-weight: 300; color: var(--mint); }
+.dual ol { list-style: none; counter-reset: step; }
+.dual ol li {
+  counter-increment: step;
+  position: relative;
+  padding: 14px 0 14px 50px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13.5px;
+  color: var(--dim);
+  line-height: 1.55;
+}
+.dual ol li:last-child { border-bottom: none; }
+.dual ol li::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute;
+  left: 0; top: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+.dual ol li strong { color: var(--text); font-weight: 500; }
+@media(max-width: 720px) { .dual { grid-template-columns: 1fr; gap: 40px; } }
+
+/* PULL QUOTE */
+.pull {
+  position: relative;
+  padding: 64px 64px 56px;
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(110,224,165,0.05), rgba(245,200,120,0.025)),
+    var(--ink-2);
+  border: 1px solid var(--line-2);
+  text-align: center;
+  margin-bottom: 56px;
+  overflow: hidden;
+}
+.pull::before {
+  content: '\201C';
+  position: absolute;
+  top: -28px; left: 36px;
+  font-family: 'Fraunces', serif;
+  font-size: 220px;
+  color: rgba(110,224,165,0.09);
+  line-height: 1;
+  pointer-events: none;
+}
+.pull q {
+  font-family: 'Fraunces', serif;
+  font-variation-settings: 'opsz' 144;
+  font-size: clamp(22px, 3.2vw, 32px);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.35;
+  letter-spacing: -0.018em;
+  color: var(--text);
+  quotes: none;
+  display: block;
+}
+.pull q::before, .pull q::after { content: ''; }
+.pull q em {
+  font-weight: 400;
+  font-style: italic;
+  background: linear-gradient(90deg, var(--mint), var(--amber));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.pull cite {
+  display: block;
+  margin-top: 26px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-style: normal;
+}
+@media(max-width: 720px) { .pull { padding: 48px 28px 40px; } }
+
+/* COLOPHON */
+.colophon {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.colophon .crest { display: flex; align-items: center; gap: 10px; }
+.colophon .crest .blob {
+  width: 8px; height: 8px;
+  background: var(--mint);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(110,224,165,0.6);
+}
+@media(max-width: 720px) {
+  .colophon { flex-direction: column; gap: 12px; text-align: center; }
+}
+
+/* LIGHTBOX */
+.lb {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.94);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  cursor: zoom-out;
+  backdrop-filter: blur(8px);
+}
+.lb.open { display: flex; }
+.lb img {
+  max-width: 96vw; max-height: 92vh;
+  border-radius: 10px;
+  border: 1px solid var(--line-2);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+}
+.lb-x {
+  position: absolute;
+  top: 24px; right: 28px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--ink-2);
+  border: 1px solid var(--line);
+  color: var(--dim);
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.lb-x:hover { color: var(--text); border-color: var(--line-2); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="mast-side">Manuale Operativo <span class="accent">·</span> Volume I</div>
+    <div><span class="mast-stamp">◆ Pagina 01 / Dashboard</span></div>
+    <div class="mast-side right">2026 · Casablanca · v2</div>
+  </header>
+
+  <section class="hero">
+    <h1>La <em>Dashboard</em><span class="dot"></span>il cruscotto</h1>
+    <p>Il quadro strategico globale — la prima cosa che apri ogni mattina alle 06:30, quando il caffè è ancora caldo e Londra non è ancora aperta.</p>
+  </section>
+
+  <div class="meta-bar">
+    <div class="meta-cell">
+      <div class="meta-key">Pagina</div>
+      <div class="meta-val">index.html</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-key">Apertura</div>
+      <div class="meta-val mint">06:30 · Casablanca</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-key">Modalità</div>
+      <div class="meta-val">Lettura pura</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-key">Auto-update</div>
+      <div class="meta-val">EA + Edge cron</div>
+    </div>
+  </div>
+
+  <div class="sect-label">
+    <span class="num">i.</span>
+    <span class="text">Screenshot live · 28 Aprile 2026</span>
+    <span class="rule"></span>
+  </div>
+
+  <div class="shot-board" id="shot">
+    <img src="images/01-dashboard.png" alt="Dashboard Trade Desk · screenshot live">
+    <div class="pin-layer">
+      <div class="pin"           data-n="1" style="top:5%;  left:39%">1</div>
+      <div class="pin c-amber"   data-n="2" style="top:5%;  left:97%">2</div>
+      <div class="pin c-azure"   data-n="3" style="top:24%; left:3%" >3</div>
+      <div class="pin"           data-n="4" style="top:60%; left:3%" >4</div>
+      <div class="pin c-crimson" data-n="5" style="top:20%; left:32%">5</div>
+      <div class="pin c-amber"   data-n="6" style="top:57%; left:32%">6</div>
+      <div class="pin"           data-n="7" style="top:20%; left:97%">7</div>
+      <div class="pin c-amber"   data-n="8" style="top:52%; left:97%">8</div>
+    </div>
+  </div>
+
+  <div class="sect-label">
+    <span class="num">ii.</span>
+    <span class="text">Otto elementi chiave · annotati</span>
+    <span class="rule"></span>
+  </div>
+
+  <div class="notes">
+    <div class="note" data-n="1">
+      <div class="note-num">01</div>
+      <div class="note-body">
+        <div class="note-title">Timeline sessioni</div>
+        <div class="note-desc">Asia chiusa · London chiusa · <strong>New York attiva (14–17)</strong>. Cursore live sulla posizione temporale, clock al secondo.</div>
+      </div>
+    </div>
+    <div class="note c-amber" data-n="2">
+      <div class="note-num">02</div>
+      <div class="note-body">
+        <div class="note-title">Win Rate ring</div>
+        <div class="note-desc"><strong>67%</strong> calcolato live su tutti i trade registrati. Si aggiorna ad ogni chiusura.</div>
+      </div>
+    </div>
+    <div class="note c-azure" data-n="3">
+      <div class="note-num">03</div>
+      <div class="note-body">
+        <div class="note-title">Forza Paniere USD</div>
+        <div class="note-desc">Indice DXY-like aggiornato ogni 5 minuti dall'EA <strong>USDStrength</strong> su MT4. Contesto macro per il bias.</div>
+      </div>
+    </div>
+    <div class="note" data-n="4">
+      <div class="note-num">04</div>
+      <div class="note-body">
+        <div class="note-title">Checklist disciplina</div>
+        <div class="note-desc">Items configurati in Impostazioni · "Review Wkly notes" già spuntato. Nessuna sessione si apre se è incompleta.</div>
+      </div>
+    </div>
+    <div class="note c-crimson" data-n="5">
+      <div class="note-num">05</div>
+      <div class="note-body">
+        <div class="note-title">Processi attivi & eventi</div>
+        <div class="note-desc">Tutto ciò che richiede azione adesso: trade da taggare, NFP rilasciato, sessione aperta. <strong>Il pulse della giornata.</strong></div>
+      </div>
+    </div>
+    <div class="note c-amber" data-n="6">
+      <div class="note-num">06</div>
+      <div class="note-body">
+        <div class="note-title">Calendario notizie</div>
+        <div class="note-desc">NFP 14:30 <strong>HIGH</strong> · Unemployment Rate 14:30 HIGH. Campanella gialla = alert impostato in Telegram.</div>
+      </div>
+    </div>
+    <div class="note" data-n="7">
+      <div class="note-num">07</div>
+      <div class="note-body">
+        <div class="note-title">Watchlist live</div>
+        <div class="note-desc"><strong>XAUUSD +1%</strong> · US30 · GER30 · NAS100 · BTCUSD. Tick prezzo aggiornato ogni minuto dall'EA Watchlist.</div>
+      </div>
+    </div>
+    <div class="note c-amber" data-n="8">
+      <div class="note-num">08</div>
+      <div class="note-body">
+        <div class="note-title">Alert in attesa</div>
+        <div class="note-desc">XAUUSD a <strong>2045.50</strong> · US30 apertura NY. Generati e mantenuti dall'EA <strong>PriceAlert</strong>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sect-label">
+    <span class="num">iii.</span>
+    <span class="text">Protocollo di lettura mattutino</span>
+    <span class="rule"></span>
+  </div>
+
+  <div class="dual">
+    <div>
+      <h3>Cosa <em>guardi</em></h3>
+      <ol>
+        <li><strong>Header KPI</strong> — win rate, sessione attiva, mindset</li>
+        <li><strong>Timeline</strong> — dove sei nella giornata</li>
+        <li><strong>Processi attivi</strong> — cosa richiede azione subito</li>
+        <li><strong>Calendario notizie</strong> — eventi HIGH da segnare</li>
+        <li><strong>Forza USD</strong> — contesto macro per il bias</li>
+        <li><strong>Watchlist</strong> — chi si muove fuori range</li>
+        <li><strong>Checklist</strong> — cosa hai fatto, cosa manca</li>
+      </ol>
+    </div>
+    <div>
+      <h3>Cosa <em>non fai</em></h3>
+      <ol>
+        <li>Non compili nulla — i dati arrivano dagli EA</li>
+        <li>Non apri trade da qui — è una <strong>sola lettura</strong></li>
+        <li>Non spendi più di <strong>30 secondi</strong> a guardarla</li>
+        <li>Non aggiorni il browser — Realtime fa il suo</li>
+        <li>Non saltare la checklist anche se tutto è verde</li>
+        <li>Non passare alla sessione senza marcare il mindset</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="pull">
+    <q>La Dashboard non si compila — <em>si legge</em>. È il tuo cruscotto: in trenta secondi capisci dove sei, cosa è successo, cosa ti aspetta.</q>
+    <cite>— Manuale Trade Desk · §1.1</cite>
+  </div>
+
+  <footer class="colophon">
+    <div class="crest"><span class="blob"></span> Trade Desk · Manuale</div>
+    <div>Vol. I · Pagina 01 · Dashboard</div>
+  </footer>
+
+</div>
+
+<div class="lb" id="lb"></div>
+
+<script>
+const board = document.getElementById('shot');
+const lb = document.getElementById('lb');
+const imgSrc = board.querySelector('img').getAttribute('src');
+
+board.addEventListener('click', e => {
+  if (e.target.closest('.pin')) return;
+  lb.innerHTML = '<div class="lb-x">&#10005;</div><img src="' + imgSrc + '" alt="">';
+  lb.classList.add('open');
+});
+lb.addEventListener('click', () => lb.classList.remove('open'));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+
+const setActive = (n, on) => {
+  document.querySelectorAll('.pin[data-n="'+n+'"], .note[data-n="'+n+'"]').forEach(el => {
+    el.classList.toggle('is-active', on);
+  });
+};
+document.querySelectorAll('.pin').forEach(p => {
+  p.addEventListener('mouseenter', () => setActive(p.dataset.n, true));
+  p.addEventListener('mouseleave', () => setActive(p.dataset.n, false));
+  p.addEventListener('click', e => {
+    e.stopPropagation();
+    const note = document.querySelector('.note[data-n="'+p.dataset.n+'"]');
+    if (note) note.scrollIntoView({behavior:'smooth', block:'center'});
+  });
+});
+document.querySelectorAll('.note').forEach(n => {
+  n.addEventListener('mouseenter', () => setActive(n.dataset.n, true));
+  n.addEventListener('mouseleave', () => setActive(n.dataset.n, false));
+});
+</script>
+</body>
+</html>

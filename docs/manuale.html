@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trade Desk · Manuale Operativo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400;1,9..144,500&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #07090b;
+  --ink-2: #0d1115;
+  --ink-3: #141a20;
+  --line: #1c242c;
+  --line-2: #2a3540;
+  --paper: #ece4d3;
+  --text: #e6ecf1;
+  --dim: #8693a0;
+  --muted: #4d5965;
+  --mint: #6ee0a5;
+  --amber: #f5c878;
+  --crimson: #ff7770;
+  --azure: #6ec5f4;
+  --violet: #b39bff;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ink);
+  background-image:
+    radial-gradient(circle at 20% -8%, rgba(110,224,165,0.06), transparent 55%),
+    radial-gradient(circle at 92% 8%, rgba(245,200,120,0.045), transparent 55%);
+  color: var(--text);
+  font-family: 'Inter Tight', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* SHELL */
+.shell {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: 0;
+}
+@media(max-width: 900px) { .shell { grid-template-columns: 1fr; } }
+
+/* SIDEBAR TOC */
+.toc {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 32px 24px 32px 32px;
+  border-right: 1px solid var(--line);
+  background: rgba(7,9,11,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 10;
+}
+.toc-mark {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--mint);
+  margin-bottom: 28px;
+}
+.toc-mark .blob {
+  width: 8px; height: 8px;
+  background: var(--mint);
+  border-radius: 50%;
+  box-shadow: 0 0 14px rgba(110,224,165,0.7);
+}
+.toc-title {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin-bottom: 4px;
+}
+.toc-title em { font-style: italic; font-weight: 300; color: var(--paper); }
+.toc-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+.toc nav { display: flex; flex-direction: column; }
+.toc nav a {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 9px 0;
+  font-size: 13px;
+  color: var(--dim);
+  text-decoration: none;
+  border-bottom: 1px dashed transparent;
+  transition: color 0.2s;
+  letter-spacing: -0.005em;
+}
+.toc nav a:hover { color: var(--text); }
+.toc nav a.is-active { color: var(--mint); }
+.toc nav a .n {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+  width: 24px;
+}
+.toc nav a.is-active .n { color: var(--mint); }
+.toc nav .group {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 22px 0 6px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.toc nav .group:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+@media(max-width: 900px) {
+  .toc { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--line); }
+}
+
+/* MAIN COLUMN */
+.manual {
+  padding: 56px 56px 96px;
+  max-width: 1080px;
+}
+@media(max-width: 900px) { .manual { padding: 40px 24px 80px; } }
+
+/* COVER */
+.cover {
+  text-align: center;
+  padding-bottom: 64px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 80px;
+}
+.cover-mark {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  color: var(--mint);
+  text-transform: uppercase;
+  padding: 7px 18px;
+  border: 1px solid rgba(110,224,165,0.28);
+  border-radius: 4px;
+  background: rgba(110,224,165,0.04);
+  display: inline-block;
+  margin-bottom: 32px;
+}
+.cover h1 {
+  font-family: 'Fraunces', serif;
+  font-variation-settings: 'opsz' 144, 'SOFT' 30;
+  font-size: clamp(56px, 9vw, 96px);
+  font-weight: 400;
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+  margin-bottom: 28px;
+}
+.cover h1 em { font-style: italic; color: var(--paper); font-weight: 300; }
+.cover h1 .dot {
+  display: inline-block;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--mint);
+  vertical-align: 0.32em;
+  margin: 0 14px 0 18px;
+  box-shadow: 0 0 32px rgba(110,224,165,0.7);
+}
+.cover p {
+  font-family: 'Fraunces', serif;
+  font-variation-settings: 'opsz' 14;
+  font-size: 18px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--dim);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+.cover-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-top: 48px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--ink-2), var(--ink));
+  text-align: left;
+}
+@media(max-width: 720px) { .cover-stats { grid-template-columns: 1fr 1fr; } }
+.cover-stats > div { padding: 18px 22px; border-right: 1px solid var(--line); }
+.cover-stats > div:last-child { border-right: none; }
+.cover-stats .k {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px;
+}
+.cover-stats .v {
+  font-family: 'Fraunces', serif;
+  font-size: 18px; font-weight: 600; letter-spacing: -0.012em;
+}
+
+/* PAGE SECTION */
+.page-section { margin-bottom: 96px; scroll-margin-top: 24px; }
+.page-section:last-of-type { margin-bottom: 64px; }
+
+/* HERO header per pagina */
+.page-hero {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 24px;
+  align-items: end;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 36px;
+}
+.page-hero .num {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 88px;
+  line-height: 0.85;
+  color: var(--mint);
+  letter-spacing: -0.05em;
+}
+.page-hero .meta { padding-bottom: 6px; }
+.page-hero .meta .kicker {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.page-hero .meta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+.page-hero .meta h2 em { font-style: italic; color: var(--paper); font-weight: 300; }
+.page-hero .meta p {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 16px;
+  color: var(--dim);
+  line-height: 1.45;
+  max-width: 500px;
+}
+.page-hero .stamp {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  color: var(--dim);
+  white-space: nowrap;
+  align-self: center;
+}
+.page-hero .stamp.mint { color: var(--mint); border-color: rgba(110,224,165,0.35); background: rgba(110,224,165,0.05); }
+@media(max-width: 720px) {
+  .page-hero { grid-template-columns: 1fr; gap: 8px; }
+  .page-hero .num { font-size: 56px; }
+  .page-hero .meta h2 { font-size: 32px; }
+  .page-hero .stamp { justify-self: start; }
+}
+
+/* META BAR per pagina */
+.meta-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 36px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--ink-2);
+}
+.meta-bar .cell { padding: 16px 20px; border-right: 1px solid var(--line); }
+.meta-bar .cell:last-child { border-right: none; }
+.meta-bar .k {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px;
+}
+.meta-bar .v {
+  font-family: 'Fraunces', serif;
+  font-size: 16px; font-weight: 600; letter-spacing: -0.01em;
+}
+.meta-bar .v.mint { color: var(--mint); }
+.meta-bar .v.amber { color: var(--amber); }
+.meta-bar .v.azure { color: var(--azure); }
+@media(max-width: 720px) {
+  .meta-bar { grid-template-columns: 1fr 1fr; }
+  .meta-bar .cell { border-bottom: 1px solid var(--line); }
+  .meta-bar .cell:nth-child(even) { border-right: none; }
+  .meta-bar .cell:nth-last-child(-n+2) { border-bottom: none; }
+}
+
+/* SECTION LABEL */
+.sect-label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.sect-label .ix {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--mint);
+  letter-spacing: -0.02em;
+}
+.sect-label .text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.sect-label .rule { flex: 1; height: 1px; background: var(--line); }
+
+/* SHOT BOARD */
+.shot-board {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  background: #000;
+  margin-bottom: 48px;
+  cursor: zoom-in;
+  box-shadow: 0 24px 60px -20px rgba(0,0,0,0.55);
+}
+.shot-board img { width: 100%; display: block; }
+
+/* WIREFRAME (per pagine senza screenshot) */
+.shot-wireframe {
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+  background:
+    repeating-linear-gradient(45deg, rgba(110,224,165,0.015) 0 12px, transparent 12px 24px),
+    var(--ink-2);
+  padding: 32px;
+  margin-bottom: 48px;
+  display: grid;
+  gap: 16px;
+  position: relative;
+}
+.shot-wireframe::before {
+  content: 'WIREFRAME · SCREENSHOT IN CATTURA';
+  position: absolute;
+  top: 16px; right: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  color: var(--muted);
+  background: var(--ink-3);
+  padding: 5px 10px;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+}
+.wf-row { display: grid; gap: 12px; }
+.wf-row.r2 { grid-template-columns: 1fr 1fr; }
+.wf-row.r3 { grid-template-columns: 1fr 1fr 1fr; }
+.wf-row.r-asym { grid-template-columns: 1.6fr 1fr; }
+.wf-cell {
+  border: 1px dashed var(--line-2);
+  border-radius: 8px;
+  padding: 18px 20px;
+  background: rgba(7,9,11,0.4);
+  position: relative;
+  min-height: 64px;
+}
+.wf-cell.tall { min-height: 140px; }
+.wf-cell.x-tall { min-height: 220px; }
+.wf-cell .wf-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mint);
+  margin-bottom: 6px;
+}
+.wf-cell .wf-text {
+  font-size: 13px;
+  color: var(--dim);
+  line-height: 1.45;
+}
+.wf-cell .wf-pin {
+  position: absolute;
+  top: 12px; right: 14px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(7,9,11,0.85);
+  border: 1.5px solid var(--mint);
+  color: var(--mint);
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s, color 0.2s;
+}
+.wf-cell .wf-pin.is-active,
+.wf-cell .wf-pin:hover {
+  background: var(--mint);
+  color: var(--ink);
+  transform: scale(1.15);
+}
+
+/* PINS */
+.pin-layer { position: absolute; inset: 0; pointer-events: none; }
+.pin {
+  position: absolute;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  pointer-events: auto;
+  cursor: pointer;
+  background: rgba(7,9,11,0.88);
+  border: 1.5px solid var(--mint);
+  color: var(--mint);
+  backdrop-filter: blur(4px);
+  transition: transform 0.2s, background 0.2s, color 0.2s;
+  box-shadow: 0 0 0 4px rgba(7,9,11,0.5), 0 4px 14px rgba(0,0,0,0.5);
+  transform: translate(-50%, -50%);
+}
+.pin::after {
+  content: '';
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  opacity: 0.25;
+  animation: ping 2.4s cubic-bezier(0,0,0.2,1) infinite;
+  pointer-events: none;
+}
+@keyframes ping {
+  0%   { transform: scale(0.7); opacity: 0.5; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+.pin:hover, .pin.is-active {
+  transform: translate(-50%, -50%) scale(1.18);
+  background: var(--mint);
+  color: var(--ink);
+}
+.pin.c-amber   { border-color: var(--amber);   color: var(--amber); }
+.pin.c-azure   { border-color: var(--azure);   color: var(--azure); }
+.pin.c-crimson { border-color: var(--crimson); color: var(--crimson); }
+.pin.c-violet  { border-color: var(--violet);  color: var(--violet); }
+.pin.c-amber:hover,   .pin.c-amber.is-active   { background: var(--amber);   color: var(--ink); }
+.pin.c-azure:hover,   .pin.c-azure.is-active   { background: var(--azure);   color: var(--ink); }
+.pin.c-crimson:hover, .pin.c-crimson.is-active { background: var(--crimson); color: var(--ink); }
+.pin.c-violet:hover,  .pin.c-violet.is-active  { background: var(--violet);  color: var(--ink); }
+
+/* NOTES */
+.notes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--ink-2);
+  margin-bottom: 56px;
+}
+.note {
+  padding: 20px 22px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 16px;
+  transition: background 0.2s;
+  position: relative;
+}
+.note:nth-child(2n) { border-right: none; }
+.note:nth-last-child(-n+2) { border-bottom: none; }
+.note::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: transparent;
+  transition: background 0.2s;
+}
+.note:hover, .note.is-active { background: var(--ink-3); }
+.note.is-active::before          { background: var(--mint); }
+.note.c-amber.is-active::before  { background: var(--amber); }
+.note.c-azure.is-active::before  { background: var(--azure); }
+.note.c-crimson.is-active::before{ background: var(--crimson); }
+.note.c-violet.is-active::before { background: var(--violet); }
+.note-num {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 36px;
+  line-height: 0.9;
+  color: var(--mint);
+  flex-shrink: 0;
+  width: 42px;
+  letter-spacing: -0.05em;
+}
+.note.c-amber   .note-num { color: var(--amber); }
+.note.c-azure   .note-num { color: var(--azure); }
+.note.c-crimson .note-num { color: var(--crimson); }
+.note.c-violet  .note-num { color: var(--violet); }
+.note-body { flex: 1; min-width: 0; }
+.note-title {
+  font-family: 'Fraunces', serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 5px;
+}
+.note-desc { font-size: 13px; color: var(--dim); line-height: 1.55; }
+.note-desc strong { color: var(--text); font-weight: 600; }
+@media(max-width: 720px) {
+  .notes { grid-template-columns: 1fr; }
+  .note { border-right: none; }
+  .note:last-child { border-bottom: none; }
+  .note:nth-last-child(2) { border-bottom: 1px solid var(--line); }
+}
+
+/* DUAL */
+.dual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  margin-bottom: 56px;
+}
+.dual h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin-bottom: 18px;
+}
+.dual h3 em { font-style: italic; font-weight: 300; color: var(--mint); }
+.dual ol { list-style: none; counter-reset: step; }
+.dual ol li {
+  counter-increment: step;
+  position: relative;
+  padding: 12px 0 12px 46px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13.5px;
+  color: var(--dim);
+  line-height: 1.5;
+}
+.dual ol li:last-child { border-bottom: none; }
+.dual ol li::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute;
+  left: 0; top: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+.dual ol li strong { color: var(--text); font-weight: 500; }
+@media(max-width: 720px) { .dual { grid-template-columns: 1fr; gap: 36px; } }
+
+/* PULL QUOTE */
+.pull {
+  position: relative;
+  padding: 48px 56px 44px;
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, rgba(110,224,165,0.05), rgba(245,200,120,0.025)),
+    var(--ink-2);
+  border: 1px solid var(--line-2);
+  text-align: center;
+  overflow: hidden;
+}
+.pull::before {
+  content: '\201C';
+  position: absolute;
+  top: -28px; left: 28px;
+  font-family: 'Fraunces', serif;
+  font-size: 200px;
+  color: rgba(110,224,165,0.08);
+  line-height: 1;
+  pointer-events: none;
+}
+.pull q {
+  font-family: 'Fraunces', serif;
+  font-variation-settings: 'opsz' 144;
+  font-size: clamp(20px, 2.6vw, 26px);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  quotes: none;
+  display: block;
+}
+.pull q::before, .pull q::after { content: ''; }
+.pull q em {
+  font-weight: 400;
+  font-style: italic;
+  background: linear-gradient(90deg, var(--mint), var(--amber));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.pull cite {
+  display: block;
+  margin-top: 22px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.26em;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-style: normal;
+}
+@media(max-width: 720px) { .pull { padding: 40px 24px 36px; } }
+
+/* DETAIL CARD (sub-section per dettaglio_*) */
+.detail-card {
+  margin-top: 32px;
+  margin-bottom: 56px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--ink-2);
+}
+.detail-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(110,224,165,0.04), transparent);
+}
+.detail-head .tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--mint);
+  padding: 4px 10px;
+  border: 1px solid rgba(110,224,165,0.3);
+  border-radius: 3px;
+}
+.detail-head h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+}
+.detail-head h4 em { font-style: italic; font-weight: 300; color: var(--paper); }
+.detail-body { padding: 24px; }
+.detail-body img {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--line-2);
+  display: block;
+  margin-bottom: 18px;
+  cursor: zoom-in;
+}
+.detail-body p {
+  font-size: 13.5px;
+  color: var(--dim);
+  line-height: 1.6;
+  max-width: 780px;
+}
+.detail-body p strong { color: var(--text); }
+.detail-body p + p { margin-top: 12px; }
+
+/* COLOPHON */
+.colophon {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.colophon .crest { display: flex; align-items: center; gap: 10px; }
+.colophon .crest .blob {
+  width: 8px; height: 8px;
+  background: var(--mint); border-radius: 50%;
+  box-shadow: 0 0 12px rgba(110,224,165,0.6);
+}
+@media(max-width: 720px) {
+  .colophon { flex-direction: column; gap: 12px; text-align: center; }
+}
+
+/* LIGHTBOX */
+.lb {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.94);
+  z-index: 1000;
+  align-items: center; justify-content: center;
+  padding: 32px;
+  cursor: zoom-out;
+  backdrop-filter: blur(8px);
+}
+.lb.open { display: flex; }
+.lb img {
+  max-width: 96vw; max-height: 92vh;
+  border-radius: 10px;
+  border: 1px solid var(--line-2);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+}
+.lb-x {
+  position: absolute;
+  top: 24px; right: 28px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--ink-2);
+  border: 1px solid var(--line);
+  color: var(--dim);
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.lb-x:hover { color: var(--text); }
+
+/* PRINT / PDF */
+@media print {
+  @page { size: A4; margin: 12mm 10mm; }
+  html, body { background: #07090b !important; }
+  body { padding: 0; font-size: 11px; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .toc { display: none !important; }
+  .shell { display: block; max-width: none; }
+  .manual { padding: 0; max-width: none; }
+  .lb, .lb-x { display: none !important; }
+  .pin::after { animation: none !important; }
+  .shot-board, .detail-body img { cursor: default; }
+  .cover { padding-bottom: 32px; margin-bottom: 32px; page-break-after: always; break-after: page; }
+  .cover h1 { font-size: 56px; }
+  .page-section { page-break-before: always; break-before: page; margin-bottom: 32px; }
+  .page-section:last-of-type { margin-bottom: 16px; }
+  .page-hero .num { font-size: 64px; }
+  .page-hero .meta h2 { font-size: 36px; }
+  .shot-board, .shot-wireframe { box-shadow: none; page-break-inside: avoid; break-inside: avoid; }
+  .notes, .dual, .pull, .detail-card { page-break-inside: avoid; break-inside: avoid; }
+  .colophon { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ===== TOC SIDEBAR ===== -->
+  <aside class="toc">
+    <div class="toc-mark"><span class="blob"></span> Manuale · Vol. I</div>
+    <div class="toc-title">Trade<em> Desk</em></div>
+    <div class="toc-sub">2026 · Casablanca · v2</div>
+    <nav>
+      <a href="#cover"><span class="n">◇</span> Copertina</a>
+
+      <div class="group">Operatività</div>
+      <a href="#s01"><span class="n">01</span> Dashboard</a>
+      <a href="#s02"><span class="n">02</span> Giornaliero</a>
+      <a href="#s03"><span class="n">03</span> Tabella Trade</a>
+      <a href="#s04"><span class="n">04</span> Cronache</a>
+      <a href="#s05"><span class="n">05</span> Settimanale</a>
+
+      <div class="group">Sessioni · Bias · Eventi</div>
+      <a href="#s06"><span class="n">06</span> Sessioni</a>
+      <a href="#s07"><span class="n">07</span> Reperti</a>
+      <a href="#s08"><span class="n">08</span> Eventi</a>
+
+      <div class="group">Analisi · Strategie · AI</div>
+      <a href="#s09"><span class="n">09</span> Analisi</a>
+      <a href="#s10"><span class="n">10</span> Strategie</a>
+      <a href="#s11"><span class="n">11</span> Grafici</a>
+      <a href="#s12"><span class="n">12</span> Peter</a>
+      <a href="#s13"><span class="n">13</span> Steve</a>
+
+      <div class="group">Configurazione</div>
+      <a href="#s14"><span class="n">14</span> Impostazioni</a>
+    </nav>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="manual">
+
+    <!-- COVER -->
+    <section class="cover" id="cover">
+      <div class="cover-mark">◆ Manuale Operativo · Volume I</div>
+      <h1>Trade<em> Desk</em><span class="dot"></span>il manuale</h1>
+      <p>Guida illustrata alle quattordici pagine del sistema. Per ogni schermata: cosa contiene, dove guardare, cosa fare, e quando farlo. Pensata per essere riletta nei momenti di confusione operativa.</p>
+      <div class="cover-stats">
+        <div><div class="k">Pagine</div><div class="v">14 · sezioni</div></div>
+        <div><div class="k">Schermate</div><div class="v">10 · annotate</div></div>
+        <div><div class="k">Timezone</div><div class="v">Africa / Casablanca</div></div>
+        <div><div class="k">Cadenza</div><div class="v">Lun – Ven · scalping</div></div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 01 · DASHBOARD                                                -->
+    <!-- ============================================================ -->
+    <section class="page-section" id="s01">
+      <header class="page-hero">
+        <div class="num">01</div>
+        <div class="meta">
+          <div class="kicker">Operatività</div>
+          <h2>La <em>Dashboard</em></h2>
+          <p>Il quadro strategico globale. Prima cosa che apri ogni mattina alle 06:30, quando il caffè è ancora caldo e Londra non è ancora aperta.</p>
+        </div>
+        <div class="stamp mint">06:30 · ogni mattina</div>
+      </header>
+
+      <div class="meta-bar">
+        <div class="cell"><div class="k">File</div><div class="v">index.html</div></div>
+        <div class="cell"><div class="k">Modalità</div><div class="v">Lettura pura</div></div>
+        <div class="cell"><div class="k">Sorgenti</div><div class="v mint">EA + Edge cron</div></div>
+        <div class="cell"><div class="k">Tempo speso</div><div class="v amber">≤ 30 secondi</div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">i.</span><span class="text">Screenshot live</span><span class="rule"></span></div>
+      <div class="shot-board" data-section="01">
+        <img src="images/01-dashboard.png" alt="Dashboard">
+        <div class="pin-layer">
+          <div class="pin"           data-n="1" style="top:5%;  left:38%">1</div>
+          <div class="pin c-amber"   data-n="2" style="top:5%;  left:97%">2</div>
+          <div class="pin c-azure"   data-n="3" style="top:24%; left:3%" >3</div>
+          <div class="pin"           data-n="4" style="top:60%; left:3%" >4</div>
+          <div class="pin c-crimson" data-n="5" style="top:20%; left:32%">5</div>
+          <div class="pin c-amber"   data-n="6" style="top:57%; left:32%">6</div>
+          <div class="pin"           data-n="7" style="top:20%; left:97%">7</div>
+          <div class="pin c-amber"   data-n="8" style="top:52%; left:97%">8</div>
+        </div>
+      </div>
+
+      <div class="sect-label"><span class="ix">ii.</span><span class="text">Otto elementi chiave</span><span class="rule"></span></div>
+      <div class="notes" data-section="01">
+        <div class="note" data-n="1"><div class="note-num">01</div><div class="note-body"><div class="note-title">Timeline sessioni</div><div class="note-desc">Asia chiusa · London chiusa · <strong>New York attiva (14–17)</strong>. Cursore live, clock al secondo.</div></div></div>
+        <div class="note c-amber" data-n="2"><div class="note-num">02</div><div class="note-body"><div class="note-title">Win Rate ring</div><div class="note-desc"><strong>67%</strong> calcolato live su tutti i trade. Si aggiorna ad ogni chiusura.</div></div></div>
+        <div class="note c-azure" data-n="3"><div class="note-num">03</div><div class="note-body"><div class="note-title">Forza Paniere USD</div><div class="note-desc">Indice DXY-like aggiornato ogni 5 min dall'EA <strong>USDStrength</strong>. Contesto macro per il bias.</div></div></div>
+        <div class="note" data-n="4"><div class="note-num">04</div><div class="note-body"><div class="note-title">Checklist disciplina</div><div class="note-desc">Items configurati in Impostazioni. Nessuna sessione si apre se è incompleta.</div></div></div>
+        <div class="note c-crimson" data-n="5"><div class="note-num">05</div><div class="note-body"><div class="note-title">Processi attivi</div><div class="note-desc">Tutto ciò che richiede azione adesso: trade da taggare, NFP rilasciato, sessione aperta. <strong>Il pulse della giornata.</strong></div></div></div>
+        <div class="note c-amber" data-n="6"><div class="note-num">06</div><div class="note-body"><div class="note-title">Calendario notizie</div><div class="note-desc">NFP 14:30 <strong>HIGH</strong> · Unemployment 14:30 HIGH. Campanella gialla = alert Telegram impostato.</div></div></div>
+        <div class="note" data-n="7"><div class="note-num">07</div><div class="note-body"><div class="note-title">Watchlist live</div><div class="note-desc"><strong>XAUUSD +1%</strong> · US30 · GER30 · NAS100 · BTCUSD. Tick aggiornato ogni minuto.</div></div></div>
+        <div class="note c-amber" data-n="8"><div class="note-num">08</div><div class="note-body"><div class="note-title">Alert in attesa</div><div class="note-desc">XAUUSD a <strong>2045.50</strong> · US30 apertura NY. Generati da <strong>PriceAlert</strong> EA.</div></div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">iii.</span><span class="text">Protocollo mattutino</span><span class="rule"></span></div>
+      <div class="dual">
+        <div><h3>Cosa <em>guardi</em></h3>
+          <ol>
+            <li><strong>Header KPI</strong> — win rate, sessione attiva, mindset</li>
+            <li><strong>Timeline</strong> — dove sei nella giornata</li>
+            <li><strong>Processi attivi</strong> — cosa richiede azione subito</li>
+            <li><strong>Calendario</strong> — eventi HIGH da segnare</li>
+            <li><strong>Forza USD</strong> — contesto macro per il bias</li>
+            <li><strong>Watchlist</strong> — chi si muove fuori range</li>
+          </ol>
+        </div>
+        <div><h3>Cosa <em>non fai</em></h3>
+          <ol>
+            <li>Non compili nulla — i dati arrivano dagli EA</li>
+            <li>Non apri trade da qui — è una <strong>sola lettura</strong></li>
+            <li>Non spendi più di <strong>30 secondi</strong> a guardarla</li>
+            <li>Non aggiorni il browser — Realtime fa il suo</li>
+            <li>Non saltare la checklist anche se tutto è verde</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="pull">
+        <q>La Dashboard non si compila — <em>si legge</em>. È il tuo cruscotto: in trenta secondi capisci dove sei, cosa è successo, cosa ti aspetta.</q>
+        <cite>— Manuale Trade Desk · §1.1</cite>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 02 · GIORNALIERO                                              -->
+    <!-- ============================================================ -->
+    <section class="page-section" id="s02">
+      <header class="page-hero">
+        <div class="num">02</div>
+        <div class="meta">
+          <div class="kicker">Operatività</div>
+          <h2>Il <em>Giornaliero</em></h2>
+          <p>Archivio delle giornate operative. Ogni card è un giorno: data, mindset iniziale, asset toccati, P/L netto. Il diario cronologico del processo.</p>
+        </div>
+        <div class="stamp">archivio · perpetuo</div>
+      </header>
+
+      <div class="meta-bar">
+        <div class="cell"><div class="k">File</div><div class="v">giornaliero.html</div></div>
+        <div class="cell"><div class="k">Tabella</div><div class="v">giornate</div></div>
+        <div class="cell"><div class="k">Click card</div><div class="v mint">→ dettaglio</div></div>
+        <div class="cell"><div class="k">Filtri</div><div class="v">data · mood · P/L</div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">i.</span><span class="text">Screenshot live · 9 Aprile 2026</span><span class="rule"></span></div>
+      <div class="shot-board" data-section="02">
+        <img src="images/02-giornaliero.png" alt="Giornaliero">
+        <div class="pin-layer">
+          <div class="pin"           data-n="1" style="top:6%;  left:13%">1</div>
+          <div class="pin c-amber"   data-n="2" style="top:6%;  left:95%">2</div>
+          <div class="pin c-azure"   data-n="3" style="top:14%; left:30%">3</div>
+          <div class="pin"           data-n="4" style="top:21%; left:30%">4</div>
+          <div class="pin c-crimson" data-n="5" style="top:21%; left:75%">5</div>
+          <div class="pin"           data-n="6" style="top:38%; left:50%">6</div>
+        </div>
+      </div>
+
+      <div class="sect-label"><span class="ix">ii.</span><span class="text">Sei elementi chiave</span><span class="rule"></span></div>
+      <div class="notes" data-section="02">
+        <div class="note" data-n="1"><div class="note-num">01</div><div class="note-body"><div class="note-title">Titolo &amp; quick-jump</div><div class="note-desc"><strong>Database Giornaliero</strong>. Bottoni rapidi: Trade Analisi · Tabella Trades · Giornaliero — la triade operativa.</div></div></div>
+        <div class="note c-amber" data-n="2"><div class="note-num">02</div><div class="note-body"><div class="note-title">Header KPI live</div><div class="note-desc">Win rate ring <strong>67%</strong> sempre visibile in alto a destra. Persiste tra pagine — è il battito del sistema.</div></div></div>
+        <div class="note c-azure" data-n="3"><div class="note-num">03</div><div class="note-body"><div class="note-title">Filtri &amp; vista</div><div class="note-desc">Filtra · Ordina · contatore <strong>"4 Giornate archiviate"</strong>. Toggle a destra: griglia o tabella compatta.</div></div></div>
+        <div class="note" data-n="4"><div class="note-num">04</div><div class="note-body"><div class="note-title">Card data</div><div class="note-desc">Colonna sinistra con mese + giorno. Titolo della giornata + badge asset (XAUUSD · US30). Sotto: mindset registrato.</div></div></div>
+        <div class="note c-crimson" data-n="5"><div class="note-num">05</div><div class="note-body"><div class="note-title">P/L netto colorato</div><div class="note-desc">Verde se profit, rosso se perdita. Aggregazione dei trade del giorno — non si modifica a mano.</div></div></div>
+        <div class="note" data-n="6"><div class="note-num">06</div><div class="note-body"><div class="note-title">Crea nuova entry</div><div class="note-desc">Per giornate archiviate manualmente. In genere la riga la crea il sistema all'apertura della prima sessione.</div></div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">iii.</span><span class="text">Quando ci torni</span><span class="rule"></span></div>
+      <div class="dual">
+        <div><h3>Cosa <em>fai qui</em></h3>
+          <ol>
+            <li>Sfogli le ultime 5–10 giornate per trovare pattern</li>
+            <li>Click su una card → editi mindset, note, checklist</li>
+            <li>Confronti P/L vs mood: "ho perso quando ero stanco?"</li>
+            <li>Filtri per asset per vedere come stai sull'oro questa settimana</li>
+          </ol>
+        </div>
+        <div><h3>Cosa <em>non tocchi</em></h3>
+          <ol>
+            <li>Non modifichi P/L manualmente — viene dai trade</li>
+            <li>Non cancelli giornate vecchie — sono storia</li>
+            <li>Non cambi badge asset se hai già trade collegati</li>
+            <li>Non duplichi giornate — il vincolo UNIQUE per data te lo blocca</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-head"><div class="tag">Sub-pagina</div><h4>dettaglio_giornata <em>· edit completo</em></h4></div>
+        <div class="detail-body">
+          <img src="images/02b-dettaglio_giornata.png" alt="Dettaglio Giornata">
+          <p>Click su una card della Giornaliero → arrivi qui. <strong>Quattro blocchi</strong>: Checklist Base (gli items configurabili in Impostazioni), Proprietà Attive (taglia · stato mentale · marea · sessioni operate · note di sessione), Analisi Sessioni (Asia/London/NY con screenshot di setup), Bias Giornaliero (lettura macro del giorno).</p>
+          <p>A destra trovi <strong>Allert di oggi</strong> e <strong>Forza USD</strong> sempre presenti. In basso: TP fired vs Stop Loss della giornata, P/L lordo, dati economici programmati. È la pagina che editi <strong>più frequentemente</strong> dopo la dashboard.</p>
+        </div>
+      </div>
+
+      <div class="pull">
+        <q>Il giornaliero è la <em>memoria muscolare</em> del processo: lo riempi senza pensare quando va bene, lo rileggi quando va male.</q>
+        <cite>— Manuale Trade Desk · §2.1</cite>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 03 · TABELLA TRADE                                            -->
+    <!-- ============================================================ -->
+    <section class="page-section" id="s03">
+      <header class="page-hero">
+        <div class="num">03</div>
+        <div class="meta">
+          <div class="kicker">Operatività</div>
+          <h2>La <em>Tabella Trade</em></h2>
+          <p>Registro piatto e cronologico di tutti i trade. Una riga per operazione, ordinata per data desc. Il libro mastro dell'attività.</p>
+        </div>
+        <div class="stamp">registro · piatto</div>
+      </header>
+
+      <div class="meta-bar">
+        <div class="cell"><div class="k">File</div><div class="v">tabella_trades.html</div></div>
+        <div class="cell"><div class="k">Tabella</div><div class="v">trades</div></div>
+        <div class="cell"><div class="k">Sorgenti</div><div class="v mint">MT4 · Bybit · manual</div></div>
+        <div class="cell"><div class="k">Stato badge</div><div class="v amber">compilato · da accettare</div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">i.</span><span class="text">Screenshot live</span><span class="rule"></span></div>
+      <div class="shot-board" data-section="03">
+        <img src="images/03-tabella_trades.png" alt="Tabella Trade">
+        <div class="pin-layer">
+          <div class="pin"           data-n="1" style="top:5%;  left:9%" >1</div>
+          <div class="pin c-amber"   data-n="2" style="top:14%; left:14%">2</div>
+          <div class="pin c-azure"   data-n="3" style="top:19%; left:32%">3</div>
+          <div class="pin c-crimson" data-n="4" style="top:26%; left:50%">4</div>
+          <div class="pin"           data-n="5" style="top:19%; left:75%">5</div>
+          <div class="pin c-amber"   data-n="6" style="top:19%; left:97%">6</div>
+        </div>
+      </div>
+
+      <div class="sect-label"><span class="ix">ii.</span><span class="text">Sei elementi chiave</span><span class="rule"></span></div>
+      <div class="notes" data-section="03">
+        <div class="note" data-n="1"><div class="note-num">01</div><div class="note-body"><div class="note-title">Registro Trades</div><div class="note-desc">Header pagina. Sotto, contatore <strong>"12 Trades archiviati in lista"</strong> — conta totale storica, non solo oggi.</div></div></div>
+        <div class="note c-amber" data-n="2"><div class="note-num">02</div><div class="note-body"><div class="note-title">ID trade</div><div class="note-desc"><strong>#TRD-104</strong> · numerazione progressiva univoca, generata da sequence Postgres. Mai riassegnata.</div></div></div>
+        <div class="note c-azure" data-n="3"><div class="note-num">03</div><div class="note-body"><div class="note-title">Direzione &amp; size</div><div class="note-desc">Badge <strong>LONG (BUY)</strong>/SHORT (SELL) · breakeven. Lots accanto. Colore della badge = direzione.</div></div></div>
+        <div class="note c-crimson" data-n="4"><div class="note-num">04</div><div class="note-body"><div class="note-title">Sorgente &amp; stato</div><div class="note-desc"><strong>MT4 · COMPILATO</strong> · <strong>BYBIT · DA ACCETTARE</strong>. I trade da MT4/Bybit arrivano grezzi, vanno validati.</div></div></div>
+        <div class="note" data-n="5"><div class="note-num">05</div><div class="note-body"><div class="note-title">Open / Close · R:R</div><div class="note-desc">Prezzo apertura/chiusura · ratio R:R calcolato. Colonna sintetica per scorrere veloce.</div></div></div>
+        <div class="note c-amber" data-n="6"><div class="note-num">06</div><div class="note-body"><div class="note-title">P/L colorato &amp; arrow</div><div class="note-desc"><strong>+$1450</strong> verde · <strong>−$750</strong> rosso · 0 grigio. Click sulla freccia → dettaglio_trade.</div></div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">iii.</span><span class="text">Workflow tipico</span><span class="rule"></span></div>
+      <div class="dual">
+        <div><h3>Cosa <em>fai qui</em></h3>
+          <ol>
+            <li>Apri dopo una sessione per vedere i nuovi trade da MT4</li>
+            <li>I "DA ACCETTARE" li compili: tag strategia, mindset, screenshot</li>
+            <li>Click su riga → dettaglio per editare TP/SL/note</li>
+            <li>Filtri per asset/sorgente quando ti serve un subset</li>
+          </ol>
+        </div>
+        <div><h3>Cosa <em>non fai</em></h3>
+          <ol>
+            <li>Non cancelli trade — usa "archivia" se proprio serve</li>
+            <li>Non modifichi entry/exit prezzo — quelli arrivano dall'EA</li>
+            <li>Non taggi una strategia "a memoria" — usa le esistenti</li>
+            <li>Non lasci trade in DA ACCETTARE per più di 24h</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-head"><div class="tag">Sub-pagina</div><h4>dettaglio_trade <em>· analisi singolo trade</em></h4></div>
+        <div class="detail-body">
+          <img src="images/03b-dettaglio_trade.png" alt="Dettaglio Trade">
+          <p><strong>Analisi Trade #TRD-104</strong>: dati execution (entry · exit · size · stop loss · take profit), R:R e Net Profit calcolati, galleria screenshot &amp; setup. Sotto: <strong>Referto Trade Eseguito</strong> — selezioni la strategia eseguita, registri mindset/livello, voto disciplina, descrizione del setup.</p>
+          <p>A destra: <strong>Collegamenti Operativi</strong> (bias del giorno, allert correlati, notizia macro che lo ha mosso). Bottone giallo <strong>Archivia Referto</strong> in basso = chiude il caso e contribuisce al win rate aggregato.</p>
+        </div>
+      </div>
+
+      <div class="pull">
+        <q>Un trade non chiuso correttamente è un trade che <em>continuerà a costarti</em>: non in soldi, in attenzione.</q>
+        <cite>— Manuale Trade Desk · §3.1</cite>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 04 · CRONACHE                                                 -->
+    <!-- ============================================================ -->
+    <section class="page-section" id="s04">
+      <header class="page-hero">
+        <div class="num">04</div>
+        <div class="meta">
+          <div class="kicker">Operatività</div>
+          <h2>Le <em>Cronache</em></h2>
+          <p>Recap quotidiano di price action e macro per coin. Una settimana = 5 colonne (lun–ven), una colonna per coin. Il giornale di bordo del mercato.</p>
+        </div>
+        <div class="stamp">griglia · settimanale</div>
+      </header>
+
+      <div class="meta-bar">
+        <div class="cell"><div class="k">File</div><div class="v">cronache.html</div></div>
+        <div class="cell"><div class="k">Tabelle</div><div class="v">cronache · cronache_auto</div></div>
+        <div class="cell"><div class="k">Asset</div><div class="v mint">XAU · US30 · GER30 · NAS · BTC · EUR</div></div>
+        <div class="cell"><div class="k">Sorgente</div><div class="v amber">EA + manuale</div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">i.</span><span class="text">Screenshot live</span><span class="rule"></span></div>
+      <div class="shot-board" data-section="04">
+        <img src="images/04-cronache.png" alt="Cronache">
+        <div class="pin-layer">
+          <div class="pin"           data-n="1" style="top:8%;  left:10%">1</div>
+          <div class="pin c-amber"   data-n="2" style="top:18%; left:30%">2</div>
+          <div class="pin c-azure"   data-n="3" style="top:32%; left:14%">3</div>
+          <div class="pin"           data-n="4" style="top:42%; left:35%">4</div>
+          <div class="pin c-crimson" data-n="5" style="top:18%; left:90%">5</div>
+          <div class="pin c-amber"   data-n="6" style="top:42%; left:80%">6</div>
+        </div>
+      </div>
+
+      <div class="sect-label"><span class="ix">ii.</span><span class="text">Sei elementi chiave</span><span class="rule"></span></div>
+      <div class="notes" data-section="04">
+        <div class="note" data-n="1"><div class="note-num">01</div><div class="note-body"><div class="note-title">Cronache Mercato</div><div class="note-desc">Header pagina. Sotto: <strong>Archivio Daily Chart e Analisi Trend</strong> — il claim del modulo.</div></div></div>
+        <div class="note c-amber" data-n="2"><div class="note-num">02</div><div class="note-body"><div class="note-title">Tab asset</div><div class="note-desc"><strong>Tutti</strong> · XAUUSD · US30 · selezionano la riga visibile. "Tutti" mostra la matrice intera.</div></div></div>
+        <div class="note c-azure" data-n="3"><div class="note-num">03</div><div class="note-body"><div class="note-title">Card giornaliera</div><div class="note-desc">16:9 con thumbnail screenshot grafico. Sotto: titolo evento ("Falsa rottura Asia"), asset badge, percentuale del giorno colorata.</div></div></div>
+        <div class="note" data-n="4"><div class="note-num">04</div><div class="note-body"><div class="note-title">Commento sintetico</div><div class="note-desc">Tre righe max. Cosa è successo, in tono operativo: "<strong>Giornata indecisa con sweep e ritorno</strong>".</div></div></div>
+        <div class="note c-crimson" data-n="5"><div class="note-num">05</div><div class="note-body"><div class="note-title">Nuova Cronaca</div><div class="note-desc">Crei manualmente una cronaca per un evento non catturato dall'EA. Da usare con parsimonia.</div></div></div>
+        <div class="note c-amber" data-n="6"><div class="note-num">06</div><div class="note-body"><div class="note-title">Slot vuoto</div><div class="note-desc">Cella senza cronaca → opportunità persa o giornata flat. Click → crea nuova entry per quella casella.</div></div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">iii.</span><span class="text">Pipeline cronache</span><span class="rule"></span></div>
+      <div class="dual">
+        <div><h3>Come <em>arrivano</em></h3>
+          <ol>
+            <li>EA <strong>CodeTV</strong> butta dati grezzi in <code>cronache_auto</code></li>
+            <li>Trigger Postgres unisce con <code>cronache</code> (vista utente)</li>
+            <li>Tu rileggi, aggiungi commento, decidi se taggare strategia</li>
+            <li>Steve può analizzare la coorte settimanale per pattern</li>
+          </ol>
+        </div>
+        <div><h3>Cosa <em>non fai</em></h3>
+          <ol>
+            <li>Non scrivi mai direttamente in <code>cronache_auto</code></li>
+            <li>Non cancelli cronache vecchie — sono il dataset di Steve</li>
+            <li>Non taggi 5 strategie sulla stessa cronaca — al massimo 2</li>
+            <li>Non riempi le caselle vuote a forza — il flat è informazione</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-head"><div class="tag">Sub-pagina</div><h4>dettaglio_cronaca <em>· del mercato</em></h4></div>
+        <div class="detail-body">
+          <img src="images/04b-dettaglio_cronaca.png" alt="Dettaglio Cronaca">
+          <p><strong>Setup giornata</strong>: orari piccolo volume (London Lunch) · orari sbilanciamenti (News NFP) · sentiment di mercato. Sotto, <strong>I/O vs Mercato</strong> — correlazioni tra i tuoi trade e il movimento del giorno. A destra: TradingView chart embed (16:9) con il setup screenshottato.</p>
+          <p><strong>Dal Diario</strong> in basso: gli eventi clou aggregati — sbilanciamenti NFP, allert price/macro, sessioni operate. La cronaca è il punto in cui market e processo si incontrano.</p>
+        </div>
+      </div>
+
+      <div class="pull">
+        <q>La cronaca non è il movimento, è la tua <em>lettura</em> del movimento. Se non la scrivi, non è successa.</q>
+        <cite>— Manuale Trade Desk · §4.1</cite>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 05 · SETTIMANALE                                              -->
+    <!-- ============================================================ -->
+    <section class="page-section" id="s05">
+      <header class="page-hero">
+        <div class="num">05</div>
+        <div class="meta">
+          <div class="kicker">Operatività</div>
+          <h2>La <em>Weekly Review</em></h2>
+          <p>Aggregazione cinque-giorni. Una card per settimana lavorativa con win rate totale e net profit. Il livello di zoom giusto per vedere pattern di processo.</p>
+        </div>
+        <div class="stamp">venerdì · 18:00</div>
+      </header>
+
+      <div class="meta-bar">
+        <div class="cell"><div class="k">File</div><div class="v">settimanale.html</div></div>
+        <div class="cell"><div class="k">Aggregazione</div><div class="v">lun–ven</div></div>
+        <div class="cell"><div class="k">Card corrente</div><div class="v mint">badge "IN CORSO"</div></div>
+        <div class="cell"><div class="k">Storico</div><div class="v">≥ 12 settimane</div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">i.</span><span class="text">Screenshot live</span><span class="rule"></span></div>
+      <div class="shot-board" data-section="05">
+        <img src="images/05-settimanale.png" alt="Settimanale">
+        <div class="pin-layer">
+          <div class="pin"           data-n="1" style="top:14%; left:32%">1</div>
+          <div class="pin c-amber"   data-n="2" style="top:14%; left:50%">2</div>
+          <div class="pin c-azure"   data-n="3" style="top:25%; left:32%">3</div>
+          <div class="pin"           data-n="4" style="top:33%; left:50%">4</div>
+          <div class="pin c-crimson" data-n="5" style="top:33%; left:75%">5</div>
+        </div>
+      </div>
+
+      <div class="sect-label"><span class="ix">ii.</span><span class="text">Cinque elementi chiave</span><span class="rule"></span></div>
+      <div class="notes" data-section="05">
+        <div class="note" data-n="1"><div class="note-num">01</div><div class="note-body"><div class="note-title">Numero settimana</div><div class="note-desc"><strong>Week 14 (Corrente)</strong> in mint = settimana in corso. Calcolato come ISO week dell'anno.</div></div></div>
+        <div class="note c-amber" data-n="2"><div class="note-num">02</div><div class="note-body"><div class="note-title">Badge stato</div><div class="note-desc"><strong>IN CORSO</strong> · ✓ chiusa · ⊘ vuota. Solo una card può essere "IN CORSO".</div></div></div>
+        <div class="note c-azure" data-n="3"><div class="note-num">03</div><div class="note-body"><div class="note-title">Range date</div><div class="note-desc">"<strong>1 APR – 7 APR 2026</strong>" — sempre lunedì → domenica, anche se opera solo lun-ven.</div></div></div>
+        <div class="note" data-n="4"><div class="note-num">04</div><div class="note-body"><div class="note-title">Win Rate Totale</div><div class="note-desc"><strong>65%</strong> aggregato sui trade chiusi della settimana. "--" se in corso o senza trade.</div></div></div>
+        <div class="note c-crimson" data-n="5"><div class="note-num">05</div><div class="note-body"><div class="note-title">Net Profit</div><div class="note-desc"><strong>+$3,450</strong> verde · <strong>-$850</strong> rosso · "Elaborazione…" se ancora in corso.</div></div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">iii.</span><span class="text">Quando la guardi</span><span class="rule"></span></div>
+      <div class="dual">
+        <div><h3>Cosa <em>cerchi</em></h3>
+          <ol>
+            <li><strong>Trend</strong>: 4 settimane positive di fila o alternanza?</li>
+            <li><strong>Volatilità</strong>: net profit a spike o costante?</li>
+            <li><strong>Mood-PnL</strong>: settimane stress = settimane red?</li>
+            <li><strong>Asset rotation</strong>: cambia il PnL leader settimana per settimana?</li>
+          </ol>
+        </div>
+        <div><h3>Cosa <em>non fai</em></h3>
+          <ol>
+            <li>Non chiudi mai la corrente in anticipo — aspetta venerdì 18:00</li>
+            <li>Non cancelli settimane vuote — sono "settimane di pausa"</li>
+            <li>Non confronti settimane diverse senza pesare i giorni operati</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-head"><div class="tag">Sub-pagina</div><h4>dettaglio_settimana <em>· debrief</em></h4></div>
+        <div class="detail-body">
+          <img src="images/05b-dettaglio_settimana.png" alt="Dettaglio Settimana">
+          <p><strong>Flusso operativo giornaliero</strong>: 5 righe (lun–ven), una per giorno della settimana. Per ogni giorno: mood, badge sintetico ("INDECISO" · "PAZIENTE NON STANCO" · "SETUP ECCELLENTE" · "FOCUSED" · "DISTRATTO"), P/L netto.</p>
+          <p>A destra: <strong>Cosa ha funzionato bene</strong> (estratto dei pattern positivi della settimana) · <strong>Cosa devi smettere di fare</strong> (lezioni Peter). In basso: <strong>Broad Market Bias per la prossima settimana</strong> — riepilogo macro per orientarti il lunedì.</p>
+        </div>
+      </div>
+
+      <div class="pull">
+        <q>La settimana è la più piccola unità in cui un trader retail vede <em>pattern reali</em>. Sotto è rumore, sopra è vanità.</q>
+        <cite>— Manuale Trade Desk · §5.1</cite>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 06 · SESSIONI                                                 -->
+    <!-- ============================================================ -->
+    <section class="page-section" id="s06">
+      <header class="page-hero">
+        <div class="num">06</div>
+        <div class="meta">
+          <div class="kicker">Sessioni · Bias · Eventi</div>
+          <h2>Le <em>Sessioni</em></h2>
+          <p>Archivio Asia · London · NewYork. Tre righe per giornata, una per sessione. La granularità giusta per vedere quando opera meglio.</p>
+        </div>
+        <div class="stamp">apertura · automatica</div>
+      </header>
+
+      <div class="meta-bar">
+        <div class="cell"><div class="k">File</div><div class="v">sessioni.html</div></div>
+        <div class="cell"><div class="k">Tabella</div><div class="v">sessioni</div></div>
+        <div class="cell"><div class="k">Nomi</div><div class="v mint">asia · london · newyork</div></div>
+        <div class="cell"><div class="k">Seed</div><div class="v amber">trigger su giornate</div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">i.</span><span class="text">Screenshot live</span><span class="rule"></span></div>
+      <div class="shot-board" data-section="06">
+        <img src="images/06-sessioni.png" alt="Sessioni">
+        <div class="pin-layer">
+          <div class="pin"           data-n="1" style="top:4%;  left:18%">1</div>
+          <div class="pin c-amber"   data-n="2" style="top:4%;  left:60%">2</div>
+          <div class="pin c-azure"   data-n="3" style="top:18%; left:25%">3</div>
+          <div class="pin"           data-n="4" style="top:18%; left:55%">4</div>
+          <div class="pin c-crimson" data-n="5" style="top:30%; left:65%">5</div>
+          <div class="pin c-amber"   data-n="6" style="top:30%; left:78%">6</div>
+        </div>
+      </div>
+
+      <div class="sect-label"><span class="ix">ii.</span><span class="text">Sei elementi chiave</span><span class="rule"></span></div>
+      <div class="notes" data-section="06">
+        <div class="note" data-n="1"><div class="note-num">01</div><div class="note-body"><div class="note-title">Archivio Sessioni</div><div class="note-desc">Header. Claim: <strong>"cronologia logica e session analysis"</strong>. Counter "Totale Sessioni 24" in alto a destra.</div></div></div>
+        <div class="note c-amber" data-n="2"><div class="note-num">02</div><div class="note-body"><div class="note-title">Tab filtro</div><div class="note-desc"><strong>Tutte</strong> · Asia · London · New York. Filtro veloce per concentrarti su una sola sessione.</div></div></div>
+        <div class="note c-azure" data-n="3"><div class="note-num">03</div><div class="note-body"><div class="note-title">Riga sessione</div><div class="note-desc">Asia/London/NY · data · asset principale. Icona sole = pre-market quiet, vento = volatilità, scudo = chiusura difensiva.</div></div></div>
+        <div class="note" data-n="4"><div class="note-num">04</div><div class="note-body"><div class="note-title">Range pips</div><div class="note-desc"><strong>65 pips</strong> · 120 · 450. Indica volatilità della sessione misurata da H–L escluso outlier news.</div></div></div>
+        <div class="note c-crimson" data-n="5"><div class="note-num">05</div><div class="note-body"><div class="note-title">Bias result</div><div class="note-desc">Badge <strong>LONG</strong> · SHORT · NEUTRAL. È il bias che il sistema (o tu) hai dichiarato a inizio sessione, validato dall'esito.</div></div></div>
+        <div class="note c-amber" data-n="6"><div class="note-num">06</div><div class="note-body"><div class="note-title">Mood emoji</div><div class="note-desc">😀 sereno · 😐 neutro · 😡 frustrato. Sintesi del MonitoraSmile della sessione.</div></div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">iii.</span><span class="text">Logica di seed</span><span class="rule"></span></div>
+      <div class="dual">
+        <div><h3>Come <em>nascono</em></h3>
+          <ol>
+            <li>Trigger Postgres su <code>giornate</code>: alla creazione di una giornata, crea le 3 sessioni</li>
+            <li>EA MT4 popola <code>coin_data</code> con high/low della sessione</li>
+            <li>Tu rileggi e aggiungi bias result + commento</li>
+            <li>L'AI Rodrigo NON può fare insert su <code>sessioni</code> — solo update</li>
+          </ol>
+        </div>
+        <div><h3>Cosa <em>non fai</em></h3>
+          <ol>
+            <li>Non crei sessioni a mano — il trigger lo fa</li>
+            <li>Non cambi i nomi: sempre <code>asia</code>/<code>london</code>/<code>newyork</code> (mai "londra")</li>
+            <li>Non passi numeri a <code>coin_data</code> — sono <strong>sempre stringhe</strong></li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-head"><div class="tag">Sub-pagina</div><h4>dettaglio_sessione <em>· focus su una</em></h4></div>
+        <div class="detail-body">
+          <img src="images/06b-dettaglio_sessione.png" alt="Dettaglio Sessione">
+          <p><strong>Asia Session · 02 Aprile 2026</strong>. Tab per coin (XAUUSD · EURUSD · US30) con per ognuna: massimo/minimo, bias asset (LONG · SHORT · NEUTRO), commento testuale, screenshot setup.</p>
+          <p>In basso: <strong>Categorizzazione Universale</strong> (Cronache · Strategia · Trade) e <strong>MonitoraSmile</strong> (stato emotivo + volatilità percepita). La sessione è l'unità minima dove disciplina e mercato si toccano.</p>
+        </div>
+      </div>
+
+      <div class="pull">
+        <q>La sessione è il <em>blocco operativo</em>: tre ore di attenzione concentrata, tre lezioni nascoste dentro.</q>
+        <cite>— Manuale Trade Desk · §6.1</cite>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 07 · REPERTI / BIAS  (placeholder)                             -->
+    <!-- ============================================================ -->
+    <section class="page-section" id="s07">
+      <header class="page-hero">
+        <div class="num">07</div>
+        <div class="meta">
+          <div class="kicker">Sessioni · Bias · Eventi</div>
+          <h2>I <em>Reperti</em></h2>
+          <p>Memorie psicologiche e di mercato. Bias direzionali su un asset in una data, con confluenze, esito e screenshot. Servono a riconoscere i tuoi pattern di lettura.</p>
+        </div>
+        <div class="stamp">memoria · selettiva</div>
+      </header>
+
+      <div class="meta-bar">
+        <div class="cell"><div class="k">File</div><div class="v">bias.html</div></div>
+        <div class="cell"><div class="k">Tabella</div><div class="v">bias</div></div>
+        <div class="cell"><div class="k">Esiti</div><div class="v mint">corretto · sbagliato · parziale</div></div>
+        <div class="cell"><div class="k">Direzioni</div><div class="v">LONG · SHORT</div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">i.</span><span class="text">Layout · wireframe</span><span class="rule"></span></div>
+      <div class="shot-wireframe" data-section="07">
+        <div class="wf-row">
+          <div class="wf-cell"><div class="wf-pin" data-n="1">1</div><div class="wf-label">Header · Reperti</div><div class="wf-text">Titolo pagina, contatore reperti totali, filtro asset/direzione/esito.</div></div>
+        </div>
+        <div class="wf-row r3">
+          <div class="wf-cell tall"><div class="wf-pin" data-n="2">2</div><div class="wf-label">Card reperto</div><div class="wf-text">Asset · data · direzione (LONG/SHORT) · screenshot grafico H4.</div></div>
+          <div class="wf-cell tall"><div class="wf-pin" data-n="3">3</div><div class="wf-label">Confluenze</div><div class="wf-text">Lista bullet: liquidità presa, FVG, struttura HTF, allineamento DXY.</div></div>
+          <div class="wf-cell tall"><div class="wf-pin" data-n="4">4</div><div class="wf-label">Esito badge</div><div class="wf-text">Verde "corretto" · giallo "parziale" · rosso "sbagliato". Calcolato post-evento.</div></div>
+        </div>
+        <div class="wf-row r-asym">
+          <div class="wf-cell"><div class="wf-pin" data-n="5">5</div><div class="wf-label">Commento</div><div class="wf-text">Testo libero: "perché pensavo questo, cosa è successo davvero, lezione".</div></div>
+          <div class="wf-cell"><div class="wf-pin" data-n="6">6</div><div class="wf-label">Trade collegati</div><div class="wf-text">FK ai trade aperti basati su questo bias. Click → tabella trade filtrata.</div></div>
+        </div>
+      </div>
+
+      <div class="sect-label"><span class="ix">ii.</span><span class="text">Sei elementi chiave</span><span class="rule"></span></div>
+      <div class="notes" data-section="07">
+        <div class="note" data-n="1"><div class="note-num">01</div><div class="note-body"><div class="note-title">Header &amp; filtri</div><div class="note-desc">Selezioni asset (XAU · EUR · US30) · direzione · esito. Vista sempre desc per data.</div></div></div>
+        <div class="note c-amber" data-n="2"><div class="note-num">02</div><div class="note-body"><div class="note-title">Card reperto</div><div class="note-desc">Asset · data · screenshot H4 grafico. Click → dettaglio_bias.</div></div></div>
+        <div class="note c-azure" data-n="3"><div class="note-num">03</div><div class="note-body"><div class="note-title">Confluenze</div><div class="note-desc">Lista delle ragioni che hanno generato il bias. Ti aiuta a capire <strong>quanti elementi servono</strong> in media perché tu abbia ragione.</div></div></div>
+        <div class="note" data-n="4"><div class="note-num">04</div><div class="note-body"><div class="note-title">Esito automatico</div><div class="note-desc">Il sistema confronta direzione del bias vs movimento reale a +24h e classifica.</div></div></div>
+        <div class="note c-crimson" data-n="5"><div class="note-num">05</div><div class="note-body"><div class="note-title">Commento post-mortem</div><div class="note-desc">La parte più importante. Va scritta <strong>entro 24h dall'esito</strong>, prima che il ricordo si sbiadisca.</div></div></div>
+        <div class="note c-amber" data-n="6"><div class="note-num">06</div><div class="note-body"><div class="note-title">Trade collegati</div><div class="note-desc">Quanti trade hai aperto basandoti su questo bias? La domanda chiave per la disciplina.</div></div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">iii.</span><span class="text">Cosa cercare nei Reperti</span><span class="rule"></span></div>
+      <div class="dual">
+        <div><h3>Domande <em>buone</em></h3>
+          <ol>
+            <li>Quante confluenze ho in media nei bias corretti vs sbagliati?</li>
+            <li>Sono più affidabile in LONG o in SHORT?</li>
+            <li>Quale asset prevedo meglio? (XAU? EUR?)</li>
+            <li>Dopo un bias sbagliato, quanti giorni tornano ad essere corretti?</li>
+          </ol>
+        </div>
+        <div><h3>Domande <em>cattive</em></h3>
+          <ol>
+            <li>"Perché XAU sale?" — non è il punto, il punto è la <strong>tua lettura</strong></li>
+            <li>"Quante volte ho avuto ragione?" — senza n statistico è vanità</li>
+            <li>"Il prossimo bias sarà giusto?" — non c'è regressione alla media qui</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="pull">
+        <q>I reperti non servono per <em>prevedere</em>. Servono per riconoscere quando ti sbagli sempre allo stesso modo.</q>
+        <cite>— Manuale Trade Desk · §7.1</cite>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 08 · EVENTI / ALLERT                                          -->
+    <!-- ============================================================ -->
+    <section class="page-section" id="s08">
+      <header class="page-hero">
+        <div class="num">08</div>
+        <div class="meta">
+          <div class="kicker">Sessioni · Bias · Eventi</div>
+          <h2>Gli <em>Eventi</em></h2>
+          <p>Calendario macro USD/EUR · alert prezzo MT4 · MonitoraSmile. La pagina più impegnativa del sistema: notizie e disciplina si compilano qui.</p>
+        </div>
+        <div class="stamp mint">cuore · sistema notizie</div>
+      </header>
+
+      <div class="meta-bar">
+        <div class="cell"><div class="k">File</div><div class="v">allert.html</div></div>
+        <div class="cell"><div class="k">Tabelle</div><div class="v">allert · allert_prezzo · monitora_smile</div></div>
+        <div class="cell"><div class="k">Sorgente news</div><div class="v mint">ForexFactory weekly</div></div>
+        <div class="cell"><div class="k">Reminder</div><div class="v amber">−5 min · Telegram</div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">i.</span><span class="text">Screenshot live</span><span class="rule"></span></div>
+      <div class="shot-board" data-section="08">
+        <img src="images/08-allert.png" alt="Eventi">
+        <div class="pin-layer">
+          <div class="pin"           data-n="1" style="top:13%; left:30%">1</div>
+          <div class="pin c-amber"   data-n="2" style="top:22%; left:55%">2</div>
+          <div class="pin c-crimson" data-n="3" style="top:22%; left:75%">3</div>
+          <div class="pin c-azure"   data-n="4" style="top:35%; left:30%">4</div>
+          <div class="pin"           data-n="5" style="top:48%; left:30%">5</div>
+          <div class="pin c-amber"   data-n="6" style="top:60%; left:55%">6</div>
+        </div>
+      </div>
+
+      <div class="sect-label"><span class="ix">ii.</span><span class="text">Sei elementi chiave</span><span class="rule"></span></div>
+      <div class="notes" data-section="08">
+        <div class="note" data-n="1"><div class="note-num">01</div><div class="note-body"><div class="note-title">Notizie macro</div><div class="note-desc">Sezione <strong>Economic Calendar</strong>. NFP · Jobless Claims · BOE Gov Bailey Speaks. Iniettate il lunedì 05:30 da <code>news-weekly-fetch</code>.</div></div></div>
+        <div class="note c-amber" data-n="2"><div class="note-num">02</div><div class="note-body"><div class="note-title">Impact badge</div><div class="note-desc"><strong>HIGH IMPACT</strong> rosso · MED giallo · LOW grigio. Filtro: solo USD ed EUR (scelta esplicita per ridurre rumore).</div></div></div>
+        <div class="note c-crimson" data-n="3"><div class="note-num">03</div><div class="note-body"><div class="note-title">Actual / Forecast</div><div class="note-desc">"<strong>Actual: 303K (F: 205K)</strong>" + freccia direzione: XAU↓ · DXY↑. Compilato dopo l'uscita; trigger Postgres invoca Rodrigo per il commento.</div></div></div>
+        <div class="note c-azure" data-n="4"><div class="note-num">04</div><div class="note-body"><div class="note-title">Allert prezzo</div><div class="note-desc"><strong>EURUSD Target</strong> · <strong>1.0850</strong>. Generati dall'EA <strong>PriceAlert</strong> su MT4. Validi finché non triggerati o ignorati manual.</div></div></div>
+        <div class="note" data-n="5"><div class="note-num">05</div><div class="note-body"><div class="note-title">MonitoraSmile</div><div class="note-desc">Registro stato emotivo. <strong>Focussed/Calmo</strong> oggi 08:30 · <strong>FOMO/Fretta</strong> ieri 15:45. Storia raw del processo.</div></div></div>
+        <div class="note c-amber" data-n="6"><div class="note-num">06</div><div class="note-body"><div class="note-title">Quote post-mood</div><div class="note-desc">Frasi tra virgolette: "<em>Ottima dormita, pronto per NY</em>" · "<em>Ingresso anticipato per colpa di X(Twitter)</em>". Sono i memo che il futuro-te leggerà.</div></div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">iii.</span><span class="text">Pipeline notizie</span><span class="rule"></span></div>
+      <div class="dual">
+        <div><h3>Cosa <em>fai qui</em></h3>
+          <ol>
+            <li>Lunedì alle 06:00 vedi la settimana già compilata con analisi pre</li>
+            <li>5 min prima di un evento HIGH ricevi reminder Telegram da Rodrigo</li>
+            <li>Dopo l'uscita apri il modale, scrivi l'<strong>actual</strong>, salvi</li>
+            <li>Il trigger DB invoca Rodrigo che scrive <strong>commento_rodrigo</strong></li>
+          </ol>
+        </div>
+        <div><h3>Cosa <em>non fai</em></h3>
+          <ol>
+            <li>Non rimuovi il filtro USD/EUR — è per ridurre rumore</li>
+            <li>Non modifichi <code>ff_id</code> — è la chiave di dedup</li>
+            <li>Non skippi il MonitoraSmile prima di una sessione</li>
+            <li>Non scrivi <code>commento_rodrigo</code> a mano — lo scrive lui</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-head"><div class="tag">Modale</div><h4>Validazione Post-Notizia <em>· NFP</em></h4></div>
+        <div class="detail-body">
+          <img src="images/08b-allert_modal.png" alt="Modale Validazione Allert">
+          <p>Si apre cliccando sull'evento. <strong>Header rosso</strong> = HIGH IMPACT. Forecast/Previous, intelligenza alta, commento esistente di Rodrigo (analisi pre-evento). <strong>Tu compili</strong>: Dato Uscito (es. 303K), Commento Utente Post-News.</p>
+          <p><strong>MonitoraSmile rapido</strong>: per ogni asset (XAUUSD · USDX) clicchi tag operativi: <em>manipolazione</em> · <em>reversal</em> · <em>impulso immediato</em>. Categorizzazione destinazione focus: Cronache · Strategia · Trade. Riepilogo eventi correlati. Bottone giallo "Invia a DB Notizie" → <strong>UPDATE</strong> + trigger Rodrigo.</p>
+        </div>
+      </div>
+
+      <div class="pull">
+        <q>La notizia non è il dato — è la <em>tua reazione</em> al dato. Se non la registri, non è successa.</q>
+        <cite>— Manuale Trade Desk · §8.1</cite>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 09 · ANALISI                                                  -->
+    <!-- ============================================================ -->
+    <section class="page-section" id="s09">
+      <header class="page-hero">
+        <div class="num">09</div>
+        <div class="meta">
+          <div class="kicker">Analisi · Strategie · AI</div>
+          <h2>L'<em>Analisi</em></h2>
+          <p>Dashboard statistica completa. Equity curve · pie chart per asset · bar chart per sessione. Il livello di zoom giusto per le decisioni di portafoglio.</p>
+        </div>
+        <div class="stamp">venerdì + EOM</div>
+      </header>
+
+      <div class="meta-bar">
+        <div class="cell"><div class="k">File</div><div class="v">analisi.html</div></div>
+        <div class="cell"><div class="k">Tab</div><div class="v">Tutto · MT4 · Bybit</div></div>
+        <div class="cell"><div class="k">Periodo</div><div class="v mint">filtrabile</div></div>
+        <div class="cell"><div class="k">KPI</div><div class="v">Net P/L · WR · R:R · DD</div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">i.</span><span class="text">Screenshot live</span><span class="rule"></span></div>
+      <div class="shot-board" data-section="09">
+        <img src="images/09-analisi.png" alt="Analisi">
+        <div class="pin-layer">
+          <div class="pin"           data-n="1" style="top:14%; left:14%">1</div>
+          <div class="pin c-amber"   data-n="2" style="top:14%; left:40%">2</div>
+          <div class="pin c-azure"   data-n="3" style="top:14%; left:60%">3</div>
+          <div class="pin c-crimson" data-n="4" style="top:14%; left:85%">4</div>
+          <div class="pin"           data-n="5" style="top:42%; left:50%">5</div>
+          <div class="pin c-amber"   data-n="6" style="top:78%; left:25%">6</div>
+          <div class="pin c-azure"   data-n="7" style="top:78%; left:70%">7</div>
+        </div>
+      </div>
+
+      <div class="sect-label"><span class="ix">ii.</span><span class="text">Sette elementi chiave</span><span class="rule"></span></div>
+      <div class="notes" data-section="09">
+        <div class="note" data-n="1"><div class="note-num">01</div><div class="note-body"><div class="note-title">Net P/L Globale</div><div class="note-desc"><strong>+$14,250</strong>. Aggregato su tutto il periodo selezionato. Dollari, non pips.</div></div></div>
+        <div class="note c-amber" data-n="2"><div class="note-num">02</div><div class="note-body"><div class="note-title">Win Rate %</div><div class="note-desc"><strong>68.5%</strong> con delta vs periodo precedente (<strong>+2.6%</strong>). Verde se in miglioramento.</div></div></div>
+        <div class="note c-azure" data-n="3"><div class="note-num">03</div><div class="note-body"><div class="note-title">Risk / Reward medio</div><div class="note-desc"><strong>1 : 2.4</strong>. Calcolato come media dei R:R per trade chiuso. Un valore &lt; 1.5 alza un alert.</div></div></div>
+        <div class="note c-crimson" data-n="4"><div class="note-num">04</div><div class="note-body"><div class="note-title">Max Drawdown</div><div class="note-desc"><strong>-4.2%</strong>. Picco di perdita dal massimo equity. Il numero che decide se sopravvivi.</div></div></div>
+        <div class="note" data-n="5"><div class="note-num">05</div><div class="note-body"><div class="note-title">Equity Curve</div><div class="note-desc">Balance ↑ nel tempo. La curva ideale è ripida e liscia. <strong>Trades in Profit</strong> in alto a destra.</div></div></div>
+        <div class="note c-amber" data-n="6"><div class="note-num">06</div><div class="note-body"><div class="note-title">Distribuzione P/L Asset</div><div class="note-desc">Pie chart: XAU · US30 · EUR. La fetta più grande è l'asset che porta a casa il bacon — o quello che ti distrugge.</div></div></div>
+        <div class="note c-azure" data-n="7"><div class="note-num">07</div><div class="note-body"><div class="note-title">P/L per sessione</div><div class="note-desc">Bar chart: London Open · Lunch · NY Open · NY PM · Asia. Vedi quando sei più produttivo.</div></div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">iii.</span><span class="text">Domande dell'analisi</span><span class="rule"></span></div>
+      <div class="dual">
+        <div><h3>Domande <em>buone</em></h3>
+          <ol>
+            <li>L'equity curve ha avuto <strong>3 mesi flat</strong>? Cosa è cambiato dopo?</li>
+            <li>Se tolgo XAU dal pie, cosa rimane? Sono <strong>scalper d'oro</strong> o trader generico?</li>
+            <li>NY PM è verde o rosso? La sessione di chiusura è quella dove rovino?</li>
+            <li>Win Rate e R:R medio si tengono insieme o uno dei due è "in saldo"?</li>
+          </ol>
+        </div>
+        <div><h3>Domande <em>cattive</em></h3>
+          <ol>
+            <li>"Quanto ho fatto questo mese?" — il mese è una finestra arbitraria</li>
+            <li>"Posso scalare a 5 lots?" — la risposta non è in questa pagina</li>
+            <li>"Sono migliorato?" — confronta sempre con l'equity, non col PnL grezzo</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="pull">
+        <q>L'analisi non ti dice <em>cosa fare domani</em>. Ti dice solo se quello che hai fatto fin qui ha senso.</q>
+        <cite>— Manuale Trade Desk · §9.1</cite>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 10 · STRATEGIE                                                -->
+    <!-- ============================================================ -->
+    <section class="page-section" id="s10">
+      <header class="page-hero">
+        <div class="num">10</div>
+        <div class="meta">
+          <div class="kicker">Analisi · Strategie · AI</div>
+          <h2>Le <em>Strategie</em></h2>
+          <p>Playbook meccanici. Una card per setup con regole d'ingresso, gestione rischio, win rate storico, screenshot esempio. Il libro delle decisioni replicabili.</p>
+        </div>
+        <div class="stamp">playbook · attivo</div>
+      </header>
+
+      <div class="meta-bar">
+        <div class="cell"><div class="k">File</div><div class="v">strategie.html</div></div>
+        <div class="cell"><div class="k">Tabella</div><div class="v">strategie</div></div>
+        <div class="cell"><div class="k">Status</div><div class="v mint">attiva · pausa · archiviata</div></div>
+        <div class="cell"><div class="k">Regole</div><div class="v">JSONB checklist</div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">i.</span><span class="text">Screenshot live</span><span class="rule"></span></div>
+      <div class="shot-board" data-section="10">
+        <img src="images/10-strategie.png" alt="Strategie">
+        <div class="pin-layer">
+          <div class="pin"           data-n="1" style="top:13%; left:14%">1</div>
+          <div class="pin c-amber"   data-n="2" style="top:25%; left:18%">2</div>
+          <div class="pin c-azure"   data-n="3" style="top:38%; left:14%">3</div>
+          <div class="pin c-crimson" data-n="4" style="top:60%; left:18%">4</div>
+          <div class="pin"           data-n="5" style="top:38%; left:78%">5</div>
+        </div>
+      </div>
+
+      <div class="sect-label"><span class="ix">ii.</span><span class="text">Cinque elementi chiave</span><span class="rule"></span></div>
+      <div class="notes" data-section="10">
+        <div class="note" data-n="1"><div class="note-num">01</div><div class="note-body"><div class="note-title">Playbook Strategie</div><div class="note-desc">Header. Sotto: <em>"il mio playbook · archivio delle definizioni operative e analisi flow per singola iterazione strategica"</em>.</div></div></div>
+        <div class="note c-amber" data-n="2"><div class="note-num">02</div><div class="note-body"><div class="note-title">Card strategia</div><div class="note-desc"><strong>London Breakout</strong> · setup momentum. <strong>ICT Turtle Soup</strong> · reversal stop hunt. Status badge "Attiva" mint.</div></div></div>
+        <div class="note c-azure" data-n="3"><div class="note-num">03</div><div class="note-body"><div class="note-title">Mini-grafico equity</div><div class="note-desc">Sparkline degli ultimi N trade della strategia. La curva ti dice se è in forma o se è da rivedere.</div></div></div>
+        <div class="note c-crimson" data-n="4"><div class="note-num">04</div><div class="note-body"><div class="note-title">KPI sintetici</div><div class="note-desc"><strong>Win Rate · Trades · P/L</strong>. Aggregati a vita della strategia. Se WR &lt; 40% → status diventa "Pausa" automaticamente.</div></div></div>
+        <div class="note" data-n="5"><div class="note-num">05</div><div class="note-body"><div class="note-title">Aggiungi Modello</div><div class="note-desc">Card vuota che invita a creare nuovo playbook. <em>"Usa le impostazioni per inserire una nuova voce nel dizionario strategie."</em></div></div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">iii.</span><span class="text">Vita di una strategia</span><span class="rule"></span></div>
+      <div class="dual">
+        <div><h3>Quando <em>la usi</em></h3>
+          <ol>
+            <li>Idea → bozza con regole d'ingresso, gestione rischio</li>
+            <li>Backtest manuale: 20 trade simulati o storici</li>
+            <li>Status "Attiva" → tagghi i trade reali con la strategia</li>
+            <li>Dopo 30 trade reali rivedi WR/R:R/expectancy</li>
+          </ol>
+        </div>
+        <div><h3>Quando <em>la archivi</em></h3>
+          <ol>
+            <li>WR sotto 40% per 30+ trade → archivia o riformula</li>
+            <li>Setup non più coerente con tuo orario operativo</li>
+            <li>Il mercato è cambiato (regime shift) e i livelli non funzionano</li>
+            <li>Hai trovato una strategia migliore che la sostituisce</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-head"><div class="tag">Sub-pagina</div><h4>dettaglio_strategia <em>· London Breakout</em></h4></div>
+        <div class="detail-body">
+          <img src="images/10b-dettaglio_strategia.png" alt="Dettaglio Strategia">
+          <p><strong>Ipotesi Analitica</strong>: la strategia si basa sulla creazione di induzione prima dell'apertura del mercato di Londra. <strong>Regole di ingresso</strong> (checklist): Asia Range chiuso e ben definito (≤ 40 pips) · C'è un FVG su M15 o H1 opposto all'induzione · Nessuna Red News schedulata alle 09:00–10:00 GBP/EUR.</p>
+          <p><strong>Gestione Rischio &amp; Stop</strong>: Stop Loss posizionato 3 pips sopra/sotto la candela di induzione · Rischio Max 1%. <strong>Take Profit</strong>: TP1 a 1:2 per parzialitare 50% · TP2 a liquidità asiatica opposta · BE appena tocco 1:1.5. A destra: Metriche storiche (WR 74%, 128 trades, +$14k) e Trades filtrati. In basso: Reperti ricevuti collegati e Allert Premarket per conferma del giorno.</p>
+        </div>
+      </div>
+
+      <div class="pull">
+        <q>Una strategia non è un'opinione: è una <em>regola scritta</em> che hai accettato di seguire anche quando non ti va.</q>
+        <cite>— Manuale Trade Desk · §10.1</cite>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 11 · GRAFICI (placeholder)                                    -->
+    <!-- ============================================================ -->
+    <section class="page-section" id="s11">
+      <header class="page-hero">
+        <div class="num">11</div>
+        <div class="meta">
+          <div class="kicker">Analisi · Strategie · AI</div>
+          <h2>I <em>Grafici</em></h2>
+          <p>Embed TradingView per coin con tab e workflow di paste rapido (Ctrl+V) verso una destinazione: trade, bias, cronaca, sessione. Lo screenshot finisce in Storage e l'URL nel record.</p>
+        </div>
+        <div class="stamp">embed · live</div>
+      </header>
+
+      <div class="meta-bar">
+        <div class="cell"><div class="k">File</div><div class="v">grafici.html</div></div>
+        <div class="cell"><div class="k">Engine</div><div class="v">TradingView widget</div></div>
+        <div class="cell"><div class="k">Storage</div><div class="v mint">trade-screenshots bucket</div></div>
+        <div class="cell"><div class="k">Workflow</div><div class="v amber">Ctrl+V → destinazione</div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">i.</span><span class="text">Layout · wireframe</span><span class="rule"></span></div>
+      <div class="shot-wireframe" data-section="11">
+        <div class="wf-row">
+          <div class="wf-cell"><div class="wf-pin" data-n="1">1</div><div class="wf-label">Tab asset</div><div class="wf-text">XAUUSD · US30 · GER30 · NAS100 · EURUSD · BTCUSD. Cambiano il symbol del widget TV.</div></div>
+        </div>
+        <div class="wf-row r-asym">
+          <div class="wf-cell x-tall"><div class="wf-pin" data-n="2">2</div><div class="wf-label">TradingView embed</div><div class="wf-text">Iframe widget interattivo. Timeframe selector built-in: 1m · 5m · 15m · 1h · 4h · 1d.</div></div>
+          <div class="wf-cell tall"><div class="wf-pin" data-n="3">3</div><div class="wf-label">Destinazione paste</div><div class="wf-text">Radio button: Trade · Bias · Cronaca · Sessione. Determina la tabella dove va l'URL.</div></div>
+        </div>
+        <div class="wf-row r2">
+          <div class="wf-cell"><div class="wf-pin" data-n="4">4</div><div class="wf-label">ID record</div><div class="wf-text">Input/select per scegliere a quale record allegare lo screenshot (es. TRD-104).</div></div>
+          <div class="wf-cell"><div class="wf-pin" data-n="5">5</div><div class="wf-label">Drop area</div><div class="wf-text">"Incolla con Ctrl+V o trascina qui". Anteprima thumb dell'immagine in attesa di salvataggio.</div></div>
+        </div>
+      </div>
+
+      <div class="sect-label"><span class="ix">ii.</span><span class="text">Cinque elementi chiave</span><span class="rule"></span></div>
+      <div class="notes" data-section="11">
+        <div class="note" data-n="1"><div class="note-num">01</div><div class="note-body"><div class="note-title">Tab asset</div><div class="note-desc">Lista degli asset preferiti: <strong>XAUUSD · US30 · GER30 · NAS100 · BTCUSD · EURUSD</strong>. Click → cambia simbolo TradingView.</div></div></div>
+        <div class="note c-amber" data-n="2"><div class="note-num">02</div><div class="note-body"><div class="note-title">Widget TradingView</div><div class="note-desc">Embed iframe interattivo. Tutto il chart nativo TV: drawing tools, indicatori, replay (premium).</div></div></div>
+        <div class="note c-azure" data-n="3"><div class="note-num">03</div><div class="note-body"><div class="note-title">Destinazione</div><div class="note-desc">Radio: <strong>Trade · Bias · Cronaca · Sessione</strong>. Decide in quale tabella scrivere l'URL.</div></div></div>
+        <div class="note" data-n="4"><div class="note-num">04</div><div class="note-body"><div class="note-title">Selettore record</div><div class="note-desc">Dopo aver scelto la destinazione, selezioni a quale ID associare (es. TRD-104, BIAS-23).</div></div></div>
+        <div class="note c-crimson" data-n="5"><div class="note-num">05</div><div class="note-body"><div class="note-title">Ctrl+V drop</div><div class="note-desc">Incolla screenshot dal grafico → upload su Supabase Storage → URL scritto nel record. <strong>Workflow di 3 secondi</strong>.</div></div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">iii.</span><span class="text">Quando lo usi</span><span class="rule"></span></div>
+      <div class="dual">
+        <div><h3>Casi <em>tipici</em></h3>
+          <ol>
+            <li>Hai chiuso un trade, vuoi allegare il setup screenshot</li>
+            <li>Stai compilando un bias, ti serve il chart H4 dell'asset</li>
+            <li>Cronaca giornaliera: thumbnail per la card della griglia</li>
+            <li>Sessione: high/low di sessione catturati visivamente</li>
+          </ol>
+        </div>
+        <div><h3>Quando <em>non lo usi</em></h3>
+          <ol>
+            <li>Per analisi profonda — usa direttamente TradingView Desktop con MCP</li>
+            <li>Per backtesting — usa Replay TV o strategie Pine</li>
+            <li>Per allegare PDF o file generici — questo è solo per chart</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="pull">
+        <q>Lo screenshot è la <em>memoria visiva</em> del trade. Senza, il trade vive solo nei numeri — e i numeri non insegnano niente.</q>
+        <cite>— Manuale Trade Desk · §11.1</cite>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 12 · PETER (dede)                                             -->
+    <!-- ============================================================ -->
+    <section class="page-section" id="s12">
+      <header class="page-hero">
+        <div class="num">12</div>
+        <div class="meta">
+          <div class="kicker">Analisi · Strategie · AI</div>
+          <h2>Peter <em>· il coach</em></h2>
+          <p>Analista comportamentale clinico. Identifica errori cognitivi (FOMO, revenge, overconfidence), trova il primo momento di deviazione, dà voto disciplina 0–10. Non motivazionale, mai.</p>
+        </div>
+        <div class="stamp">post-sessione · debrief</div>
+      </header>
+
+      <div class="meta-bar">
+        <div class="cell"><div class="k">File</div><div class="v">dede.html</div></div>
+        <div class="cell"><div class="k">Edge function</div><div class="v">chat-ai · mode=coach</div></div>
+        <div class="cell"><div class="k">Modello</div><div class="v mint">claude-sonnet-4-6</div></div>
+        <div class="cell"><div class="k">Contesto</div><div class="v">30gg · trade · giornate · bias</div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">i.</span><span class="text">Layout · wireframe</span><span class="rule"></span></div>
+      <div class="shot-wireframe" data-section="12">
+        <div class="wf-row r-asym">
+          <div class="wf-cell tall"><div class="wf-pin" data-n="1">1</div><div class="wf-label">Header coach</div><div class="wf-text">Avatar Peter · titolo "Coach Disciplina" · status "in linea" · ultimo debrief timestamp.</div></div>
+          <div class="wf-cell tall"><div class="wf-pin" data-n="2">2</div><div class="wf-label">Quick prompts</div><div class="wf-text">"Debrief sessione di oggi" · "Voto disciplina 30gg" · "Pattern errori questa settimana".</div></div>
+        </div>
+        <div class="wf-row">
+          <div class="wf-cell x-tall"><div class="wf-pin" data-n="3">3</div><div class="wf-label">Conversazione</div><div class="wf-text">Bubble chat. User a destra mint, Peter a sinistra paper. Markdown rendering, sezioni con header.</div></div>
+        </div>
+        <div class="wf-row r-asym">
+          <div class="wf-cell"><div class="wf-pin" data-n="4">4</div><div class="wf-label">Composer</div><div class="wf-text">Input testuale + bottone invia. Cmd/Ctrl+Enter per inviare rapido.</div></div>
+          <div class="wf-cell"><div class="wf-pin" data-n="5">5</div><div class="wf-label">Footer dati</div><div class="wf-text">Sample size visibile sempre: "n=23 trade · n=12 giornate · finestra 30gg".</div></div>
+        </div>
+      </div>
+
+      <div class="sect-label"><span class="ix">ii.</span><span class="text">Cinque elementi chiave</span><span class="rule"></span></div>
+      <div class="notes" data-section="12">
+        <div class="note" data-n="1"><div class="note-num">01</div><div class="note-body"><div class="note-title">Avatar &amp; identità</div><div class="note-desc">Peter è un <strong>analista clinico</strong>, non un Mr. Miyagi. Tono distaccato, terzo.</div></div></div>
+        <div class="note c-amber" data-n="2"><div class="note-num">02</div><div class="note-body"><div class="note-title">Quick prompts</div><div class="note-desc">Tre azioni veloci: debrief · voto · pattern. Servono per ridurre attrito iniziale.</div></div></div>
+        <div class="note c-azure" data-n="3"><div class="note-num">03</div><div class="note-body"><div class="note-title">Output strutturato</div><div class="note-desc">Peter risponde con sezioni: <strong>Identificazione errore</strong> · <strong>Primo momento di deviazione</strong> · <strong>Voto disciplina</strong> · <strong>Una regola per domani</strong>.</div></div></div>
+        <div class="note" data-n="4"><div class="note-num">04</div><div class="note-body"><div class="note-title">Composer</div><div class="note-desc">Input semplice. Niente upload, niente attachment. Solo conversazione.</div></div></div>
+        <div class="note c-crimson" data-n="5"><div class="note-num">05</div><div class="note-body"><div class="note-title">Sample size sempre</div><div class="note-desc"><strong>Regola critica</strong>: Peter dichiara sempre il livello di confidenza statistica ("n=4, debole" / "n=23, robusto"). Mai pattern senza n.</div></div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">iii.</span><span class="text">Quando parli con Peter</span><span class="rule"></span></div>
+      <div class="dual">
+        <div><h3>Domande <em>buone</em></h3>
+          <ol>
+            <li>"Debrief della sessione di London di oggi"</li>
+            <li>"Quante volte ho violato la checklist questa settimana?"</li>
+            <li>"Pattern degli stop loss negli ultimi 30 giorni"</li>
+            <li>"Voto disciplina del mese scorso, in numeri"</li>
+          </ol>
+        </div>
+        <div><h3>Domande <em>cattive</em></h3>
+          <ol>
+            <li>"Come sto andando?" — troppo vago, Peter non motiva</li>
+            <li>"Mi sento giù, dimmi che andrà bene" — non è un coach</li>
+            <li>"Predici se domani sarà profittevole" — non è il suo lavoro</li>
+            <li>"Suggeriscimi un trade adesso" — è Rodrigo, non Peter</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="pull">
+        <q>Peter non ti dice se hai vinto. Ti dice se hai <em>seguito il processo</em>. Vincere è una conseguenza che tu cerchi a parte.</q>
+        <cite>— Manuale Trade Desk · §12.1</cite>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 13 · STEVE                                                    -->
+    <!-- ============================================================ -->
+    <section class="page-section" id="s13">
+      <header class="page-hero">
+        <div class="num">13</div>
+        <div class="meta">
+          <div class="kicker">Analisi · Strategie · AI</div>
+          <h2>Steve <em>· il calcolatore</em></h2>
+          <p>Strategist quantitativo. Analisi numeriche profonde, lavoro su strategie, sample size sempre dichiarato. Tabelle, sezioni chiare, zero fronzoli. Lo apri raramente — ma quando lo apri serve.</p>
+        </div>
+        <div class="stamp">batch · weekly</div>
+      </header>
+
+      <div class="meta-bar">
+        <div class="cell"><div class="k">File</div><div class="v">steve.html</div></div>
+        <div class="cell"><div class="k">Edge function</div><div class="v">chat-ai · mode=power</div></div>
+        <div class="cell"><div class="k">Contesto</div><div class="v mint">150 trade · cronache · settimane</div></div>
+        <div class="cell"><div class="k">Output</div><div class="v">tabelle markdown</div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">i.</span><span class="text">Layout · wireframe</span><span class="rule"></span></div>
+      <div class="shot-wireframe" data-section="13">
+        <div class="wf-row r-asym">
+          <div class="wf-cell tall"><div class="wf-pin" data-n="1">1</div><div class="wf-label">Header strategist</div><div class="wf-text">Avatar Steve · "Calcolatore Strategico" · ultimo run timestamp.</div></div>
+          <div class="wf-cell tall"><div class="wf-pin" data-n="2">2</div><div class="wf-label">Templates di analisi</div><div class="wf-text">"Backtest playbook X · 90gg" · "Distribuzione R:R per asset" · "Expectancy per sessione".</div></div>
+        </div>
+        <div class="wf-row">
+          <div class="wf-cell x-tall"><div class="wf-pin" data-n="3">3</div><div class="wf-label">Conversazione + tabelle</div><div class="wf-text">Output markdown con tabelle strutturate. Sezioni chiare, nessun emoji, sample size in header.</div></div>
+        </div>
+        <div class="wf-row r2">
+          <div class="wf-cell"><div class="wf-pin" data-n="4">4</div><div class="wf-label">Composer + filtri</div><div class="wf-text">Input testuale + filtri rapidi: periodo · asset · sessione · strategia.</div></div>
+          <div class="wf-cell"><div class="wf-pin" data-n="5">5</div><div class="wf-label">Export</div><div class="wf-text">Bottone "Salva risposta in Note". Le risposte di Steve sono draft di documenti.</div></div>
+        </div>
+      </div>
+
+      <div class="sect-label"><span class="ix">ii.</span><span class="text">Cinque elementi chiave</span><span class="rule"></span></div>
+      <div class="notes" data-section="13">
+        <div class="note" data-n="1"><div class="note-num">01</div><div class="note-body"><div class="note-title">Identità</div><div class="note-desc">Steve è il <strong>quant</strong>. Numerico, conciso, zero fronzoli. Risposte in tabelle.</div></div></div>
+        <div class="note c-amber" data-n="2"><div class="note-num">02</div><div class="note-body"><div class="note-title">Templates</div><div class="note-desc">Analisi pre-impostate per ridurre il prompt-engineering quotidiano.</div></div></div>
+        <div class="note c-azure" data-n="3"><div class="note-num">03</div><div class="note-body"><div class="note-title">Output tabellare</div><div class="note-desc">Markdown con tabelle. Header sempre con <strong>n=N</strong>, periodo, condizioni del campione.</div></div></div>
+        <div class="note" data-n="4"><div class="note-num">04</div><div class="note-body"><div class="note-title">Filtri rapidi</div><div class="note-desc">Periodo · asset · sessione · strategia. Per non dover specificare tutto in prompt.</div></div></div>
+        <div class="note c-crimson" data-n="5"><div class="note-num">05</div><div class="note-body"><div class="note-title">Export</div><div class="note-desc">Salvi risposte come note interne. Steve produce <strong>draft</strong>, non chat.</div></div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">iii.</span><span class="text">Quando lo apri</span><span class="rule"></span></div>
+      <div class="dual">
+        <div><h3>Casi <em>giusti</em></h3>
+          <ol>
+            <li>Backtest formale di una strategia su 90+ giorni</li>
+            <li>Distribuzione R:R per asset, con percentili</li>
+            <li>Expectancy (E = WR×R − (1−WR)) per sessione</li>
+            <li>Validazione di un'ipotesi: "London Lunch è flat?"</li>
+          </ol>
+        </div>
+        <div><h3>Casi <em>sbagliati</em></h3>
+          <ol>
+            <li>Domande operative del giorno (è Rodrigo)</li>
+            <li>Debrief post-sessione (è Peter)</li>
+            <li>Conferme emotive ("ho fatto bene?")</li>
+            <li>Forecast di mercato ("dove va XAU?")</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="pull">
+        <q>Steve non parla — <em>conta</em>. Quando ti serve un sì/no fondato, non un'opinione, è lui.</q>
+        <cite>— Manuale Trade Desk · §13.1</cite>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 14 · IMPOSTAZIONI                                             -->
+    <!-- ============================================================ -->
+    <section class="page-section" id="s14">
+      <header class="page-hero">
+        <div class="num">14</div>
+        <div class="meta">
+          <div class="kicker">Configurazione</div>
+          <h2>Le <em>Impostazioni</em></h2>
+          <p>Pannello di configurazione del Motore Logico. Checklist disciplina · orari sessioni · badge asset · stati mentali · setup modelli strategici. Tutto in <code>user_settings</code>.</p>
+        </div>
+        <div class="stamp">configurazione · radice</div>
+      </header>
+
+      <div class="meta-bar">
+        <div class="cell"><div class="k">File</div><div class="v">impostazioni.html</div></div>
+        <div class="cell"><div class="k">Tabella</div><div class="v">user_settings</div></div>
+        <div class="cell"><div class="k">Chiavi</div><div class="v mint">td_checklist · td_timeline · td_asset</div></div>
+        <div class="cell"><div class="k">Effetto</div><div class="v amber">tutto il sito</div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">i.</span><span class="text">Screenshot live</span><span class="rule"></span></div>
+      <div class="shot-board" data-section="14">
+        <img src="images/15-impostazioni.png" alt="Impostazioni">
+        <div class="pin-layer">
+          <div class="pin"           data-n="1" style="top:14%; left:20%">1</div>
+          <div class="pin c-amber"   data-n="2" style="top:14%; left:50%">2</div>
+          <div class="pin c-azure"   data-n="3" style="top:14%; left:80%">3</div>
+          <div class="pin c-crimson" data-n="4" style="top:55%; left:20%">4</div>
+          <div class="pin"           data-n="5" style="top:65%; left:50%">5</div>
+        </div>
+      </div>
+
+      <div class="sect-label"><span class="ix">ii.</span><span class="text">Cinque elementi chiave</span><span class="rule"></span></div>
+      <div class="notes" data-section="14">
+        <div class="note" data-n="1"><div class="note-num">01</div><div class="note-body"><div class="note-title">Checklist Base</div><div class="note-desc">Items del Giornaliero. Drag &amp; drop per riordinare. <strong>"Review Macro Calendario" · "Controllato liquidità Asia" · "Verifica Marea Attuale" · "Aggiornato livelli HTF"</strong>.</div></div></div>
+        <div class="note c-amber" data-n="2"><div class="note-num">02</div><div class="note-body"><div class="note-title">Orari Sessioni</div><div class="note-desc">Asia 00:00–09:00 · London 09:00–11:30 · NewYork 14:00–17:00. <strong>Casablanca time</strong>. Modificabili ma cambiano la timeline ovunque.</div></div></div>
+        <div class="note c-azure" data-n="3"><div class="note-num">03</div><div class="note-body"><div class="note-title">Badge Asset &amp; Proprietà</div><div class="note-desc">Asset preferiti: XAUUSD · US30 · GER30. Stati mentali opzionali: Eccellente focus · Stanchezza · Forte / Urgenza.</div></div></div>
+        <div class="note c-crimson" data-n="4"><div class="note-num">04</div><div class="note-body"><div class="note-title">Setup Modelli Strategici</div><div class="note-desc">Crea/edita strategie da qui. Bottone <strong>Crea Strategia</strong> popola la tabella <code>strategie</code> con un nuovo skeleton.</div></div></div>
+        <div class="note" data-n="5"><div class="note-num">05</div><div class="note-body"><div class="note-title">Cards strategia esistenti</div><div class="note-desc"><strong>London Breakout · ICT Turtle Soup</strong>. Click → edit regole d'ingresso (JSONB checklist) e gestione rischio.</div></div></div>
+      </div>
+
+      <div class="sect-label"><span class="ix">iii.</span><span class="text">Cosa configuri qui</span><span class="rule"></span></div>
+      <div class="dual">
+        <div><h3>Cose <em>sicure</em> da toccare</h3>
+          <ol>
+            <li>Aggiungere/togliere item dalla checklist disciplina</li>
+            <li>Cambiare gli stati mentali disponibili nel mood picker</li>
+            <li>Aggiungere asset alla watchlist preferiti</li>
+            <li>Creare nuovo modello strategia</li>
+            <li>Modificare frasi disciplina (motto del giorno)</li>
+          </ol>
+        </div>
+        <div><h3>Cose <em>delicate</em></h3>
+          <ol>
+            <li>Cambiare orari sessioni → ricalcola tutta la timeline</li>
+            <li>Rinominare badge asset → trade vecchi diventano "Other"</li>
+            <li>Eliminare strategie con trade collegati → FK error</li>
+            <li>Cambiare timezone → tutto il sito si scombina (resta su Casablanca)</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="pull">
+        <q>Le impostazioni sono il <em>motore logico</em>: lo configuri una volta, lo dimentichi. Se ci torni spesso, c'è qualcosa che non va nel processo.</q>
+        <cite>— Manuale Trade Desk · §14.1</cite>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- COLOPHON                                                      -->
+    <!-- ============================================================ -->
+    <footer class="colophon">
+      <div class="crest"><span class="blob"></span> Trade Desk · Manuale Operativo</div>
+      <div>Vol. I · 14 sezioni · 2026</div>
+    </footer>
+
+  </main>
+
+</div>
+
+<div class="lb" id="lb"></div>
+
+<script>
+// LIGHTBOX
+const lb = document.getElementById('lb');
+let currentImg = '';
+
+document.querySelectorAll('.shot-board, .detail-body img').forEach(el => {
+  el.addEventListener('click', e => {
+    if (e.target.closest('.pin')) return;
+    const img = el.tagName === 'IMG' ? el : el.querySelector('img');
+    if (!img) return;
+    currentImg = img.getAttribute('src');
+    lb.innerHTML = '<div class="lb-x">&#10005;</div><img src="' + currentImg + '" alt="">';
+    lb.classList.add('open');
+  });
+});
+lb.addEventListener('click', () => lb.classList.remove('open'));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+
+// PINS bidirezionali (per sezione)
+document.querySelectorAll('[data-section]').forEach(container => {
+  const section = container.dataset.section;
+});
+
+const setActive = (section, n, on) => {
+  document.querySelectorAll(
+    '[data-section="'+section+'"] .pin[data-n="'+n+'"], ' +
+    '[data-section="'+section+'"] .note[data-n="'+n+'"], ' +
+    '[data-section="'+section+'"] .wf-pin[data-n="'+n+'"]'
+  ).forEach(el => {
+    el.classList.toggle('is-active', on);
+  });
+};
+
+document.querySelectorAll('.pin, .wf-pin').forEach(p => {
+  const section = p.closest('[data-section]')?.dataset.section;
+  if (!section) return;
+  p.addEventListener('mouseenter', () => setActive(section, p.dataset.n, true));
+  p.addEventListener('mouseleave', () => setActive(section, p.dataset.n, false));
+  p.addEventListener('click', e => {
+    e.stopPropagation();
+    const note = document.querySelector('[data-section="'+section+'"] .note[data-n="'+p.dataset.n+'"]');
+    if (note) note.scrollIntoView({behavior:'smooth', block:'center'});
+  });
+});
+
+document.querySelectorAll('.note').forEach(n => {
+  const section = n.closest('[data-section]')?.dataset.section;
+  if (!section) return;
+  n.addEventListener('mouseenter', () => setActive(section, n.dataset.n, true));
+  n.addEventListener('mouseleave', () => setActive(section, n.dataset.n, false));
+});
+
+// TOC active section on scroll
+const tocLinks = document.querySelectorAll('.toc nav a');
+const sections = Array.from(document.querySelectorAll('.page-section, #cover'));
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      tocLinks.forEach(a => a.classList.toggle('is-active', a.getAttribute('href') === '#' + id));
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
