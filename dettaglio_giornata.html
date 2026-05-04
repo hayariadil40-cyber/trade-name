@@ -557,6 +557,17 @@
                         </div>
                     </div>
 
+                    <!-- 2b. Trade da Lavorare (stato=nuovo del giorno) -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-tp-warning mb-3 flex items-center justify-between gap-2 border-b border-tp-border pb-2">
+                            <span class="flex items-center gap-2"><i data-lucide="crosshair" class="w-4 h-4"></i> Trade da Lavorare</span>
+                            <span id="trades-da-lavorare-count" class="text-[10px] text-tp-muted font-bold px-2 py-0.5 bg-tp-border/30 rounded border border-tp-border/50">0</span>
+                        </h3>
+                        <div id="trades-da-lavorare-list" class="space-y-2 max-h-[260px] overflow-y-auto">
+                            <p class="text-xs text-tp-muted italic text-center py-2">Caricamento...</p>
+                        </div>
+                    </div>
+
                     <!-- 3. Save + Chiudi -->
                     <button onclick="saveGiornata()" id="btn-save" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 transition-colors shadow-lg">
                         <i data-lucide="save" class="w-4 h-4"></i> Salva Giornata
@@ -574,13 +585,17 @@
     <!-- Modal Conferma generico (reperti) -->
     <div id="modal-confirm" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeConfirm()"></div>
-        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-sm mx-4 relative z-10 shadow-2xl overflow-hidden flex flex-col">
+        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-lg mx-4 relative z-10 shadow-2xl overflow-hidden flex flex-col">
             <div class="px-6 py-4 border-b border-tp-border bg-tp-panel relative">
                 <div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-warning"></div>
                 <h2 id="confirm-title" class="text-lg font-bold">Conferma</h2>
             </div>
-            <div class="p-6">
+            <div class="p-6 flex flex-col gap-4">
                 <p id="confirm-msg" class="text-sm text-tp-muted">Sei sicuro?</p>
+                <div id="confirm-preview-wrap" class="hidden flex-col gap-2">
+                    <span id="confirm-preview-label" class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">Anteprima</span>
+                    <div id="confirm-preview" class="text-xs text-white/90 bg-[#0a0c10] border border-tp-border rounded-lg p-3 max-h-[40vh] overflow-y-auto whitespace-pre-wrap leading-relaxed"></div>
+                </div>
             </div>
             <div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel">
                 <button onclick="closeConfirm()" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white border border-tp-border rounded-lg">Annulla</button>
@@ -669,7 +684,8 @@
                 loadAllertEAGiornata(),
                 loadSessioniCards(),
                 loadBiasGiornaliero(),
-                loadTradeStats()
+                loadTradeStats(),
+                loadTradesDaLavorare()
             ]);
             // Carica checklist con stato ripristinato
             await loadChecklist();
@@ -1315,25 +1331,45 @@
         }
 
         async function biasQuickClose(id) {
-            const { data: cur } = await db.from('bias').select('esito, stato').eq('id', id).single();
+            const { data: cur } = await db.from('bias').select('esito, stato, asset, direzione, tipo, commento').eq('id', id).single();
             if (!cur) return;
             if (cur.stato === 'chiuso') return;
             if (!cur.esito) { alert('Imposta prima un esito.'); return; }
+            const asset = cur.asset || 'reperto';
+            const dir = cur.direzione || '';
+            const tipo = (cur.tipo && cur.tipo.length) ? cur.tipo[0] : 'bias';
+            const previewLabel = `${tipo.toUpperCase()} ${asset}${dir ? ' · ' + dir : ''} · esito: ${cur.esito}`;
             showConfirm(
                 'Chiudere il reperto?',
-                'Una volta chiuso non sara piu modificabile ne eliminabile.',
+                'Rileggi il commento prima di confermare. Una volta chiuso il reperto non sara piu modificabile ne eliminabile (correzioni minime su asset/screenshot consentite).',
                 async function() {
                     const { error } = await db.from('bias').update({ stato: 'chiuso' }).eq('id', id);
                     if (error) { alert('Errore chiusura: ' + error.message); return; }
                     await loadBiasGiornaliero();
-                }
+                },
+                cur.commento || '',
+                previewLabel
             );
         }
 
         // --- MODAL CONFIRM ---
-        function showConfirm(title, msg, callback) {
+        // Argomenti opzionali: preview (testo lungo da rileggere), previewLabel (intestazione del box)
+        function showConfirm(title, msg, callback, preview, previewLabel) {
             document.getElementById('confirm-title').textContent = title;
             document.getElementById('confirm-msg').textContent = msg;
+            const wrap = document.getElementById('confirm-preview-wrap');
+            const previewEl = document.getElementById('confirm-preview');
+            const labelEl = document.getElementById('confirm-preview-label');
+            if (preview && preview.trim()) {
+                labelEl.textContent = previewLabel || 'Anteprima';
+                previewEl.textContent = preview;
+                wrap.classList.remove('hidden');
+                wrap.classList.add('flex');
+            } else {
+                wrap.classList.add('hidden');
+                wrap.classList.remove('flex');
+                previewEl.textContent = '';
+            }
             document.getElementById('confirm-action').onclick = function() { closeConfirm(); callback(); };
             document.getElementById('modal-confirm').classList.add('open');
         }
@@ -1362,6 +1398,59 @@
             const pnlEl = document.getElementById('stat-pnl');
             pnlEl.textContent = `${totalPnl >= 0 ? '+' : ''} $${totalPnl.toFixed(2)}`;
             pnlEl.classList.add(totalPnl >= 0 ? 'text-tp-accent' : 'text-tp-loss');
+        }
+
+        // Trade del giorno con stato='nuovo' — accesso veloce al dettaglio per compilarli.
+        async function loadTradesDaLavorare() {
+            if (!giornataDate) return;
+            const container = document.getElementById('trades-da-lavorare-list');
+            const countEl = document.getElementById('trades-da-lavorare-count');
+
+            const dayStart = giornataDate + 'T00:00:00';
+            const dayEnd = giornataDate + 'T23:59:59';
+            const { data: trades } = await db.from('trades')
+                .select('id, asset, direzione, sorgente, data, pnl, esito')
+                .gte('data', dayStart).lte('data', dayEnd)
+                .eq('stato', 'nuovo')
+                .order('data', { ascending: false });
+
+            const items = trades || [];
+            if (countEl) countEl.textContent = items.length;
+
+            if (!items.length) {
+                container.innerHTML = '<p class="text-xs text-tp-muted italic text-center py-4">Nessun trade da lavorare.</p>';
+                return;
+            }
+
+            container.innerHTML = items.map(t => {
+                const ora = t.data ? new Date(t.data).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' }) : '--:--';
+                const dir = (t.direzione || '').toUpperCase();
+                const dirColor = dir === 'LONG' ? 'text-tp-accent' : dir === 'SHORT' ? 'text-tp-loss' : 'text-tp-muted';
+                const sorgenteBadge = t.sorgente ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-tp-border/40 text-tp-muted border border-tp-border font-bold uppercase">${t.sorgente}</span>` : '';
+                const pnl = parseFloat(t.pnl || 0);
+                const pnlBadge = pnl !== 0
+                    ? `<span class="text-[10px] font-bold ${pnl >= 0 ? 'text-tp-accent' : 'text-tp-loss'}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</span>`
+                    : '';
+                return `<div class="bg-[#0a0c10] border border-tp-border hover:border-tp-warning/40 rounded-lg p-2.5 transition-all group relative overflow-hidden cursor-pointer" onclick="window.location.href='dettaglio_trade.html?id=${t.id}'">
+                    <div class="absolute inset-y-0 left-0 w-1 bg-tp-warning/70"></div>
+                    <div class="flex justify-between items-center pl-2 gap-2">
+                        <div class="flex flex-col flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-white text-xs">${t.asset || 'N/A'}</span>
+                                <span class="text-[10px] font-bold ${dirColor}">${dir || '--'}</span>
+                                ${sorgenteBadge}
+                            </div>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="text-[10px] text-tp-muted font-bold">${ora}</span>
+                                ${pnlBadge}
+                            </div>
+                        </div>
+                        <i data-lucide="edit-3" class="w-3.5 h-3.5 text-tp-muted group-hover:text-tp-warning shrink-0"></i>
+                    </div>
+                </div>`;
+            }).join('');
+
+            if (typeof lucide !== 'undefined') lucide.createIcons({ root: container });
         }
 
         // ============================================
