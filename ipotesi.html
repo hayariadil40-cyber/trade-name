@@ -1,10 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trade Desk - Reperti</title>
-
+    <title>Trade Desk - Ipotesi di Trading</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,44 +11,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        tp: {
-                            bg: '#0B0E14',
-                            panel: '#161920',
-                            panelHover: '#1c1f26',
-                            border: '#252932',
-                            text: '#f8fafc',
-                            muted: '#848d97',
-                            accent: '#20c997',
-                            loss: '#f43f5e',
-                            warning: '#eab308'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Inter', 'sans-serif']
-                    }
-                }
-            }
+            theme: { extend: { colors: { tp: { bg:'#0B0E14', panel:'#161920', panelHover:'#1c1f26', border:'#252932', text:'#f8fafc', muted:'#848d97', accent:'#20c997', loss:'#f43f5e', warning:'#eab308' } }, fontFamily: { sans:['Inter','sans-serif'], display:['Inter','sans-serif'] } } }
         }
     </script>
     <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #252932; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3b4252; }
-        .esito-mini { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #252932; color: #848d97; transition: all 0.15s; }
-        .esito-mini:hover { border-color: rgba(132,141,151,0.6); }
-        .esito-mini.active-corretto { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
-        .esito-mini.active-parziale { background: rgba(234,179,8,0.15); border-color: #eab308; color: #eab308; }
-        .esito-mini.active-sbagliato { background: rgba(244,63,94,0.15); border-color: #f43f5e; color: #f43f5e; }
-        .stato-badge-aperto { background: rgba(32,201,151,0.1); border: 1px solid rgba(32,201,151,0.4); color: #20c997; }
-        .stato-badge-chiuso { background: rgba(132,141,151,0.15); border: 1px solid rgba(132,141,151,0.4); color: #848d97; }
-        .card-chiuso { opacity: 0.7; }
+        ::-webkit-scrollbar { width:6px; height:6px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:#252932; border-radius:4px; }
+        .stato-pill { display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:9999px; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; border:1px solid; }
+        .stato-ipotesi      { background: rgba(132,141,151,0.10); color:#848d97; border-color: rgba(132,141,151,0.4); }
+        .stato-ingresso     { background: rgba(32,201,151,0.12); color:#20c997; border-color: rgba(32,201,151,0.45); }
+        .stato-non_eseguito { background: rgba(244,63,94,0.10);  color:#f43f5e; border-color: rgba(244,63,94,0.4); }
+        .stato-da_osservare { background: rgba(234,179,8,0.10);  color:#eab308; border-color: rgba(234,179,8,0.4); }
+        .stato-osservata    { background: rgba(34,211,238,0.10); color:#22d3ee; border-color: rgba(34,211,238,0.4); }
+        .filter-btn { padding:6px 12px; border-radius:8px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; border:1px solid #252932; color:#848d97; cursor:pointer; transition: all .15s; }
+        .filter-btn:hover { color:#fff; border-color: rgba(32,201,151,0.4); }
+        .filter-btn.active { background: rgba(32,201,151,0.10); color:#20c997; border-color: rgba(32,201,151,0.5); }
     </style>
-    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="settings.js"></script>
@@ -57,7 +35,7 @@
 </head>
 <body class="bg-tp-bg text-tp-text font-sans h-screen flex overflow-hidden">
 
-    <!-- Sidebar Universale -->
+    <!-- Sidebar (identico al resto del sito) -->
     <aside class="w-16 hover:w-64 border-r border-tp-border flex flex-col flex-shrink-0 bg-tp-bg transition-all duration-300 z-50 absolute h-full lg:relative group">
         <div class="h-24 flex items-center justify-center lg:justify-start px-3 gap-4 border-b border-tp-border/50 overflow-hidden cursor-default w-full">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#161920] to-[#0a0c10] border border-[#20c997]/50 flex items-center justify-center shadow-[0_0_10px_rgba(32,201,151,0.2)] shrink-0 group-hover:rotate-3 transition-transform duration-300 mx-auto group-hover:mx-0">
@@ -67,40 +45,23 @@
         </div>
         <nav class="flex-1 overflow-x-hidden overflow-y-auto py-6 space-y-2 flex flex-col w-full group">
             <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span></a>
-
             <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span></a>
-
             <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span></a>
-
             <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span></a>
-
             <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span></a>
-
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-
             <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span></a>
-
             <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Reperti</span></a>
-
             <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span></a>
-
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-
             <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span></a>
-
             <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span></a>
-            <a href="ipotesi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Ipotesi</span></a>
-
+            <a href="ipotesi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-tp-accent bg-[#161920] transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Ipotesi</span></a>
             <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
-
             <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Peter</span></a>
-
             <a href="steve.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Steve</span></a>
-
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-
             <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span></a>
-
         </nav>
     </aside>
 
@@ -110,11 +71,11 @@
         <header class="flex justify-between items-center px-4 py-3 lg:px-8 lg:py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
             <div class="flex items-center gap-4 w-auto min-w-max">
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Reperti</h1>
+                    <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Ipotesi di Trading</h1>
                     <div class="flex gap-2.5 mt-1">
-                        <a href="analisi.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Trade Analisi</a>
+                        <a href="strategie.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="target" class="w-3.5 h-3.5"></i> Strategie</a>
                         <a href="tabella_trades.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Tabella Trades</a>
-                        <a href="giornaliero.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> Giornaliero</a>
+                        <a href="analisi.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Analisi</a>
                     </div>
                 </div>
             </div>
@@ -168,194 +129,172 @@
             </div>
         </header>
 
-        <!-- ============================================ -->
-        <!-- LISTA REPERTI                                -->
-        <!-- ============================================ -->
+        <!-- List View -->
         <div class="flex-1 overflow-y-auto p-3 lg:p-8 scroll-smooth">
             <div class="max-w-7xl mx-auto">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                            <i data-lucide="microscope" class="w-5 h-5 text-tp-accent"></i> Archivio Reperti
-                        </h2>
-                        <p class="text-sm text-tp-muted mt-1" id="bias-count">Caricamento...</p>
-                    </div>
-                    <button onclick="window.location.href='dettaglio_bias.html'" class="bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] px-4 py-2 text-xs font-bold uppercase rounded-lg flex items-center gap-2 transition-colors shadow-sm">
-                        <i data-lucide="plus" class="w-4 h-4"></i> Nuovo Reperto
+
+                <!-- Toolbar: count + filtri + nuovo -->
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+                    <div class="text-sm text-tp-muted font-medium" id="ipotesi-count">Caricamento...</div>
+                    <button onclick="creaNuovaIpotesi()" class="bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 font-bold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition-colors flex items-center gap-2">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Nuova Ipotesi
                     </button>
                 </div>
 
-                <div id="bias-list" class="space-y-2">
-                    <!-- Caricato dinamicamente -->
+                <!-- Filtri stato -->
+                <div class="flex items-center gap-2 mb-4 flex-wrap">
+                    <span class="text-[10px] uppercase tracking-widest font-bold text-tp-muted/70 mr-1">Stato</span>
+                    <button class="filter-btn active" data-stato="all" onclick="setFilter('all')">Tutte</button>
+                    <button class="filter-btn" data-stato="ipotesi" onclick="setFilter('ipotesi')">Ipotesi</button>
+                    <button class="filter-btn" data-stato="ingresso" onclick="setFilter('ingresso')">Ingresso</button>
+                    <button class="filter-btn" data-stato="da_osservare" onclick="setFilter('da_osservare')">Da Osservare</button>
+                    <button class="filter-btn" data-stato="osservata" onclick="setFilter('osservata')">Osservata</button>
+                    <button class="filter-btn" data-stato="non_eseguito" onclick="setFilter('non_eseguito')">Non Eseguito</button>
+                    <span class="mx-2 text-tp-border">|</span>
+                    <span class="text-[10px] uppercase tracking-widest font-bold text-tp-muted/70 mr-1">Strategia</span>
+                    <select id="filter-strategia" onchange="setFilterStrategia(this.value)" class="filter-btn bg-tp-bg outline-none">
+                        <option value="all">Tutte</option>
+                    </select>
                 </div>
 
-                <!-- Empty state -->
-                <div id="empty-state" class="hidden text-center py-16 text-tp-muted">
-                    <i data-lucide="microscope" class="w-12 h-12 mx-auto mb-3 opacity-30"></i>
-                    <p class="text-sm font-bold">Nessun reperto archiviato</p>
-                    <p class="text-xs mt-1 opacity-60">Crea il tuo primo reperto per iniziare a costruire la memoria del mercato</p>
+                <!-- Lista -->
+                <div id="ipotesi-list" class="space-y-2"></div>
+                <div id="ipotesi-empty" class="hidden text-center py-16 text-tp-muted">
+                    <i data-lucide="zap" class="w-12 h-12 mx-auto mb-3 opacity-30"></i>
+                    <p class="text-sm font-bold">Nessuna ipotesi</p>
+                    <p class="text-[11px] mt-1 opacity-60">Crea una nuova ipotesi cliccando "+ Nuova Ipotesi" oppure dalla scheda di una strategia</p>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Modal Conferma -->
-    <div id="modal-confirm" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeConfirm()"></div>
-        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-sm mx-4 relative z-10 shadow-2xl overflow-hidden flex flex-col">
-            <div class="px-6 py-4 border-b border-tp-border bg-tp-panel relative">
-                <div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-warning"></div>
-                <h2 id="confirm-title" class="text-lg font-bold">Conferma</h2>
-            </div>
-            <div class="p-6">
-                <p id="confirm-msg" class="text-sm text-tp-muted">Sei sicuro?</p>
-            </div>
-            <div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel">
-                <button onclick="closeConfirm()" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white border border-tp-border rounded-lg">Annulla</button>
-                <button id="confirm-action" class="bg-tp-warning hover:bg-tp-warning/80 text-[#0a0c10] px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors">Conferma</button>
-            </div>
-        </div>
-    </div>
-
     <script src="app.js"></script>
     <script>
+        // ============================================
+        // IPOTESI — Lista (stile tabella_trades)
+        // ============================================
+
+        let ipotesiAll = [];
+        let strategieMap = {};   // id → nome
+        let filterStato = 'all';
+        let filterStrategia = 'all';
+
         document.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
             if (!db) return;
-            await loadBiasList();
+            await loadStrategie();
+            await loadIpotesi();
         });
 
-        async function loadBiasList() {
-            const { data: biasEntries, error } = await db
-                .from('bias')
-                .select('*')
-                .order('data', { ascending: false });
+        async function loadStrategie() {
+            const { data } = await db.from('strategie').select('id, nome').order('nome');
+            strategieMap = {};
+            (data || []).forEach(s => { strategieMap[s.id] = s.nome; });
+            const sel = document.getElementById('filter-strategia');
+            (data || []).forEach(s => {
+                const o = document.createElement('option');
+                o.value = s.id;
+                o.textContent = s.nome;
+                sel.appendChild(o);
+            });
+        }
 
+        async function loadIpotesi() {
+            const { data, error } = await db.from('ipotesi_trading').select('*').order('created_at', { ascending: false });
             if (error) { console.error(error); return; }
+            ipotesiAll = data || [];
+            render();
+        }
 
-            const list = document.getElementById('bias-list');
-            const empty = document.getElementById('empty-state');
-            const count = document.getElementById('bias-count');
+        function setFilter(stato) {
+            filterStato = stato;
+            document.querySelectorAll('.filter-btn[data-stato]').forEach(b => {
+                b.classList.toggle('active', b.dataset.stato === stato);
+            });
+            render();
+        }
+        function setFilterStrategia(id) {
+            filterStrategia = id;
+            render();
+        }
 
-            if (!biasEntries || biasEntries.length === 0) {
+        function render() {
+            const list = document.getElementById('ipotesi-list');
+            const empty = document.getElementById('ipotesi-empty');
+            const count = document.getElementById('ipotesi-count');
+
+            const filtered = ipotesiAll.filter(ip => {
+                if (filterStato !== 'all' && ip.stato !== filterStato) return false;
+                if (filterStrategia !== 'all' && ip.strategia_id !== filterStrategia) return false;
+                return true;
+            });
+
+            count.textContent = `${filtered.length} ipotesi${filtered.length === 1 ? '' : ''}`;
+
+            if (!filtered.length) {
+                list.innerHTML = '';
                 empty.classList.remove('hidden');
-                count.textContent = '0 reperti archiviati';
+                lucide.createIcons();
                 return;
             }
+            empty.classList.add('hidden');
 
-            count.textContent = `${biasEntries.length} repert${biasEntries.length === 1 ? 'o' : 'i'} archiviat${biasEntries.length === 1 ? 'o' : 'i'}`;
-
-            list.innerHTML = biasEntries.map(b => {
-                const isLong = b.direzione === 'LONG';
-                const isShort = b.direzione === 'SHORT';
-                const isChiuso = b.stato === 'chiuso';
-                const barColor = isLong ? 'bg-tp-accent' : isShort ? 'bg-tp-loss' : 'bg-tp-border';
-                const hoverBorder = isLong ? 'hover:border-tp-accent/50' : isShort ? 'hover:border-tp-loss/50' : 'hover:border-white/50';
-                const dirColor = isLong ? 'text-tp-accent bg-[#14231f] border-tp-accent/20' : isShort ? 'text-tp-loss bg-tp-loss/10 border-tp-loss/20' : 'text-tp-muted bg-[#0a0c10] border-tp-border';
-                const dirText = isLong ? 'Long' : isShort ? 'Short' : 'Neutro';
-                const nameColor = isLong ? 'group-hover:text-tp-accent' : isShort ? 'group-hover:text-tp-loss' : 'group-hover:text-white';
-                const dateStr = b.data ? new Date(b.data + 'T00:00:00').toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' }) : '--';
-                const hasScreens = (b.screenshots || []).length;
-                const comment = b.commento || b.confluenze || '';
-                const preview = comment.length > 80 ? comment.substring(0, 80) + '...' : comment;
-                const esito = b.esito || '';
-                const statoBadgeClass = isChiuso ? 'stato-badge-chiuso' : 'stato-badge-aperto';
-                const statoLabel = isChiuso ? 'Chiuso' : 'Aperto';
-                const cardOpacity = isChiuso ? 'card-chiuso' : '';
-
-                // Esito mini-buttons (in lista: read-only se chiuso, altrimenti cliccabili)
-                const esitoBtns = ['corretto','parziale','sbagliato'].map(v => {
-                    const icon = v === 'corretto' ? 'check' : v === 'parziale' ? 'circle-dot' : 'x';
-                    const active = esito === v ? `active-${v}` : '';
-                    const handler = isChiuso ? '' : `onclick="event.stopPropagation(); quickSetEsito('${b.id}', '${v}')"`;
-                    const cursor = isChiuso ? 'cursor-default' : 'cursor-pointer';
-                    return `<button type="button" ${handler} title="${v}" class="esito-mini ${active} ${cursor}"><i data-lucide="${icon}" class="w-3.5 h-3.5"></i></button>`;
-                }).join('');
-
-                const closeBtn = isChiuso ? '' : `
-                    <button type="button" onclick="event.stopPropagation(); quickClose('${b.id}')" ${esito ? '' : 'disabled'} title="Chiudi reperto" class="ml-2 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1.5 rounded border border-tp-warning/40 text-tp-warning hover:bg-tp-warning hover:text-[#0a0c10] transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-tp-warning">
-                        <i data-lucide="lock" class="w-3 h-3"></i> Chiudi
-                    </button>`;
+            list.innerHTML = filtered.map(ip => {
+                const stratName = ip.strategia_id ? (strategieMap[ip.strategia_id] || '— Strategia non trovata') : '<span class="text-tp-warning italic">Strategia non scelta</span>';
+                const statoClass = 'stato-' + (ip.stato || 'ipotesi');
+                const statoLabel = labelStato(ip.stato);
+                const flagCount =
+                    (ip.check_list_flagged || []).length +
+                    (ip.dove_entro_flagged || []).length +
+                    (ip.dove_esco_sl_flagged || []).length +
+                    (ip.dove_esco_tp_flagged || []).length;
+                const dateStr = new Date(ip.created_at).toLocaleString('it-IT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                const barColor = ({
+                    ipotesi:'bg-tp-muted', ingresso:'bg-tp-accent', non_eseguito:'bg-tp-loss',
+                    da_osservare:'bg-tp-warning', osservata:'bg-cyan-400'
+                })[ip.stato] || 'bg-tp-border';
+                const tradeBadge = ip.trade_id
+                    ? '<span class="text-[9px] font-bold uppercase tracking-widest text-tp-accent bg-tp-accent/10 border border-tp-accent/40 px-2 py-0.5 rounded">trade collegato</span>'
+                    : '';
 
                 return `
-                    <div onclick="window.location.href='dettaglio_bias.html?id=${b.id}'" class="group ${cardOpacity} bg-tp-panel border border-tp-border ${hoverBorder} rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
-                        <div class="w-1 absolute left-0 top-0 bottom-0 ${barColor}"></div>
-
-                        <!-- Riga 1: info -->
-                        <div class="grid grid-cols-2 gap-y-2 lg:flex lg:items-center p-3 lg:p-4 pl-5">
-                            <div class="flex items-center lg:w-1/5 gap-2 lg:gap-3">
-                                <span class="text-[10px] lg:text-xs font-bold text-tp-muted uppercase tracking-widest bg-tp-bg px-2 py-1 rounded">${b.id.substring(0, 8)}</span>
-                                <span class="font-bold text-base lg:text-lg ${nameColor} transition-colors">${b.asset || '--'}</span>
-                            </div>
-
-                            <div class="lg:w-1/5 flex items-center justify-end lg:justify-start gap-2">
-                                <span class="${statoBadgeClass} text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded">${statoLabel}</span>
-                                <div class="flex items-center gap-1 text-tp-muted text-xs font-bold">
-                                    <i data-lucide="image" class="w-4 h-4 ${hasScreens ? '' : 'opacity-30'}"></i> ${hasScreens}
-                                </div>
-                                <i data-lucide="chevron-right" class="hidden lg:inline w-5 h-5 text-tp-muted group-hover:text-tp-accent transition-colors"></i>
-                            </div>
-
-                            <div class="lg:w-1/5 flex flex-col justify-center">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[10px] lg:text-xs font-bold ${dirColor} border px-2 py-0.5 rounded uppercase">${dirText}</span>
-                                    <span class="text-[10px] lg:text-xs font-bold text-tp-text">${dateStr}</span>
+                    <div onclick="window.location.href='dettaglio_ipotesi.html?id=${ip.id}'" class="group cursor-pointer flex items-stretch bg-tp-panel border border-tp-border hover:border-tp-accent/40 rounded-lg overflow-hidden transition-all">
+                        <div class="w-1.5 ${barColor} shrink-0"></div>
+                        <div class="flex-1 px-4 py-3 flex items-center gap-4 flex-wrap">
+                            <span class="${statoClass} stato-pill shrink-0">${statoLabel}</span>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-bold text-white group-hover:text-tp-accent transition-colors truncate">${stratName}</div>
+                                <div class="text-[10px] text-tp-muted mt-0.5 flex items-center gap-3 flex-wrap">
+                                    ${ip.asset ? `<span><i data-lucide="hash" class="w-3 h-3 inline -mt-0.5"></i> ${escHtml(ip.asset)}</span>` : '<span class="opacity-50 italic">no asset</span>'}
+                                    ${ip.sessione ? `<span><i data-lucide="clock" class="w-3 h-3 inline -mt-0.5"></i> ${escHtml(ip.sessione)}</span>` : ''}
+                                    <span><i data-lucide="check-square" class="w-3 h-3 inline -mt-0.5"></i> ${flagCount} flag</span>
+                                    ${tradeBadge}
                                 </div>
                             </div>
-
-                            <div class="col-span-2 lg:w-2/5 flex flex-col text-sm text-tp-muted justify-center lg:px-2">
-                                <p class="text-[11px] lg:text-xs text-tp-muted/80 line-clamp-2 lg:line-clamp-1">${preview || 'Nessun commento'}</p>
-                            </div>
-                        </div>
-
-                        <!-- Riga 2: azioni inline (esito + chiudi) -->
-                        <div class="flex items-center gap-2 px-5 pb-3 pt-1 border-t border-tp-border/40">
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-tp-muted/70 mr-2">Esito:</span>
-                            ${esitoBtns}
-                            ${closeBtn}
+                            <span class="text-[10px] font-bold text-tp-muted shrink-0">${dateStr}</span>
+                            <span class="text-[10px] uppercase tracking-widest text-tp-muted/60 shrink-0 font-mono">#${ip.id.substring(0, 6)}</span>
                         </div>
                     </div>
                 `;
             }).join('');
-
             lucide.createIcons();
         }
 
-        // --- QUICK ACTIONS (inline sulla card) ---
-        async function quickSetEsito(id, value) {
-            // Carica esito corrente per fare toggle
-            const { data: cur } = await db.from('bias').select('esito, stato').eq('id', id).single();
-            if (!cur || cur.stato === 'chiuso') return;
-            const newEsito = (cur.esito === value) ? null : value;
-            const { error } = await db.from('bias').update({ esito: newEsito }).eq('id', id);
-            if (error) { alert('Errore: ' + error.message); return; }
-            await loadBiasList();
+        function labelStato(s) {
+            return ({
+                ipotesi: 'ipotesi', ingresso: 'ingresso', non_eseguito: 'non eseguito',
+                da_osservare: 'da osservare', osservata: 'osservata'
+            })[s] || (s || '—');
         }
 
-        async function quickClose(id) {
-            const { data: cur } = await db.from('bias').select('esito, stato').eq('id', id).single();
-            if (!cur) return;
-            if (cur.stato === 'chiuso') return;
-            if (!cur.esito) { alert('Imposta prima un esito.'); return; }
-            showConfirm(
-                'Chiudere il reperto?',
-                'Una volta chiuso non sara piu modificabile ne eliminabile.',
-                async function() {
-                    const { error } = await db.from('bias').update({ stato: 'chiuso' }).eq('id', id);
-                    if (error) { alert('Errore chiusura: ' + error.message); return; }
-                    await loadBiasList();
-                }
-            );
+        async function creaNuovaIpotesi() {
+            // Crea ipotesi vuota, strategia_id NULL: l'utente sceglie nella pagina dettaglio.
+            const { data, error } = await db.from('ipotesi_trading').insert({ stato: 'ipotesi' }).select().single();
+            if (error) { alert('Errore creazione: ' + error.message); return; }
+            window.location.href = `dettaglio_ipotesi.html?id=${data.id}`;
         }
 
-        // --- MODAL CONFIRM ---
-        function showConfirm(title, msg, callback) {
-            document.getElementById('confirm-title').textContent = title;
-            document.getElementById('confirm-msg').textContent = msg;
-            document.getElementById('confirm-action').onclick = function() { closeConfirm(); callback(); };
-            document.getElementById('modal-confirm').classList.add('open');
-        }
-        function closeConfirm() { document.getElementById('modal-confirm').classList.remove('open'); }
+        function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
     </script>
 </body>
 </html>

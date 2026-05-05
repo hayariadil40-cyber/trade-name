@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -52,6 +52,7 @@
             <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span></a>
 
             <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span></a>
+            <a href="ipotesi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Ipotesi</span></a>
 
             <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
 
@@ -162,9 +163,17 @@
                 <div class="flex flex-col lg:flex-row gap-6 mt-6">
                     <div class="flex-1 bg-tp-panel border border-tp-border rounded-xl p-5">
                         <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2"><i data-lucide="link" class="w-4 h-4 text-tp-accent"></i> Categorizzatore</label>
-                        <div class="flex gap-2 mb-3"><button onclick="switchCat('cronache')" id="cat-tab-cronache" class="cat-tab active flex-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase">Cronache</button><button onclick="switchCat('strategie')" id="cat-tab-strategie" class="cat-tab flex-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase">Strategia</button></div>
+                        <div class="flex gap-2 mb-3"><button onclick="switchCat('cronache')" id="cat-tab-cronache" class="cat-tab active flex-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase">Cronache</button><button onclick="switchCat('strategie')" id="cat-tab-strategie" class="cat-tab flex-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase">Strategia</button><button onclick="switchCat('ipotesi')" id="cat-tab-ipotesi" class="cat-tab flex-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-yellow-500 text-yellow-400 bg-yellow-500/10 uppercase">Ipotesi</button></div>
                         <div id="cat-cronache" class="cat-panel"><select id="sel-cronache" multiple class="w-full bg-[#0a0c10] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[70px]"></select></div>
                         <div id="cat-strategie" class="cat-panel hidden"><select id="sel-strategie" class="w-full bg-[#0a0c10] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none" onchange="loadStrategiaRegole(this.value)"><option value="">-- Seleziona Strategia --</option></select></div>
+                        <div id="cat-ipotesi" class="cat-panel hidden">
+                            <select id="sel-ipotesi" class="w-full bg-[#0a0c10] border border-yellow-500/30 rounded-lg px-3 py-2 text-xs text-yellow-400 font-bold outline-none" onchange="onIpotesiChange(this.value)"><option value="">-- Seleziona Ipotesi --</option></select>
+                            <div id="ipotesi-info" class="hidden mt-2 bg-[#0a0c10] border border-yellow-500/20 rounded-lg p-3">
+                                <div class="text-[10px] uppercase tracking-widest text-yellow-400 font-bold mb-1 flex items-center gap-1.5"><i data-lucide="zap" class="w-3 h-3"></i> Setup ipotizzato</div>
+                                <p id="ipotesi-info-text" class="text-[10px] text-tp-text/80 leading-relaxed line-clamp-3"></p>
+                                <a id="ipotesi-info-link" href="#" class="text-[9px] uppercase tracking-widest text-yellow-400 hover:text-white font-bold mt-2 inline-flex items-center gap-1"><i data-lucide="external-link" class="w-3 h-3"></i> Apri ipotesi</a>
+                            </div>
+                        </div>
                         <!-- Checklist Regole Strategia -->
                         <div id="regole-checklist" class="hidden mt-3 bg-[#0a0c10] border border-purple-500/20 rounded-lg p-4">
                             <h4 class="text-[10px] font-bold uppercase tracking-widest text-purple-400 mb-3 flex items-center gap-2"><i data-lucide="check-square" class="w-3.5 h-3.5"></i> Regole di Ingresso</h4>
@@ -329,6 +338,13 @@
                     if (sel) { sel.value = t.strategia_id; loadStrategiaRegole(t.strategia_id); }
                 }, 600);
             }
+            // Ripristina ipotesi collegata
+            if (t.ipotesi_id) {
+                setTimeout(function() {
+                    var sel = document.getElementById('sel-ipotesi');
+                    if (sel) { sel.value = t.ipotesi_id; onIpotesiChange(t.ipotesi_id); }
+                }, 600);
+            }
             // Frattalita: prima da colonne DB, poi fallback a fractal_data JSONB
             if (t.candle_m15 || t.candle_h1 || t.candle_h4 || t.candle_d1) {
                 fractalData = { '15m': t.candle_m15, '1h': t.candle_h1, '4h': t.candle_h4, '1d': t.candle_d1 };
@@ -431,13 +447,39 @@
             document.getElementById('cat-tab-'+tab).classList.add('active');
         }
 
+        let ipotesiCache = [];
         async function loadCategorizers() {
             const{data:cr}=await db.from('cronache').select('id,data,titolo').order('data',{ascending:false}).limit(20);
             const{data:st}=await db.from('strategie').select('id,nome,regole_ingresso').order('nome');
+            const{data:ip}=await db.from('ipotesi_trading').select('id, asset, sessione, stato, note, created_at, strategia_id').order('created_at',{ascending:false}).limit(100);
             strategieCache = st || [];
-            const sc=document.getElementById('sel-cronache'), ss=document.getElementById('sel-strategie');
+            ipotesiCache = ip || [];
+            const sc=document.getElementById('sel-cronache'), ss=document.getElementById('sel-strategie'), si=document.getElementById('sel-ipotesi');
             (cr||[]).forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.data} - ${c.titolo}`;sc.appendChild(o)});
             (st||[]).forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.nome;ss.appendChild(o)});
+            // Strategie name lookup per descrivere l'ipotesi
+            const stratNameById = {};
+            (st||[]).forEach(s=>{ stratNameById[s.id] = s.nome; });
+            (ip||[]).forEach(i=>{
+                const o=document.createElement('option');
+                o.value=i.id;
+                const stratName = i.strategia_id ? (stratNameById[i.strategia_id] || '?') : 'no strategia';
+                const dt = new Date(i.created_at).toLocaleDateString('it-IT', { day:'2-digit', month:'short' });
+                const stato = (i.stato || 'ipotesi').replace('_',' ');
+                o.textContent = `${dt} · ${stratName} · ${i.asset || '—'} · [${stato}]`;
+                si.appendChild(o);
+            });
+        }
+
+        function onIpotesiChange(ipotesiId) {
+            const info = document.getElementById('ipotesi-info');
+            if (!ipotesiId) { info.classList.add('hidden'); return; }
+            const ip = ipotesiCache.find(x => x.id === ipotesiId);
+            if (!ip) { info.classList.add('hidden'); return; }
+            document.getElementById('ipotesi-info-text').textContent = ip.note || '(nessuna nota di setup)';
+            document.getElementById('ipotesi-info-link').href = `dettaglio_ipotesi.html?id=${ip.id}`;
+            info.classList.remove('hidden');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         async function loadStrategiaRegole(strategiaId) {
@@ -475,7 +517,9 @@
 
         function getTradePayload() {
             const strategiaId = document.getElementById('sel-strategie').value || null;
+            const ipotesiId = document.getElementById('sel-ipotesi').value || null;
             return {
+                ipotesi_id: ipotesiId,
                 asset: document.getElementById('tr-asset').value,
                 direzione: currentDir,
                 sorgente: document.getElementById('tr-sorgente').value,
@@ -506,6 +550,25 @@
             };
         }
 
+        // Auto-transizione stato ipotesi quando collegata a un trade
+        async function syncIpotesiStatoFromTrade(ipotesiId) {
+            if (!ipotesiId) return;
+            const { data: ip } = await db.from('ipotesi_trading').select('stato').eq('id', ipotesiId).single();
+            if (!ip) return;
+            // Stati finali: non sovrascrivere
+            if (ip.stato === 'osservata' || ip.stato === 'non_eseguito') {
+                await db.from('ipotesi_trading').update({ trade_id: tradeId, updated_at: new Date().toISOString() }).eq('id', ipotesiId);
+                return;
+            }
+            // Trade aperto → ingresso, trade chiuso → da_osservare
+            const nuovoStato = tradeChiuso ? 'da_osservare' : 'ingresso';
+            await db.from('ipotesi_trading').update({
+                stato: nuovoStato,
+                trade_id: tradeId,
+                updated_at: new Date().toISOString()
+            }).eq('id', ipotesiId);
+        }
+
         async function saveTrade() {
             const btn=document.getElementById('save-btn');
             btn.innerHTML='<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvando...'; btn.disabled=true;
@@ -513,6 +576,9 @@
             const payload = getTradePayload();
             const{error}=await db.from('trades').update(payload).eq('id',tradeId);
             if(error){btn.innerHTML='<i data-lucide="alert-circle" class="w-4 h-4"></i> Errore!';alert('Errore: '+error.message);setTimeout(()=>{btn.innerHTML='<i data-lucide="save" class="w-4 h-4"></i> Salva';btn.disabled=false;lucide.createIcons()},2000);return}
+
+            // Transizione automatica stato ipotesi se collegata
+            await syncIpotesiStatoFromTrade(payload.ipotesi_id);
 
             btn.innerHTML='<i data-lucide="check" class="w-4 h-4"></i> Salvato!';
             document.getElementById('trade-canvas').classList.add('save-flash');
@@ -549,6 +615,9 @@
                 payload.stato = 'completato';
                 const{error}=await db.from('trades').update(payload).eq('id',tradeId);
                 if(error){alert('Errore: '+error.message);return}
+                // Trade ora chiuso → ipotesi collegata va in "da osservare"
+                tradeChiuso = true;
+                await syncIpotesiStatoFromTrade(payload.ipotesi_id);
                 window.location.href='tabella_trades.html';
             });
         }

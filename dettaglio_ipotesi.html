@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Desk - Dettaglio Ipotesi</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tp: {
+                            bg: '#0B0E14', panel: '#161920', panelHover: '#1c1f26',
+                            border: '#252932', text: '#f8fafc', muted: '#848d97',
+                            accent: '#20c997', loss: '#f43f5e', warning: '#eab308'
+                        }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #252932; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b4252; }
+        .notion-textarea { resize: none; overflow: hidden; }
+        .notion-textarea:focus { outline: none; }
+        .fractal-btn{transition:all .15s}
+        .fractal-btn.green{background:rgba(32,201,151,0.2);border-color:#20c997;color:#20c997}
+        .fractal-btn.red{background:rgba(244,63,94,0.2);border-color:#f43f5e;color:#f43f5e}
+        .save-flash { animation: flashGreen 0.6s ease; }
+        @keyframes flashGreen {
+            0% { box-shadow: 0 0 0 rgba(32,201,151,0); }
+            50% { box-shadow: 0 0 12px rgba(32,201,151,0.4); }
+            100% { box-shadow: 0 0 0 rgba(32,201,151,0); }
+        }
+        /* Chip toggle (same as scheda strategia) */
+        .chip-btn { display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:9999px; font-size:11px; font-weight:700; line-height:1; transition: all .15s; cursor:pointer; border:1px solid transparent; }
+        .chip-btn.on { background: rgba(32,201,151,0.12); border-color: rgba(32,201,151,0.45); color:#20c997; box-shadow: inset 0 0 8px rgba(32,201,151,0.12); }
+        .chip-btn.on:hover { background: rgba(32,201,151,0.18); }
+        .chip-btn.off { background: transparent; border-color: #252932; color:#848d97; }
+        .chip-btn.off:hover { color:#f8fafc; border-color: rgba(32,201,151,0.4); }
+        /* Stato badge */
+        .stato-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:9999px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.1em; border:1px solid; }
+        .stato-ipotesi      { background: rgba(132,141,151,0.10); color:#848d97; border-color: rgba(132,141,151,0.4); }
+        .stato-ingresso     { background: rgba(32,201,151,0.12); color:#20c997; border-color: rgba(32,201,151,0.45); }
+        .stato-non_eseguito { background: rgba(244,63,94,0.10);  color:#f43f5e; border-color: rgba(244,63,94,0.4); }
+        .stato-da_osservare { background: rgba(234,179,8,0.10);  color:#eab308; border-color: rgba(234,179,8,0.4); }
+        .stato-osservata    { background: rgba(34,211,238,0.10); color:#22d3ee; border-color: rgba(34,211,238,0.4); }
+        /* Checkbox-row flaggable (per voci della strategia spuntabili) */
+        .flag-row { display:flex; align-items:flex-start; gap:12px; padding:8px 4px; border-radius:6px; cursor:pointer; transition:background-color .15s; }
+        .flag-row:hover { background: rgba(32,201,151,0.05); }
+        .flag-row .check-box { width:18px; height:18px; border:2px solid #252932; border-radius:4px; flex-shrink:0; display:flex; align-items:center; justify-content:center; margin-top:2px; transition: all .15s; }
+        .flag-row.on .check-box { background:#20c997; border-color:#20c997; }
+        .flag-row.on .check-box i { color:#0a0c10; opacity:1; }
+        .flag-row .check-box i { opacity:0; transition: opacity .15s; }
+        .flag-row .flag-text { font-size:13px; color:#848d97; line-height:1.4; }
+        .flag-row.on .flag-text { color:#f8fafc; font-weight:500; }
+    </style>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="settings.js"></script>
+    <script src="auth.js"></script>
+</head>
+<body class="bg-tp-bg text-tp-text font-sans h-screen flex overflow-hidden">
+
+    <!-- Sidebar Universale -->
+    <aside class="w-16 hover:w-64 border-r border-tp-border flex flex-col flex-shrink-0 bg-tp-bg transition-all duration-300 z-50 absolute h-full lg:relative group">
+        <div class="h-24 flex items-center justify-center lg:justify-start px-3 gap-4 border-b border-tp-border/50 overflow-hidden cursor-default w-full">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#161920] to-[#0a0c10] border border-[#20c997]/50 flex items-center justify-center shadow-[0_0_10px_rgba(32,201,151,0.2)] shrink-0 group-hover:rotate-3 transition-transform duration-300 mx-auto group-hover:mx-0">
+                <span class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-[#20c997] to-white tracking-tighter">TD</span>
+            </div>
+            <span class="text-xl font-extrabold tracking-tighter uppercase font-display select-none opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300">Trade<span class="text-[#20c997] ml-1">Desk</span></span>
+        </div>
+        <nav class="flex-1 overflow-x-hidden overflow-y-auto py-6 space-y-2 flex flex-col w-full group">
+            <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span>
+            </a>
+            <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span>
+            </a>
+            <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span>
+            </a>
+            <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span>
+            </a>
+            <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span>
+            </a>
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span>
+            </a>
+            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Reperti</span>
+            </a>
+            <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span>
+            </a>
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+            <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span>
+            </a>
+            <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span>
+            </a>
+            <a href="ipotesi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-tp-accent bg-[#161920] transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Ipotesi</span>
+            </a>
+            <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
+            <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Peter</span></a>
+            <a href="steve.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Steve</span></a>
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+            <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
+                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full bg-[#0e1116] relative overflow-hidden">
+
+        <!-- Header Universale -->
+        <header class="flex justify-between items-center px-4 py-3 lg:px-8 lg:py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
+            <div class="flex items-center gap-4 w-auto min-w-max">
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Ipotesi di Trading</h1>
+                    <div class="flex gap-2.5 mt-1">
+                        <a id="back-to-strat" href="strategie.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="target" class="w-3.5 h-3.5"></i> Torna alla Strategia</a>
+                        <a href="ipotesi.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="zap" class="w-3.5 h-3.5"></i> Tutte le Ipotesi</a>
+                        <a href="tabella_trades.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Tabella Trades</a>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden lg:flex items-center flex-1 max-w-3xl mx-8 gap-6">
+                <div class="flex flex-col items-center justify-center shrink-0">
+                    <span id="digital-clock" class="text-xl font-display font-bold text-white tracking-widest tabular-nums leading-none">00:00:00</span>
+                    <div class="flex gap-1 mt-1.5">
+                        <span id="tf-5m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">5m</span>
+                        <span id="tf-15m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">15m</span>
+                        <span id="tf-30m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">30m</span>
+                        <span id="tf-1h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">1h</span>
+                        <span id="tf-4h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">4h</span>
+                    </div>
+                </div>
+                <div class="flex-col flex-1 relative w-full mx-4">
+                    <div class="flex justify-between text-[10px] items-end font-bold uppercase tracking-widest mb-2 px-2">
+                        <span class="text-tp-muted opacity-30">Asia</span>
+                        <span class="text-tp-muted opacity-60">London</span>
+                        <span class="text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] scale-110 origin-bottom transition-all">New York (14-17)</span>
+                        <span class="text-tp-muted opacity-30">End</span>
+                    </div>
+                    <div class="h-2 w-full bg-gradient-to-r from-tp-bg via-tp-border to-tp-bg rounded-full border border-tp-border/30 relative shadow-inner">
+                        <div id="timeline-progress" class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-teal-600 via-tp-accent to-[#22d3ee] rounded-full shadow-[0_0_10px_rgba(32,201,151,0.5)]" style="width: 45%;"></div>
+                        <div id="timeline-dot" class="timeline-cursor absolute top-1/2 -ml-2.5 -mt-2.5 w-5 h-5 bg-white rounded-full border-[3px] border-tp-accent shadow-[0_0_15px_rgba(32,201,151,0.9)] z-10" style="left: 45%;"></div>
+                        <div class="absolute left-[30%] top-0 bottom-0 w-px bg-tp-border/50"></div>
+                        <div class="absolute left-[50%] top-0 bottom-0 w-px bg-tp-border/50"></div>
+                        <div class="absolute left-[70%] top-0 bottom-0 w-px bg-tp-border/50"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 w-auto shrink-0 justify-end">
+                <div class="hidden xl:flex items-center gap-6 bg-gradient-to-b from-[#13161c] to-[#0a0c10] border border-tp-border/40 px-6 py-3 rounded-2xl shadow-inner h-16 mr-4">
+                    <div class="flex flex-col items-center gap-1 w-10"><i id="mindset-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i></div>
+                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
+                    <div class="flex flex-col items-center gap-1 w-10"><i id="market-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i></div>
+                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
+                    <div class="flex flex-col items-center gap-1 w-10"><i id="volatility-icon-wrapper" data-lucide="dollar-sign" class="w-7 h-7 text-tp-accent drop-shadow-[0_0_12px_rgba(32,201,151,0.8)] transition-all duration-300 transform"></i></div>
+                </div>
+                <div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem] shadow-[0_0_15px_rgba(32,201,151,0.05)]">
+                    <div class="flex flex-col">
+                        <span class="text-[9px] text-tp-accent font-bold uppercase tracking-widest opacity-80">Win Rate</span>
+                        <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-tp-accent to-white drop-shadow-[0_0_8px_rgba(32,201,151,0.6)] leading-none mt-0.5">67%</span>
+                    </div>
+                    <div class="relative w-10 h-10 flex items-center justify-center">
+                        <svg class="w-[120%] h-[120%] transform -rotate-90 overflow-visible absolute" viewBox="0 0 36 36">
+                            <path class="text-tp-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                            <path class="text-tp-accent drop-shadow-[0_0_4px_rgba(32,201,151,0.8)]" stroke-dasharray="67, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ============================================ -->
+        <!-- CONTENUTO PRINCIPALE: Dettaglio Ipotesi      -->
+        <!-- ============================================ -->
+        <div class="flex-1 overflow-y-auto p-3 lg:p-8 scroll-smooth">
+            <div class="max-w-[1600px] mx-auto pb-12">
+                <div class="flex flex-col gap-6">
+
+                    <!-- Toolbar: Torna indietro (sx) + Salva / Cestino (dx) -->
+                    <div class="flex items-center justify-between mb-2 gap-3 flex-wrap">
+                        <div class="flex items-center gap-2 text-tp-muted hover:text-white transition-colors cursor-pointer" onclick="window.location.href='ipotesi.html'">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                            <span class="text-xs font-bold uppercase tracking-widest">Torna alle Ipotesi</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button id="save-btn" onclick="saveIpotesi()" class="bg-tp-accent hover:bg-tp-accent/80 text-[#0a0c10] font-bold text-xs uppercase tracking-widest py-2 px-4 rounded-lg transition-colors flex items-center gap-2">
+                                <i data-lucide="save" class="w-3.5 h-3.5"></i> Salva
+                            </button>
+                            <button onclick="deleteIpotesi()" class="bg-tp-bg border border-tp-loss/30 hover:bg-tp-loss/10 text-tp-loss font-bold text-xs uppercase tracking-widest py-2 px-3 rounded-lg transition-colors flex items-center justify-center" title="Elimina ipotesi">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Ipotesi -->
+                    <div id="ipotesi-canvas" class="bg-tp-panel rounded-xl border border-tp-border p-8 shadow-lg">
+
+                        <!-- Header: title + strategy (divider close to title) -->
+                        <div class="border-b border-tp-border/50 pb-3 mb-6">
+                            <div class="flex items-center gap-3 flex-wrap">
+                                <div class="w-12 h-12 rounded-lg bg-tp-bg border border-tp-border flex items-center justify-center shrink-0">
+                                    <i data-lucide="zap" class="w-6 h-6 text-tp-accent"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-3 mb-1 flex-wrap">
+                                        <div class="text-[10px] uppercase tracking-widest text-tp-muted font-bold">Ipotesi · <span id="ipotesi-id-short">—</span></div>
+                                        <span id="ipotesi-stato-badge" class="stato-badge stato-ipotesi"><i data-lucide="circle-dot" class="w-3 h-3"></i> ipotesi</span>
+                                        <span class="text-[10px] text-tp-muted font-bold uppercase tracking-widest" id="ipotesi-meta">—</span>
+                                    </div>
+                                    <!-- Modalita 1: strategia gia scelta (link readonly) -->
+                                    <a id="strat-link" href="#" class="hidden text-2xl font-extrabold text-white hover:text-tp-accent transition-colors block truncate">—</a>
+                                    <!-- Modalita 2: strategia non scelta (select + conferma) -->
+                                    <div id="strat-select-wrap" class="flex items-center gap-3 flex-wrap">
+                                        <select id="strat-select" class="bg-[#0a0c10] border border-tp-accent/40 rounded-lg px-3 py-2 text-base font-bold text-white outline-none min-w-[220px]">
+                                            <option value="">— Scegli una strategia —</option>
+                                        </select>
+                                        <button onclick="confermaStrategia()" class="bg-tp-accent hover:bg-tp-accent/85 text-[#0a0c10] font-bold text-xs uppercase tracking-widest px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5">
+                                            <i data-lucide="check" class="w-3.5 h-3.5"></i> Conferma
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Trade collegato (pill compatto, accanto ai bottoni stato) -->
+                                <a id="trade-collegato-pill" href="#" class="hidden items-center gap-2 shrink-0 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border bg-[#0a0c10] transition-colors">
+                                    <i data-lucide="link" class="w-3.5 h-3.5"></i>
+                                    <span id="trade-pill-text">Trade</span>
+                                    <i data-lucide="external-link" class="w-3 h-3 opacity-60"></i>
+                                </a>
+                                <!-- Bottoni transizione stato -->
+                                <div class="flex items-center gap-2 shrink-0" id="stato-actions"></div>
+                            </div>
+                        </div>
+
+                        <!-- Sezioni flag (visibili solo se strategia scelta) -->
+                        <div id="sezioni-flag">
+
+                        <!-- 50/50: [Asset/Sessione/Tipo + Note] | [Screenshot 16:9 dall'alto] -->
+                        <div class="flex flex-col lg:flex-row gap-6 mb-8">
+                            <!-- LEFT: Property rows + Note di setup -->
+                            <div class="flex-1 flex flex-col min-w-0 gap-6">
+                                <!-- Asset / Sessione / Tipo Mercato -->
+                                <div id="property-rows" class="space-y-2 pl-1">
+                                    <!-- Asset (single) -->
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-2 text-tp-muted/80 text-[10px] uppercase tracking-widest font-bold shrink-0 w-32">
+                                            <i data-lucide="hash" class="w-3.5 h-3.5 text-tp-accent/70"></i> Asset
+                                        </div>
+                                        <div id="asset-chips" class="flex flex-wrap gap-1.5 items-center flex-1 min-h-[26px]"></div>
+                                    </div>
+                                    <!-- Sessione (single) -->
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-2 text-tp-muted/80 text-[10px] uppercase tracking-widest font-bold shrink-0 w-32">
+                                            <i data-lucide="clock" class="w-3.5 h-3.5 text-tp-accent/70"></i> Sessione
+                                        </div>
+                                        <div id="sessione-chips" class="flex flex-wrap gap-1.5 items-center flex-1 min-h-[26px]"></div>
+                                    </div>
+                                    <!-- Tipo Mercato (multi) -->
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-2 text-tp-muted/80 text-[10px] uppercase tracking-widest font-bold shrink-0 w-32">
+                                            <i data-lucide="activity" class="w-3.5 h-3.5 text-tp-accent/70"></i> Tipo Mercato
+                                        </div>
+                                        <div id="tipo-mercato-chips" class="flex flex-wrap gap-1.5 items-center flex-1 min-h-[26px]"></div>
+                                    </div>
+                                    <!-- Ingresso (LONG / SHORT) -->
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-2 text-tp-muted/80 text-[10px] uppercase tracking-widest font-bold shrink-0 w-32">
+                                            <i data-lucide="trending-up" class="w-3.5 h-3.5 text-tp-accent/70"></i> Ingresso
+                                        </div>
+                                        <div class="flex gap-2 flex-1">
+                                            <button type="button" onclick="setIpotesiDir('LONG')" id="ip-dir-long" class="ip-dir-btn flex-1 py-1.5 rounded-lg border border-tp-border text-tp-muted font-bold text-xs uppercase tracking-widest transition-all hover:border-tp-accent/50">Long</button>
+                                            <button type="button" onclick="setIpotesiDir('SHORT')" id="ip-dir-short" class="ip-dir-btn flex-1 py-1.5 rounded-lg border border-tp-border text-tp-muted font-bold text-xs uppercase tracking-widest transition-all hover:border-tp-loss/50">Short</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Frattalita Candele -->
+                                <div class="bg-[#0a0c10] border border-tp-border/50 rounded-xl p-4">
+                                    <h3 class="text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-3 flex items-center gap-2"><i data-lucide="layers" class="w-3.5 h-3.5 text-tp-accent"></i> Frattalita</h3>
+                                    <div class="flex gap-4 flex-wrap" id="fractal-grid">
+                                        <div class="flex flex-col items-center gap-2" data-tf="15m"><span class="text-[10px] font-bold text-tp-muted uppercase">15m</span><div class="flex gap-1"><button onclick="setFractal('15m','green',this)" class="fractal-btn w-8 h-8 rounded border border-tp-border text-tp-muted flex items-center justify-center text-xs font-bold hover:border-tp-accent/50">G</button><button onclick="setFractal('15m','red',this)" class="fractal-btn w-8 h-8 rounded border border-tp-border text-tp-muted flex items-center justify-center text-xs font-bold hover:border-tp-loss/50">R</button></div></div>
+                                        <div class="flex flex-col items-center gap-2" data-tf="1h"><span class="text-[10px] font-bold text-tp-muted uppercase">1H</span><div class="flex gap-1"><button onclick="setFractal('1h','green',this)" class="fractal-btn w-8 h-8 rounded border border-tp-border text-tp-muted flex items-center justify-center text-xs font-bold hover:border-tp-accent/50">G</button><button onclick="setFractal('1h','red',this)" class="fractal-btn w-8 h-8 rounded border border-tp-border text-tp-muted flex items-center justify-center text-xs font-bold hover:border-tp-loss/50">R</button></div></div>
+                                        <div class="flex flex-col items-center gap-2" data-tf="4h"><span class="text-[10px] font-bold text-tp-muted uppercase">4H</span><div class="flex gap-1"><button onclick="setFractal('4h','green',this)" class="fractal-btn w-8 h-8 rounded border border-tp-border text-tp-muted flex items-center justify-center text-xs font-bold hover:border-tp-accent/50">G</button><button onclick="setFractal('4h','red',this)" class="fractal-btn w-8 h-8 rounded border border-tp-border text-tp-muted flex items-center justify-center text-xs font-bold hover:border-tp-loss/50">R</button></div></div>
+                                        <div class="flex flex-col items-center gap-2" data-tf="1d"><span class="text-[10px] font-bold text-tp-muted uppercase">1D</span><div class="flex gap-1"><button onclick="setFractal('1d','green',this)" class="fractal-btn w-8 h-8 rounded border border-tp-border text-tp-muted flex items-center justify-center text-xs font-bold hover:border-tp-accent/50">G</button><button onclick="setFractal('1d','red',this)" class="fractal-btn w-8 h-8 rounded border border-tp-border text-tp-muted flex items-center justify-center text-xs font-bold hover:border-tp-loss/50">R</button></div></div>
+                                    </div>
+                                </div>
+                                <!-- Note di setup -->
+                                <div class="flex flex-col">
+                                    <h3 class="text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
+                                        <i data-lucide="align-left" class="w-4 h-4 text-tp-accent"></i> Note di setup
+                                        <span class="text-[9px] font-normal text-tp-muted/70 ml-1 normal-case tracking-normal">contesto al momento dell'identificazione</span>
+                                    </h3>
+                                    <textarea id="ip-note" class="notion-textarea w-full bg-[#0a0c10] border border-tp-border rounded-lg p-3 text-sm text-tp-text/90 leading-relaxed outline-none min-h-[80px] resize-none focus:border-tp-accent transition-colors" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="Cosa stai vedendo sul grafico, perche' adesso..."></textarea>
+                                </div>
+                            </div>
+                            <!-- RIGHT: Screenshot 16:9 -->
+                            <div class="flex-1 flex flex-col">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="text-xs font-bold uppercase tracking-wider text-tp-muted flex items-center gap-2">
+                                        <i data-lucide="image" class="w-4 h-4"></i> Screenshot
+                                        <span class="text-[9px] font-normal text-tp-muted/70 ml-1 normal-case tracking-normal">Ctrl+V incolla</span>
+                                    </label>
+                                    <label class="text-[10px] text-tp-accent hover:text-white uppercase font-bold tracking-widest transition-colors flex items-center gap-1 cursor-pointer">
+                                        <i data-lucide="upload" class="w-3 h-3"></i> Carica
+                                        <input type="file" accept="image/*" class="hidden" onchange="handleIpotesiScreenshot(this.files[0])">
+                                    </label>
+                                </div>
+                                <!-- Empty state -->
+                                <label id="ip-screenshot-dropzone" class="border-2 border-dashed border-tp-border rounded-xl flex flex-col items-center justify-center cursor-pointer bg-[#0a0c10] text-tp-muted hover:border-tp-accent/50 hover:text-tp-accent hover:bg-tp-accent/5 transition-all" style="aspect-ratio:16/9">
+                                    <i data-lucide="upload-cloud" class="w-10 h-10 text-tp-muted/40 mb-2"></i>
+                                    <span class="text-xs font-bold uppercase tracking-widest">Screenshot Ipotesi</span>
+                                    <span class="text-[10px] mt-1 opacity-60">Clicca, trascina o Ctrl+V</span>
+                                    <input type="file" accept="image/*" class="hidden" onchange="handleIpotesiScreenshot(this.files[0])">
+                                </label>
+                                <!-- Filled state -->
+                                <div id="ip-screenshot-preview" class="hidden rounded-xl overflow-hidden border border-tp-border bg-[#0a0c10] relative" style="aspect-ratio:16/9">
+                                    <img id="ip-screenshot-img" src="" class="w-full h-full object-contain" alt="">
+                                    <button onclick="removeIpotesiScreenshot()" type="button" class="absolute top-2 right-2 bg-black/70 text-tp-loss p-1.5 rounded-lg z-10 hover:bg-black">
+                                        <i data-lucide="x" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Grid 50/50: Check List flaggable | Da Osservare -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+                            <!-- Check List flaggable -->
+                            <div class="flex flex-col">
+                                <h3 class="text-sm font-bold text-tp-muted mb-4 flex items-center gap-2">
+                                    <i data-lucide="check-square" class="w-4 h-4 text-tp-accent"></i> Check List
+                                    <span class="text-[9px] font-normal text-tp-muted/70 ml-1 normal-case tracking-normal">spunta cosa hai verificato</span>
+                                </h3>
+                                <div class="bg-[#0a0c10] border border-tp-border/50 rounded-lg p-3 h-[480px] overflow-y-auto" id="check-list-flag-container">
+                                    <!-- Voci flaggabili dalla strategia padre -->
+                                </div>
+                            </div>
+
+                            <!-- Da Osservare (snapshot domande con tag risposta) -->
+                            <div class="flex flex-col">
+                                <h3 class="text-sm font-bold text-tp-muted mb-4 flex items-center gap-2">
+                                    <i data-lucide="eye" class="w-4 h-4 text-tp-warning"></i> Da Osservare
+                                    <span class="text-[9px] font-normal text-tp-muted/70 ml-1 normal-case tracking-normal">le risposte si compilano dopo</span>
+                                </h3>
+                                <div class="bg-[#0a0c10] border border-tp-border/50 rounded-lg p-5 h-[480px] overflow-y-auto space-y-3" id="osservazioni-container">
+                                    <!-- Domande caricate dinamicamente -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Grid 50/50: Dove Entro flaggable | Dove Esco flaggable -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+                            <!-- Dove Entro flaggable -->
+                            <div>
+                                <h3 class="text-sm font-bold text-tp-muted mb-4 flex items-center gap-2">
+                                    <i data-lucide="log-in" class="w-4 h-4 text-tp-accent"></i> Dove Entro
+                                </h3>
+                                <div class="bg-[#0a0c10] border border-tp-border/50 rounded-lg p-3" id="dove-entro-flag-container"></div>
+                            </div>
+
+                            <!-- Dove Esco flaggable (SL + TP) -->
+                            <div>
+                                <h3 class="text-sm font-bold text-tp-muted mb-4 flex items-center gap-2">
+                                    <i data-lucide="log-out" class="w-4 h-4 text-tp-accent"></i> Dove Esco
+                                </h3>
+                                <div class="bg-[#0a0c10] border border-tp-border/50 rounded-lg p-5 space-y-4">
+                                    <div>
+                                        <h4 class="text-xs font-bold uppercase tracking-widest text-tp-loss mb-2 flex items-center gap-2">
+                                            <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Stop Loss
+                                        </h4>
+                                        <div id="dove-esco-sl-flag-container" class="space-y-1"></div>
+                                    </div>
+                                    <div class="border-t border-tp-border/30 pt-4">
+                                        <h4 class="text-xs font-bold uppercase tracking-widest text-tp-accent mb-2 flex items-center gap-2">
+                                            <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Take Profit
+                                        </h4>
+                                        <div id="dove-esco-tp-flag-container" class="space-y-1"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        </div><!-- /sezioni-flag -->
+
+                        <!-- Placeholder se strategia non scelta -->
+                        <div id="placeholder-no-strat" class="hidden bg-[#0a0c10] border border-dashed border-tp-border/50 rounded-lg p-12 mb-8 text-center">
+                            <i data-lucide="arrow-up" class="w-8 h-8 mx-auto mb-3 text-tp-muted/40"></i>
+                            <p class="text-sm font-bold text-tp-muted uppercase tracking-widest">Scegli una strategia per cominciare</p>
+                            <p class="text-[11px] text-tp-muted/60 mt-2">Una volta confermata, vedrai qui sopra le voci da spuntare e le domande da osservare.</p>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Conferma -->
+    <div id="modal-confirm" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto"><div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeConfirm()"></div><div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-sm mx-4 relative z-10 shadow-2xl overflow-hidden flex flex-col"><div class="px-6 py-4 border-b border-tp-border bg-tp-panel relative"><div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-loss"></div><h2 id="confirm-title" class="text-lg font-bold">Conferma</h2></div><div class="p-6"><p id="confirm-msg" class="text-sm text-tp-muted">Sei sicuro?</p></div><div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel"><button onclick="closeConfirm()" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white border border-tp-border rounded-lg">Annulla</button><button id="confirm-action" class="bg-tp-loss hover:bg-tp-loss/80 text-white px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors">Conferma</button></div></div></div>
+
+    <script>
+        // ============================================
+        // DETTAGLIO IPOTESI — Supabase Logic
+        // ============================================
+
+        const ipotesiId = new URLSearchParams(window.location.search).get('id');
+
+        let ipotesi = null;       // riga ipotesi_trading
+        let strategia = null;     // riga strategie (template padre, per opzioni)
+        let osservazioni = [];    // [{domanda, tags:[]}] copia in memoria
+        let strategieList = [];   // tutte le strategie disponibili (per il select)
+        let fractalData = {};     // {15m,1h,4h,1d -> 'green'|'red'}
+        let currentDir = '';      // 'LONG' | 'SHORT' | ''
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            lucide.createIcons();
+            if (!db) { alert('Supabase non inizializzato.'); return; }
+            if (!ipotesiId) {
+                alert('Nessun id ipotesi nella URL.');
+                window.location.href = 'ipotesi.html';
+                return;
+            }
+            await loadIpotesi();
+            if (!ipotesi) return;
+            await loadStrategieList();
+            if (ipotesi.strategia_id) {
+                await loadStrategia();
+            }
+            renderAll();
+        });
+
+        async function loadStrategieList() {
+            const { data } = await db.from('strategie').select('id, nome').order('nome');
+            strategieList = data || [];
+            const sel = document.getElementById('strat-select');
+            strategieList.forEach(s => {
+                const o = document.createElement('option');
+                o.value = s.id;
+                o.textContent = s.nome;
+                sel.appendChild(o);
+            });
+        }
+
+        async function loadIpotesi() {
+            const { data, error } = await db.from('ipotesi_trading').select('*').eq('id', ipotesiId).single();
+            if (error || !data) { alert('Ipotesi non trovata.'); return; }
+            ipotesi = data;
+            osservazioni = Array.isArray(data.osservazioni) ? data.osservazioni.map(o => ({
+                domanda: (o && o.domanda) ? o.domanda : String(o || ''),
+                tags: (o && Array.isArray(o.tags)) ? o.tags.slice() : []
+            })) : [];
+        }
+
+        async function loadStrategia() {
+            const { data, error } = await db.from('strategie').select('*').eq('id', ipotesi.strategia_id).single();
+            if (error || !data) { console.error('Strategia padre non trovata', error); return; }
+            strategia = data;
+        }
+
+        function renderAll() {
+            renderHeader();
+            renderStatoActions();
+
+            const stratChosen = !!ipotesi.strategia_id && !!strategia;
+
+            // Toggle visibility: sezioni flag vs placeholder
+            document.getElementById('sezioni-flag').classList.toggle('hidden', !stratChosen);
+            document.getElementById('placeholder-no-strat').classList.toggle('hidden', stratChosen);
+            document.getElementById('property-rows').classList.toggle('hidden', !stratChosen);
+
+            // Toggle visibility: link vs select strategia
+            document.getElementById('strat-link').classList.toggle('hidden', !stratChosen);
+            document.getElementById('strat-select-wrap').classList.toggle('hidden', stratChosen);
+
+            if (stratChosen) {
+                renderAssetChips();
+                renderSessioneChips();
+                renderTipoMercatoChips();
+                renderCheckListFlag();
+                renderDoveEntroFlag();
+                renderDoveEscoSLFlag();
+                renderDoveEscoTPFlag();
+                renderOsservazioni();
+                loadTradeCollegato();
+                document.getElementById('ip-note').value = ipotesi.note || '';
+                document.querySelectorAll('.notion-textarea').forEach(ta => { ta.style.height = ''; ta.style.height = ta.scrollHeight + 'px'; });
+                fractalData = {
+                    '15m': ipotesi.candle_m15 || null,
+                    '1h':  ipotesi.candle_h1  || null,
+                    '4h':  ipotesi.candle_h4  || null,
+                    '1d':  ipotesi.candle_d1  || null
+                };
+                renderFractals();
+                setIpotesiDir(ipotesi.direzione || '');
+                renderScreenshot();
+            }
+            lucide.createIcons();
+        }
+
+        function renderHeader() {
+            const stratNome = strategia ? strategia.nome : null;
+            const link = document.getElementById('strat-link');
+            if (stratNome) {
+                link.textContent = stratNome;
+                link.href = `dettaglio_strategia.html?id=${strategia.id}`;
+                document.getElementById('back-to-strat').href = `dettaglio_strategia.html?id=${strategia.id}`;
+                document.getElementById('page-global-title').textContent = `Ipotesi · ${stratNome}`;
+            } else {
+                document.getElementById('back-to-strat').href = 'ipotesi.html';
+                document.getElementById('back-to-strat').innerHTML = '<i data-lucide="list" class="w-3.5 h-3.5"></i> Tutte le Ipotesi';
+                document.getElementById('page-global-title').textContent = 'Nuova Ipotesi';
+            }
+            document.getElementById('ipotesi-id-short').textContent = ipotesiId.substring(0, 8);
+
+            const created = new Date(ipotesi.created_at);
+            const dateStr = created.toLocaleString('it-IT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+            document.getElementById('ipotesi-meta').textContent = `Creata ${dateStr}`;
+
+            // Stato badge
+            const badge = document.getElementById('ipotesi-stato-badge');
+            badge.className = 'stato-badge stato-' + ipotesi.stato;
+            badge.innerHTML = `<i data-lucide="${iconForStato(ipotesi.stato)}" class="w-3 h-3"></i> ${labelForStato(ipotesi.stato)}`;
+            lucide.createIcons();
+        }
+
+        // Conferma scelta strategia: UPDATE su DB con strategia_id + snapshot domande Da Osservare
+        async function confermaStrategia() {
+            const sel = document.getElementById('strat-select');
+            const newStratId = sel.value;
+            if (!newStratId) { alert('Seleziona una strategia.'); return; }
+
+            // Carica la strategia scelta per leggere da_osservare
+            const { data: strat, error: e1 } = await db.from('strategie').select('*').eq('id', newStratId).single();
+            if (e1 || !strat) { alert('Errore caricamento strategia: ' + (e1 ? e1.message : 'non trovata')); return; }
+
+            // Snapshot domande
+            const osservazioniSnapshot = (Array.isArray(strat.da_osservare) ? strat.da_osservare : []).map(o => ({
+                domanda: (o && o.domanda) ? o.domanda : String(o || ''),
+                tags: []
+            }));
+
+            const { error } = await db.from('ipotesi_trading').update({
+                strategia_id: newStratId,
+                osservazioni: osservazioniSnapshot,
+                updated_at: new Date().toISOString()
+            }).eq('id', ipotesiId);
+
+            if (error) { alert('Errore conferma: ' + error.message); return; }
+
+            // Reload pagina (cosi si carica tutto come "ipotesi normale")
+            window.location.reload();
+        }
+
+        function iconForStato(s) {
+            return ({
+                'ipotesi':'circle-dot', 'ingresso':'log-in', 'non_eseguito':'x-circle',
+                'da_osservare':'eye', 'osservata':'check-circle'
+            })[s] || 'circle';
+        }
+        function labelForStato(s) {
+            return ({
+                'ipotesi':'ipotesi', 'ingresso':'ingresso', 'non_eseguito':'non eseguito',
+                'da_osservare':'da osservare', 'osservata':'osservata'
+            })[s] || s;
+        }
+
+        // --- ASSET (single-select chip) ---
+        function renderAssetChips() {
+            const container = document.getElementById('asset-chips');
+            container.innerHTML = '';
+            const opts = (strategia && Array.isArray(strategia.asset)) ? strategia.asset : [];
+            if (!opts.length) {
+                container.innerHTML = '<span class="text-[10px] text-tp-muted/50 italic">Strategia padre non ha asset configurati</span>';
+                return;
+            }
+            opts.forEach(v => {
+                const isOn = ipotesi.asset === v;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = isOn ? 'chip-btn on' : 'chip-btn off';
+                btn.textContent = v;
+                btn.onclick = () => { ipotesi.asset = isOn ? null : v; renderAssetChips(); };
+                container.appendChild(btn);
+            });
+        }
+
+        // --- SESSIONE (single-select chip) ---
+        function renderSessioneChips() {
+            const container = document.getElementById('sessione-chips');
+            container.innerHTML = '';
+            const opts = (strategia && Array.isArray(strategia.sessione)) ? strategia.sessione : [];
+            if (!opts.length) {
+                container.innerHTML = '<span class="text-[10px] text-tp-muted/50 italic">Strategia padre non ha sessioni configurate</span>';
+                return;
+            }
+            opts.forEach(v => {
+                const isOn = ipotesi.sessione === v;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = isOn ? 'chip-btn on' : 'chip-btn off';
+                btn.textContent = v;
+                btn.onclick = () => { ipotesi.sessione = isOn ? null : v; renderSessioneChips(); };
+                container.appendChild(btn);
+            });
+        }
+
+        // --- TIPO MERCATO (multi-select chip) ---
+        function renderTipoMercatoChips() {
+            const container = document.getElementById('tipo-mercato-chips');
+            container.innerHTML = '';
+            const opts = (strategia && Array.isArray(strategia.tipo_mercato)) ? strategia.tipo_mercato : [];
+            if (!opts.length) {
+                container.innerHTML = '<span class="text-[10px] text-tp-muted/50 italic">Strategia padre non ha tipi mercato configurati</span>';
+                return;
+            }
+            if (!Array.isArray(ipotesi.tipo_mercato)) ipotesi.tipo_mercato = [];
+            opts.forEach(v => {
+                const isOn = ipotesi.tipo_mercato.includes(v);
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = isOn ? 'chip-btn on' : 'chip-btn off';
+                btn.textContent = v;
+                btn.onclick = () => {
+                    const i = ipotesi.tipo_mercato.indexOf(v);
+                    if (i >= 0) ipotesi.tipo_mercato.splice(i, 1); else ipotesi.tipo_mercato.push(v);
+                    renderTipoMercatoChips();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // --- FLAG ROW HELPERS (per voci checkbox-style) ---
+        function renderFlagList(containerId, sourceField, ipotesiField) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            const opts = (strategia && Array.isArray(strategia[sourceField])) ? strategia[sourceField] : [];
+            if (!Array.isArray(ipotesi[ipotesiField])) ipotesi[ipotesiField] = [];
+
+            if (!opts.length) {
+                container.innerHTML = `<p class="text-[11px] text-tp-muted/50 italic py-2 px-2">Nessuna voce nella strategia padre.</p>`;
+                return;
+            }
+            opts.forEach(v => {
+                const isOn = ipotesi[ipotesiField].includes(v);
+                const row = document.createElement('div');
+                row.className = 'flag-row' + (isOn ? ' on' : '');
+                row.innerHTML = `
+                    <div class="check-box"><i data-lucide="check" class="w-3 h-3"></i></div>
+                    <span class="flag-text">${escHtml(v)}</span>
+                `;
+                row.onclick = () => {
+                    const i = ipotesi[ipotesiField].indexOf(v);
+                    if (i >= 0) ipotesi[ipotesiField].splice(i, 1); else ipotesi[ipotesiField].push(v);
+                    renderFlagList(containerId, sourceField, ipotesiField);
+                };
+                container.appendChild(row);
+            });
+            lucide.createIcons();
+        }
+
+        function renderCheckListFlag()    { renderFlagList('check-list-flag-container',    'regole_ingresso', 'check_list_flagged'); }
+        function renderDoveEntroFlag()    { renderFlagList('dove-entro-flag-container',    'dove_entro',      'dove_entro_flagged'); }
+        function renderDoveEscoSLFlag()   { renderFlagList('dove-esco-sl-flag-container',  'dove_esco_sl',    'dove_esco_sl_flagged'); }
+        function renderDoveEscoTPFlag()   { renderFlagList('dove-esco-tp-flag-container',  'dove_esco_tp',    'dove_esco_tp_flagged'); }
+
+        // --- OSSERVAZIONI (snapshot domande con tag risposte) ---
+        function renderOsservazioni() {
+            const container = document.getElementById('osservazioni-container');
+            container.innerHTML = '';
+            if (!osservazioni.length) {
+                container.innerHTML = '<p class="text-[11px] text-tp-muted/50 italic">Nessuna domanda da osservare (la strategia padre non ne ha al momento dello snapshot).</p>';
+                return;
+            }
+            osservazioni.forEach((o, i) => {
+                const tags = Array.isArray(o.tags) ? o.tags : [];
+                const tagsHtml = tags.map((t, j) =>
+                    `<span class="inline-flex items-center gap-1 bg-tp-warning/10 border border-tp-warning/40 text-tp-warning text-[10px] font-bold rounded-full px-2 py-0.5">
+                        ${escHtml(t)}
+                        <button onclick="removeOsservazioneTag(${i}, ${j})" class="hover:text-white" title="rimuovi"><i data-lucide="x" class="w-3 h-3"></i></button>
+                     </span>`
+                ).join('');
+                const div = document.createElement('div');
+                div.className = 'osservazione-item flex items-start gap-3 group';
+                div.innerHTML = `
+                    <div class="w-5 h-5 mt-1 shrink-0 rounded border-2 border-tp-warning/50 bg-transparent flex items-center justify-center cursor-default">
+                        <i data-lucide="help-circle" class="w-3 h-3 text-tp-warning opacity-50"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-sm text-white font-medium">${escHtml(o.domanda || '')}</div>
+                        <div class="flex flex-wrap gap-1.5 mt-2 items-center">
+                            ${tagsHtml}
+                            <input type="text" placeholder="+ tag risposta (Invio)" onkeydown="if(event.key==='Enter'){event.preventDefault();addOsservazioneTag(${i}, this);}" class="bg-transparent text-[11px] text-tp-muted outline-none border-b border-tp-border/30 px-1 w-32 placeholder-tp-border/70">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+        function addOsservazioneTag(i, inputEl) {
+            const v = (inputEl.value || '').trim();
+            if (!v) return;
+            if (!osservazioni[i]) return;
+            if (!Array.isArray(osservazioni[i].tags)) osservazioni[i].tags = [];
+            if (!osservazioni[i].tags.includes(v)) osservazioni[i].tags.push(v);
+            inputEl.value = '';
+            renderOsservazioni();
+            renderStatoActions();
+        }
+        function removeOsservazioneTag(i, j) {
+            if (!osservazioni[i] || !Array.isArray(osservazioni[i].tags)) return;
+            osservazioni[i].tags.splice(j, 1);
+            renderOsservazioni();
+            renderStatoActions();
+        }
+
+        // --- STATO TRANSITIONS ---
+        function renderStatoActions() {
+            const wrap = document.getElementById('stato-actions');
+            wrap.innerHTML = '';
+            const s = ipotesi.stato;
+            // Marca Non Eseguito (disponibile solo se 'ipotesi')
+            if (s === 'ipotesi') {
+                const b = document.createElement('button');
+                b.className = 'flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-tp-loss/30 text-tp-loss hover:bg-tp-loss/10 transition-colors';
+                b.innerHTML = '<i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Non Eseguito';
+                b.onclick = () => transizione('non_eseguito');
+                wrap.appendChild(b);
+            }
+            // Marca Osservata (disponibile solo se 'da_osservare' E tutte le osservazioni compilate)
+            if (s === 'da_osservare') {
+                const totale = osservazioni.length;
+                const compilate = osservazioni.filter(o => Array.isArray(o.tags) && o.tags.length > 0).length;
+                const tutteCompilate = totale > 0 && compilate === totale;
+                const b = document.createElement('button');
+                if (tutteCompilate) {
+                    b.className = 'flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10 transition-colors';
+                    b.innerHTML = '<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Marca Osservata';
+                    b.onclick = () => transizione('osservata');
+                } else {
+                    b.className = 'flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-tp-border text-tp-muted/60 cursor-not-allowed';
+                    b.disabled = true;
+                    const missing = totale === 0 ? 'nessuna domanda da osservare' : `${compilate}/${totale} compilate`;
+                    b.title = `Compila tutte le risposte di "Da Osservare" prima di marcare osservata (${missing})`;
+                    b.innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i> Marca Osservata · ${compilate}/${totale}`;
+                }
+                wrap.appendChild(b);
+            }
+            lucide.createIcons();
+        }
+
+        async function transizione(nuovoStato) {
+            const { error } = await db.from('ipotesi_trading').update({ stato: nuovoStato, updated_at: new Date().toISOString() }).eq('id', ipotesiId);
+            if (error) { alert('Errore transizione: ' + error.message); return; }
+            ipotesi.stato = nuovoStato;
+            renderHeader();
+            renderStatoActions();
+        }
+
+        // --- INGRESSO LONG/SHORT ---
+        function setIpotesiDir(d) {
+            currentDir = d;
+            const long = document.getElementById('ip-dir-long');
+            const short = document.getElementById('ip-dir-short');
+            [long, short].forEach(b => {
+                if (!b) return;
+                b.classList.remove('border-tp-accent','text-tp-accent','bg-tp-accent/10','border-tp-loss','text-tp-loss','bg-tp-loss/10');
+                b.classList.add('border-tp-border','text-tp-muted');
+            });
+            if (d === 'LONG' && long) {
+                long.classList.add('border-tp-accent','text-tp-accent','bg-tp-accent/10');
+                long.classList.remove('border-tp-border','text-tp-muted');
+            }
+            if (d === 'SHORT' && short) {
+                short.classList.add('border-tp-loss','text-tp-loss','bg-tp-loss/10');
+                short.classList.remove('border-tp-border','text-tp-muted');
+            }
+        }
+
+        // --- FRATTALITA ---
+        function setFractal(tf, color, btn) {
+            const group = btn.closest('[data-tf]');
+            group.querySelectorAll('.fractal-btn').forEach(b => b.classList.remove('green','red'));
+            btn.classList.add(color);
+            fractalData[tf] = color;
+        }
+        function renderFractals() {
+            Object.entries(fractalData).forEach(([tf, color]) => {
+                if (!color) return;
+                const group = document.querySelector(`[data-tf="${tf}"]`);
+                if (!group) return;
+                group.querySelectorAll('.fractal-btn').forEach(b => b.classList.remove('green','red'));
+                const idx = color === 'green' ? 0 : 1;
+                group.querySelectorAll('.fractal-btn')[idx]?.classList.add(color);
+            });
+        }
+
+        // --- SCREENSHOT ---
+        function renderScreenshot() {
+            const dz = document.getElementById('ip-screenshot-dropzone');
+            const prev = document.getElementById('ip-screenshot-preview');
+            const img = document.getElementById('ip-screenshot-img');
+            if (ipotesi && ipotesi.screenshot) {
+                img.src = ipotesi.screenshot;
+                dz.classList.add('hidden');
+                prev.classList.remove('hidden');
+            } else {
+                img.src = '';
+                dz.classList.remove('hidden');
+                prev.classList.add('hidden');
+            }
+            lucide.createIcons();
+        }
+
+        function handleIpotesiScreenshot(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                ipotesi.screenshot = e.target.result;
+                renderScreenshot();
+                await db.from('ipotesi_trading').update({ screenshot: ipotesi.screenshot, updated_at: new Date().toISOString() }).eq('id', ipotesiId);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function removeIpotesiScreenshot() {
+            ipotesi.screenshot = null;
+            renderScreenshot();
+            await db.from('ipotesi_trading').update({ screenshot: null, updated_at: new Date().toISOString() }).eq('id', ipotesiId);
+        }
+
+        // Ctrl+V incolla immagine
+        document.addEventListener('paste', (e) => {
+            if (!ipotesi) return;
+            const items = (e.clipboardData || {}).items || [];
+            for (const it of items) {
+                if (it.type && it.type.indexOf('image') !== -1) {
+                    const f = it.getAsFile();
+                    if (f) { handleIpotesiScreenshot(f); e.preventDefault(); break; }
+                }
+            }
+        });
+
+        // --- TRADE COLLEGATO (pill compatto nel title row) ---
+        async function loadTradeCollegato() {
+            const pill = document.getElementById('trade-collegato-pill');
+            const text = document.getElementById('trade-pill-text');
+            if (!ipotesi.trade_id) {
+                pill.classList.add('hidden');
+                pill.classList.remove('inline-flex');
+                return;
+            }
+            const { data: t } = await db.from('trades').select('id, asset, direzione, stato, esito, pnl').eq('id', ipotesi.trade_id).single();
+            if (!t) {
+                pill.classList.add('hidden');
+                pill.classList.remove('inline-flex');
+                return;
+            }
+            const isWin = t.esito === 'win';
+            const isLoss = t.esito === 'loss';
+            const colorClass = isWin
+                ? 'border-tp-accent/50 text-tp-accent hover:bg-tp-accent/10'
+                : isLoss
+                    ? 'border-tp-loss/50 text-tp-loss hover:bg-tp-loss/10'
+                    : 'border-tp-border text-tp-muted hover:bg-tp-bg hover:text-white';
+            pill.className = `inline-flex items-center gap-2 shrink-0 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border bg-[#0a0c10] transition-colors ${colorClass}`;
+            pill.classList.remove('hidden');
+            pill.href = `dettaglio_trade.html?id=${t.id}`;
+            const pnlSign = (t.pnl || 0) >= 0 ? '+' : '';
+            const pnlStr = (t.pnl !== null && t.pnl !== undefined) ? ` · ${pnlSign}$${Math.abs(t.pnl || 0).toFixed(0)}` : '';
+            text.textContent = `${t.asset || '—'} ${t.direzione || ''}${pnlStr}`;
+            lucide.createIcons();
+        }
+
+        // --- SAVE ---
+        async function saveIpotesi() {
+            const btn = document.getElementById('save-btn');
+            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvando...';
+            btn.disabled = true;
+
+            const payload = {
+                asset: ipotesi.asset || null,
+                sessione: ipotesi.sessione || null,
+                tipo_mercato: ipotesi.tipo_mercato || [],
+                check_list_flagged: ipotesi.check_list_flagged || [],
+                dove_entro_flagged: ipotesi.dove_entro_flagged || [],
+                dove_esco_sl_flagged: ipotesi.dove_esco_sl_flagged || [],
+                dove_esco_tp_flagged: ipotesi.dove_esco_tp_flagged || [],
+                osservazioni: osservazioni,
+                note: document.getElementById('ip-note').value,
+                screenshot: ipotesi.screenshot || null,
+                candle_m15: fractalData['15m'] || null,
+                candle_h1:  fractalData['1h']  || null,
+                candle_h4:  fractalData['4h']  || null,
+                candle_d1:  fractalData['1d']  || null,
+                direzione: currentDir || null,
+                updated_at: new Date().toISOString()
+            };
+
+            const { error } = await db.from('ipotesi_trading').update(payload).eq('id', ipotesiId);
+            if (error) {
+                btn.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4"></i> Errore!';
+                alert('Errore salvataggio: ' + error.message);
+                setTimeout(() => { btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Salva'; btn.disabled = false; lucide.createIcons(); }, 2000);
+                return;
+            }
+
+            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Salvato!';
+            const canvas = document.getElementById('ipotesi-canvas');
+            canvas.classList.add('save-flash');
+            setTimeout(() => canvas.classList.remove('save-flash'), 600);
+            setTimeout(() => { btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Salva'; btn.disabled = false; lucide.createIcons(); }, 1500);
+        }
+
+        // --- DELETE ---
+        function deleteIpotesi() {
+            showConfirm('Eliminare questa ipotesi?', 'Questa azione non puo essere annullata.', async function() {
+                const { error } = await db.from('ipotesi_trading').delete().eq('id', ipotesiId);
+                if (error) { alert('Errore: ' + error.message); return; }
+                if (strategia) window.location.href = `dettaglio_strategia.html?id=${strategia.id}`;
+                else window.location.href = 'ipotesi.html';
+            });
+        }
+
+        function showConfirm(title, msg, callback) {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-msg').textContent = msg;
+            document.getElementById('confirm-action').onclick = function() { closeConfirm(); callback(); };
+            document.getElementById('modal-confirm').classList.add('open');
+        }
+        function closeConfirm() { document.getElementById('modal-confirm').classList.remove('open'); }
+
+        // --- UTIL ---
+        function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    </script>
+</body>
+</html>

@@ -103,7 +103,7 @@ serve(async (req) => {
 
     if (assistantMode === "coach" || assistantMode === "power") {
       const { data: strategie } = await supabase.from("strategie")
-        .select("id, nome, stato, sessione, ipotesi, regole_ingresso, gestione_operazione, take_profit, da_osservare, gestione_rischio, note, asset, tipo, timeframe, winrate")
+        .select("id, nome, stato, sessione, ipotesi, regole_ingresso, tipo_mercato, dove_entro, dove_esco_sl, dove_esco_tp, gestione_operazione, da_osservare, gestione_rischio, note, asset, tipo, timeframe, winrate")
         .limit(10);
       if (strategie && strategie.length) dbContext += "\n\n## STRATEGIE:\n" + JSON.stringify(strategie);
     }
@@ -158,15 +158,20 @@ IMPORTANTE: NON usare MAI insert su "sessioni". Le 3 righe (asia, london, newyor
 [{"table":"cronache","action":"update_coin","match":{"data":"2026-04-24"},"coin":"XAUUSD","data":{"low":"4657.69","high":"4740.42","open":"4692.44","close":"4707.41","percentuale":"+0.32"}}]
 \`\`\`
 
-Tabelle scrittura: sessioni (coin_data, mood, nome, data), giornate (mindset, volatilita, note_domani, fajr, marea, day_tags), trades (note, mood, volatilita, tag - solo se non completato), bias (asset, direzione, commento), cronache (coin_data, titolo), settimane (review, note), strategie (nome, ipotesi, regole_ingresso, sessione, gestione_operazione, take_profit, da_osservare, asset, tipo, timeframe, note, stato, winrate, gestione_rischio[LEGACY]), allert (SOLO valore_effettivo, screenshot).
+Tabelle scrittura: sessioni (coin_data, mood, nome, data), giornate (mindset, volatilita, note_domani, fajr, marea, day_tags), trades (note, mood, volatilita, tag - solo se non completato), bias (asset, direzione, commento), cronache (coin_data, titolo), settimane (review, note), strategie (nome, ipotesi, regole_ingresso, sessione, tipo_mercato, dove_entro, dove_esco_sl, dove_esco_tp, gestione_operazione, da_osservare, asset, tipo, timeframe, note, stato, winrate, gestione_rischio[LEGACY], take_profit[LEGACY]), allert (SOLO valore_effettivo, screenshot).
 
 REGOLE STRATEGIE (split campi):
 - ipotesi: cosa vede il setup, perche dovrebbe funzionare (testo libero, 3-8 righe).
-- regole_ingresso: ARRAY JSONB di stringhe-checklist ordinato (1 riga = 1 condizione strict, prefisso "☐ " ammesso).
-- sessione: finestra oraria operativa (es. "08:00-17:00 Casablanca").
+- regole_ingresso: ARRAY JSONB di stringhe-checklist ordinato (1 riga = 1 condizione strict, prefisso "☐ " ammesso). UI lo mostra come "Check List".
+- sessione: text[] (array Postgres), 1 voce per sessione operativa (es. ["London","NewYork"]). MAI passare stringa singola: il tipo della colonna e' text[].
+- tipo_mercato: text[], condizioni di mercato in cui la strategia funziona bene (es. ["trending H4","range Asia","post-news"]). MAI stringa singola.
+- asset: text[] (era text). Lista di asset operabili (es. ["XAUUSD","US30"]). MAI stringa singola.
+- dove_entro: text[], lista di trigger/punti di ingresso (es. ["cambio candela M15 dopo C3","retest box"]).
+- dove_esco_sl: text[], lista posizioni SL operative (es. ["wick di C1","box di C2"]).
+- dove_esco_tp: text[], lista target TP (es. ["PDH/PDL","FVG opposto","EMA 50"]).
 - gestione_operazione: SL operativo, rischio max per fase, modulatore size, circuit breaker. SOLO regole pre-trade / di sopravvivenza.
-- take_profit: filtro RR minimo, TP base, trail, BE, stati 1-N. SOLO regole post-entry.
-- da_osservare: checklist cose da monitorare/calibrare nei primi N trade (lista con "- " all'inizio di ogni riga).
+- take_profit: LEGACY. NON scrivere qui per nuove strategie. Le regole TP vivono ora in dove_esco_tp (text[]) per i target e in gestione_operazione per BE/trail.
+- da_osservare: jsonb array di {domanda: string, tags: string[]}. Ogni voce e' una domanda aperta da monitorare; i tags sono le risposte aggregate nello stile "momenti di spinta" (snake_case_lower). Es: [{"domanda":"Buffer BE ottimale su XAU","tags":["20pip","30pip"]}]. Per aggiungere una domanda passa l'array INTERO con la nuova entry; mai append parziale.
 - note: appunti generici e contestuali, NON sostitutivo di da_osservare.
 - gestione_rischio: LEGACY. NON scrivere qui per nuove strategie. Se trovi una strategia vecchia con tutto qui dentro e l'utente chiede di "splittare" o "ripulire", dividi i contenuti tra gestione_operazione + take_profit + da_osservare con un singolo update e svuota gestione_rischio mettendolo a "".
 - nome: SE l'utente cambia il nome della strategia includilo nel data dell'update. Non assumere mai il vecchio nome se nel testo nuovo c'e' un titolo diverso.

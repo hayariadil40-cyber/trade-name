@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -48,6 +48,12 @@
             50% { box-shadow: 0 0 12px rgba(32,201,151,0.4); }
             100% { box-shadow: 0 0 0 rgba(32,201,151,0); }
         }
+        /* Chip toggle: ON = illuminato verde, OFF = outlined */
+        .chip-btn { display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:9999px; font-size:11px; font-weight:700; line-height:1; transition: all .15s; cursor:pointer; border:1px solid transparent; }
+        .chip-btn.on { background: rgba(32,201,151,0.12); border-color: rgba(32,201,151,0.45); color:#20c997; box-shadow: inset 0 0 8px rgba(32,201,151,0.12); }
+        .chip-btn.on:hover { background: rgba(32,201,151,0.18); }
+        .chip-btn.off { background: transparent; border-color: #252932; color:#848d97; }
+        .chip-btn.off:hover { color:#f8fafc; border-color: rgba(32,201,151,0.4); }
     </style>
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -119,6 +125,7 @@
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div>
                 <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span>
             </a>
+            <a href="ipotesi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Ipotesi</span></a>
 
             <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
 
@@ -210,97 +217,216 @@
         <!-- CONTENUTO PRINCIPALE: Dettaglio Strategia    -->
         <!-- ============================================ -->
         <div class="flex-1 overflow-y-auto p-3 lg:p-8 scroll-smooth">
-            <div class="max-w-[1600px] mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 pb-12">
+            <div class="max-w-[1600px] mx-auto pb-12">
 
-                <!-- COLONNA SINISTRA: Editor Strategia -->
-                <div class="xl:col-span-8 flex flex-col gap-6">
+                <!-- LAYOUT FULL-WIDTH: Editor Strategia -->
+                <div class="flex flex-col gap-6">
 
-                    <!-- Torna indietro -->
-                    <div class="flex items-center gap-2 mb-2 text-tp-muted hover:text-white transition-colors cursor-pointer w-fit" onclick="window.location.href='strategie.html'">
-                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                        <span class="text-xs font-bold uppercase tracking-widest">Torna alle Strategie</span>
+                    <!-- Toolbar: Torna indietro (sx) + Salva / Cestino (dx) -->
+                    <div class="flex items-center justify-between mb-2 gap-3 flex-wrap">
+                        <div class="flex items-center gap-2 text-tp-muted hover:text-white transition-colors cursor-pointer" onclick="window.location.href='strategie.html'">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                            <span class="text-xs font-bold uppercase tracking-widest">Torna alle Strategie</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button id="save-btn" onclick="saveStrategy()" class="bg-tp-accent hover:bg-tp-accent/80 text-[#0a0c10] font-bold text-xs uppercase tracking-widest py-2 px-4 rounded-lg transition-colors flex items-center gap-2">
+                                <i data-lucide="save" class="w-3.5 h-3.5"></i> Salva
+                            </button>
+                            <button onclick="deleteStrategy()" class="bg-tp-bg border border-tp-loss/30 hover:bg-tp-loss/10 text-tp-loss font-bold text-xs uppercase tracking-widest py-2 px-3 rounded-lg transition-colors flex items-center justify-center" title="Elimina strategia">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Canvas Strategia -->
                     <div id="strategy-canvas" class="bg-tp-panel rounded-xl border border-tp-border p-8 shadow-lg min-h-[600px]">
 
-                        <!-- Nome Strategia -->
+                        <!-- Header: Nome + Properties row + Metriche grandi (dx) -->
                         <div class="border-b border-tp-border/50 pb-6 mb-6">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-lg bg-tp-bg border border-tp-border flex items-center justify-center">
+                            <div class="flex items-center gap-3 mb-5">
+                                <div class="w-12 h-12 rounded-lg bg-tp-bg border border-tp-border flex items-center justify-center shrink-0">
                                     <i data-lucide="target" class="w-6 h-6 text-tp-accent"></i>
                                 </div>
-                                <input id="strat-nome" type="text" class="bg-transparent text-3xl font-extrabold text-white outline-none w-full tracking-tight" placeholder="Nome Strategia..." value="">
+                                <input id="strat-nome" type="text" class="bg-transparent text-3xl font-extrabold text-white outline-none flex-1 min-w-0 tracking-tight" placeholder="Nome Strategia..." value="">
+                            </div>
+
+                            <!-- Property rows (sx, flex-1) + Win Rate / R:R Medio grandi (dx, altezza 3 righe) -->
+                            <div class="flex items-stretch gap-6">
+                                <!-- Properties Row -->
+                                <div class="space-y-2.5 pl-1 flex-1 min-w-0">
+                                <!-- Sessione -->
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-2 text-tp-muted/80 text-[10px] uppercase tracking-widest font-bold shrink-0 w-32">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5 text-tp-accent/70"></i> Sessione
+                                    </div>
+                                    <div class="flex flex-wrap gap-1.5 items-center flex-1">
+                                        <div id="sessione-chips" class="flex flex-wrap gap-1.5 items-center"></div>
+                                        <button id="sessione-add-btn" type="button" onclick="startAddCustom('new-sessione-input','sessione-add-btn')" class="chip-btn off" title="Aggiungi custom">
+                                            <i data-lucide="plus" class="w-3 h-3"></i>
+                                        </button>
+                                        <input id="new-sessione-input" type="text" placeholder="custom..." class="hidden bg-transparent border-b border-tp-accent/60 outline-none text-xs text-white px-2 py-0.5 w-32" onblur="endAddCustom('new-sessione-input','sessione-add-btn')" onkeydown="handleAddInputKey(event,'new-sessione-input','sessione-add-btn',addSessione)">
+                                    </div>
+                                </div>
+
+                                <!-- Tipo di Mercato -->
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-2 text-tp-muted/80 text-[10px] uppercase tracking-widest font-bold shrink-0 w-32">
+                                        <i data-lucide="activity" class="w-3.5 h-3.5 text-tp-accent/70"></i> Tipo Mercato
+                                    </div>
+                                    <div class="flex flex-wrap gap-1.5 items-center flex-1">
+                                        <div id="tipo-mercato-chips" class="flex flex-wrap gap-1.5 items-center"></div>
+                                        <button id="tipo-mercato-add-btn" type="button" onclick="startAddCustom('new-tipo-mercato-input','tipo-mercato-add-btn')" class="chip-btn off" title="Aggiungi custom">
+                                            <i data-lucide="plus" class="w-3 h-3"></i>
+                                        </button>
+                                        <input id="new-tipo-mercato-input" type="text" placeholder="custom..." class="hidden bg-transparent border-b border-tp-accent/60 outline-none text-xs text-white px-2 py-0.5 w-32" onblur="endAddCustom('new-tipo-mercato-input','tipo-mercato-add-btn')" onkeydown="handleAddInputKey(event,'new-tipo-mercato-input','tipo-mercato-add-btn',addTipoMercato)">
+                                    </div>
+                                </div>
+
+                                <!-- Asset -->
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-2 text-tp-muted/80 text-[10px] uppercase tracking-widest font-bold shrink-0 w-32">
+                                        <i data-lucide="hash" class="w-3.5 h-3.5 text-tp-accent/70"></i> Asset
+                                    </div>
+                                    <div class="flex flex-wrap gap-1.5 items-center flex-1">
+                                        <div id="asset-chips" class="flex flex-wrap gap-1.5 items-center"></div>
+                                        <button id="asset-add-btn" type="button" onclick="startAddCustom('new-asset-input','asset-add-btn')" class="chip-btn off" title="Aggiungi custom">
+                                            <i data-lucide="plus" class="w-3 h-3"></i>
+                                        </button>
+                                        <input id="new-asset-input" type="text" placeholder="custom..." class="hidden bg-transparent border-b border-tp-accent/60 outline-none text-xs text-white px-2 py-0.5 w-32" onblur="endAddCustom('new-asset-input','asset-add-btn')" onkeydown="handleAddInputKey(event,'new-asset-input','asset-add-btn',addAsset)">
+                                    </div>
+                                </div>
+                                </div><!-- /properties col -->
+
+                                <!-- Metriche compatte in riga (Win Rate · R:R · Trade) -->
+                                <div class="shrink-0 flex items-center gap-3 self-center">
+                                    <div class="flex flex-col items-center justify-center bg-[#0a0c10] border border-tp-border rounded-lg px-6 py-3 min-w-[110px]">
+                                        <span class="text-[10px] uppercase tracking-widest text-tp-muted font-bold leading-none">Win Rate</span>
+                                        <span id="topbar-winrate" class="text-3xl font-black text-tp-accent leading-none mt-1.5 tabular-nums">--</span>
+                                    </div>
+                                    <div class="flex flex-col items-center justify-center bg-[#0a0c10] border border-tp-border rounded-lg px-6 py-3 min-w-[110px]">
+                                        <span class="text-[10px] uppercase tracking-widest text-tp-muted font-bold leading-none">R:R Medio</span>
+                                        <span id="topbar-rr" class="text-3xl font-black text-tp-accent leading-none mt-1.5 tabular-nums">--</span>
+                                    </div>
+                                    <div class="flex flex-col items-center justify-center bg-[#0a0c10] border border-tp-border rounded-lg px-6 py-3 min-w-[110px]">
+                                        <span class="text-[10px] uppercase tracking-widest text-tp-muted font-bold leading-none">Trade</span>
+                                        <span id="topbar-trades-count" class="text-3xl font-black text-white leading-none mt-1.5 tabular-nums">--</span>
+                                    </div>
+                                </div>
+                            </div><!-- /flex properties + metriche -->
+                        </div>
+
+                        <!-- Fondamenta: Ipotesi (sx) + Gestione del Rischio (dx) — 50/50 -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                            <!-- Ipotesi Analitica -->
+                            <div>
+                                <h3 class="text-sm font-bold text-tp-muted mb-2 flex items-center gap-2">
+                                    <i data-lucide="align-left" class="w-4 h-4 text-tp-accent"></i> Ipotesi Analitica
+                                </h3>
+                                <textarea id="strat-ipotesi" class="notion-textarea w-full bg-[#0a0c10] border border-tp-border rounded-lg p-4 text-sm text-tp-text/90 leading-relaxed outline-none min-h-[180px]" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="Descrivi l'ipotesi alla base di questa strategia..."></textarea>
+                            </div>
+                            <!-- Gestione del Rischio -->
+                            <div>
+                                <h3 class="text-sm font-bold text-tp-muted mb-2 flex items-center gap-2">
+                                    <i data-lucide="shield-alert" class="w-4 h-4 text-tp-loss"></i> Gestione del Rischio
+                                    <span class="text-[9px] font-normal text-tp-muted/70 ml-1 normal-case tracking-normal">SL operativo, rischio max, modulatore size, circuit breaker</span>
+                                </h3>
+                                <textarea id="strat-gestione-operazione" class="notion-textarea w-full bg-[#0a0c10] border border-tp-border rounded-lg p-4 text-sm text-tp-text/90 leading-relaxed outline-none min-h-[180px]" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="SL operativo, rischio max, modulatore size, circuit breaker..."></textarea>
                             </div>
                         </div>
 
-                        <!-- Ipotesi Analitica -->
-                        <div class="mb-8 group">
-                            <h3 class="text-sm font-bold text-tp-muted mb-2 flex items-center gap-2 group-hover:text-white transition-colors">
-                                <i data-lucide="align-left" class="w-4 h-4"></i> Ipotesi Analitica
-                            </h3>
-                            <textarea id="strat-ipotesi" class="notion-textarea w-full bg-[#0a0c10] border border-tp-border rounded-lg p-4 text-base text-tp-text/90 leading-relaxed outline-none min-h-[120px]" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="Descrivi l'ipotesi alla base di questa strategia..."></textarea>
-                        </div>
 
-                        <!-- Sessione -->
-                        <div class="mb-8 group">
-                            <h3 class="text-sm font-bold text-tp-muted mb-2 flex items-center gap-2 group-hover:text-white transition-colors">
-                                <i data-lucide="clock" class="w-4 h-4 text-tp-accent"></i> Sessione
-                            </h3>
-                            <input id="strat-sessione" type="text" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg p-3 text-sm text-tp-text/90 outline-none" placeholder="es. 08:00-17:00 Casablanca">
-                        </div>
+                        <!-- Grid 50/50: Check List (sx) | Da Osservare (dx) — entrambe altezza fissa con scroll interno -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
-                        <!-- Regole di Ingresso -->
-                        <div class="mb-8">
-                            <h3 class="text-sm font-bold text-tp-muted mb-4 flex items-center gap-2">
-                                <i data-lucide="check-square" class="w-4 h-4 text-tp-accent"></i> Regole di Ingresso
-                            </h3>
-                            <div id="regole-container" class="space-y-3 bg-[#0a0c10] border border-tp-border/50 rounded-lg p-5">
-                                <!-- Le regole vengono caricate dinamicamente -->
+                            <!-- Check List -->
+                            <div class="flex flex-col">
+                                <h3 class="text-sm font-bold text-tp-muted mb-4 flex items-center gap-2">
+                                    <i data-lucide="check-square" class="w-4 h-4 text-tp-accent"></i> Check List
+                                </h3>
+                                <div class="bg-[#0a0c10] border border-tp-border/50 rounded-lg flex flex-col h-[480px]">
+                                    <div id="regole-container" class="flex-1 overflow-y-auto p-5 space-y-3">
+                                        <!-- Le regole vengono caricate dinamicamente -->
+                                    </div>
+                                    <div class="flex items-center gap-3 px-5 py-3 border-t border-tp-border/30 shrink-0">
+                                        <i data-lucide="plus" class="w-4 h-4 text-tp-muted"></i>
+                                        <input id="new-rule-input" type="text" placeholder="Aggiungi una voce..." class="flex-1 bg-transparent border-none outline-none text-sm text-tp-muted placeholder-tp-border" onkeydown="if(event.key==='Enter')addRule()">
+                                        <button onclick="addRule()" class="text-tp-accent hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Aggiungi</button>
+                                    </div>
+                                </div>
+                            </div>
 
-                                <!-- Aggiungi regola -->
-                                <div class="flex items-center gap-3 pt-2 border-t border-tp-border/30">
-                                    <i data-lucide="plus" class="w-4 h-4 text-tp-muted"></i>
-                                    <input id="new-rule-input" type="text" placeholder="Aggiungi una regola..." class="flex-1 bg-transparent border-none outline-none text-sm text-tp-muted placeholder-tp-border" onkeydown="if(event.key==='Enter')addRule()">
-                                    <button onclick="addRule()" class="text-tp-accent hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Aggiungi</button>
+                            <!-- Da Osservare -->
+                            <div class="flex flex-col">
+                                <h3 class="text-sm font-bold text-tp-muted mb-4 flex items-center gap-2">
+                                    <i data-lucide="eye" class="w-4 h-4 text-tp-warning"></i> Da Osservare
+                                    <span class="text-[9px] font-normal text-tp-muted/70 ml-1 normal-case tracking-normal">domande — risposte = tag</span>
+                                </h3>
+                                <div class="bg-[#0a0c10] border border-tp-border/50 rounded-lg flex flex-col h-[480px]">
+                                    <div id="osservazioni-container" class="flex-1 overflow-y-auto p-5 space-y-3">
+                                        <!-- Domande caricate dinamicamente -->
+                                    </div>
+                                    <div class="flex items-center gap-3 px-5 py-3 border-t border-tp-border/30 shrink-0">
+                                        <i data-lucide="plus" class="w-4 h-4 text-tp-muted"></i>
+                                        <input id="new-osservazione-input" type="text" placeholder="Aggiungi una domanda..." class="flex-1 bg-transparent border-none outline-none text-sm text-tp-muted placeholder-tp-border" onkeydown="if(event.key==='Enter')addOsservazione()">
+                                        <button onclick="addOsservazione()" class="text-tp-warning hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Aggiungi</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Gestione Operazione -->
-                        <div class="mb-8 group">
-                            <h3 class="text-sm font-bold text-tp-muted mb-2 flex items-center gap-2 group-hover:text-white transition-colors">
-                                <i data-lucide="shield-alert" class="w-4 h-4 text-tp-loss"></i> Gestione Operazione
-                                <span class="text-[9px] font-normal text-tp-muted/70 ml-2 normal-case tracking-normal">SL, rischio max, modulatore size, circuit breaker</span>
-                            </h3>
-                            <textarea id="strat-gestione-operazione" class="notion-textarea w-full bg-[#0a0c10] border border-tp-border rounded-lg p-4 text-sm text-tp-text/90 leading-relaxed outline-none min-h-[100px]" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="SL operativo, rischio max, modulatore size, circuit breaker..."></textarea>
-                        </div>
+                        <!-- Grid 50/50: Dove Entro (sx) | Dove Esco SL+TP (dx) -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
-                        <!-- Take Profit -->
-                        <div class="mb-8 group">
-                            <h3 class="text-sm font-bold text-tp-muted mb-2 flex items-center gap-2 group-hover:text-white transition-colors">
-                                <i data-lucide="trending-up" class="w-4 h-4 text-tp-accent"></i> Take Profit & Trail
-                                <span class="text-[9px] font-normal text-tp-muted/70 ml-2 normal-case tracking-normal">Filtro RR, stati TP, BE, trail</span>
-                            </h3>
-                            <textarea id="strat-take-profit" class="notion-textarea w-full bg-[#0a0c10] border border-tp-border rounded-lg p-4 text-sm text-tp-text/90 leading-relaxed outline-none min-h-[100px]" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="Filtro RR minimo, stati TP, BE, trail..."></textarea>
-                        </div>
+                            <!-- Dove Entro -->
+                            <div>
+                                <h3 class="text-sm font-bold text-tp-muted mb-4 flex items-center gap-2">
+                                    <i data-lucide="log-in" class="w-4 h-4 text-tp-accent"></i> Dove Entro
+                                </h3>
+                                <div class="bg-[#0a0c10] border border-tp-border/50 rounded-lg p-5">
+                                    <div id="dove-entro-container" class="space-y-3"></div>
+                                    <div class="flex items-center gap-3 pt-3 mt-3 border-t border-tp-border/30">
+                                        <i data-lucide="plus" class="w-4 h-4 text-tp-muted"></i>
+                                        <input id="new-dove-entro-input" type="text" placeholder="Aggiungi punto di ingresso..." class="flex-1 bg-transparent border-none outline-none text-sm text-tp-muted placeholder-tp-border" onkeydown="if(event.key==='Enter')addDoveEntro()">
+                                        <button onclick="addDoveEntro()" class="text-tp-accent hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Aggiungi</button>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <!-- Da Osservare -->
-                        <div class="mb-8 group">
-                            <h3 class="text-sm font-bold text-tp-muted mb-2 flex items-center gap-2 group-hover:text-white transition-colors">
-                                <i data-lucide="eye" class="w-4 h-4 text-tp-warning"></i> Da Osservare
-                                <span class="text-[9px] font-normal text-tp-muted/70 ml-2 normal-case tracking-normal">Cose da monitorare nei primi N trade</span>
-                            </h3>
-                            <textarea id="strat-da-osservare" class="notion-textarea w-full bg-[#0a0c10] border border-tp-border rounded-lg p-4 text-sm text-tp-text/90 leading-relaxed outline-none min-h-[100px]" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="Lista cose da monitorare/calibrare..."></textarea>
-                        </div>
+                            <!-- Dove Esco (SL + TP) -->
+                            <div>
+                                <h3 class="text-sm font-bold text-tp-muted mb-4 flex items-center gap-2">
+                                    <i data-lucide="log-out" class="w-4 h-4 text-tp-accent"></i> Dove Esco
+                                </h3>
+                                <div class="bg-[#0a0c10] border border-tp-border/50 rounded-lg p-5 space-y-6">
 
-                        <!-- Gestione del Rischio (LEGACY) -->
-                        <div id="strat-rischio-legacy-wrapper" class="mb-8 group" style="display:none">
-                            <h3 class="text-sm font-bold text-tp-muted mb-2 flex items-center gap-2 group-hover:text-white transition-colors">
-                                <i data-lucide="archive" class="w-4 h-4 text-tp-muted"></i> Gestione Rischio (Legacy)
-                                <span class="text-[9px] font-normal text-tp-muted/70 ml-2 normal-case tracking-normal">Vecchio campo unico — splittalo nei tre nuovi sopra</span>
-                            </h3>
-                            <textarea id="strat-rischio" class="notion-textarea w-full bg-[#0a0c10] border border-tp-border/50 rounded-lg p-4 text-sm text-tp-muted leading-relaxed outline-none min-h-[80px]" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder=""></textarea>
+                                    <!-- SL -->
+                                    <div>
+                                        <h4 class="text-xs font-bold uppercase tracking-widest text-tp-loss mb-3 flex items-center gap-2">
+                                            <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Stop Loss
+                                        </h4>
+                                        <div id="dove-esco-sl-container" class="space-y-3"></div>
+                                        <div class="flex items-center gap-3 pt-2 mt-2 border-t border-tp-border/30">
+                                            <i data-lucide="plus" class="w-4 h-4 text-tp-muted"></i>
+                                            <input id="new-dove-esco-sl-input" type="text" placeholder="Aggiungi posizione SL..." class="flex-1 bg-transparent border-none outline-none text-sm text-tp-muted placeholder-tp-border" onkeydown="if(event.key==='Enter')addDoveEscoSL()">
+                                            <button onclick="addDoveEscoSL()" class="text-tp-loss hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Aggiungi</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- TP -->
+                                    <div>
+                                        <h4 class="text-xs font-bold uppercase tracking-widest text-tp-accent mb-3 flex items-center gap-2">
+                                            <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Take Profit
+                                        </h4>
+                                        <div id="dove-esco-tp-container" class="space-y-3"></div>
+                                        <div class="flex items-center gap-3 pt-2 mt-2 border-t border-tp-border/30">
+                                            <i data-lucide="plus" class="w-4 h-4 text-tp-muted"></i>
+                                            <input id="new-dove-esco-tp-input" type="text" placeholder="Aggiungi target TP..." class="flex-1 bg-transparent border-none outline-none text-sm text-tp-muted placeholder-tp-border" onkeydown="if(event.key==='Enter')addDoveEscoTP()">
+                                            <button onclick="addDoveEscoTP()" class="text-tp-accent hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Aggiungi</button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Screenshot -->
@@ -326,96 +452,62 @@
                             </div>
                         </div>
 
+                    </div>
+
+                    <!-- Tre colonne in fondo: Reperti | Trade | Ipotesi -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-2">
+
                         <!-- Reperti / Bias Collegati -->
-                        <div>
-                            <div class="flex items-center justify-between mb-4 pb-2 border-b border-tp-border">
-                                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                                    <i data-lucide="microscope" class="w-5 h-5 text-tp-warning"></i> Reperti / Bias Collegati
+                        <div class="bg-tp-panel rounded-xl border border-tp-border shadow-lg flex flex-col max-h-[500px] overflow-hidden">
+                            <div class="p-4 border-b border-tp-border/50 bg-[#0a0c10] flex justify-between items-center flex-shrink-0">
+                                <h3 class="text-xs font-bold uppercase tracking-widest text-tp-warning flex items-center gap-2">
+                                    <i data-lucide="microscope" class="w-4 h-4"></i> Reperti Collegati
                                 </h3>
+                                <button onclick="window.location.href='bias.html'" class="text-[10px] uppercase font-bold text-tp-accent hover:text-white transition-colors">Tutti</button>
                             </div>
-                            <div id="bias-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <!-- Bias caricati dinamicamente -->
-                                <div id="no-bias-msg" class="col-span-full text-center py-8 text-tp-muted">
+                            <div id="bias-container" class="flex-1 overflow-y-auto p-4 space-y-3">
+                                <div id="no-bias-msg" class="text-center py-8 text-tp-muted">
                                     <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
-                                    <p class="text-xs font-bold uppercase tracking-widest">Nessun reperto collegato</p>
-                                    <p class="text-[10px] mt-1 opacity-60">I reperti con questa strategia come categorizzatore appariranno qui</p>
+                                    <p class="text-xs font-bold uppercase tracking-widest">Nessun reperto</p>
+                                    <p class="text-[10px] mt-1 opacity-60">I reperti con questa strategia appariranno qui</p>
                                 </div>
                             </div>
                         </div>
 
-                    </div>
-                </div>
-
-                <!-- COLONNA DESTRA: Metriche + Trades -->
-                <div class="xl:col-span-4 flex flex-col gap-6">
-
-                    <!-- Metriche Calcolate -->
-                    <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted border-b border-tp-border/50 pb-3 mb-4">Metriche Storiche</h3>
-
-                        <!-- Win Rate Gauge -->
-                        <div class="flex justify-center mb-6 mt-2 relative w-32 h-32 mx-auto">
-                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                <path class="text-tp-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
-                                <path id="winrate-ring" class="text-tp-accent" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" style="transition: stroke-dasharray 0.8s ease;" />
-                            </svg>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                <span id="winrate-value" class="text-2xl font-black text-tp-accent">--</span>
-                                <span class="text-[10px] text-tp-muted uppercase font-bold tracking-widest">Win Rate</span>
+                        <!-- Trade con questa Strategia -->
+                        <div class="bg-tp-panel rounded-xl border border-tp-border shadow-lg flex flex-col max-h-[500px] overflow-hidden">
+                            <div class="p-4 border-b border-tp-border/50 bg-[#0a0c10] flex justify-between items-center flex-shrink-0">
+                                <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2">
+                                    <i data-lucide="history" class="w-4 h-4"></i> Trade Collegati
+                                </h3>
+                                <button onclick="window.location.href='tabella_trades.html'" class="text-[10px] uppercase font-bold text-tp-accent hover:text-white transition-colors">Tabella</button>
+                            </div>
+                            <div id="trades-list" class="flex-1 overflow-y-auto p-4">
+                                <div id="no-trades-msg" class="text-center py-8 text-tp-muted">
+                                    <i data-lucide="crosshair" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+                                    <p class="text-xs font-bold uppercase tracking-widest">Nessun trade</p>
+                                    <p class="text-[10px] mt-1 opacity-60">I trade categorizzati appariranno qui</p>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- R:R Medio -->
-                        <div class="bg-[#0a0c10] border border-tp-border rounded-lg p-4 text-center">
-                            <span id="rr-value" class="block text-xl font-bold text-tp-accent mb-0.5">--</span>
-                            <span class="text-[9px] uppercase font-bold tracking-widest text-tp-muted">R:R Medio</span>
-                        </div>
-
-                        <!-- Contatore trades -->
-                        <div class="mt-3 text-center">
-                            <span id="trades-count" class="text-[10px] text-tp-muted font-bold uppercase tracking-widest">0 trade registrati</span>
-                        </div>
-                    </div>
-
-                    <!-- Momenti di Spinta (aggregato tag dei trade collegati) -->
-                    <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted border-b border-tp-border/50 pb-3 mb-4 flex items-center gap-2">
-                            <i data-lucide="flame" class="w-4 h-4 text-tp-warning"></i> Momenti di Spinta
-                        </h3>
-                        <div id="tag-aggregati" class="space-y-2">
-                            <div id="no-tag-msg" class="text-center py-4 text-tp-muted">
-                                <p class="text-[10px] opacity-60">Aggregati dai tag dei trade collegati</p>
+                        <!-- Ipotesi Collegate -->
+                        <div class="bg-tp-panel rounded-xl border border-tp-border shadow-lg flex flex-col max-h-[500px] overflow-hidden">
+                            <div class="p-4 border-b border-tp-border/50 bg-[#0a0c10] flex justify-between items-center flex-shrink-0">
+                                <h3 class="text-xs font-bold uppercase tracking-widest text-tp-accent flex items-center gap-2">
+                                    <i data-lucide="zap" class="w-4 h-4"></i> Ipotesi Collegate
+                                </h3>
+                                <button onclick="window.location.href='ipotesi.html'" class="text-[10px] uppercase font-bold text-tp-accent hover:text-white transition-colors">Tutte</button>
+                            </div>
+                            <div id="ipotesi-container" class="flex-1 overflow-y-auto p-4 space-y-3">
+                                <div id="no-ipotesi-msg" class="text-center py-8 text-tp-muted">
+                                    <i data-lucide="zap-off" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+                                    <p class="text-xs font-bold uppercase tracking-widest">Nessuna ipotesi</p>
+                                    <p class="text-[10px] mt-1 opacity-60">Crea una nuova ipotesi con il bottone in alto</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Salva / Stato -->
-                    <div class="flex gap-3">
-                        <button id="save-btn" onclick="saveStrategy()" class="flex-1 bg-tp-accent hover:bg-tp-accent/80 text-[#0a0c10] font-bold text-sm py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
-                            <i data-lucide="save" class="w-4 h-4"></i> Salva
-                        </button>
-                        <button onclick="deleteStrategy()" class="bg-tp-bg border border-tp-loss/30 hover:bg-tp-loss/10 text-tp-loss font-bold text-sm px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-
-                    <!-- Lista Trade Filtrati -->
-                    <div class="bg-tp-panel rounded-xl border border-tp-border shadow-lg flex flex-col flex-1 max-h-[600px] overflow-hidden">
-                        <div class="p-4 border-b border-tp-border/50 bg-[#0a0c10] flex justify-between items-center flex-shrink-0">
-                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2">
-                                <i data-lucide="history" class="w-4 h-4"></i> Trade con questa Strategia
-                            </h3>
-                            <button onclick="window.location.href='tabella_trades.html'" class="text-[10px] uppercase font-bold text-tp-accent hover:text-white transition-colors">Vedi in Tabella</button>
-                        </div>
-
-                        <div id="trades-list" class="flex-1 overflow-y-auto p-4">
-                            <!-- Trade caricati dinamicamente -->
-                            <div id="no-trades-msg" class="text-center py-8 text-tp-muted">
-                                <i data-lucide="crosshair" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
-                                <p class="text-xs font-bold uppercase tracking-widest">Nessun trade</p>
-                                <p class="text-[10px] mt-1 opacity-60">I trade categorizzati con questa strategia appariranno qui</p>
-                            </div>
-                        </div>
                     </div>
 
                 </div>
@@ -434,8 +526,21 @@
         // ============================================
 
         const strategyId = new URLSearchParams(window.location.search).get('id');
+
+        // Preset bottoni "illuminabili" per le sezioni con valori canonici
+        const SESSIONE_PRESETS = ['Asia','London','NewYork'];
+        const TIPO_MERCATO_PRESETS = ['inrange','reversal','continuation'];
+        const ASSET_PRESETS = ['XAUUSD','US30','NAS100','GER30','BTCUSD','EURUSD'];
+
         let currentStrategy = null;
         let rules = [];
+        let sessioni = [];
+        let tipiMercato = [];
+        let assets = [];
+        let doveEntro = [];
+        let doveEscoSL = [];
+        let doveEscoTP = [];
+        let osservazioni = []; // [{domanda, tags:[]}]
         let screenshots = [];
 
         // --- INIT ---
@@ -472,6 +577,7 @@
             await loadStrategy();
             await loadTrades();
             await loadBias();
+            await loadIpotesiCollegate();
         });
 
         // --- LOAD STRATEGY ---
@@ -493,15 +599,7 @@
             document.getElementById('strat-nome').value = data.nome || '';
             document.getElementById('page-global-title').textContent = `Playbook: ${data.nome || 'Strategia'}`;
             document.getElementById('strat-ipotesi').value = data.ipotesi || '';
-            document.getElementById('strat-sessione').value = data.sessione || '';
             document.getElementById('strat-gestione-operazione').value = data.gestione_operazione || '';
-            document.getElementById('strat-take-profit').value = data.take_profit || '';
-            document.getElementById('strat-da-osservare').value = data.da_osservare || '';
-            document.getElementById('strat-rischio').value = data.gestione_rischio || '';
-            // Mostra il blocco Legacy solo se ha contenuto: per le strategie nuove resta nascosto.
-            if (data.gestione_rischio && data.gestione_rischio.trim()) {
-                document.getElementById('strat-rischio-legacy-wrapper').style.display = '';
-            }
 
             // Auto-resize textareas
             document.querySelectorAll('.notion-textarea').forEach(ta => {
@@ -513,6 +611,43 @@
             rules = data.regole_ingresso || [];
             renderRules();
 
+            // Sessioni — supporta sia text[] (nuovo) sia stringa legacy
+            sessioni = Array.isArray(data.sessione)
+                ? data.sessione.slice()
+                : (data.sessione ? [data.sessione] : []);
+            renderSessioni();
+
+            // Tipo di Mercato
+            tipiMercato = Array.isArray(data.tipo_mercato) ? data.tipo_mercato.slice() : [];
+            renderTipiMercato();
+
+            // Asset — supporta sia text[] (nuovo) sia stringa legacy
+            assets = Array.isArray(data.asset)
+                ? data.asset.slice()
+                : (data.asset ? [data.asset] : []);
+            renderAssets();
+
+            // Dove Entro / Dove Esco
+            doveEntro = Array.isArray(data.dove_entro) ? data.dove_entro.slice() : [];
+            doveEscoSL = Array.isArray(data.dove_esco_sl) ? data.dove_esco_sl.slice() : [];
+            doveEscoTP = Array.isArray(data.dove_esco_tp) ? data.dove_esco_tp.slice() : [];
+            renderDoveEntro();
+            renderDoveEscoSL();
+            renderDoveEscoTP();
+
+            // Da Osservare — domande+tag (jsonb). Fallback se vecchio formato stringa: split su \n.
+            if (Array.isArray(data.da_osservare)) {
+                osservazioni = data.da_osservare.map(o => ({
+                    domanda: (o && typeof o === 'object') ? (o.domanda || '') : String(o || ''),
+                    tags: (o && Array.isArray(o.tags)) ? o.tags.slice() : []
+                }));
+            } else if (typeof data.da_osservare === 'string' && data.da_osservare.trim()) {
+                osservazioni = data.da_osservare.split('\n').map(l => l.trim()).filter(Boolean).map(l => ({ domanda: l, tags: [] }));
+            } else {
+                osservazioni = [];
+            }
+            renderOsservazioni();
+
             // Screenshots
             screenshots = data.screenshots || [];
             renderScreenshots();
@@ -521,11 +656,7 @@
         // --- RULES ---
         function renderRules() {
             const container = document.getElementById('regole-container');
-            const addSection = container.querySelector('.border-t');
-
-            // Rimuovi regole esistenti (ma non il form di aggiunta)
-            container.querySelectorAll('.rule-item').forEach(el => el.remove());
-
+            container.innerHTML = '';
             rules.forEach((rule, i) => {
                 const div = document.createElement('div');
                 div.className = 'rule-item flex items-start gap-3 group';
@@ -537,9 +668,8 @@
                     <input type="text" value="${rule.replace(/"/g, '&quot;')}" class="flex-1 bg-transparent border-none outline-none text-sm text-white font-medium" onchange="updateRule(${i}, this.value)">
                     <button onclick="removeRule(${i})" class="text-tp-muted hover:text-tp-loss opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="x" class="w-4 h-4"></i></button>
                 `;
-                container.insertBefore(div, addSection);
+                container.appendChild(div);
             });
-
             lucide.createIcons();
         }
 
@@ -559,6 +689,243 @@
         function removeRule(index) {
             rules.splice(index, 1);
             renderRules();
+        }
+
+        // --- NUOVA IPOTESI ---
+        // Crea una riga ipotesi_trading agganciata alla strategia corrente, in stato 'ipotesi'.
+        // I flag partono vuoti: l'utente li spunterà sulla pagina dettaglio_ipotesi (prossimo step).
+        // Snapshot delle domande "Da Osservare" copiato dalla strategia (stessa struttura, tags vuoti).
+        async function createNuovaIpotesi() {
+            if (!strategyId || !currentStrategy) {
+                alert('Salva prima la strategia.');
+                return;
+            }
+            // Snapshot delle domande Da Osservare (azzero i tags risposta — si compilano dopo)
+            const osservazioniSnapshot = (currentStrategy.da_osservare || []).map(o => ({
+                domanda: (o && o.domanda) ? o.domanda : String(o || ''),
+                tags: []
+            }));
+            const payload = {
+                strategia_id: strategyId,
+                stato: 'ipotesi',
+                osservazioni: osservazioniSnapshot
+            };
+            const { data, error } = await db.from('ipotesi_trading').insert(payload).select().single();
+            if (error) {
+                alert('Errore creazione ipotesi: ' + error.message);
+                console.error(error);
+                return;
+            }
+            window.location.href = `dettaglio_ipotesi.html?id=${data.id}`;
+        }
+
+        // --- INLINE "+ custom" INPUT (sostituisce il bottone + con un input al volo) ---
+        function startAddCustom(inputId, btnId) {
+            document.getElementById(btnId).classList.add('hidden');
+            const inp = document.getElementById(inputId);
+            inp.classList.remove('hidden');
+            inp.value = '';
+            setTimeout(() => inp.focus(), 0);
+        }
+        function endAddCustom(inputId, btnId) {
+            document.getElementById(inputId).classList.add('hidden');
+            document.getElementById(btnId).classList.remove('hidden');
+        }
+        function handleAddInputKey(e, inputId, btnId, addFn) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addFn();
+                endAddCustom(inputId, btnId);
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                endAddCustom(inputId, btnId);
+            }
+        }
+
+        // --- CHIP-SET FACTORY (preset toggle + custom) ---
+        // Render: ogni preset = chip ON o OFF; ogni valore custom (non-preset) = chip ON con marker.
+        // Click chip ON = rimuovi; click chip OFF = aggiungi. Niente ordinamento: i preset escono prima.
+        function renderChipSet(elId, list, presets, toggleFn) {
+            const container = document.getElementById(elId);
+            if (!container) return;
+            container.innerHTML = '';
+            const seen = new Set();
+            const buildChip = (value, isPreset) => {
+                if (seen.has(value)) return;
+                seen.add(value);
+                const isOn = list.includes(value);
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = isOn ? 'chip-btn on' : 'chip-btn off';
+                btn.textContent = value;
+                if (isOn && !isPreset) {
+                    btn.insertAdjacentHTML('beforeend', '<i data-lucide="x" class="w-3 h-3 ml-1 opacity-60"></i>');
+                }
+                btn.onclick = () => toggleFn(value);
+                container.appendChild(btn);
+            };
+            presets.forEach(p => buildChip(p, true));
+            list.forEach(v => buildChip(v, false));
+            lucide.createIcons();
+        }
+
+        // --- SESSIONI ---
+        function renderSessioni() { renderChipSet('sessione-chips', sessioni, SESSIONE_PRESETS, toggleSessione); }
+        function toggleSessione(v) {
+            const i = sessioni.indexOf(v);
+            if (i >= 0) sessioni.splice(i, 1); else sessioni.push(v);
+            renderSessioni();
+        }
+        function addSessione() {
+            const input = document.getElementById('new-sessione-input');
+            const t = input.value.trim();
+            if (!t) return;
+            if (!sessioni.includes(t)) sessioni.push(t);
+            input.value = '';
+            renderSessioni();
+        }
+
+        // --- TIPO DI MERCATO ---
+        function renderTipiMercato() { renderChipSet('tipo-mercato-chips', tipiMercato, TIPO_MERCATO_PRESETS, toggleTipoMercato); }
+        function toggleTipoMercato(v) {
+            const i = tipiMercato.indexOf(v);
+            if (i >= 0) tipiMercato.splice(i, 1); else tipiMercato.push(v);
+            renderTipiMercato();
+        }
+        function addTipoMercato() {
+            const input = document.getElementById('new-tipo-mercato-input');
+            const t = input.value.trim();
+            if (!t) return;
+            if (!tipiMercato.includes(t)) tipiMercato.push(t);
+            input.value = '';
+            renderTipiMercato();
+        }
+
+        // --- CHECKLIST FACTORY (per asset, dove_entro, dove_esco_*) ---
+        // Riduce duplicazione: stesso markup di rules/sessioni/tipi_mercato.
+        function checklistRender(containerId, itemClass, list, updateFn, removeFn) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            list.forEach((v, i) => {
+                const div = document.createElement('div');
+                div.className = itemClass + ' flex items-start gap-3 group';
+                div.innerHTML = `
+                    <i data-lucide="grip-vertical" class="w-4 h-4 mt-0.5 text-tp-muted opacity-0 group-hover:opacity-50"></i>
+                    <div class="w-5 h-5 mt-0.5 shrink-0 rounded border-2 border-tp-border bg-transparent flex items-center justify-center cursor-default">
+                        <i data-lucide="check" class="w-3 h-3 text-tp-accent opacity-30"></i>
+                    </div>
+                    <input type="text" value="${(v || '').replace(/"/g, '&quot;')}" class="flex-1 bg-transparent border-none outline-none text-sm text-white font-medium" onchange="${updateFn}(${i}, this.value)">
+                    <button onclick="${removeFn}(${i})" class="text-tp-muted hover:text-tp-loss opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="x" class="w-4 h-4"></i></button>
+                `;
+                container.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+        function checklistAdd(inputId, list, renderFn) {
+            const input = document.getElementById(inputId);
+            const text = input.value.trim();
+            if (!text) return;
+            list.push(text);
+            input.value = '';
+            renderFn();
+        }
+
+        // --- ASSET ---
+        function renderAssets() { renderChipSet('asset-chips', assets, ASSET_PRESETS, toggleAsset); }
+        function toggleAsset(v) {
+            const i = assets.indexOf(v);
+            if (i >= 0) assets.splice(i, 1); else assets.push(v);
+            renderAssets();
+        }
+        function addAsset() {
+            const input = document.getElementById('new-asset-input');
+            const t = input.value.trim();
+            if (!t) return;
+            if (!assets.includes(t)) assets.push(t);
+            input.value = '';
+            renderAssets();
+        }
+
+        // --- DOVE ENTRO ---
+        function renderDoveEntro() { checklistRender('dove-entro-container', 'dove-entro-item', doveEntro, 'updateDoveEntro', 'removeDoveEntro'); }
+        function addDoveEntro() { checklistAdd('new-dove-entro-input', doveEntro, renderDoveEntro); }
+        function updateDoveEntro(i, v) { doveEntro[i] = v; }
+        function removeDoveEntro(i) { doveEntro.splice(i, 1); renderDoveEntro(); }
+
+        // --- DOVE ESCO — SL ---
+        function renderDoveEscoSL() { checklistRender('dove-esco-sl-container', 'dove-esco-sl-item', doveEscoSL, 'updateDoveEscoSL', 'removeDoveEscoSL'); }
+        function addDoveEscoSL() { checklistAdd('new-dove-esco-sl-input', doveEscoSL, renderDoveEscoSL); }
+        function updateDoveEscoSL(i, v) { doveEscoSL[i] = v; }
+        function removeDoveEscoSL(i) { doveEscoSL.splice(i, 1); renderDoveEscoSL(); }
+
+        // --- DOVE ESCO — TP ---
+        function renderDoveEscoTP() { checklistRender('dove-esco-tp-container', 'dove-esco-tp-item', doveEscoTP, 'updateDoveEscoTP', 'removeDoveEscoTP'); }
+        function addDoveEscoTP() { checklistAdd('new-dove-esco-tp-input', doveEscoTP, renderDoveEscoTP); }
+        function updateDoveEscoTP(i, v) { doveEscoTP[i] = v; }
+        function removeDoveEscoTP(i) { doveEscoTP.splice(i, 1); renderDoveEscoTP(); }
+
+        // --- OSSERVAZIONI (Da Osservare = lista di {domanda, tags[]}) ---
+        function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+        function renderOsservazioni() {
+            const container = document.getElementById('osservazioni-container');
+            container.innerHTML = '';
+
+            osservazioni.forEach((o, i) => {
+                const tags = Array.isArray(o.tags) ? o.tags : [];
+                const tagsHtml = tags.map((t, j) =>
+                    `<span class="inline-flex items-center gap-1 bg-tp-warning/10 border border-tp-warning/40 text-tp-warning text-[10px] font-bold rounded-full px-2 py-0.5">
+                        ${escHtml(t)}
+                        <button onclick="removeOsservazioneTag(${i}, ${j})" class="hover:text-white" title="rimuovi"><i data-lucide="x" class="w-3 h-3"></i></button>
+                     </span>`
+                ).join('');
+
+                const div = document.createElement('div');
+                div.className = 'osservazione-item flex items-start gap-3 group';
+                div.innerHTML = `
+                    <i data-lucide="grip-vertical" class="w-4 h-4 mt-1 text-tp-muted opacity-0 group-hover:opacity-50"></i>
+                    <div class="w-5 h-5 mt-1 shrink-0 rounded border-2 border-tp-border bg-transparent flex items-center justify-center cursor-default">
+                        <i data-lucide="check" class="w-3 h-3 text-tp-warning opacity-30"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <input type="text" value="${escHtml(o.domanda || '').replace(/"/g,'&quot;')}" placeholder="Domanda..." onchange="updateOsservazioneDomanda(${i}, this.value)" class="w-full bg-transparent text-sm text-white font-medium outline-none">
+                        <div class="flex flex-wrap gap-1.5 mt-2 items-center">
+                            ${tagsHtml}
+                            <input type="text" placeholder="+ tag (Invio)" onkeydown="if(event.key==='Enter'){event.preventDefault();addOsservazioneTag(${i}, this);}" class="bg-transparent text-[11px] text-tp-muted outline-none border-b border-tp-border/30 px-1 w-32 placeholder-tp-border/70">
+                        </div>
+                    </div>
+                    <button onclick="removeOsservazione(${i})" class="text-tp-muted hover:text-tp-loss opacity-0 group-hover:opacity-100 transition-opacity mt-1" title="rimuovi domanda"><i data-lucide="x" class="w-4 h-4"></i></button>
+                `;
+                container.appendChild(div);
+            });
+
+            lucide.createIcons();
+        }
+
+        function addOsservazione() {
+            const input = document.getElementById('new-osservazione-input');
+            const text = input.value.trim();
+            if (!text) return;
+            osservazioni.push({ domanda: text, tags: [] });
+            input.value = '';
+            renderOsservazioni();
+        }
+        function updateOsservazioneDomanda(i, v) { if (osservazioni[i]) osservazioni[i].domanda = v; }
+        function removeOsservazione(i) { osservazioni.splice(i, 1); renderOsservazioni(); }
+
+        function addOsservazioneTag(i, inputEl) {
+            const v = (inputEl.value || '').trim();
+            if (!v) return;
+            if (!osservazioni[i]) return;
+            if (!Array.isArray(osservazioni[i].tags)) osservazioni[i].tags = [];
+            if (!osservazioni[i].tags.includes(v)) osservazioni[i].tags.push(v);
+            inputEl.value = '';
+            renderOsservazioni();
+        }
+        function removeOsservazioneTag(i, j) {
+            if (!osservazioni[i] || !Array.isArray(osservazioni[i].tags)) return;
+            osservazioni[i].tags.splice(j, 1);
+            renderOsservazioni();
         }
 
         // --- SCREENSHOTS ---
@@ -623,12 +990,15 @@
             const payload = {
                 nome: document.getElementById('strat-nome').value.trim() || 'Senza Nome',
                 ipotesi: document.getElementById('strat-ipotesi').value,
-                sessione: document.getElementById('strat-sessione').value,
+                sessione: sessioni,
                 regole_ingresso: rules,
+                tipo_mercato: tipiMercato,
+                asset: assets,
+                dove_entro: doveEntro,
+                dove_esco_sl: doveEscoSL,
+                dove_esco_tp: doveEscoTP,
                 gestione_operazione: document.getElementById('strat-gestione-operazione').value,
-                take_profit: document.getElementById('strat-take-profit').value,
-                da_osservare: document.getElementById('strat-da-osservare').value,
-                gestione_rischio: document.getElementById('strat-rischio').value,
+                da_osservare: osservazioni,
                 screenshots: screenshots,
                 updated_at: new Date().toISOString()
             };
@@ -738,61 +1108,39 @@
             }).join('') + '</ul>';
 
             updateMetrics(trades);
-            renderTagAggregati(trades);
         }
 
-        // --- TAG AGGREGATI (Momenti di Spinta) ---
-        function renderTagAggregati(trades) {
-            const container = document.getElementById('tag-aggregati');
-            const counts = {};
-            (trades || []).forEach(function(t) {
-                (t.tag || []).forEach(function(tag) {
-                    if (!tag) return;
-                    counts[tag] = (counts[tag] || 0) + 1;
-                });
-            });
-            const sorted = Object.entries(counts).sort(function(a,b){return b[1]-a[1];});
-            if (sorted.length === 0) {
-                container.innerHTML = '<div class="text-center py-4 text-tp-muted"><p class="text-[10px] opacity-60">Nessun tag sui trade collegati</p></div>';
-                return;
-            }
-            container.innerHTML = sorted.slice(0, 8).map(function(entry) {
-                var tag = entry[0], n = entry[1];
-                return '<div class="flex items-center justify-between bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2">' +
-                    '<span class="text-xs font-bold text-white truncate">' + tag + '</span>' +
-                    '<span class="text-[10px] font-bold text-tp-warning bg-tp-warning/10 px-2 py-0.5 rounded">' + n + '</span>' +
-                    '</div>';
-            }).join('');
-        }
-
-        // --- METRICS ---
+        // --- METRICS (popola solo i chip in topbar) ---
         function updateMetrics(trades) {
-            const total = trades.length;
             const wins = trades.filter(t => t.esito === 'win').length;
             const losses = trades.filter(t => t.esito === 'loss').length;
             const decided = wins + losses;
             const winrate = decided > 0 ? Math.round((wins / decided) * 100) : 0;
+            const winrateText = decided > 0 ? winrate + '%' : '--';
 
-            // Win Rate
-            document.getElementById('winrate-value').textContent = decided > 0 ? winrate + '%' : '--';
-            document.getElementById('winrate-ring').setAttribute('stroke-dasharray', `${winrate}, 100`);
+            const topWR = document.getElementById('topbar-winrate');
+            if (topWR) topWR.textContent = winrateText;
 
-            // R:R Medio - calcolato da entry, exit, stop_loss
-            let rrValues = [];
+            const topCount = document.getElementById('topbar-trades-count');
+            if (topCount) topCount.textContent = (trades && trades.length) ? trades.length : '0';
+
+            // R:R Medio direzionale (LONG: exit-entry, SHORT: entry-exit)
+            const rrValues = [];
             trades.forEach(t => {
                 if (t.entry_price && t.exit_price && t.stop_loss) {
                     const risk = Math.abs(t.entry_price - t.stop_loss);
                     if (risk > 0) {
-                        const reward = Math.abs(t.exit_price - t.entry_price);
+                        const isLong = (t.direzione || '').toUpperCase() === 'LONG';
+                        const reward = isLong ? (t.exit_price - t.entry_price) : (t.entry_price - t.exit_price);
                         rrValues.push(reward / risk);
                     }
                 }
             });
-            const avgRR = rrValues.length > 0 ? (rrValues.reduce((a, b) => a + b, 0) / rrValues.length).toFixed(1) : '--';
-            document.getElementById('rr-value').textContent = avgRR !== '--' ? `1:${avgRR}` : '--';
+            const avgRR = rrValues.length > 0 ? (rrValues.reduce((a, b) => a + b, 0) / rrValues.length).toFixed(1) : null;
+            const rrText = avgRR !== null ? `1:${avgRR}` : '--';
 
-            // Contatore
-            document.getElementById('trades-count').textContent = `${total} trade registrat${total === 1 ? 'o' : 'i'}`;
+            const topRR = document.getElementById('topbar-rr');
+            if (topRR) topRR.textContent = rrText;
         }
 
         // --- LOAD BIAS ---
@@ -837,6 +1185,59 @@
             container.innerHTML = '<div id="no-bias-msg" style="display:none"></div>' + html;
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
+
+        // --- LOAD IPOTESI COLLEGATE ---
+        async function loadIpotesiCollegate() {
+            if (!strategyId) return;
+            const { data: rows, error } = await db
+                .from('ipotesi_trading')
+                .select('id, asset, sessione, stato, note, created_at, trade_id')
+                .eq('strategia_id', strategyId)
+                .order('created_at', { ascending: false });
+            if (error) { console.error(error); return; }
+
+            const container = document.getElementById('ipotesi-container');
+            const noMsg = document.getElementById('no-ipotesi-msg');
+            if (!rows || rows.length === 0) { noMsg.style.display = ''; return; }
+            noMsg.style.display = 'none';
+
+            const statoColor = (s) => ({
+                ipotesi:'text-tp-muted', ingresso:'text-tp-accent', non_eseguito:'text-tp-loss',
+                da_osservare:'text-tp-warning', osservata:'text-cyan-400'
+            })[s] || 'text-tp-muted';
+            const statoBar = (s) => ({
+                ipotesi:'bg-tp-muted', ingresso:'bg-tp-accent', non_eseguito:'bg-tp-loss',
+                da_osservare:'bg-tp-warning', osservata:'bg-cyan-400'
+            })[s] || 'bg-tp-border';
+
+            const html = rows.map(ip => {
+                const dateStr = new Date(ip.created_at).toLocaleDateString('it-IT', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+                const note = ip.note ? String(ip.note) : '';
+                const noteShort = note.length > 80 ? note.substring(0, 80) + '...' : note;
+                const tradeBadge = ip.trade_id ? '<span class="text-[9px] font-bold uppercase text-tp-accent">trade</span>' : '';
+                return `
+                    <div onclick="window.location.href='dettaglio_ipotesi.html?id=${ip.id}'" class="cursor-pointer flex items-stretch bg-[#0a0c10] border border-tp-border hover:border-tp-accent/40 rounded-lg overflow-hidden transition-all">
+                        <div class="w-1 ${statoBar(ip.stato)} shrink-0"></div>
+                        <div class="flex-1 p-3 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10px] font-bold uppercase tracking-widest ${statoColor(ip.stato)}">${(ip.stato || 'ipotesi').replace('_',' ')}</span>
+                                <span class="text-[9px] text-tp-muted">${dateStr}</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs font-bold text-white">
+                                ${ip.asset ? escHtml(ip.asset) : '<span class="text-tp-muted/60 italic font-normal">no asset</span>'}
+                                ${ip.sessione ? `<span class="text-[9px] text-tp-muted font-bold uppercase">· ${escHtml(ip.sessione)}</span>` : ''}
+                                ${tradeBadge}
+                            </div>
+                            ${noteShort ? `<p class="text-[10px] text-tp-muted/70 line-clamp-2 mt-1">${escHtml(noteShort)}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            container.innerHTML = '<div id="no-ipotesi-msg" style="display:none"></div>' + html;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
     </script>
 </body>
 </html>
