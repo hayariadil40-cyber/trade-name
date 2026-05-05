@@ -569,6 +569,17 @@
                         </div>
                     </div>
 
+                    <!-- 2c. Ipotesi del Giorno (stesso stile reperti) -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-tp-accent mb-3 flex items-center justify-between gap-2 border-b border-tp-border pb-2">
+                            <span class="flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4"></i> Ipotesi del Giorno</span>
+                            <span id="ipotesi-giorno-count" class="text-[10px] text-tp-muted font-bold px-2 py-0.5 bg-tp-border/30 rounded border border-tp-border/50">0</span>
+                        </h3>
+                        <div id="ipotesi-giorno-list" class="space-y-2 max-h-[260px] overflow-y-auto">
+                            <p class="text-xs text-tp-muted italic text-center py-2">Caricamento...</p>
+                        </div>
+                    </div>
+
                     <!-- 3. Save + Chiudi -->
                     <button onclick="saveGiornata()" id="btn-save" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 transition-colors shadow-lg">
                         <i data-lucide="save" class="w-4 h-4"></i> Salva Giornata
@@ -686,7 +697,8 @@
                 loadSessioniCards(),
                 loadBiasGiornaliero(),
                 loadTradeStats(),
-                loadTradesDaLavorare()
+                loadTradesDaLavorare(),
+                loadIpotesiDelGiorno()
             ]);
             // Carica checklist con stato ripristinato
             await loadChecklist();
@@ -1447,6 +1459,74 @@
                             </div>
                         </div>
                         <i data-lucide="edit-3" class="w-3.5 h-3.5 text-tp-muted group-hover:text-tp-warning shrink-0"></i>
+                    </div>
+                </div>`;
+            }).join('');
+
+            if (typeof lucide !== 'undefined') lucide.createIcons({ root: container });
+        }
+
+        // Ipotesi create nella giornata — accesso veloce al dettaglio per check/follow-up.
+        async function loadIpotesiDelGiorno() {
+            if (!giornataDate) return;
+            const container = document.getElementById('ipotesi-giorno-list');
+            const countEl = document.getElementById('ipotesi-giorno-count');
+
+            const dayStart = giornataDate + 'T00:00:00';
+            const dayEnd = giornataDate + 'T23:59:59';
+            const { data: rows } = await db.from('ipotesi_trading')
+                .select('id, asset, sessione, stato, direzione, strategia_id, trade_id, created_at')
+                .gte('created_at', dayStart).lte('created_at', dayEnd)
+                .order('created_at', { ascending: false });
+
+            const items = rows || [];
+            if (countEl) countEl.textContent = items.length;
+
+            if (!items.length) {
+                container.innerHTML = '<p class="text-xs text-tp-muted italic text-center py-4">Nessuna ipotesi nel giorno.</p>';
+                return;
+            }
+
+            // Lookup nomi strategie
+            const stratIds = [...new Set(items.map(i => i.strategia_id).filter(Boolean))];
+            const stratMap = {};
+            if (stratIds.length) {
+                const { data: strats } = await db.from('strategie').select('id, nome').in('id', stratIds);
+                (strats || []).forEach(s => { stratMap[s.id] = s.nome; });
+            }
+
+            const statoBar = (s) => ({
+                ipotesi:'bg-tp-muted', ingresso:'bg-tp-accent', non_eseguito:'bg-tp-loss',
+                da_osservare:'bg-tp-warning', osservata:'bg-cyan-400'
+            })[s] || 'bg-tp-border';
+            const statoColor = (s) => ({
+                ipotesi:'text-tp-muted', ingresso:'text-tp-accent', non_eseguito:'text-tp-loss',
+                da_osservare:'text-tp-warning', osservata:'text-cyan-400'
+            })[s] || 'text-tp-muted';
+
+            container.innerHTML = items.map(ip => {
+                const ora = new Date(ip.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' });
+                const dir = (ip.direzione || '').toUpperCase();
+                const dirColor = dir === 'LONG' ? 'text-tp-accent' : dir === 'SHORT' ? 'text-tp-loss' : 'text-tp-muted';
+                const stratName = ip.strategia_id ? (stratMap[ip.strategia_id] || '?') : 'no strategia';
+                const stato = (ip.stato || 'ipotesi').replace('_', ' ');
+                const tradeBadge = ip.trade_id ? '<span class="text-[9px] font-bold uppercase text-tp-accent">trade</span>' : '';
+                return `<div class="bg-[#0a0c10] border border-tp-border hover:border-tp-accent/40 rounded-lg p-2.5 transition-all group relative overflow-hidden cursor-pointer" onclick="window.location.href='dettaglio_ipotesi.html?id=${ip.id}'">
+                    <div class="absolute inset-y-0 left-0 w-1 ${statoBar(ip.stato)}"></div>
+                    <div class="flex justify-between items-center pl-2 gap-2">
+                        <div class="flex flex-col flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-white text-xs truncate">${stratName}</span>
+                                ${dir ? `<span class="text-[10px] font-bold ${dirColor}">${dir}</span>` : ''}
+                                ${tradeBadge}
+                            </div>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="text-[10px] text-tp-muted font-bold">${ora}</span>
+                                ${ip.asset ? `<span class="text-[10px] text-tp-muted">${ip.asset}</span>` : ''}
+                                <span class="text-[10px] uppercase tracking-widest font-bold ${statoColor(ip.stato)}">${stato}</span>
+                            </div>
+                        </div>
+                        <i data-lucide="edit-3" class="w-3.5 h-3.5 text-tp-muted group-hover:text-tp-accent shrink-0"></i>
                     </div>
                 </div>`;
             }).join('');

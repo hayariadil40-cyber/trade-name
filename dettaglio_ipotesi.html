@@ -253,12 +253,8 @@
                                         </button>
                                     </div>
                                 </div>
-                                <!-- Trade collegato (pill compatto, accanto ai bottoni stato) -->
-                                <a id="trade-collegato-pill" href="#" class="hidden items-center gap-2 shrink-0 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border bg-[#0a0c10] transition-colors">
-                                    <i data-lucide="link" class="w-3.5 h-3.5"></i>
-                                    <span id="trade-pill-text">Trade</span>
-                                    <i data-lucide="external-link" class="w-3 h-3 opacity-60"></i>
-                                </a>
+                                <!-- Trade(s) collegati: pills dinamici (uno per trade) -->
+                                <div id="trade-pills-container" class="flex items-center gap-1.5 shrink-0 flex-wrap"></div>
                                 <!-- Bottoni transizione stato -->
                                 <div class="flex items-center gap-2 shrink-0" id="stato-actions"></div>
                             </div>
@@ -367,13 +363,16 @@
                                 </div>
                             </div>
 
-                            <!-- Da Osservare (snapshot domande con tag risposta) -->
+                            <!-- Da Osservare (tabs per trade collegato + risposte dedicate) -->
                             <div class="flex flex-col">
-                                <h3 class="text-sm font-bold text-tp-muted mb-4 flex items-center gap-2">
+                                <h3 class="text-sm font-bold text-tp-muted mb-3 flex items-center gap-2">
                                     <i data-lucide="eye" class="w-4 h-4 text-tp-warning"></i> Da Osservare
-                                    <span class="text-[9px] font-normal text-tp-muted/70 ml-1 normal-case tracking-normal">le risposte si compilano dopo</span>
+                                    <span class="text-[9px] font-normal text-tp-muted/70 ml-1 normal-case tracking-normal">una scheda per ogni trade collegato (incrementi / setup multipli)</span>
                                 </h3>
-                                <div class="bg-[#0a0c10] border border-tp-border/50 rounded-lg p-5 h-[480px] overflow-y-auto space-y-3" id="osservazioni-container">
+                                <!-- Tabs (una per trade, oppure "Template" se nessun trade) -->
+                                <div id="osservazioni-tabs" class="flex gap-1 mb-2 flex-wrap"></div>
+                                <!-- Container risposte (dipende dal tab attivo) -->
+                                <div class="bg-[#0a0c10] border border-tp-border/50 rounded-lg p-5 h-[440px] overflow-y-auto space-y-3" id="osservazioni-container">
                                     <!-- Domande caricate dinamicamente -->
                                 </div>
                             </div>
@@ -421,12 +420,26 @@
                             <p class="text-[11px] text-tp-muted/60 mt-2">Una volta confermata, vedrai qui sopra le voci da spuntare e le domande da osservare.</p>
                         </div>
 
+                        <!-- Elementi collegati: Reperti + Allert -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                            <div class="bg-[#0a0c10] border border-tp-border rounded-xl p-5">
+                                <h3 class="text-[10px] font-bold uppercase tracking-widest text-tp-warning mb-3 flex items-center gap-2"><i data-lucide="microscope" class="w-3.5 h-3.5"></i> Reperti Collegati</h3>
+                                <div id="linked-bias" class="space-y-2"><p class="text-xs text-tp-muted/50 italic">Nessuno</p></div>
+                            </div>
+                            <div class="bg-[#0a0c10] border border-tp-border rounded-xl p-5">
+                                <h3 class="text-[10px] font-bold uppercase tracking-widest text-tp-warning mb-3 flex items-center gap-2"><i data-lucide="bell" class="w-3.5 h-3.5"></i> Allert Collegati</h3>
+                                <div id="linked-allert" class="space-y-2"><p class="text-xs text-tp-muted/50 italic">Nessuno</p></div>
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
             </div>
         </div>
     </main>
+
+    <script src="app.js"></script>
 
     <!-- Modal Conferma -->
     <div id="modal-confirm" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto"><div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeConfirm()"></div><div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-sm mx-4 relative z-10 shadow-2xl overflow-hidden flex flex-col"><div class="px-6 py-4 border-b border-tp-border bg-tp-panel relative"><div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-loss"></div><h2 id="confirm-title" class="text-lg font-bold">Conferma</h2></div><div class="p-6"><p id="confirm-msg" class="text-sm text-tp-muted">Sei sicuro?</p></div><div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel"><button onclick="closeConfirm()" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white border border-tp-border rounded-lg">Annulla</button><button id="confirm-action" class="bg-tp-loss hover:bg-tp-loss/80 text-white px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors">Conferma</button></div></div></div>
@@ -444,6 +457,8 @@
         let strategieList = [];   // tutte le strategie disponibili (per il select)
         let fractalData = {};     // {15m,1h,4h,1d -> 'green'|'red'}
         let currentDir = '';      // 'LONG' | 'SHORT' | ''
+        let tradesCollegati = []; // [{id, asset, direzione, stato, esito, pnl, data, osservazioni}]
+        let activeOssTab = '__template__'; // tab attivo: '__template__' o trade.id
 
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', async () => {
@@ -514,8 +529,8 @@
                 renderDoveEntroFlag();
                 renderDoveEscoSLFlag();
                 renderDoveEscoTPFlag();
-                renderOsservazioni();
-                loadTradeCollegato();
+                loadTradesCollegati(); // carica trades + render pills + tabs + osservazioni attive
+                loadLinkedBiasAllert();
                 document.getElementById('ip-note').value = ipotesi.note || '';
                 document.querySelectorAll('.notion-textarea').forEach(ta => { ta.style.height = ''; ta.style.height = ta.scrollHeight + 'px'; });
                 fractalData = {
@@ -700,12 +715,16 @@
         // --- OSSERVAZIONI (snapshot domande con tag risposte) ---
         function renderOsservazioni() {
             const container = document.getElementById('osservazioni-container');
+            const oss = getActiveOsservazioni();
             container.innerHTML = '';
-            if (!osservazioni.length) {
-                container.innerHTML = '<p class="text-[11px] text-tp-muted/50 italic">Nessuna domanda da osservare (la strategia padre non ne ha al momento dello snapshot).</p>';
+            if (!oss.length) {
+                const placeholder = activeOssTab === '__template__'
+                    ? 'Nessuna domanda template (la strategia padre non ne ha al momento dello snapshot).'
+                    : 'Nessuna domanda per questo trade. Verra` popolata dal template quando ricolleghi il trade.';
+                container.innerHTML = `<p class="text-[11px] text-tp-muted/50 italic">${placeholder}</p>`;
                 return;
             }
-            osservazioni.forEach((o, i) => {
+            oss.forEach((o, i) => {
                 const tags = Array.isArray(o.tags) ? o.tags : [];
                 const tagsHtml = tags.map((t, j) =>
                     `<span class="inline-flex items-center gap-1 bg-tp-warning/10 border border-tp-warning/40 text-tp-warning text-[10px] font-bold rounded-full px-2 py-0.5">
@@ -731,20 +750,26 @@
             });
             lucide.createIcons();
         }
-        function addOsservazioneTag(i, inputEl) {
+        async function addOsservazioneTag(i, inputEl) {
             const v = (inputEl.value || '').trim();
             if (!v) return;
-            if (!osservazioni[i]) return;
-            if (!Array.isArray(osservazioni[i].tags)) osservazioni[i].tags = [];
-            if (!osservazioni[i].tags.includes(v)) osservazioni[i].tags.push(v);
+            const oss = getActiveOsservazioni();
+            if (!oss[i]) return;
+            if (!Array.isArray(oss[i].tags)) oss[i].tags = [];
+            if (!oss[i].tags.includes(v)) oss[i].tags.push(v);
             inputEl.value = '';
+            await persistActiveOsservazioni(oss);
             renderOsservazioni();
+            renderOsservazioniTabs();
             renderStatoActions();
         }
-        function removeOsservazioneTag(i, j) {
-            if (!osservazioni[i] || !Array.isArray(osservazioni[i].tags)) return;
-            osservazioni[i].tags.splice(j, 1);
+        async function removeOsservazioneTag(i, j) {
+            const oss = getActiveOsservazioni();
+            if (!oss[i] || !Array.isArray(oss[i].tags)) return;
+            oss[i].tags.splice(j, 1);
+            await persistActiveOsservazioni(oss);
             renderOsservazioni();
+            renderOsservazioniTabs();
             renderStatoActions();
         }
 
@@ -761,10 +786,29 @@
                 b.onclick = () => transizione('non_eseguito');
                 wrap.appendChild(b);
             }
-            // Marca Osservata (disponibile solo se 'da_osservare' E tutte le osservazioni compilate)
+            // Passa a Da Osservare (disponibile se 'ingresso', cioe trade collegato ma ancora aperto)
+            if (s === 'ingresso') {
+                const b = document.createElement('button');
+                b.className = 'flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-tp-warning/40 text-tp-warning hover:bg-tp-warning/10 transition-colors';
+                b.innerHTML = '<i data-lucide="eye" class="w-3.5 h-3.5"></i> Passa a Da Osservare';
+                b.onclick = () => transizione('da_osservare');
+                wrap.appendChild(b);
+            }
+            // Marca Osservata: disponibile solo se 'da_osservare' E tutti i trade collegati hanno tutte le osservazioni compilate
             if (s === 'da_osservare') {
-                const totale = osservazioni.length;
-                const compilate = osservazioni.filter(o => Array.isArray(o.tags) && o.tags.length > 0).length;
+                let totale = 0, compilate = 0;
+                if (tradesCollegati.length) {
+                    // Conteggio aggregato su tutti i trade collegati
+                    tradesCollegati.forEach(t => {
+                        const oss = Array.isArray(t.osservazioni) ? t.osservazioni : [];
+                        totale += oss.length;
+                        compilate += oss.filter(o => Array.isArray(o.tags) && o.tags.length > 0).length;
+                    });
+                } else {
+                    // Fallback al template ipotesi se nessun trade
+                    totale = osservazioni.length;
+                    compilate = osservazioni.filter(o => Array.isArray(o.tags) && o.tags.length > 0).length;
+                }
                 const tutteCompilate = totale > 0 && compilate === totale;
                 const b = document.createElement('button');
                 if (tutteCompilate) {
@@ -775,7 +819,8 @@
                     b.className = 'flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-tp-border text-tp-muted/60 cursor-not-allowed';
                     b.disabled = true;
                     const missing = totale === 0 ? 'nessuna domanda da osservare' : `${compilate}/${totale} compilate`;
-                    b.title = `Compila tutte le risposte di "Da Osservare" prima di marcare osservata (${missing})`;
+                    const ctx = tradesCollegati.length ? `su ${tradesCollegati.length} trade collegat${tradesCollegati.length === 1 ? 'o' : 'i'}` : 'nel template';
+                    b.title = `Compila tutte le risposte di "Da Osservare" ${ctx} prima di marcare osservata (${missing})`;
                     b.innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i> Marca Osservata · ${compilate}/${totale}`;
                 }
                 wrap.appendChild(b);
@@ -875,35 +920,135 @@
             }
         });
 
-        // --- TRADE COLLEGATO (pill compatto nel title row) ---
-        async function loadTradeCollegato() {
-            const pill = document.getElementById('trade-collegato-pill');
-            const text = document.getElementById('trade-pill-text');
-            if (!ipotesi.trade_id) {
-                pill.classList.add('hidden');
-                pill.classList.remove('inline-flex');
-                return;
+        // --- REPERTI / ALLERT COLLEGATI (in fondo) ---
+        async function loadLinkedBiasAllert() {
+            // Reperti (bias) che includono questa ipotesi nel categorizzatore
+            const { data: biasAll } = await db.from('bias').select('id, asset, direzione, data, commento, categorizzatori').order('data', { ascending: false });
+            const linkedBias = (biasAll || []).filter(b => b.categorizzatori && Array.isArray(b.categorizzatori.ipotesi) && b.categorizzatori.ipotesi.includes(ipotesiId));
+            const wrapBias = document.getElementById('linked-bias');
+            if (!linkedBias.length) {
+                wrapBias.innerHTML = '<p class="text-xs text-tp-muted/50 italic">Nessuno</p>';
+            } else {
+                wrapBias.innerHTML = linkedBias.map(b => {
+                    const dirColor = b.direzione === 'LONG' ? 'tp-accent' : b.direzione === 'SHORT' ? 'tp-loss' : 'tp-muted';
+                    return `<div onclick="window.location.href='dettaglio_bias.html?id=${b.id}'" class="bg-tp-panel border border-l-4 border-l-${dirColor} border-r-tp-border border-t-tp-border border-b-tp-border rounded-lg p-3 cursor-pointer hover:border-r-tp-warning/50 transition-all">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-white">${escHtml(b.asset || '--')} <span class="text-[10px] text-${dirColor}">${escHtml(b.direzione || '')}</span></span>
+                            <span class="text-[9px] text-tp-muted font-bold">${escHtml(b.data || '')}</span>
+                        </div>
+                    </div>`;
+                }).join('');
             }
-            const { data: t } = await db.from('trades').select('id, asset, direzione, stato, esito, pnl').eq('id', ipotesi.trade_id).single();
-            if (!t) {
-                pill.classList.add('hidden');
-                pill.classList.remove('inline-flex');
-                return;
+
+            // Allert prezzo che includono questa ipotesi
+            const { data: alertAll } = await db.from('allert_prezzo').select('id, coin, prezzo, categorizzatori').order('created_at', { ascending: false });
+            const linkedA = (alertAll || []).filter(a => a.categorizzatori && Array.isArray(a.categorizzatori.ipotesi) && a.categorizzatori.ipotesi.includes(ipotesiId));
+            const wrapA = document.getElementById('linked-allert');
+            if (!linkedA.length) {
+                wrapA.innerHTML = '<p class="text-xs text-tp-muted/50 italic">Nessuno</p>';
+            } else {
+                wrapA.innerHTML = linkedA.map(a => {
+                    return `<div class="bg-tp-panel border border-l-4 border-l-tp-warning border-r-tp-border border-t-tp-border border-b-tp-border rounded-lg p-3">
+                        <span class="text-xs font-bold text-white">${escHtml(a.coin || '')} ${a.prezzo || ''}</span>
+                    </div>`;
+                }).join('');
             }
-            const isWin = t.esito === 'win';
-            const isLoss = t.esito === 'loss';
-            const colorClass = isWin
-                ? 'border-tp-accent/50 text-tp-accent hover:bg-tp-accent/10'
-                : isLoss
-                    ? 'border-tp-loss/50 text-tp-loss hover:bg-tp-loss/10'
-                    : 'border-tp-border text-tp-muted hover:bg-tp-bg hover:text-white';
-            pill.className = `inline-flex items-center gap-2 shrink-0 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border bg-[#0a0c10] transition-colors ${colorClass}`;
-            pill.classList.remove('hidden');
-            pill.href = `dettaglio_trade.html?id=${t.id}`;
-            const pnlSign = (t.pnl || 0) >= 0 ? '+' : '';
-            const pnlStr = (t.pnl !== null && t.pnl !== undefined) ? ` · ${pnlSign}$${Math.abs(t.pnl || 0).toFixed(0)}` : '';
-            text.textContent = `${t.asset || '—'} ${t.direzione || ''}${pnlStr}`;
             lucide.createIcons();
+        }
+
+        // --- TRADES COLLEGATI (multi-pill nel title row + tabs osservazioni) ---
+        async function loadTradesCollegati() {
+            const { data: trades } = await db.from('trades')
+                .select('id, asset, direzione, stato, esito, pnl, data, osservazioni')
+                .eq('ipotesi_id', ipotesiId)
+                .order('data', { ascending: true });
+            tradesCollegati = trades || [];
+            renderTradePills();
+            // Default tab: primo trade collegato se esiste, altrimenti template
+            if (tradesCollegati.length && (activeOssTab === '__template__' || !tradesCollegati.find(t => t.id === activeOssTab))) {
+                activeOssTab = tradesCollegati[0].id;
+            } else if (!tradesCollegati.length) {
+                activeOssTab = '__template__';
+            }
+            renderOsservazioniTabs();
+            renderOsservazioni();
+            renderStatoActions();
+        }
+
+        function renderTradePills() {
+            const wrap = document.getElementById('trade-pills-container');
+            if (!tradesCollegati.length) { wrap.innerHTML = ''; return; }
+            wrap.innerHTML = tradesCollegati.map((t, idx) => {
+                const isWin = t.esito === 'win';
+                const isLoss = t.esito === 'loss';
+                const colorClass = isWin
+                    ? 'border-tp-accent/50 text-tp-accent hover:bg-tp-accent/10'
+                    : isLoss
+                        ? 'border-tp-loss/50 text-tp-loss hover:bg-tp-loss/10'
+                        : 'border-tp-border text-tp-muted hover:bg-tp-bg hover:text-white';
+                const pnlSign = (t.pnl || 0) >= 0 ? '+' : '';
+                const pnlStr = (t.pnl !== null && t.pnl !== undefined && t.pnl !== 0) ? ` · ${pnlSign}$${Math.abs(t.pnl || 0).toFixed(0)}` : '';
+                const label = `#${idx+1} ${t.asset || '—'} ${t.direzione || ''}${pnlStr}`;
+                return `<a href="dettaglio_trade.html?id=${t.id}" class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1.5 rounded-lg border bg-[#0a0c10] transition-colors ${colorClass}">
+                    <i data-lucide="link" class="w-3 h-3"></i>
+                    <span>${escHtml(label)}</span>
+                    <i data-lucide="external-link" class="w-3 h-3 opacity-60"></i>
+                </a>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function renderOsservazioniTabs() {
+            const wrap = document.getElementById('osservazioni-tabs');
+            if (!wrap) return;
+            const tabs = [];
+            if (tradesCollegati.length) {
+                tradesCollegati.forEach((t, idx) => {
+                    const oss = Array.isArray(t.osservazioni) ? t.osservazioni : [];
+                    const compilate = oss.filter(o => Array.isArray(o.tags) && o.tags.length > 0).length;
+                    const totale = oss.length;
+                    const counter = totale > 0 ? `${compilate}/${totale}` : '0';
+                    const isActive = activeOssTab === t.id;
+                    const baseColor = t.esito === 'win' ? 'tp-accent' : t.esito === 'loss' ? 'tp-loss' : 'tp-warning';
+                    const cls = isActive
+                        ? `bg-${baseColor}/10 border-${baseColor} text-${baseColor}`
+                        : 'bg-tp-bg border-tp-border text-tp-muted hover:text-white';
+                    tabs.push(`<button onclick="setOsservazioniTab('${t.id}')" class="${cls} text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border transition-colors flex items-center gap-1.5">
+                        <span>#${idx+1} ${escHtml(t.asset || '—')}</span>
+                        <span class="opacity-70">${counter}</span>
+                    </button>`);
+                });
+            } else {
+                // Solo template (nessun trade)
+                tabs.push(`<button onclick="setOsservazioniTab('__template__')" class="bg-tp-warning/10 border-tp-warning text-tp-warning text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border flex items-center gap-1.5">
+                    <i data-lucide="file-text" class="w-3 h-3"></i> Template
+                </button>`);
+            }
+            wrap.innerHTML = tabs.join('');
+            lucide.createIcons();
+        }
+
+        function setOsservazioniTab(tabId) {
+            activeOssTab = tabId;
+            renderOsservazioniTabs();
+            renderOsservazioni();
+        }
+
+        function getActiveOsservazioni() {
+            if (activeOssTab === '__template__') return osservazioni;
+            const t = tradesCollegati.find(x => x.id === activeOssTab);
+            return t && Array.isArray(t.osservazioni) ? t.osservazioni : [];
+        }
+
+        async function persistActiveOsservazioni(newOss) {
+            if (activeOssTab === '__template__') {
+                osservazioni = newOss;
+                await db.from('ipotesi_trading').update({ osservazioni: newOss, updated_at: new Date().toISOString() }).eq('id', ipotesiId);
+            } else {
+                const t = tradesCollegati.find(x => x.id === activeOssTab);
+                if (t) t.osservazioni = newOss;
+                await db.from('trades').update({ osservazioni: newOss }).eq('id', activeOssTab);
+            }
         }
 
         // --- SAVE ---
@@ -951,8 +1096,7 @@
             showConfirm('Eliminare questa ipotesi?', 'Questa azione non puo essere annullata.', async function() {
                 const { error } = await db.from('ipotesi_trading').delete().eq('id', ipotesiId);
                 if (error) { alert('Errore: ' + error.message); return; }
-                if (strategia) window.location.href = `dettaglio_strategia.html?id=${strategia.id}`;
-                else window.location.href = 'ipotesi.html';
+                window.location.href = 'ipotesi.html';
             });
         }
 

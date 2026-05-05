@@ -308,10 +308,11 @@
                             </label>
 
                             <!-- Tab -->
-                            <div class="flex gap-2 mb-4">
+                            <div class="flex gap-2 mb-4 flex-wrap">
                                 <button onclick="switchCatTab('cronache')" id="cat-tab-cronache" class="cat-tab active flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase transition-all">Cronache</button>
                                 <button onclick="switchCatTab('strategie')" id="cat-tab-strategie" class="cat-tab flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase transition-all">Strategia</button>
                                 <button onclick="switchCatTab('trades')" id="cat-tab-trades" class="cat-tab flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-blue-500 text-blue-400 bg-blue-500/10 uppercase transition-all">Trade</button>
+                                <button onclick="switchCatTab('ipotesi')" id="cat-tab-ipotesi" class="cat-tab flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-yellow-500 text-yellow-400 bg-yellow-500/10 uppercase transition-all">Ipotesi</button>
                             </div>
 
                             <!-- Selettori dinamici -->
@@ -329,6 +330,12 @@
                             </div>
                             <div id="cat-trades" class="cat-panel hidden">
                                 <select id="sel-trades" multiple class="w-full bg-[#0a0c10] border border-blue-500/30 rounded-lg px-3 py-2 text-xs text-blue-400 font-bold outline-none h-[100px]">
+                                    <!-- Caricato da Supabase -->
+                                </select>
+                                <p class="text-[10px] text-tp-muted mt-1">Ctrl+Click per selezione multipla</p>
+                            </div>
+                            <div id="cat-ipotesi" class="cat-panel hidden">
+                                <select id="sel-ipotesi" multiple class="w-full bg-[#0a0c10] border border-yellow-500/30 rounded-lg px-3 py-2 text-xs text-yellow-400 font-bold outline-none h-[100px]">
                                     <!-- Caricato da Supabase -->
                                 </select>
                                 <p class="text-[10px] text-tp-muted mt-1">Ctrl+Click per selezione multipla</p>
@@ -519,6 +526,7 @@
                     restoreSelections('sel-cronache', data.categorizzatori.cronache || []);
                     restoreSelections('sel-strategie', data.categorizzatori.strategie || []);
                     restoreSelections('sel-trades', data.categorizzatori.trades || []);
+                    restoreSelections('sel-ipotesi', data.categorizzatori.ipotesi || []);
                 }, 500);
             }
 
@@ -663,6 +671,21 @@
                 opt.textContent = `${t.asset} ${t.direzione} - ${d}`;
                 selTrades.appendChild(opt);
             });
+
+            // Ipotesi (con nome strategia per riconoscibilita)
+            const { data: ipotesi } = await db.from('ipotesi_trading').select('id, asset, sessione, stato, strategia_id, created_at').order('created_at', { ascending: false }).limit(50);
+            const stratNames = {};
+            (strategie || []).forEach(s => { stratNames[s.id] = s.nome; });
+            const selIpotesi = document.getElementById('sel-ipotesi');
+            (ipotesi || []).forEach(i => {
+                const opt = document.createElement('option');
+                opt.value = i.id;
+                const dt = new Date(i.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
+                const stratName = i.strategia_id ? (stratNames[i.strategia_id] || '?') : 'no strategia';
+                const stato = (i.stato || 'ipotesi').replace('_', ' ');
+                opt.textContent = `${dt} · ${stratName} · ${i.asset || '—'} · [${stato}]`;
+                selIpotesi.appendChild(opt);
+            });
         }
 
         function getSelectedValues(selectId) {
@@ -734,7 +757,8 @@
                 categorizzatori: {
                     cronache: getSelectedValues('sel-cronache'),
                     strategie: getSelectedValues('sel-strategie'),
-                    trades: getSelectedValues('sel-trades')
+                    trades: getSelectedValues('sel-trades'),
+                    ipotesi: getSelectedValues('sel-ipotesi')
                 }
             };
         }
