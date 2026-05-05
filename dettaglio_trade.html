@@ -463,13 +463,18 @@
         }
 
         async function loadLinked() {
-            const{data:biasAll}=await db.from('bias').select('id,asset,direzione,data,categorizzatori').order('data',{ascending:false});
-            const linked=(biasAll||[]).filter(b=>b.categorizzatori?.trades?.includes(tradeId));
-            if(linked.length) document.getElementById('linked-bias').innerHTML=linked.map(b=>`<div onclick="window.location.href='dettaglio_bias.html?id=${b.id}'" class="bg-[#0a0c10] border border-l-4 border-l-tp-warning border-r-tp-border border-t-tp-border border-b-tp-border rounded-lg p-3 cursor-pointer hover:border-r-tp-warning/50 transition-all"><div class="flex justify-between"><span class="text-xs font-bold text-white">${b.asset||'--'}</span><span class="text-[9px] text-tp-muted">${b.data||''}</span></div></div>`).join('');
+            // Server-side filter: categorizzatori @> {"trades":["<id>"]} via GIN
+            const{data:linked}=await db.from('bias')
+                .select('id,asset,direzione,data')
+                .contains('categorizzatori', { trades: [tradeId] })
+                .order('data',{ascending:false});
+            if(linked && linked.length) document.getElementById('linked-bias').innerHTML=linked.map(b=>`<div onclick="window.location.href='dettaglio_bias.html?id=${b.id}'" class="bg-[#0a0c10] border border-l-4 border-l-tp-warning border-r-tp-border border-t-tp-border border-b-tp-border rounded-lg p-3 cursor-pointer hover:border-r-tp-warning/50 transition-all"><div class="flex justify-between"><span class="text-xs font-bold text-white">${b.asset||'--'}</span><span class="text-[9px] text-tp-muted">${b.data||''}</span></div></div>`).join('');
 
-            const{data:alertAll}=await db.from('allert_prezzo').select('id,coin,prezzo,categorizzatori').order('created_at',{ascending:false});
-            const linkedA=(alertAll||[]).filter(a=>a.categorizzatori?.trades?.includes(tradeId));
-            if(linkedA.length) document.getElementById('linked-allert').innerHTML=linkedA.map(a=>`<div class="bg-[#0a0c10] border border-l-4 border-l-tp-warning border-r-tp-border border-t-tp-border border-b-tp-border rounded-lg p-3"><span class="text-xs font-bold text-white">${a.coin||''} ${a.prezzo||''}</span></div>`).join('');
+            const{data:linkedA}=await db.from('allert_prezzo')
+                .select('id,coin,prezzo')
+                .contains('categorizzatori', { trades: [tradeId] })
+                .order('created_at',{ascending:false});
+            if(linkedA && linkedA.length) document.getElementById('linked-allert').innerHTML=linkedA.map(a=>`<div class="bg-[#0a0c10] border border-l-4 border-l-tp-warning border-r-tp-border border-t-tp-border border-b-tp-border rounded-lg p-3"><span class="text-xs font-bold text-white">${a.coin||''} ${a.prezzo||''}</span></div>`).join('');
         }
 
         function getTradePayload() {

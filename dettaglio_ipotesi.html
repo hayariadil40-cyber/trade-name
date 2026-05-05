@@ -922,11 +922,13 @@
 
         // --- REPERTI / ALLERT COLLEGATI (in fondo) ---
         async function loadLinkedBiasAllert() {
-            // Reperti (bias) che includono questa ipotesi nel categorizzatore
-            const { data: biasAll } = await db.from('bias').select('id, asset, direzione, data, commento, categorizzatori').order('data', { ascending: false });
-            const linkedBias = (biasAll || []).filter(b => b.categorizzatori && Array.isArray(b.categorizzatori.ipotesi) && b.categorizzatori.ipotesi.includes(ipotesiId));
+            // Server-side filter: categorizzatori @> {"ipotesi":["<id>"]} via GIN
+            const { data: linkedBias } = await db.from('bias')
+                .select('id, asset, direzione, data')
+                .contains('categorizzatori', { ipotesi: [ipotesiId] })
+                .order('data', { ascending: false });
             const wrapBias = document.getElementById('linked-bias');
-            if (!linkedBias.length) {
+            if (!linkedBias || !linkedBias.length) {
                 wrapBias.innerHTML = '<p class="text-xs text-tp-muted/50 italic">Nessuno</p>';
             } else {
                 wrapBias.innerHTML = linkedBias.map(b => {
@@ -940,11 +942,13 @@
                 }).join('');
             }
 
-            // Allert prezzo che includono questa ipotesi
-            const { data: alertAll } = await db.from('allert_prezzo').select('id, coin, prezzo, categorizzatori').order('created_at', { ascending: false });
-            const linkedA = (alertAll || []).filter(a => a.categorizzatori && Array.isArray(a.categorizzatori.ipotesi) && a.categorizzatori.ipotesi.includes(ipotesiId));
+            // Allert prezzo che includono questa ipotesi (server-side filter)
+            const { data: linkedA } = await db.from('allert_prezzo')
+                .select('id, coin, prezzo')
+                .contains('categorizzatori', { ipotesi: [ipotesiId] })
+                .order('created_at', { ascending: false });
             const wrapA = document.getElementById('linked-allert');
-            if (!linkedA.length) {
+            if (!linkedA || !linkedA.length) {
                 wrapA.innerHTML = '<p class="text-xs text-tp-muted/50 italic">Nessuno</p>';
             } else {
                 wrapA.innerHTML = linkedA.map(a => {

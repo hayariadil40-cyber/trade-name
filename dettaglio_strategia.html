@@ -1143,13 +1143,14 @@
             if (topRR) topRR.textContent = rrText;
         }
 
-        // --- LOAD BIAS ---
+        // --- LOAD BIAS (server-side filter via GIN) ---
         async function loadBias() {
             if (!strategyId) return;
 
-            const { data: biasEntries, error } = await db
+            const { data: linked, error } = await db
                 .from('bias')
-                .select('*')
+                .select('id, asset, direzione, data, commento')
+                .contains('categorizzatori', { strategie: [strategyId] })
                 .order('data', { ascending: false });
 
             if (error) { console.error(error); return; }
@@ -1157,12 +1158,7 @@
             const container = document.getElementById('bias-container');
             const noMsg = document.getElementById('no-bias-msg');
 
-            // Filtra bias che hanno questa strategia nel categorizzatore
-            const linked = (biasEntries || []).filter(function(b) {
-                return b.categorizzatori && b.categorizzatori.strategie && b.categorizzatori.strategie.includes(strategyId);
-            });
-
-            if (linked.length === 0) {
+            if (!linked || linked.length === 0) {
                 noMsg.style.display = '';
                 return;
             }

@@ -513,7 +513,12 @@
                                 <h3 class="text-xs font-bold uppercase tracking-widest text-[#eab308] drop-shadow-sm">
                                     Allert EA</h3>
                             </div>
-                            <span id="allert-count-badge" class="text-tp-muted text-[10px] font-bold px-2 py-1 bg-tp-border/30 rounded border border-tp-border/50">0</span>
+                            <div class="flex items-center gap-2">
+                                <button onclick="ignoraTuttiAllertEA()" id="ignora-tutti-btn" class="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border border-tp-loss/30 text-tp-loss hover:bg-tp-loss/10 transition-colors flex items-center gap-1" title="Ignora tutti gli allert EA visualizzati">
+                                    <i data-lucide="x-square" class="w-3 h-3"></i> Ignora tutti
+                                </button>
+                                <span id="allert-count-badge" class="text-tp-muted text-[10px] font-bold px-2 py-1 bg-tp-border/30 rounded border border-tp-border/50">0</span>
+                            </div>
                         </div>
 
                         <div id="allert-list" class="space-y-3 relative z-10 max-h-[450px] overflow-y-auto custom-scroll">
@@ -540,6 +545,24 @@
         </div>
 
     </main>
+
+    <!-- Modal Conferma generico -->
+    <div id="modal-confirm" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeConfirm()"></div>
+        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-md mx-4 relative z-10 shadow-2xl overflow-hidden flex flex-col">
+            <div class="px-6 py-4 border-b border-tp-border bg-tp-panel relative">
+                <div id="confirm-bar" class="absolute top-0 bottom-0 left-0 w-1 bg-tp-loss"></div>
+                <h2 id="confirm-title" class="text-lg font-bold">Conferma</h2>
+            </div>
+            <div class="p-6">
+                <p id="confirm-msg" class="text-sm text-tp-muted">Sei sicuro?</p>
+            </div>
+            <div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel">
+                <button onclick="closeConfirm()" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white border border-tp-border rounded-lg">Annulla</button>
+                <button id="confirm-action" class="bg-tp-loss hover:bg-tp-loss/80 text-white px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors">Conferma</button>
+            </div>
+        </div>
+    </div>
 
     <script src="app.js"></script>
     <script>
@@ -780,9 +803,21 @@
             var bgColor = isPos ? 'bg-tp-accent/5' : isNeg ? 'bg-tp-loss/5' : 'bg-transparent';
             var arrow = isPos ? '▲' : isNeg ? '▼' : '';
             var pctDisplay = (isPos ? '+' : '') + pctNum.toFixed(2) + '%';
+
+            // Posizione vs range Asia
+            var posBadge = '';
+            if (w.posizione === 'sopra') {
+                posBadge = '<span class="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-tp-accent/15 text-tp-accent border border-tp-accent/40" title="Asian H ' + (w.asian_high || '?') + ' / L ' + (w.asian_low || '?') + '">↑ sopra</span>';
+            } else if (w.posizione === 'sotto') {
+                posBadge = '<span class="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-tp-loss/15 text-tp-loss border border-tp-loss/40" title="Asian H ' + (w.asian_high || '?') + ' / L ' + (w.asian_low || '?') + '">↓ sotto</span>';
+            } else if (w.posizione === 'dentro') {
+                posBadge = '<span class="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-tp-muted/15 text-tp-muted border border-tp-muted/40" title="Asian H ' + (w.asian_high || '?') + ' / L ' + (w.asian_low || '?') + '">= dentro</span>';
+            }
+
             return '<div class="flex items-center justify-between px-3 py-2.5 rounded-lg ' + bgColor + ' hover:bg-tp-panelHover transition-colors">' +
-                '<div class="flex items-center gap-3">' +
+                '<div class="flex items-center gap-2 min-w-0">' +
                 '<span class="text-sm font-bold text-white">' + (w.simbolo || '') + '</span>' +
+                posBadge +
                 '</div>' +
                 '<div class="flex items-center gap-3">' +
                 '<span class="text-sm font-bold text-tp-text tabular-nums">' + (w.prezzo || '--') + '</span>' +
@@ -972,6 +1007,45 @@
         }
     }
     window.ignoreAllertCard = ignoreAllertCard;
+
+    // Modal di conferma in stile sito (sostituisce confirm() nativo)
+    function showConfirm(title, msg, onConfirm) {
+        document.getElementById('confirm-title').textContent = title;
+        document.getElementById('confirm-msg').textContent = msg;
+        const action = document.getElementById('confirm-action');
+        action.onclick = function() { closeConfirm(); onConfirm(); };
+        document.getElementById('modal-confirm').classList.add('open');
+    }
+    function closeConfirm() {
+        document.getElementById('modal-confirm').classList.remove('open');
+    }
+    window.showConfirm = showConfirm;
+    window.closeConfirm = closeConfirm;
+
+    // Ignora in batch tutti gli allert EA attualmente visibili nella card
+    function ignoraTuttiAllertEA() {
+        const cards = document.querySelectorAll('#allert-list [data-allert-id]');
+        if (!cards.length) return;
+        const ids = Array.from(cards).map(c => c.dataset.allertId);
+        showConfirm(
+            `Ignorare ${ids.length} allert EA?`,
+            `Tutti gli allert EA attualmente visibili saranno marcati come "ignorato" e rimossi dalla lista.`,
+            async () => {
+                try {
+                    const { error } = await db.from('allert_prezzo').update({ stato: 'ignorato' }).in('id', ids);
+                    if (error) throw error;
+                    const container = document.getElementById('allert-list');
+                    container.innerHTML = '<div class="flex flex-col items-center justify-center h-20 text-tp-muted text-sm"><i data-lucide="bot" class="w-6 h-6 mb-2"></i>Nessun allert EA oggi</div>';
+                    const countBadge = document.getElementById('allert-count-badge');
+                    if (countBadge) countBadge.textContent = '0';
+                    lucide.createIcons({ root: container });
+                } catch (err) {
+                    console.error('Errore ignora tutti:', err);
+                }
+            }
+        );
+    }
+    window.ignoraTuttiAllertEA = ignoraTuttiAllertEA;
 
     // --- SUPABASE: Calendario Notizie ---
     let calTimeFilter = 'oggi';
@@ -1220,12 +1294,25 @@
         loadWatchlist();
         loadOdgHero();
         loadCoranoWidget('corano-widget');
-        // Refresh watchlist ogni 5 minuti
+        // Refresh watchlist ogni 5 minuti (fallback se Realtime down)
         setInterval(loadWatchlist, 5 * 60 * 1000);
         // Refresh processi ogni 60s: cosi le notizie compaiono automaticamente quando scatta l'orario
         setInterval(loadProcessiAttivi, 60 * 1000);
-        // Refresh Allert EA ogni 60s: l'EA inserisce nuovi allert in continuazione
-        setInterval(loadAllertEA, 60 * 1000);
+
+        // Realtime: aggiorna sezioni quando il DB cambia (pushed via WebSocket)
+        if (db && typeof db.channel === 'function') {
+            db.channel('dashboard-stream')
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'trades' },
+                  () => loadProcessiAttivi())
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'allert_prezzo' },
+                  () => loadAllertEA())
+              .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'watchlist' },
+                  () => loadWatchlist())
+              .subscribe();
+        } else {
+            // Fallback polling se Realtime non disponibile
+            setInterval(loadAllertEA, 60 * 1000);
+        }
     });
 
     // --- SUPABASE: Ordine del Giorno (HERO) ---
