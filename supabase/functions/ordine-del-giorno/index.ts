@@ -1,11 +1,12 @@
 // Ordine del giorno — Edge Function
-// Schedule: pg_cron 0 6 * * * UTC = 07:00 Casablanca (UTC+1, no DST)
+// Schedule: pg_cron 30 6 * * 1-5 UTC = 07:30 Casablanca (UTC+1, no DST, lun-ven)
 // Blocchi:
 // 1) Macro eventi oggi (allert)
-// 2) Ultimi 5 trade
+// 2) Sessione asiatica: range + prezzo corrente + posizione (sopra/dentro/sotto) da watchlist
 // 3) Forza USD intraday (apertura giornata Casablanca → ora)
 // 4) Letture del giorno (commento Claude/Rodrigo se gia disponibili)
 // 5) Allert prezzo dall'apertura giornata Casablanca (commento Claude/Rodrigo)
+// 6) Promemoria operativi statici
 // Output: UPSERT su giornate.ordine_del_giorno + Telegram
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
@@ -138,56 +139,42 @@ serve(async (req) => {
       .order("ora_evento", { ascending: true });
     const macro = macroRaw || [];
 
-    // ===== 2. Ultimi 5 trade =====
-    const { data: tradesRaw } = await supabase
-      .from("trades")
-      .select("asset, direzione, data, pnl, esito, rr_reale")
-      .order("data", { ascending: false })
-      .limit(5);
-    const trades = tradesRaw || [];
+    // ===== 2. Sessione asiatica + posizione attuale (watchlist EA) =====
+    const { data: watchlistRaw } = await supabase
+      .from("watchlist")
+      .select("simbolo, asian_high, asian_low, asian_data, prezzo, posizione, pct_change, updated_at")
+      .eq("active", true)
+      .eq("asian_data", today)
+      .order("simbolo", { ascending: true });
+    const watchlist = watchlistRaw || [];
 
-    // ===== 2b. Sessione asiatica di oggi (range MT4) =====
-    const { data: asiaTodayRaw } = await supabase
-      .from("sessioni")
-      .select("nome, data, mood, coin_data, auto_data")
-      .eq("data", today)
-      .ilike("nome", "asia%");
-    const asiaToday = asiaTodayRaw || [];
-
-    // Estrai range high/low/pips per coin (auto_data prevale su coin_data)
-    function extractRanges(
-      session: { coin_data?: Record<string, unknown>; auto_data?: Record<string, unknown> },
-    ): Record<string, { high: number; low: number; range: number }> {
-      const result: Record<string, { high: number; low: number; range: number }> = {};
-      const sources = [session.auto_data, session.coin_data].filter((s): s is Record<string, unknown> => !!s && typeof s === "object" && Object.keys(s).length > 0);
-      for (const src of sources) {
-        for (const [coin, raw] of Object.entries(src)) {
-          if (result[coin]) continue;
-          const d = raw as { high?: string | number; low?: string | number } | null;
-          if (d && d.high != null && d.low != null) {
-            const high = Number(d.high);
-            const low = Number(d.low);
-            if (!isNaN(high) && !isNaN(low) && high > low) {
-              result[coin] = { high, low, range: high - low };
-            }
-          }
-        }
-      }
-      return result;
+    type AsiaCoin = {
+      simbolo: string;
+      high: number;
+      low: number;
+      range: number;
+      prezzo: number | null;
+      posizione: string | null;
+      pct_change: string | null;
+    };
+    const asiaCoins: AsiaCoin[] = [];
+    for (const w of watchlist) {
+      const high = Number(w.asian_high);
+      const low = Number(w.asian_low);
+      const prezzo = w.prezzo != null ? Number(w.prezzo) : null;
+      if (isNaN(high) || isNaN(low) || high <= low) continue;
+      asiaCoins.push({
+        simbolo: w.simbolo,
+        high, low, range: high - low,
+        prezzo: prezzo != null && !isNaN(prezzo) ? prezzo : null,
+        posizione: w.posizione || null,
+        pct_change: w.pct_change || null,
+      });
     }
 
-    // Aggrega range di tutte le righe asia di oggi
-    const todayRanges: Record<string, { high: number; low: number; range: number }> = {};
-    for (const sess of asiaToday) {
-      const r = extractRanges(sess);
-      for (const [coin, v] of Object.entries(r)) {
-        if (!todayRanges[coin]) todayRanges[coin] = v;
-      }
-    }
-
-    const asiaBlock: { count_today: number; ranges_today: Record<string, { high: number; low: number; range: number }> } = {
-      count_today: asiaToday.length,
-      ranges_today: todayRanges,
+    const asiaBlock = {
+      count_today: asiaCoins.length,
+      coins: asiaCoins,
     };
 
     // ===== Checklist Reminder Rodrigo (statica) =====
@@ -197,6 +184,10 @@ serve(async (req) => {
       "Sistema i monitor in modalita analisi: Telegram + Claude Desktop / TradingView + Bull Clock / MT4 panoramica mercato",
       "Apri nuova giornata dalla dashboard",
       "Compila le cronache di ieri",
+      "Crea i reperti bias",
+      "Metti gli screen e ricontrolla Asia",
+      "Crea le tue ipotesi su AsiaSweep",
+      "Non tradare, segui il sistema",
     ];
 
     // ===== 3. Forza USD intraday (dall'apertura giornata Casablanca a ora) =====
@@ -332,23 +323,6 @@ Genera un commento generale (2-3 righe, italiano, asciutto, niente parolacce) su
     if (usdBlock.trend_intraday !== "n/d") {
       narrativaParts.push(`Dollaro ${usdBlock.trend_intraday} dall'apertura.`);
     }
-
-    // Streak ultimi trade
-    let streakWin = 0, streakLoss = 0;
-    for (const t of trades) {
-      if (t.esito === "win") {
-        if (streakLoss > 0) break;
-        streakWin++;
-      } else if (t.esito === "loss") {
-        if (streakWin > 0) break;
-        streakLoss++;
-      } else break;
-    }
-    if (streakLoss >= 3) {
-      narrativaParts.push(`ATTENZIONE: ${streakLoss} loss consecutivi negli ultimi trade - valuta riduzione size e pausa.`);
-    } else if (streakWin >= 3) {
-      narrativaParts.push(`Momentum positivo (${streakWin} win consecutivi). Attenzione all'overconfidence.`);
-    }
     const narrativaText = narrativaParts.join(" ");
 
     // ===== Costruisci JSON ordine_del_giorno =====
@@ -361,12 +335,6 @@ Genera un commento generale (2-3 righe, italiano, asciutto, niente parolacce) su
         impatto: m.impatto,
         valuta: m.valuta,
         note: m.note,
-      })),
-      ultimi_trade: trades.map((t) => ({
-        asset: t.asset,
-        direzione: t.direzione,
-        pnl: t.pnl,
-        esito: t.esito,
       })),
       sessione_asia: asiaBlock,
       usd_strength: usdBlock,
@@ -402,20 +370,27 @@ Genera un commento generale (2-3 righe, italiano, asciutto, niente parolacce) su
         }).join("\n")
       : "<i>nessun evento</i>";
 
-    const tradeNetPnl = trades.length > 0
-      ? trades.reduce((sum, t) => sum + (Number(t.pnl) || 0), 0).toFixed(2)
-      : "0.00";
-    const tradeLines = trades.length > 0
-      ? trades.map((t) => {
-          const p = Number(t.pnl) >= 0 ? `+${t.pnl}` : `${t.pnl}`;
-          return `- ${t.asset} ${t.direzione} <b>${p}</b> (${t.esito})`;
-        }).join("\n")
-      : "<i>nessun trade</i>";
+    function posEmoji(p: string | null): string {
+      if (p === "sopra") return "⬆️";
+      if (p === "sotto") return "⬇️";
+      if (p === "dentro") return "↔️";
+      return "·";
+    }
+    function posLabel(p: string | null): string {
+      return p ? p.toUpperCase() : "n/d";
+    }
+    function fmtNum(n: number): string {
+      if (n >= 1000) return n.toFixed(2);
+      if (n >= 10) return n.toFixed(2);
+      return n.toFixed(5);
+    }
 
-    const asiaRangeLines = Object.keys(asiaBlock.ranges_today).length > 0
-      ? Object.entries(asiaBlock.ranges_today).map(([coin, v]) =>
-          `- <b>${coin}</b>: ${v.range.toFixed(2)} pts | L ${v.low.toFixed(2)} / H ${v.high.toFixed(2)}`
-        ).join("\n")
+    const asiaRangeLines = asiaCoins.length > 0
+      ? asiaCoins.map((c) => {
+          const prezzoStr = c.prezzo != null ? fmtNum(c.prezzo) : "n/d";
+          const pct = c.pct_change ? ` (${c.pct_change}%)` : "";
+          return `- <b>${c.simbolo}</b> ${posEmoji(c.posizione)} <b>${posLabel(c.posizione)}</b> | now ${prezzoStr}${pct} | L ${fmtNum(c.low)} / H ${fmtNum(c.high)} (${fmtNum(c.range)} pts)`;
+        }).join("\n")
       : "<i>nessun dato MT4</i>";
 
     const reminderLines = reminderRodrigo.map((r) => `▢ ${r}`).join("\n");
@@ -429,8 +404,6 @@ Genera un commento generale (2-3 righe, italiano, asciutto, niente parolacce) su
       `${asiaRangeLines}\n\n` +
       `💵 <b>Forza USD</b> (intraday)\n` +
       `${usdBlock.descrizione}\n\n` +
-      `📈 <b>Ultimi 5 trade</b>: net PnL <b>${tradeNetPnl}</b>\n` +
-      `${tradeLines}\n\n` +
       `📰 <b>Letture del Giorno</b> (${lettureBlock.count})\n` +
       `${lettureBlock.commento}\n\n` +
       `🚨 <b>Allert Prezzo</b> (${allertPrezzoBlock.count} dall'apertura giornata)\n` +
@@ -446,12 +419,10 @@ Genera un commento generale (2-3 righe, italiano, asciutto, niente parolacce) su
       record_id: recordId,
       counts: {
         macro: macro.length,
-        ultimi_trade: trades.length,
         usd_punti: usdSeries.length,
         letture: articoli.length,
         allert_prezzo: allertPrezzo.length,
-        asia_today_rows: asiaToday.length,
-        asia_coins: Object.keys(todayRanges).length,
+        asia_coins: asiaCoins.length,
       },
       telegram: tg,
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });

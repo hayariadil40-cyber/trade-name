@@ -444,7 +444,7 @@
                                 <!-- Screenshots caricati dinamicamente -->
 
                                 <!-- Dropzone -->
-                                <label class="border-2 border-dashed border-tp-border rounded-xl flex flex-col items-center justify-center text-tp-muted cursor-pointer hover:border-tp-accent/50 hover:text-tp-accent hover:bg-tp-accent/5 transition-all min-h-[140px]">
+                                <label class="border-2 border-dashed border-tp-border rounded-xl flex flex-col items-center justify-center text-tp-muted cursor-pointer hover:border-tp-accent/50 hover:text-tp-accent hover:bg-tp-accent/5 transition-all aspect-video">
                                     <i data-lucide="plus" class="w-8 h-8 mb-2"></i>
                                     <span class="text-[10px] font-bold uppercase tracking-widest">Aggiungi</span>
                                     <input type="file" accept="image/*" multiple class="hidden" onchange="handleScreenshots(this.files)">
@@ -939,7 +939,7 @@
                 const div = document.createElement('div');
                 div.className = 'screenshot-item relative group rounded-xl overflow-hidden border border-tp-border';
                 div.innerHTML = `
-                    <img src="${src}" class="w-full h-[140px] object-cover" alt="Screenshot">
+                    <img src="${src}" class="w-full aspect-video object-cover bg-tp-bg cursor-zoom-in" onclick="window.open(this.src,'_blank')" alt="Screenshot">
                     <button onclick="removeScreenshot(${i})" class="absolute top-2 right-2 bg-black/70 text-tp-loss p-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
                         <i data-lucide="x" class="w-4 h-4"></i>
                     </button>

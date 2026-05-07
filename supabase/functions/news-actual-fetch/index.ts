@@ -51,6 +51,53 @@ Italiano. Diretto. Zero motivazione vuota. Zero parolacce.`;
   return data.content?.[0]?.text || "";
 }
 
+function escapeHtml(s: string | null | undefined): string {
+  if (!s) return "";
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+async function sendTelegram(text: string, botToken: string, chatId: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        parse_mode: "HTML",
+        text,
+        disable_web_page_preview: true,
+      }),
+    });
+    const data = await res.json();
+    if (!data.ok) return { ok: false, error: data.description || "telegram error" };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
+
+function impactEmoji(imp: string | null | undefined): string {
+  if (imp === "alto") return "🔴";
+  if (imp === "medio") return "🟠";
+  if (imp === "basso") return "🟡";
+  return "📊";
+}
+
+function buildTelegramText(row: {
+  titolo: string; valuta: string; impatto?: string | null;
+  valore_atteso: string | null; valore_precedente: string | null; valore_effettivo: string;
+  commento_rodrigo: string;
+}): string {
+  const emoji = impactEmoji(row.impatto);
+  return `${emoji} <b>${escapeHtml(row.titolo)}</b> (${escapeHtml(row.valuta)})
+Effettivo: <b>${escapeHtml(row.valore_effettivo)}</b>
+Atteso: ${escapeHtml(row.valore_atteso) || "n.d."}  ·  Precedente: ${escapeHtml(row.valore_precedente) || "n.d."}
+
+${escapeHtml(row.commento_rodrigo)}
+
+— Rodrigo`;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -71,6 +118,9 @@ serve(async (req) => {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN");
+    const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID");
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -103,7 +153,20 @@ serve(async (req) => {
       const { error } = await supabase.from("allert")
         .update({ commento_rodrigo: commento || null }).eq("id", body.id);
       if (error) throw error;
-      return new Response(JSON.stringify({ ok: true, id: body.id, commented: 1 }), {
+
+      let telegram_sent = false;
+      let telegram_error: string | undefined;
+      if (commento && TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
+        const tg = await sendTelegram(buildTelegramText({
+          titolo: row.titolo, valuta: row.valuta, impatto: row.impatto,
+          valore_atteso: row.valore_atteso, valore_precedente: row.valore_precedente,
+          valore_effettivo: row.valore_effettivo, commento_rodrigo: commento,
+        }), TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID);
+        telegram_sent = tg.ok;
+        if (!tg.ok) telegram_error = tg.error;
+      }
+
+      return new Response(JSON.stringify({ ok: true, id: body.id, commented: 1, telegram_sent, telegram_error }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -137,7 +200,7 @@ serve(async (req) => {
     const byFFId = new Map<string, typeof events[number]>();
     for (const e of events) byFFId.set(makeFFId(e), e);
 
-    let updated = 0, commented = 0, no_actual_yet = 0, errors = 0;
+    let updated = 0, commented = 0, no_actual_yet = 0, errors = 0, telegram_sent = 0;
 
     for (const a of pending) {
       const ff = byFFId.get(a.ff_id);
@@ -159,12 +222,21 @@ serve(async (req) => {
         valore_effettivo: ff.actual,
         commento_rodrigo: commento_rodrigo || null,
       }).eq("id", a.id);
-      if (error) errors++;
-      else updated++;
+      if (error) { errors++; continue; }
+      updated++;
+
+      if (commento_rodrigo && TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
+        const tg = await sendTelegram(buildTelegramText({
+          titolo: a.titolo, valuta: a.valuta, impatto: a.impatto,
+          valore_atteso: a.valore_atteso, valore_precedente: a.valore_precedente,
+          valore_effettivo: ff.actual, commento_rodrigo,
+        }), TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID);
+        if (tg.ok) telegram_sent++;
+      }
     }
 
     return new Response(JSON.stringify({
-      ok: true, pending: pending.length, updated, commented, no_actual_yet, errors,
+      ok: true, pending: pending.length, updated, commented, no_actual_yet, errors, telegram_sent,
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (err) {
     return new Response(JSON.stringify({ error: (err as Error).message }), {

@@ -237,7 +237,7 @@ ${eaLines}`;
     const reminderRodrigo = [
       "Sii paziente, ricordati del winrate",
       "Inverti gli schermi: TradingView al centro, MT4 sui laterali",
-      "Cerca conferme per validare la strategia",
+      "Crea ipotesi per attuare la strategia",
     ];
 
     // ===== Costruisci JSON apertura_brief =====
@@ -290,12 +290,13 @@ ${eaLines}`;
       let allertLines = "<i>nessun allert non lavorato</i>";
       if (allertNuovi.length > 0) {
         allertLines = Object.entries(byCoin).map(([coin, entries]) => {
-          const list = entries.slice(0, 3).map((e) => `${e.ora} a <b>${e.prezzo}</b>${e.descrizione ? " (" + e.descrizione + ")" : ""}`).join(", ");
-          const extra = entries.length > 3 ? ` (+${entries.length - 3} altri)` : "";
-          return `- <b>${coin}</b>: ${list}${extra}`;
-        }).join("\n");
+          const top3 = entries.slice(0, 3);
+          const lines = top3.map((e, i) => `${i + 1}. <b>${e.ora}</b>: ${e.prezzo}`).join("\n");
+          const extra = entries.length > 3 ? `\n   <i>(+${entries.length - 3} piu vecchi)</i>` : "";
+          return `<b>${coin}</b>\n${lines}${extra}`;
+        }).join("\n\n");
       }
-      allertSezione = `🚨 <b>Allert Prezzo non lavorati</b> (${allertBlock.count})\n${allertLines}`;
+      allertSezione = `🚨 <b>Allert Prezzo non lavorati</b> (${allertBlock.count})\n\n${allertLines}`;
     }
 
     const reminderLines = reminderRodrigo.map((r) => `▢ ${r}`).join("\n");
