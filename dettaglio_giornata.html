@@ -71,6 +71,13 @@
         .stato-badge-aperto { background: rgba(32,201,151,0.1); border: 1px solid rgba(32,201,151,0.4); color: #20c997; }
         .stato-badge-chiuso { background: rgba(132,141,151,0.15); border: 1px solid rgba(132,141,151,0.4); color: #848d97; }
         .card-chiuso { opacity: 0.7; }
+
+        /* Hub tabs (Corano / ODG / Dati Giornata) */
+        .dash-tab.active { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
+        .dash-tab:not(.active) { background: transparent; border-color: #252932; color: #848d97; }
+        .dash-tab:not(.active):hover { color: #ffffff; border-color: #3b4252; }
+        .dash-pane { display: none; }
+        .dash-pane.active { display: block; }
     </style>
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -308,19 +315,40 @@
                         </ul>
                     </div>
 
-                    <!-- 2. Ordine del Giorno (popolato dalla routine cloud alle 07:00 Casablanca) -->
-                    <div class="bg-gradient-to-br from-[#0e1a18] via-tp-panel to-[#0a0c10] rounded-xl border border-tp-accent/30 p-5 flex flex-col shadow-[0_0_20px_rgba(32,201,151,0.06)]">
-                        <div class="flex items-center justify-between mb-3 border-b border-tp-border/50 pb-2">
-                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-accent flex items-center gap-2">
-                                <i data-lucide="sunrise" class="w-4 h-4"></i> Ordine del Giorno
+                    <!-- 2. Reperti Giornalieri -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col shadow-lg">
+                        <div class="flex items-center justify-between border-b border-tp-border pb-2 mb-4">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2">
+                                <i data-lucide="compass" class="w-4 h-4"></i> Reperti Giornalieri
                             </h3>
-                            <span id="odg-time" class="text-[9px] text-tp-muted"></span>
+                            <a id="btn-nuovo-bias" href="#" class="bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] px-2 py-1 text-[10px] font-bold uppercase rounded flex items-center gap-1.5 transition-colors shadow-sm">
+                                <i data-lucide="plus" class="w-3 h-3"></i> Nuovo
+                            </a>
                         </div>
-                        <div id="odg-content" class="text-xs text-tp-text/85 leading-relaxed">
-                            <p class="text-tp-muted/50 italic">Nessun ordine del giorno salvato per questa giornata.</p>
+                        <div id="bias-list" class="space-y-3">
+                            <p class="text-xs text-tp-muted italic text-center py-4">Caricamento reperti...</p>
                         </div>
                     </div>
 
+                    <!-- 3. Ipotesi del Giorno -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
+                        <div class="flex items-center justify-between border-b border-tp-border pb-2 mb-3">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-accent flex items-center gap-2">
+                                <i data-lucide="zap" class="w-4 h-4"></i> Ipotesi del Giorno
+                            </h3>
+                            <div class="flex items-center gap-2">
+                                <span id="ipotesi-giorno-count" class="text-[10px] text-tp-muted font-bold px-2 py-0.5 bg-tp-border/30 rounded border border-tp-border/50">0</span>
+                                <button onclick="creaNuovaIpotesi()" class="bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] px-2 py-1 text-[10px] font-bold uppercase rounded flex items-center gap-1.5 transition-colors shadow-sm">
+                                    <i data-lucide="plus" class="w-3 h-3"></i> Nuovo
+                                </button>
+                            </div>
+                        </div>
+                        <div id="ipotesi-giorno-list" class="space-y-2 max-h-[260px] overflow-y-auto">
+                            <p class="text-xs text-tp-muted italic text-center py-2">Caricamento...</p>
+                        </div>
+                    </div>
+
+                    <!-- (Ordine del Giorno spostato nella sezione hub a tab in center column) -->
                     <!-- (Allert spostati a destra) -->
                 </div>
 
@@ -337,14 +365,28 @@
                         <p id="frase-disciplina" class="text-sm text-tp-text/90 italic leading-relaxed flex-1">--</p>
                     </div>
 
-                    <!-- CORANO: versetti configurabili (edit in impostazioni) -->
-                    <div id="corano-widget" class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
-                        <div class="text-xs text-tp-muted italic text-center py-4">Caricamento Corano...</div>
-                    </div>
+                    <!-- HUB a tab: Corano / Ordine del Giorno / Dati Giornata -->
+                    <div class="flex flex-col">
+                        <div class="flex gap-2 flex-wrap" id="dash-tabs">
+                            <button onclick="switchDashTab('corano')" id="dash-tab-corano" class="dash-tab active px-4 py-2 rounded-t-lg text-xs font-bold border border-b-0 uppercase transition-all flex items-center gap-2">
+                                <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Corano
+                            </button>
+                            <button onclick="switchDashTab('dati')" id="dash-tab-dati" class="dash-tab px-4 py-2 rounded-t-lg text-xs font-bold border border-b-0 uppercase transition-all flex items-center gap-2">
+                                <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Dati Giornata
+                            </button>
+                        </div>
 
-                    <!-- 0. Dati Giornata -->
-                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-4 border-b border-tp-border pb-2 flex items-center gap-2"><i data-lucide="sliders" class="w-4 h-4"></i> Dati Giornata</h3>
+                        <div class="bg-tp-panel border border-tp-border rounded-b-xl rounded-tr-xl shadow-lg">
+                            <!-- Pane: Corano -->
+                            <div id="dash-pane-corano" class="dash-pane active p-5">
+                                <div id="corano-widget">
+                                    <div class="text-xs text-tp-muted italic text-center py-4">Caricamento Corano...</div>
+                                </div>
+                            </div>
+
+                            <!-- Pane: Dati Giornata -->
+                            <div id="dash-pane-dati" class="dash-pane p-5">
+                                <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted mb-4 border-b border-tp-border pb-2 flex items-center gap-2"><i data-lucide="sliders" class="w-4 h-4"></i> Dati Giornata</h3>
 
                         <!-- Riga 1: Fajr + Hijri | Marea + Tags -->
                         <div class="grid grid-cols-2 gap-6 mb-4">
@@ -424,7 +466,9 @@
                                 <p class="text-tp-muted/50 italic">Nessuna notizia</p>
                             </div>
                         </div>
-                    </div>
+                            </div> <!-- /dash-pane-dati -->
+                        </div> <!-- /pannello hub -->
+                    </div> <!-- /hub flex flex-col -->
 
                     <!-- 1. Sessioni -->
                     <div>
@@ -482,47 +526,25 @@
                         </div>
                     </div>
 
-                    <!-- 2. Bias Giornaliero -->
-                    <div>
-                        <div class="flex items-center justify-between border-b border-tp-border pb-2 mb-4">
-                            <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                                <i data-lucide="compass" class="w-5 h-5 text-tp-muted"></i> Reperti Giornalieri
-                            </h2>
-                            <a id="btn-nuovo-bias" href="#" class="bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] px-3 py-1 text-xs font-bold uppercase rounded flex items-center gap-2 transition-colors shadow-sm">
-                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Nuovo Reperto
-                            </a>
+                    <!-- 1b. Ordine del Giorno (popolato dalla routine cloud alle 07:00 Casablanca) -->
+                    <div class="bg-gradient-to-br from-[#0e1a18] via-tp-panel to-[#0a0c10] rounded-xl border border-tp-accent/30 p-5 flex flex-col shadow-[0_0_20px_rgba(32,201,151,0.06)]">
+                        <div class="flex items-center justify-between mb-3 border-b border-tp-border/50 pb-2">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-accent flex items-center gap-2">
+                                <i data-lucide="sunrise" class="w-4 h-4"></i> Ordine del Giorno
+                            </h3>
+                            <span id="odg-time" class="text-[9px] text-tp-muted"></span>
                         </div>
-                        <div id="bias-list" class="space-y-3">
-                            <p class="text-xs text-tp-muted italic text-center py-4">Caricamento reperti...</p>
+                        <div id="odg-content" class="text-xs text-tp-text/85 leading-relaxed">
+                            <p class="text-tp-muted/50 italic">Nessun ordine del giorno salvato per questa giornata.</p>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- ==========================================
                      RIGHT COLUMN (col-span-3)
                      ========================================== -->
                 <div class="col-span-12 lg:col-span-3 flex flex-col gap-6">
-
-                    <!-- 0. Allert (notizie macro + allert prezzo manuali TV: task da lavorare) -->
-                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-[#eab308] mb-3 flex items-center gap-2 border-b border-tp-border pb-2">
-                            <i data-lucide="bell-ring" class="w-4 h-4"></i> Allert
-                        </h3>
-                        <div id="allert-list" class="space-y-2 max-h-[200px] overflow-y-auto">
-                            <p class="text-xs text-tp-muted italic text-center py-2">Caricamento...</p>
-                        </div>
-                    </div>
-
-                    <!-- 0b. Allert EA (automatici da EA MT4: %, FVG, EMA60 — readout) -->
-                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-[#eab308] mb-3 flex items-center justify-between gap-2 border-b border-tp-border pb-2">
-                            <span class="flex items-center gap-2"><i data-lucide="bot" class="w-4 h-4"></i> Allert EA</span>
-                            <span id="allert-ea-count" class="text-[10px] text-tp-muted font-bold px-2 py-0.5 bg-tp-border/30 rounded border border-tp-border/50">0</span>
-                        </h3>
-                        <div id="allert-ea-list" class="space-y-2 max-h-[260px] overflow-y-auto">
-                            <p class="text-xs text-tp-muted italic text-center py-2">Caricamento...</p>
-                        </div>
-                    </div>
 
                     <!-- 1. Chart with Tabs -->
                     <div class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col shadow-lg">
@@ -569,18 +591,28 @@
                         </div>
                     </div>
 
-                    <!-- 2c. Ipotesi del Giorno (stesso stile reperti) -->
+                    <!-- 4. Allert (notizie macro + allert prezzo manuali TV) -->
                     <div class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-tp-accent mb-3 flex items-center justify-between gap-2 border-b border-tp-border pb-2">
-                            <span class="flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4"></i> Ipotesi del Giorno</span>
-                            <span id="ipotesi-giorno-count" class="text-[10px] text-tp-muted font-bold px-2 py-0.5 bg-tp-border/30 rounded border border-tp-border/50">0</span>
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-[#eab308] mb-3 flex items-center gap-2 border-b border-tp-border pb-2">
+                            <i data-lucide="bell-ring" class="w-4 h-4"></i> Allert
                         </h3>
-                        <div id="ipotesi-giorno-list" class="space-y-2 max-h-[260px] overflow-y-auto">
+                        <div id="allert-list" class="space-y-2 max-h-[200px] overflow-y-auto">
                             <p class="text-xs text-tp-muted italic text-center py-2">Caricamento...</p>
                         </div>
                     </div>
 
-                    <!-- 3. Save + Chiudi -->
+                    <!-- 5. Allert EA (automatici da EA MT4: %, FVG, EMA60) -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-[#eab308] mb-3 flex items-center justify-between gap-2 border-b border-tp-border pb-2">
+                            <span class="flex items-center gap-2"><i data-lucide="bot" class="w-4 h-4"></i> Allert EA</span>
+                            <span id="allert-ea-count" class="text-[10px] text-tp-muted font-bold px-2 py-0.5 bg-tp-border/30 rounded border border-tp-border/50">0</span>
+                        </h3>
+                        <div id="allert-ea-list" class="space-y-2 max-h-[260px] overflow-y-auto">
+                            <p class="text-xs text-tp-muted italic text-center py-2">Caricamento...</p>
+                        </div>
+                    </div>
+
+                    <!-- 6. Save + Chiudi -->
                     <button onclick="saveGiornata()" id="btn-save" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 transition-colors shadow-lg">
                         <i data-lucide="save" class="w-4 h-4"></i> Salva Giornata
                     </button>
@@ -679,6 +711,19 @@
         let selectedMindset = null;
         let selectedVolatility = null;
         let activeSessions = { AS: false, LO: false, NY: false };
+
+        // ============================================
+        // HUB TABS (Corano / ODG / Dati Giornata)
+        // ============================================
+        window.switchDashTab = function(name) {
+            ['corano', 'dati'].forEach(n => {
+                const btn = document.getElementById('dash-tab-' + n);
+                const pane = document.getElementById('dash-pane-' + n);
+                if (!btn || !pane) return;
+                if (n === name) { btn.classList.add('active'); pane.classList.add('active'); }
+                else { btn.classList.remove('active'); pane.classList.remove('active'); }
+            });
+        };
 
         // ============================================
         // INIT
@@ -1464,6 +1509,13 @@
             }).join('');
 
             if (typeof lucide !== 'undefined') lucide.createIcons({ root: container });
+        }
+
+        // Crea nuova ipotesi vuota e apre il dettaglio (scorciatoia da pagina giornata).
+        async function creaNuovaIpotesi() {
+            const { data, error } = await db.from('ipotesi_trading').insert({ stato: 'ipotesi' }).select().single();
+            if (error) { alert('Errore creazione: ' + error.message); return; }
+            window.location.href = `dettaglio_ipotesi.html?id=${data.id}&from=giornata&gid=${giornataId}`;
         }
 
         // Ipotesi create nella giornata — accesso veloce al dettaglio per check/follow-up.

@@ -104,6 +104,13 @@
             transform: scale(1);
         }
 
+        /* Dashboard hero tabs (Corano / ODG / Processi) */
+        .dash-tab.active { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
+        .dash-tab:not(.active) { background: transparent; border-color: #252932; color: #848d97; }
+        .dash-tab:not(.active):hover { color: #ffffff; border-color: #3b4252; }
+        .dash-pane { display: none; }
+        .dash-pane.active { display: block; }
+
         /* Mobile sidebar drawer (< lg) */
         @media (max-width: 1023px) {
             #td-sidebar {
@@ -327,39 +334,6 @@
         <!-- Grid Workspace (Scrollable Area) -->
         <div class="flex-1 overflow-y-auto p-3 lg:p-8">
 
-            <!-- CORANO: versetti configurabili (edit in impostazioni) -->
-            <div id="corano-widget" class="mb-6 bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
-                <div class="text-xs text-tp-muted italic text-center py-4">Caricamento Corano...</div>
-            </div>
-
-            <!-- HERO: Ordine del Giorno (generato ogni mattina alle 07:00 Casablanca dalla routine) -->
-            <div id="odg-hero" class="mb-6 bg-gradient-to-br from-[#0e1a18] via-tp-panel to-[#0e1a18] rounded-xl border border-tp-accent/30 shadow-[0_0_30px_rgba(32,201,151,0.08)] overflow-hidden">
-                <div class="p-5 border-b border-tp-border/50 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-tp-accent/15 flex items-center justify-center border border-tp-accent/30">
-                            <i data-lucide="sunrise" class="w-5 h-5 text-tp-accent"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
-                                Ordine del Giorno
-                                <span id="odg-badge" class="hidden text-[9px] px-2 py-0.5 rounded-full bg-tp-accent/15 text-tp-accent border border-tp-accent/30 normal-case tracking-normal font-semibold">Aggiornato</span>
-                            </h2>
-                            <p id="odg-meta" class="text-[11px] text-tp-muted mt-0.5">Pre-sessione · in attesa generazione</p>
-                        </div>
-                    </div>
-                    <a id="odg-link" href="#" class="text-[10px] uppercase font-bold tracking-wider text-tp-muted hover:text-tp-accent transition-colors flex items-center gap-1 hidden">
-                        Vedi giornata <i data-lucide="arrow-right" class="w-3 h-3"></i>
-                    </a>
-                </div>
-                <div id="odg-body" class="p-5">
-                    <!-- empty state default; sostituito da JS -->
-                    <div class="flex items-center gap-3 text-tp-muted text-sm">
-                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
-                        Caricamento ordine del giorno...
-                    </div>
-                </div>
-            </div>
-
             <!-- The 3 Column CSS Grid -->
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 pb-12">
 
@@ -380,30 +354,45 @@
                         <!-- Dati aggiornati automaticamente da n8n ogni 5 min -->
                     </div>
 
-                    <!-- Box 2: Il Nome di Allah del Giorno -->
+                    <!-- Box 2: I Nomi di Allah (3 al giorno) -->
                     <div
                         class="bg-gradient-to-br from-[#161920] to-[#0a0c10] rounded-xl border border-[#20c997]/20 p-5 flex-1 min-h-[300px] shadow-[0_0_15px_rgba(32,201,151,0.05)] relative overflow-hidden group">
                         <div
                             class="absolute -right-6 -top-6 opacity-10 rotate-12 transform group-hover:rotate-6 transition-transform duration-700 pointer-events-none">
                             <span id="allah-bg-text" class="text-[10rem] font-display text-white">&#1575;&#1604;&#1604;&#1607;</span>
                         </div>
-                        <div
-                            class="flex items-center justify-between mb-4 border-b border-tp-border/50 pb-3 relative z-10">
+                        <div class="flex items-center justify-between mb-4 border-b border-tp-border/50 pb-3 relative z-10">
                             <h3 class="text-xs font-bold uppercase tracking-widest text-[#20c997]">I Nomi di Allah</h3>
+                            <span class="text-[9px] text-tp-muted/70 uppercase tracking-wider font-bold">Oggi · 3</span>
                         </div>
-                        <div class="flex flex-col h-full justify-center -mt-6 relative z-10 p-2">
-                            <p id="allah-index"
-                                class="text-tp-muted text-[10px] font-bold uppercase tracking-widest opacity-80 mb-2">
-                                Nome Del Giorno (1/99)</p>
-                            <h2 id="allah-title"
-                                class="text-4xl md:text-5xl font-bold font-display text-white mb-2 tracking-tight">
-                                Ar-Rahman</h2>
-                            <p id="allah-translation" class="text-lg text-tp-accent italic font-serif opacity-90">Il
-                                Compassionevole</p>
-                            <div class="w-12 h-1 bg-[#20c997] mt-5 mb-4 rounded-full opacity-40"></div>
-                            <p id="allah-desc"
-                                class="text-sm text-tp-text/80 leading-relaxed max-w-[95%] italic border-l-2 border-tp-border pl-3">
+
+                        <!-- Nome 1 -->
+                        <div class="relative z-10 mb-5">
+                            <p id="allah-index" class="text-tp-muted text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Nome 1/3 (1/99)</p>
+                            <h2 id="allah-title" class="text-3xl md:text-4xl font-bold font-display text-white tracking-tight">Ar-Rahman</h2>
+                            <p id="allah-translation" class="text-base text-tp-accent italic font-serif opacity-90 mt-1">Il Compassionevole</p>
+                            <p id="allah-desc" class="text-xs text-tp-text/80 leading-relaxed italic border-l-2 border-tp-border pl-3 mt-3">
                                 Colui la cui misericordia abbraccia incondizionatamente ogni cosa creata nell'universo.
+                            </p>
+                        </div>
+
+                        <!-- Nome 2 -->
+                        <div class="relative z-10 mb-5 border-t border-tp-border/40 pt-4">
+                            <p id="allah-index-2" class="text-tp-muted text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Nome 2/3 (2/99)</p>
+                            <h2 id="allah-title-2" class="text-3xl md:text-4xl font-bold font-display text-white tracking-tight">Ar-Rahim</h2>
+                            <p id="allah-translation-2" class="text-base text-tp-accent italic font-serif opacity-90 mt-1">Il Misericordioso</p>
+                            <p id="allah-desc-2" class="text-xs text-tp-text/80 leading-relaxed italic border-l-2 border-tp-border pl-3 mt-3">
+                                Colui che elargisce misericordia costante e specifica ai Suoi servi devoti.
+                            </p>
+                        </div>
+
+                        <!-- Nome 3 -->
+                        <div class="relative z-10 border-t border-tp-border/40 pt-4">
+                            <p id="allah-index-3" class="text-tp-muted text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Nome 3/3 (3/99)</p>
+                            <h2 id="allah-title-3" class="text-3xl md:text-4xl font-bold font-display text-white tracking-tight">Al-Malik</h2>
+                            <p id="allah-translation-3" class="text-base text-tp-accent italic font-serif opacity-90 mt-1">Il Sovrano</p>
+                            <p id="allah-desc-3" class="text-xs text-tp-text/80 leading-relaxed italic border-l-2 border-tp-border pl-3 mt-3">
+                                L'Assoluto detentore della sovranita su ogni reame visibile e invisibile.
                             </p>
                         </div>
                     </div>
@@ -412,70 +401,83 @@
                 <!-- /// CENTER COLUMN (Col Span: 6) /// -->
                 <div class="xl:col-span-6 flex flex-col gap-6">
 
-                    <!-- Box 3: Processi Attivi -->
-                    <div
-                        class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col min-h-[400px] shadow-lg relative overflow-hidden">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-br from-tp-accent/5 to-transparent pointer-events-none">
-                        </div>
-                        <div
-                            class="flex items-center justify-between mb-4 border-b border-tp-border/50 pb-3 relative z-10">
-                            <div class="flex items-center gap-2">
-                                <i data-lucide="activity" class="w-4 h-4 text-tp-accent"></i>
-                                <h3 class="text-xs font-bold uppercase tracking-widest text-white">PROCESSI ATTIVI</h3>
-                            </div>
-                            <span id="processi-badge"
-                                class="bg-tp-accent/20 text-tp-accent px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-tp-accent/20 flex items-center gap-1">
-                                <i data-lucide="check-circle" class="w-3 h-3"></i> <span id="processi-count">0</span> in attesa
-                            </span>
+                    <!-- Box 3: Hub a tab — Corano / Ordine del Giorno / Processi Attivi -->
+                    <div class="flex flex-col">
+                        <!-- Tab strip -->
+                        <div class="flex gap-2" id="dash-tabs">
+                            <button onclick="switchDashTab('corano')" id="dash-tab-corano" class="dash-tab active px-4 py-2 rounded-t-lg text-xs font-bold border border-b-0 uppercase transition-all flex items-center gap-2">
+                                <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Corano
+                            </button>
+                            <button onclick="switchDashTab('odg')" id="dash-tab-odg" class="dash-tab px-4 py-2 rounded-t-lg text-xs font-bold border border-b-0 uppercase transition-all flex items-center gap-2">
+                                <i data-lucide="sunrise" class="w-3.5 h-3.5"></i> Ordine del Giorno
+                            </button>
+                            <button onclick="switchDashTab('processi')" id="dash-tab-processi" class="dash-tab px-4 py-2 rounded-t-lg text-xs font-bold border border-b-0 uppercase transition-all flex items-center gap-2">
+                                <i data-lucide="activity" class="w-3.5 h-3.5"></i> Processi
+                                <span id="processi-badge" class="ml-1 bg-tp-accent/20 text-tp-accent px-1.5 py-0.5 rounded text-[9px] font-bold border border-tp-accent/20"><span id="processi-count">0</span></span>
+                            </button>
                         </div>
 
-                        <!-- Lista dei Ticket/Flussi attivi -->
-                        <div id="processi-list" class="space-y-3 pr-2 relative z-10 max-h-[450px] overflow-y-auto custom-scroll">
-                            <!-- Populated by JS -->
-                            <div class="flex items-center justify-center h-32 text-tp-muted text-sm">
-                                <i data-lucide="loader-2" class="w-5 h-5 animate-spin mr-2"></i> Caricamento...
+                        <!-- Pannello condiviso -->
+                        <div class="bg-tp-panel border border-tp-border rounded-b-xl rounded-tr-xl shadow-lg min-h-[400px] relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-br from-tp-accent/5 to-transparent pointer-events-none"></div>
+
+                            <!-- Pane: Corano -->
+                            <div id="dash-pane-corano" class="dash-pane active relative z-10 p-5">
+                                <div id="corano-widget">
+                                    <div class="text-xs text-tp-muted italic text-center py-4">Caricamento Corano...</div>
+                                </div>
+                            </div>
+
+                            <!-- Pane: Ordine del Giorno -->
+                            <div id="dash-pane-odg" class="dash-pane relative z-10">
+                                <div id="odg-hero">
+                                    <div class="p-5 border-b border-tp-border/50 flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-lg bg-tp-accent/15 flex items-center justify-center border border-tp-accent/30">
+                                                <i data-lucide="sunrise" class="w-5 h-5 text-tp-accent"></i>
+                                            </div>
+                                            <div>
+                                                <h2 class="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                                                    Ordine del Giorno
+                                                    <span id="odg-badge" class="hidden text-[9px] px-2 py-0.5 rounded-full bg-tp-accent/15 text-tp-accent border border-tp-accent/30 normal-case tracking-normal font-semibold">Aggiornato</span>
+                                                </h2>
+                                                <p id="odg-meta" class="text-[11px] text-tp-muted mt-0.5">Pre-sessione · in attesa generazione</p>
+                                            </div>
+                                        </div>
+                                        <a id="odg-link" href="#" class="text-[10px] uppercase font-bold tracking-wider text-tp-muted hover:text-tp-accent transition-colors flex items-center gap-1 hidden">
+                                            Vedi giornata <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                                        </a>
+                                    </div>
+                                    <div id="odg-body" class="p-5">
+                                        <div class="flex items-center gap-3 text-tp-muted text-sm">
+                                            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+                                            Caricamento ordine del giorno...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pane: Processi Attivi -->
+                            <div id="dash-pane-processi" class="dash-pane relative z-10 p-5">
+                                <div id="processi-list" class="space-y-3 pr-2 max-h-[450px] overflow-y-auto custom-scroll">
+                                    <div class="flex items-center justify-center h-32 text-tp-muted text-sm">
+                                        <i data-lucide="loader-2" class="w-5 h-5 animate-spin mr-2"></i> Caricamento...
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Box 4: Calendario Notizie -->
-                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 min-h-[450px] flex flex-col shadow-lg">
-                        <div class="flex flex-col gap-3 mb-4 border-b border-tp-border/50 pb-3">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <i data-lucide="globe-2" class="w-4 h-4 text-tp-muted"></i>
-                                    <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted">Calendario
-                                        Notizie</h3>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <!-- Bottoni Time Frame (Oggi, Domani, Settimana) -->
-                                <div id="cal-time-filters" class="flex gap-1 bg-[#0a0c10] border border-tp-border p-1 rounded-lg">
-                                    <button data-filter="oggi"
-                                        class="cal-time-btn active bg-tp-accent/20 text-tp-accent px-2 py-1 rounded text-[9px] font-bold uppercase transition-colors">Oggi</button>
-                                    <button data-filter="domani"
-                                        class="cal-time-btn text-tp-muted hover:text-white px-2 py-1 rounded text-[9px] font-bold uppercase transition-colors">Domani</button>
-                                    <button data-filter="settimana"
-                                        class="cal-time-btn text-tp-muted hover:text-white px-2 py-1 rounded text-[9px] font-bold uppercase transition-colors">Settimana</button>
-                                </div>
-                                <!-- Filtri impatto -->
-                                <div id="cal-impact-filters" class="flex gap-1.5">
-                                    <button data-impact="high"
-                                        class="cal-impact-btn active bg-tp-loss/10 text-tp-loss border border-tp-loss/20 px-2 py-1 rounded text-[9px] font-bold uppercase cursor-pointer hover:bg-tp-loss hover:text-white transition-colors">High</button>
-                                    <button data-impact="medium"
-                                        class="cal-impact-btn active bg-tp-warning/10 text-tp-warning border border-tp-warning/20 px-2 py-1 rounded text-[9px] font-bold uppercase cursor-pointer hover:bg-tp-warning hover:text-[#0a0c10] transition-colors">Med</button>
-                                    <button data-impact="low"
-                                        class="cal-impact-btn active bg-tp-bg border border-tp-border text-tp-muted px-2 py-1 rounded text-[9px] font-bold uppercase cursor-pointer hover:bg-tp-border hover:text-white transition-colors">Low</button>
-                                </div>
+                    <!-- Box 4: Letture del Giorno -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 h-[600px] flex flex-col shadow-lg">
+                        <div class="flex items-center justify-between mb-3 border-b border-tp-border/50 pb-2">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="newspaper" class="w-4 h-4 text-tp-accent"></i>
+                                <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted">Letture del Giorno</h3>
                             </div>
                         </div>
-
-                        <!-- Lista Notizie -->
-                        <div id="calendario-list" class="flex-1 overflow-y-auto space-y-2.5 pr-2 custom-scroll">
-                            <div class="flex items-center justify-center h-32 text-tp-muted text-sm">
-                                <i data-lucide="loader-2" class="w-5 h-5 animate-spin mr-2"></i> Caricamento...
-                            </div>
+                        <div id="articoli-list" class="flex-1 space-y-3 flex flex-col gap-2 overflow-y-auto custom-scroll pr-1">
+                            <p class="text-xs text-tp-muted/50 italic text-center py-4">Nessun articolo</p>
                         </div>
                     </div>
                 </div>
@@ -528,16 +530,32 @@
                         </div>
                     </div>
 
-                    <!-- Box 7: Articoli del Giorno -->
-                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col shadow-lg">
-                        <div class="flex items-center justify-between mb-3 border-b border-tp-border/50 pb-2">
-                            <div class="flex items-center gap-2">
-                                <i data-lucide="newspaper" class="w-4 h-4 text-tp-accent"></i>
-                                <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted">Letture del Giorno</h3>
+                    <!-- Box 7: Calendario Notizie -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 h-[600px] flex flex-col shadow-lg">
+                        <div class="flex flex-col gap-3 mb-4 border-b border-tp-border/50 pb-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="globe-2" class="w-4 h-4 text-tp-muted"></i>
+                                    <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted">Calendario Notizie</h3>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <div id="cal-time-filters" class="flex gap-1 bg-[#0a0c10] border border-tp-border p-1 rounded-lg">
+                                    <button data-filter="oggi" class="cal-time-btn active bg-tp-accent/20 text-tp-accent px-2 py-1 rounded text-[9px] font-bold uppercase transition-colors">Oggi</button>
+                                    <button data-filter="domani" class="cal-time-btn text-tp-muted hover:text-white px-2 py-1 rounded text-[9px] font-bold uppercase transition-colors">Domani</button>
+                                    <button data-filter="settimana" class="cal-time-btn text-tp-muted hover:text-white px-2 py-1 rounded text-[9px] font-bold uppercase transition-colors">Sett.</button>
+                                </div>
+                                <div id="cal-impact-filters" class="flex gap-1.5">
+                                    <button data-impact="high" class="cal-impact-btn active bg-tp-loss/10 text-tp-loss border border-tp-loss/20 px-2 py-1 rounded text-[9px] font-bold uppercase cursor-pointer hover:bg-tp-loss hover:text-white transition-colors">High</button>
+                                    <button data-impact="medium" class="cal-impact-btn active bg-tp-warning/10 text-tp-warning border border-tp-warning/20 px-2 py-1 rounded text-[9px] font-bold uppercase cursor-pointer hover:bg-tp-warning hover:text-[#0a0c10] transition-colors">Med</button>
+                                    <button data-impact="low" class="cal-impact-btn active bg-tp-bg border border-tp-border text-tp-muted px-2 py-1 rounded text-[9px] font-bold uppercase cursor-pointer hover:bg-tp-border hover:text-white transition-colors">Low</button>
+                                </div>
                             </div>
                         </div>
-                        <div id="articoli-list" class="space-y-3 flex flex-col gap-2 max-h-[450px] overflow-y-auto custom-scroll pr-1">
-                            <p class="text-xs text-tp-muted/50 italic text-center py-4">Nessun articolo</p>
+                        <div id="calendario-list" class="flex-1 overflow-y-auto space-y-2.5 pr-2 custom-scroll">
+                            <div class="flex items-center justify-center h-32 text-tp-muted text-sm">
+                                <i data-lucide="loader-2" class="w-5 h-5 animate-spin mr-2"></i> Caricamento...
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -673,7 +691,7 @@
         { trans: "As-Sabur", arab: "\u0627\u0644\u0635\u0651\u064E\u0628\u064F\u0648\u0631\u064F", meaning: "Il Paziente", desc: "Colui la cui pazienza e infinita e non Si affretta nel punire. La Sua longanimita da tempo al peccatore di pentirsi e al negligente di risvegliarsi, con clemenza senza fine." }
     ];
 
-    // --- Init 99 Nomi di Allah ---
+    // --- Init 99 Nomi di Allah (3 al giorno) ---
     function initNomiDiAllah99() {
         const titleEl = document.getElementById('allah-title');
         if (!titleEl) return;
@@ -683,14 +701,27 @@
         const diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
         const oneDay = 1000 * 60 * 60 * 24;
         const dayOfYear = Math.floor(diff / oneDay);
-        const nameIndex = dayOfYear % 99;
-        const name = ALLAH_NAMES_99[nameIndex];
+        const baseIdx = (dayOfYear * 3) % 99;
+        const indices = [0, 1, 2].map(i => (baseIdx + i) % 99);
 
-        document.getElementById('allah-index').textContent = 'Nome Del Giorno (' + (nameIndex + 1) + '/99)';
-        document.getElementById('allah-bg-text').textContent = name.arab;
-        titleEl.textContent = name.trans;
-        document.getElementById('allah-translation').textContent = name.meaning;
-        document.getElementById('allah-desc').textContent = name.desc;
+        // Nome 1 (principale)
+        const n1 = ALLAH_NAMES_99[indices[0]];
+        document.getElementById('allah-index').textContent = 'Nome 1/3 (' + (indices[0] + 1) + '/99)';
+        document.getElementById('allah-bg-text').textContent = n1.arab;
+        titleEl.textContent = n1.trans;
+        document.getElementById('allah-translation').textContent = n1.meaning;
+
+        document.getElementById('allah-desc').textContent = n1.desc;
+
+        // Nomi 2 e 3 (stessa struttura del primo)
+        for (let i = 1; i <= 2; i++) {
+            const n = ALLAH_NAMES_99[indices[i]];
+            const slot = i + 1;
+            document.getElementById('allah-index-' + slot).textContent = 'Nome ' + slot + '/3 (' + (indices[i] + 1) + '/99)';
+            document.getElementById('allah-title-' + slot).textContent = n.trans;
+            document.getElementById('allah-translation-' + slot).textContent = n.meaning;
+            document.getElementById('allah-desc-' + slot).textContent = n.desc;
+        }
     }
 
     // --- Init Paniere USD Chart ---
@@ -1276,6 +1307,17 @@
         logLists.forEach(list => {
             list.insertAdjacentHTML('afterbegin', entryHtml);
             lucide.createIcons({ root: list });
+        });
+    };
+
+    // --- DASH TABS (Corano / ODG / Processi) ---
+    window.switchDashTab = function(name) {
+        ['corano', 'odg', 'processi'].forEach(n => {
+            const btn = document.getElementById('dash-tab-' + n);
+            const pane = document.getElementById('dash-pane-' + n);
+            if (!btn || !pane) return;
+            if (n === name) { btn.classList.add('active'); pane.classList.add('active'); }
+            else { btn.classList.remove('active'); pane.classList.remove('active'); }
         });
     };
 
