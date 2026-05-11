@@ -117,21 +117,6 @@ function updateTimeline() {
         }
     }
 
-    if (labelsContainer) {
-        var labels = labelsContainer.querySelectorAll('span');
-        // Se il numero di label non corrisponde ai blocchi, ricostruisci
-        if (labels.length !== blocks.length) {
-            labelsContainer.innerHTML = blocks.map(function(b) {
-                return '<span class="text-tp-muted opacity-40">' + b.title + '</span>';
-            }).join('');
-            labels = labelsContainer.querySelectorAll('span');
-        } else {
-            for (var i = 0; i < labels.length && i < blocks.length; i++) {
-                labels[i].textContent = blocks[i].title;
-            }
-        }
-    }
-
     // Calcola posizione attuale nella giornata
     var now = new Date();
     var totalMinutes = now.getHours() * 60 + now.getMinutes();
@@ -150,23 +135,65 @@ function updateTimeline() {
     progress.style.width = pct + '%';
     dot.style.left = pct + '%';
 
-    // Evidenzia il blocco corrente
+    // Render labels: posizione assoluta al centro di ogni blocco, pill sull'attivo, fade laterali
     if (labelsContainer) {
-        var labels = labelsContainer.querySelectorAll('span');
-        for (var i = 0; i < blocks.length && i < labels.length; i++) {
+        var existing = labelsContainer.querySelectorAll('.timeline-label');
+        var needsRebuild = existing.length !== blocks.length;
+
+        if (needsRebuild) {
+            labelsContainer.style.position = 'relative';
+            labelsContainer.style.display = 'block';
+            labelsContainer.style.minHeight = '20px';
+            labelsContainer.innerHTML = blocks.map(function(b, idx) {
+                var bs = timeToMinutes(b.start);
+                var be = timeToMinutes(b.end);
+                var midPct = ((bs + be) / 2 - dayStart) / range * 100;
+                midPct = Math.max(4, Math.min(96, midPct));
+                return '<span class="timeline-label" data-idx="' + idx + '" style="position:absolute; top:0; left:' + midPct + '%; transform:translateX(-50%); white-space:nowrap; transition:all .35s ease;">' + b.title + '</span>';
+            }).join('');
+            existing = labelsContainer.querySelectorAll('.timeline-label');
+        } else {
+            for (var ii = 0; ii < existing.length; ii++) {
+                if (existing[ii].textContent !== blocks[ii].title) existing[ii].textContent = blocks[ii].title;
+            }
+        }
+
+        // Trova blocco corrente
+        var currentIdx = -1;
+        for (var i = 0; i < blocks.length; i++) {
             var bStart = timeToMinutes(blocks[i].start);
             var bEnd = timeToMinutes(blocks[i].end);
-            if (totalMinutes >= bStart && totalMinutes < bEnd) {
-                labels[i].classList.add('text-white');
-                labels[i].classList.remove('text-tp-muted', 'opacity-30', 'opacity-60');
-                labels[i].style.textShadow = '0 0 5px rgba(255,255,255,0.8)';
-                labels[i].style.transform = 'scale(1.1)';
+            if (totalMinutes >= bStart && totalMinutes < bEnd) { currentIdx = i; break; }
+        }
+
+        for (var i = 0; i < existing.length; i++) {
+            var lbl = existing[i];
+            lbl.classList.remove('text-white', 'text-tp-muted', 'opacity-30', 'opacity-40', 'opacity-60');
+            if (i === currentIdx) {
+                lbl.style.padding = '2px 10px';
+                lbl.style.background = 'rgba(32,201,151,0.18)';
+                lbl.style.border = '1px solid rgba(32,201,151,0.75)';
+                lbl.style.borderRadius = '9999px';
+                lbl.style.color = '#fff';
+                lbl.style.textShadow = '0 0 6px rgba(255,255,255,0.6)';
+                lbl.style.boxShadow = '0 0 10px rgba(32,201,151,0.45)';
+                lbl.style.opacity = '1';
+                lbl.style.transform = 'translateX(-50%) scale(1.05)';
+                lbl.style.zIndex = '5';
             } else {
-                labels[i].classList.remove('text-white');
-                labels[i].classList.add('text-tp-muted');
-                labels[i].style.opacity = '0.4';
-                labels[i].style.textShadow = 'none';
-                labels[i].style.transform = 'scale(1)';
+                var distance = currentIdx >= 0 ? Math.abs(i - currentIdx) : 0;
+                var op = currentIdx < 0 ? 0.35 : (distance === 1 ? 0.45 : (distance === 2 ? 0.2 : 0.08));
+                lbl.style.padding = '';
+                lbl.style.background = '';
+                lbl.style.border = '';
+                lbl.style.borderRadius = '';
+                lbl.style.color = '';
+                lbl.style.textShadow = '';
+                lbl.style.boxShadow = '';
+                lbl.style.opacity = String(op);
+                lbl.style.transform = 'translateX(-50%) scale(1)';
+                lbl.style.zIndex = '';
+                lbl.classList.add('text-tp-muted');
             }
         }
     }
@@ -752,3 +779,25 @@ window.selectVol = function(btn, type) {
         loadPending(); subscribe();
     }
 })();
+
+// ==========================================
+// Navigazione: vai al dettaglio della giornata di oggi (crea se manca)
+// ==========================================
+window.goToOggi = async function(ev) {
+    if (ev && ev.preventDefault) ev.preventDefault();
+    if (typeof db === 'undefined' || !db) { console.warn('goToOggi: db non disponibile'); return; }
+    try {
+        var today = new Date().toISOString().split('T')[0];
+        var existing = await db.from('giornate').select('id').eq('data', today).maybeSingle();
+        if (existing.data && existing.data.id) {
+            window.location.href = 'dettaglio_giornata.html?id=' + existing.data.id;
+            return;
+        }
+        var created = await db.from('giornate').insert({ data: today, stato: 'nuovo' }).select().single();
+        if (created.error) { alert('Errore creazione giornata: ' + created.error.message); return; }
+        window.location.href = 'dettaglio_giornata.html?id=' + created.data.id;
+    } catch (e) {
+        console.error('goToOggi:', e);
+        alert('Errore: ' + e.message);
+    }
+};
