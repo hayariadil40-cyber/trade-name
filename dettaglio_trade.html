@@ -423,7 +423,7 @@
                 const o=document.createElement('option');
                 o.value=i.id;
                 const stratName = i.strategia_id ? (stratNameById[i.strategia_id] || '?') : 'no strategia';
-                const dt = new Date(i.created_at).toLocaleDateString('it-IT', { day:'2-digit', month:'short' });
+                const dt = new Date(i.created_at).toLocaleString('it-IT', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit', timeZone:'Africa/Casablanca' });
                 const stato = (i.stato || 'ipotesi').replace('_',' ');
                 o.textContent = `${dt} · ${stratName} · ${i.asset || '—'} · [${stato}]`;
                 si.appendChild(o);

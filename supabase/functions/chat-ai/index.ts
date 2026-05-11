@@ -106,13 +106,27 @@ serve(async (req) => {
         .select("id, nome, stato, sessione, ipotesi, regole_ingresso, tipo_mercato, dove_entro, dove_esco_sl, dove_esco_tp, gestione_operazione, da_osservare, gestione_rischio, note, asset, tipo, timeframe, winrate")
         .limit(10);
       if (strategie && strategie.length) dbContext += "\n\n## STRATEGIE:\n" + JSON.stringify(strategie);
+
+      // Cronache con coin_data completo (picchi_volume, sbilanciamenti, OHLC, sentiment, commento).
+      // Strip dello screenshot base64 inline che gonfia il contesto fino a MB e fa troncare le righe successive.
+      const cronacheLimit = assistantMode === "power" ? 10 : 5;
+      const { data: cronache } = await supabase.from("cronache")
+        .select("data, titolo, coin_data").order("data", { ascending: false }).limit(cronacheLimit);
+      if (cronache && cronache.length) {
+        const cronacheLight = cronache.map((c: any) => ({
+          ...c,
+          coin_data: Object.fromEntries(
+            Object.entries(c.coin_data || {}).map(([coin, d]: [string, any]) => {
+              const { screenshot, ...rest } = d || {};
+              return [coin, screenshot ? { ...rest, has_screenshot: true } : rest];
+            })
+          ),
+        }));
+        dbContext += "\n\n## CRONACHE:\n" + JSON.stringify(cronacheLight);
+      }
     }
 
     if (assistantMode === "power") {
-      const { data: cronache } = await supabase.from("cronache")
-        .select("data, titolo").order("data", { ascending: false }).limit(10);
-      if (cronache && cronache.length) dbContext += "\n\n## CRONACHE:\n" + JSON.stringify(cronache);
-
       const { data: settimane } = await supabase.from("settimane")
         .select("data_inizio, data_fine, review, note, pnl, winrate").order("data_inizio", { ascending: false }).limit(6);
       if (settimane && settimane.length) dbContext += "\n\n## SETTIMANE:\n" + JSON.stringify(settimane);

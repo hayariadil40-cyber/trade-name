@@ -460,7 +460,7 @@
                 (cr||[]).forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.data} - ${c.titolo}`;sc.appendChild(o)});
                 (st||[]).forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.nome;ss.appendChild(o)});
                 (tr||[]).forEach(t=>{const o=document.createElement('option');o.value=t.id;const d=new Date(t.data).toLocaleDateString('it-IT',{day:'2-digit',month:'short'});o.textContent=`${t.asset} ${t.direzione} - ${d}`;st2.appendChild(o)});
-                if (si) (ip||[]).forEach(i=>{const o=document.createElement('option');o.value=i.id;const d=i.created_at?new Date(i.created_at).toLocaleDateString('it-IT',{day:'2-digit',month:'short'}):'';const stato=(i.stato||'ipotesi').replace('_',' ');o.textContent=`${i.asset||'?'} ${i.sessione||''} - ${d} [${stato}]`;si.appendChild(o)});
+                if (si) (ip||[]).forEach(i=>{const o=document.createElement('option');o.value=i.id;const d=i.created_at?new Date(i.created_at).toLocaleString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Africa/Casablanca'}):'';const stato=(i.stato||'ipotesi').replace('_',' ');o.textContent=`${i.asset||'?'} ${i.sessione||''} - ${d} [${stato}]`;si.appendChild(o)});
             });
         }
 

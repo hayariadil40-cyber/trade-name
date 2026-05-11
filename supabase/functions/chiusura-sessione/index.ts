@@ -20,7 +20,7 @@ const corsHeaders = {
 };
 
 const SESSIONE_INFO: Record<string, { label: string; emoji: string; oraStart: string; oraEnd: string; scope: "lifestyle" | "compilazione" }> = {
-  londra: { label: "Londra", emoji: "🇬🇧", oraStart: "08:00", oraEnd: "11:00", scope: "lifestyle" },
+  londra: { label: "Londra", emoji: "🇬🇧", oraStart: "07:00", oraEnd: "11:00", scope: "lifestyle" },
   ny:     { label: "New York", emoji: "🇺🇸", oraStart: "14:30", oraEnd: "16:30", scope: "compilazione" },
 };
 

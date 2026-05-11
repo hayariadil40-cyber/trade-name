@@ -135,26 +135,25 @@ function updateTimeline() {
     progress.style.width = pct + '%';
     dot.style.left = pct + '%';
 
-    // Render labels: posizione assoluta al centro di ogni blocco, pill sull'attivo, fade laterali
+    // Render labels: layout flex originale (justify-between), solo l'attivo evidenziato con accent + glow + scale
     if (labelsContainer) {
-        var existing = labelsContainer.querySelectorAll('.timeline-label');
-        var needsRebuild = existing.length !== blocks.length;
+        // Reset eventuali stili lasciati dalla versione precedente con position absolute
+        labelsContainer.style.position = '';
+        labelsContainer.style.display = '';
+        labelsContainer.style.minHeight = '';
+
+        var labels = labelsContainer.querySelectorAll('span');
+        // Rebuild se conta diversa o se gli span avevano la vecchia classe timeline-label (cambio layout)
+        var needsRebuild = labels.length !== blocks.length || (labels[0] && labels[0].classList.contains('timeline-label'));
 
         if (needsRebuild) {
-            labelsContainer.style.position = 'relative';
-            labelsContainer.style.display = 'block';
-            labelsContainer.style.minHeight = '20px';
-            labelsContainer.innerHTML = blocks.map(function(b, idx) {
-                var bs = timeToMinutes(b.start);
-                var be = timeToMinutes(b.end);
-                var midPct = ((bs + be) / 2 - dayStart) / range * 100;
-                midPct = Math.max(4, Math.min(96, midPct));
-                return '<span class="timeline-label" data-idx="' + idx + '" style="position:absolute; top:0; left:' + midPct + '%; transform:translateX(-50%); white-space:nowrap; transition:all .35s ease;">' + b.title + '</span>';
+            labelsContainer.innerHTML = blocks.map(function(b) {
+                return '<span class="text-tp-muted" style="transition:color .25s ease, text-shadow .25s ease, transform .25s ease, opacity .25s ease;">' + b.title + '</span>';
             }).join('');
-            existing = labelsContainer.querySelectorAll('.timeline-label');
+            labels = labelsContainer.querySelectorAll('span');
         } else {
-            for (var ii = 0; ii < existing.length; ii++) {
-                if (existing[ii].textContent !== blocks[ii].title) existing[ii].textContent = blocks[ii].title;
+            for (var ii = 0; ii < labels.length; ii++) {
+                if (labels[ii].textContent !== blocks[ii].title) labels[ii].textContent = blocks[ii].title;
             }
         }
 
@@ -166,33 +165,30 @@ function updateTimeline() {
             if (totalMinutes >= bStart && totalMinutes < bEnd) { currentIdx = i; break; }
         }
 
-        for (var i = 0; i < existing.length; i++) {
-            var lbl = existing[i];
+        for (var i = 0; i < labels.length; i++) {
+            var lbl = labels[i];
+            // Reset stili inline che potrebbero essere stati impostati prima
+            lbl.style.padding = '';
+            lbl.style.background = '';
+            lbl.style.border = '';
+            lbl.style.borderRadius = '';
+            lbl.style.boxShadow = '';
+            lbl.style.zIndex = '';
             lbl.classList.remove('text-white', 'text-tp-muted', 'opacity-30', 'opacity-40', 'opacity-60');
+
             if (i === currentIdx) {
-                lbl.style.padding = '2px 10px';
-                lbl.style.background = 'rgba(32,201,151,0.18)';
-                lbl.style.border = '1px solid rgba(32,201,151,0.75)';
-                lbl.style.borderRadius = '9999px';
-                lbl.style.color = '#fff';
-                lbl.style.textShadow = '0 0 6px rgba(255,255,255,0.6)';
-                lbl.style.boxShadow = '0 0 10px rgba(32,201,151,0.45)';
+                // Attivo: colore accent + doppio glow (accent + bianco interno) + leggero scale
+                lbl.style.color = '#20c997';
+                lbl.style.textShadow = '0 0 10px rgba(32,201,151,0.95), 0 0 3px rgba(255,255,255,0.7)';
                 lbl.style.opacity = '1';
-                lbl.style.transform = 'translateX(-50%) scale(1.05)';
-                lbl.style.zIndex = '5';
+                lbl.style.transform = 'scale(1.18)';
+                lbl.style.transformOrigin = 'center bottom';
             } else {
-                var distance = currentIdx >= 0 ? Math.abs(i - currentIdx) : 0;
-                var op = currentIdx < 0 ? 0.35 : (distance === 1 ? 0.45 : (distance === 2 ? 0.2 : 0.08));
-                lbl.style.padding = '';
-                lbl.style.background = '';
-                lbl.style.border = '';
-                lbl.style.borderRadius = '';
+                // Inattivi: muted + bassa opacity, struttura immutata
                 lbl.style.color = '';
-                lbl.style.textShadow = '';
-                lbl.style.boxShadow = '';
-                lbl.style.opacity = String(op);
-                lbl.style.transform = 'translateX(-50%) scale(1)';
-                lbl.style.zIndex = '';
+                lbl.style.textShadow = 'none';
+                lbl.style.opacity = '0.3';
+                lbl.style.transform = 'scale(1)';
                 lbl.classList.add('text-tp-muted');
             }
         }
