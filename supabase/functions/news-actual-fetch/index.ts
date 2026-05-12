@@ -13,10 +13,59 @@ function makeFFId(ev: { date: string; country: string; title: string }): string 
   return `${ev.date}|${ev.country}|${ev.title}`;
 }
 
+function formatPrezziCorrenti(coinData: Record<string, any> | null): string {
+  if (!coinData || typeof coinData !== "object") return "";
+  const wanted = ["XAUUSD", "US30", "NAS100", "GER30", "BTCUSD", "EURUSD"];
+  const rows: string[] = [];
+  for (const k of wanted) {
+    const d = coinData[k];
+    if (!d) continue;
+    const low = d.low ?? "?";
+    const high = d.high ?? "?";
+    const close = d.close ?? d.open ?? "?";
+    const pct = d.percentuale ?? "";
+    rows.push(`- ${k}: last ${close} | range ${low}-${high}${pct ? ` (${pct}%)` : ""}`);
+  }
+  return rows.length ? rows.join("\n") : "";
+}
+
+// Aggrega low/high di tutte le sessioni del giorno per asset, in fallback se cronache.coin_data e' vuoto.
+function formatPrezziDaSessioni(sessioni: Array<{ coin_data: Record<string, any> | null }> | null): string {
+  if (!sessioni || !sessioni.length) return "";
+  const wanted = ["XAUUSD", "US30", "NAS100", "GER30", "BTCUSD", "EURUSD"];
+  const agg = new Map<string, { low: number; high: number }>();
+  for (const s of sessioni) {
+    const cd = s.coin_data || {};
+    for (const k of wanted) {
+      const d = cd[k];
+      if (!d) continue;
+      const lo = parseFloat(d.low);
+      const hi = parseFloat(d.high);
+      if (!isFinite(lo) || !isFinite(hi)) continue;
+      const cur = agg.get(k);
+      if (!cur) agg.set(k, { low: lo, high: hi });
+      else { cur.low = Math.min(cur.low, lo); cur.high = Math.max(cur.high, hi); }
+    }
+  }
+  if (!agg.size) return "";
+  return [...agg.entries()].map(([k, v]) => `- ${k}: range giornaliero ${v.low}-${v.high}`).join("\n");
+}
+
+async function getPrezziCorrenti(supabase: any, todayStr: string): Promise<string> {
+  const { data: cron } = await supabase
+    .from("cronache").select("coin_data").eq("data", todayStr).maybeSingle();
+  const fromCron = formatPrezziCorrenti(cron?.coin_data ?? null);
+  if (fromCron) return fromCron;
+  const { data: sess } = await supabase
+    .from("sessioni").select("coin_data").eq("data", todayStr);
+  const fromSess = formatPrezziDaSessioni(sess ?? null);
+  return fromSess || "(prezzi correnti non disponibili nel DB)";
+}
+
 async function generateRodrigoComment(ev: {
   titolo: string; valuta: string; valore_atteso: string | null;
   valore_precedente: string | null; valore_effettivo: string;
-}, apiKey: string): Promise<string> {
+}, prezziCorrenti: string, apiKey: string): Promise<string> {
   const prompt = `Sei Rodrigo, analista macro per un trader scalper (XAU/USD, US30, NASDAQ, EURUSD, USDJPY).
 
 L'evento "${ev.titolo}" (${ev.valuta}) e appena uscito.
@@ -24,10 +73,15 @@ Forecast: ${ev.valore_atteso || "n.d."}
 Precedente: ${ev.valore_precedente || "n.d."}
 ATTUALE: ${ev.valore_effettivo}
 
+QUOTAZIONI CORRENTI DEL MERCATO (giornata di oggi, da EA MT4):
+${prezziCorrenti}
+
+REGOLA CRITICA: i livelli di prezzo che citi devono essere DENTRO o IMMEDIATAMENTE ADIACENTI alla finestra "range" riportata sopra. NON inventare livelli storici (es. XAU a 2300, EUR a 1.07): quei numeri sono OBSOLETI. Se non hai un livello plausibile, parla solo di direzione attesa (sopra/sotto, breakout/reversal) senza numeri.
+
 Commento sintetico (max 4 righe, una per punto, niente liste markdown):
 - Il dato e sopra/sotto/in linea con le attese (calcola lo scostamento se possibile)
 - Cosa significa per USD, oro, indici US
-- Direzione attesa di breve sui principali asset
+- Direzione attesa di breve sui principali asset (usa i livelli correnti sopra, MAI numeri inventati)
 - Eventuale rischio di reversal o follow-through
 
 Italiano. Diretto. Zero motivazione vuota. Zero parolacce.`;
@@ -145,11 +199,13 @@ serve(async (req) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+      const todayStrA = new Date().toISOString().split("T")[0];
+      const prezzi = await getPrezziCorrenti(supabase, todayStrA);
       const commento = await generateRodrigoComment({
         titolo: row.titolo, valuta: row.valuta,
         valore_atteso: row.valore_atteso, valore_precedente: row.valore_precedente,
         valore_effettivo: row.valore_effettivo,
-      }, ANTHROPIC_API_KEYS);
+      }, prezzi, ANTHROPIC_API_KEYS);
       const { error } = await supabase.from("allert")
         .update({ commento_rodrigo: commento || null }).eq("id", body.id);
       if (error) throw error;
@@ -202,6 +258,9 @@ serve(async (req) => {
 
     let updated = 0, commented = 0, no_actual_yet = 0, errors = 0, telegram_sent = 0;
 
+    // Fetch prezzi correnti una volta sola per tutto il batch (cronaca odierna, fallback su sessioni).
+    const prezziBatch = await getPrezziCorrenti(supabase, todayStr);
+
     for (const a of pending) {
       const ff = byFFId.get(a.ff_id);
       if (!ff || !ff.actual) { no_actual_yet++; continue; }
@@ -212,7 +271,7 @@ serve(async (req) => {
           titolo: a.titolo, valuta: a.valuta,
           valore_atteso: a.valore_atteso, valore_precedente: a.valore_precedente,
           valore_effettivo: ff.actual,
-        }, ANTHROPIC_API_KEYS);
+        }, prezziBatch, ANTHROPIC_API_KEYS);
         commented++;
       } catch {
         errors++;

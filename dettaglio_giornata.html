@@ -605,7 +605,12 @@
                     <div class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
                         <h3 class="text-xs font-bold uppercase tracking-widest text-[#eab308] mb-3 flex items-center justify-between gap-2 border-b border-tp-border pb-2">
                             <span class="flex items-center gap-2"><i data-lucide="bot" class="w-4 h-4"></i> Allert EA</span>
-                            <span id="allert-ea-count" class="text-[10px] text-tp-muted font-bold px-2 py-0.5 bg-tp-border/30 rounded border border-tp-border/50">0</span>
+                            <span class="flex items-center gap-2">
+                                <button onclick="ignoraTuttiAllertEAGiornata()" id="ignora-tutti-ea-btn" class="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border border-tp-loss/30 text-tp-loss hover:bg-tp-loss/10 transition-colors flex items-center gap-1" title="Ignora tutti gli allert EA visualizzati">
+                                    <i data-lucide="x-square" class="w-3 h-3"></i> Ignora tutti
+                                </button>
+                                <span id="allert-ea-count" class="text-[10px] text-tp-muted font-bold px-2 py-0.5 bg-tp-border/30 rounded border border-tp-border/50">0</span>
+                            </span>
                         </h3>
                         <div id="allert-ea-list" class="space-y-2 max-h-[260px] overflow-y-auto">
                             <p class="text-xs text-tp-muted italic text-center py-2">Caricamento...</p>
@@ -1257,6 +1262,29 @@
             await db.from(tbl).update({ stato: 'ignorato' }).eq('id', id);
             await Promise.all([loadAllertOggi(), loadAllertEAGiornata()]);
         }
+
+        // Ignora in batch tutti gli allert EA della giornata mostrati (stato='nuovo' + filtro isEaAllert).
+        async function ignoraTuttiAllertEAGiornata() {
+            if (!giornataDate) return;
+            const { data: prezzoData } = await db.from('allert_prezzo')
+                .select('id, regola_id, descrizione, sorgente')
+                .gte('created_at', giornataDate + 'T00:00:00')
+                .lte('created_at', giornataDate + 'T23:59:59')
+                .in('stato', ['nuovo']);
+            const items = (prezzoData || []).filter(isEaAllert);
+            if (!items.length) return;
+            const ids = items.map(a => a.id);
+            showConfirm(
+                `Ignorare ${ids.length} allert EA?`,
+                `Tutti gli allert EA della giornata saranno marcati come "ignorato" e rimossi dalla lista.`,
+                async () => {
+                    const { error } = await db.from('allert_prezzo').update({ stato: 'ignorato' }).in('id', ids);
+                    if (error) { console.error('Errore ignora tutti:', error); return; }
+                    await Promise.all([loadAllertOggi(), loadAllertEAGiornata()]);
+                }
+            );
+        }
+        window.ignoraTuttiAllertEAGiornata = ignoraTuttiAllertEAGiornata;
 
         // ============================================
         // SESSIONI CARDS

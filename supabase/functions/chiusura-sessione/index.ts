@@ -223,7 +223,15 @@ REPERTO (bias di lettura mercato) -> IPOTESI (snapshot/istanza con strategia + l
 - Il trade NON va valutato direttamente vs strategia. Va valutato vs IPOTESI di cui e' figlio (1:1 trade<->ipotesi).
 - L'IPOTESI va valutata vs REPERTO bias del giorno (allineamento direzione + asset).
 - La STRATEGIA serve solo come template a monte dell'ipotesi: regole rispettate dall'ipotesi (R/R, livelli, checklist) prima ancora del trade.
-- Se manca un anello (es. trade senza ipotesi, ipotesi senza reperto, reperto senza ipotesi consequente) e' una rottura del flusso da segnalare ESPLICITAMENTE.
+- ANELLI ROTTI (DA SEGNALARE): trade SENZA ipotesi associata, ipotesi SENZA reperto associato, reperto direzionalmente in conflitto con ipotesi/trade.
+- NON E' un anello rotto: ipotesi senza trade collegato. Un'ipotesi e' una POSSIBILITA' formulata; se non si e' verificata e non si e' tradata, e' fisiologico, non un errore disciplinare. NON chiamarla "anello aperto/non chiuso".
+
+DEADLINE IPOTESI (CRITICO, sessione attuale = ${info.label}):
+- Le ipotesi hanno deadline = FINE GIORNATA OPERATIVA (chiusura NY ~22:00 Casa), NON fine sessione intermedia.
+- Ipotesi formulate per sessioni FUTURE (es. ipotesi sessione=newyork mentre stai chiudendo Londra) sono ANCORA APERTE e VALIDE: non sono in ritardo, non sono "anelli aperti".
+- Ipotesi su "Asian range" / "asian sweep" / sessione=asia: il setup di sweep e' validabile fino a chiusura NY perche' la liquidita' asiatica puo' essere presa anche in fascia NY. NON segnalarle come scadute in chiusura Londra.
+- SOLO nel debrief EOD finale (post-NY) le ipotesi senza esito esplicito (eseguita/invalidata/scaduta) vanno trattate come "lasciate aperte da chiudere".
+- Sessione corrente del debrief: ${info.label}. Se ${info.label} != "New York", non lamentarti delle ipotesi non ancora chiuse.
 
 DEBRIEF SESSIONE ${info.label.toUpperCase()} (oggi ${today}, ${info.oraStart}-${info.oraEnd} Casablanca)
 
@@ -249,12 +257,12 @@ STRATEGIE A MONTE (template di regole):
 ${strategieLines}
 
 Genera un commento disciplinare ASCIUTTO (italiano, no parolacce, no motivational) che copra in ordine, ognuno UNA RIGA:
-1. Catena reperto->ipotesi->trade: integrita' del flusso (anelli mancanti? trade senza ipotesi? ipotesi senza reperto?). 1 riga.
+1. Catena reperto->ipotesi->trade: integrita' del flusso. Segnala SOLO veri anelli rotti (trade senza ipotesi, ipotesi senza reperto, conflitto direzionale). Ipotesi senza trade NON e' un anello rotto, NON menzionarla come problema. 1 riga.
 2. Coerenza direzionale: reperto bias e ipotesi e trade sulla stessa direzione/asset? 1 riga.
 3. Trade vs ipotesi/strategia: regole dell'ipotesi rispettate (R/R, livelli, checklist)? 1 riga.
 4. Deviazioni cognitive (FOMO, revenge, forcing) SOLO se evidenti — altrimenti "nessuna". 1 riga.
-5. Voto disciplina 0-10 + 1 motivazione tecnica (cita anelli rotti se ci sono). 1 riga.
-6. Una regola operativa concreta per la prossima sessione che chiuda l'anello mancante. 1 riga.
+5. Voto disciplina 0-10 + 1 motivazione tecnica. Se non ci sono anelli VERI rotti, non penalizzare per ipotesi non eseguite. 1 riga.
+6. Una regola operativa concreta per la prossima sessione (es. cosa monitorare nel prossimo blocco). NON suggerire "chiudere ipotesi entro fine sessione": le ipotesi si chiudono a EOD o quando si invalidano davvero. 1 riga.
 
 VINCOLI HARD:
 - Massimo 6 righe totali, NIENTE intro, NIENTE conclusioni, NIENTE markdown bold/italic.

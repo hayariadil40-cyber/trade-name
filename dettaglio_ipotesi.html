@@ -251,8 +251,8 @@
                                         <span id="ipotesi-stato-badge" class="stato-badge stato-ipotesi"><i data-lucide="circle-dot" class="w-3 h-3"></i> ipotesi</span>
                                         <span class="text-[10px] text-tp-muted font-bold uppercase tracking-widest" id="ipotesi-meta">—</span>
                                     </div>
-                                    <!-- Modalita 1: strategia gia scelta (link readonly) -->
-                                    <a id="strat-link" href="#" class="hidden text-2xl font-extrabold text-white hover:text-tp-accent transition-colors block truncate">—</a>
+                                    <!-- Modalita 1: strategia gia scelta (link readonly). display gestito da JS (inline-block) per limitare l'hitbox al testo: block estendeva l'area click a tutta la riga, l'utente cliccava lo spazio a destra del nome e finiva su dettaglio_strategia. -->
+                                    <a id="strat-link" href="#" class="text-2xl font-extrabold text-white hover:text-tp-accent transition-colors truncate" style="display:none;max-width:100%">—</a>
                                     <!-- Modalita 2: strategia non scelta (select + conferma) -->
                                     <div id="strat-select-wrap" class="flex items-center gap-3 flex-wrap">
                                         <select id="strat-select" class="bg-[#0a0c10] border border-tp-accent/40 rounded-lg px-3 py-2 text-base font-bold text-white outline-none min-w-[220px]">
@@ -572,8 +572,9 @@
             document.getElementById('placeholder-no-strat').classList.toggle('hidden', stratChosen);
             document.getElementById('property-rows').classList.toggle('hidden', !stratChosen);
 
-            // Toggle visibility: link vs select strategia
-            document.getElementById('strat-link').classList.toggle('hidden', !stratChosen);
+            // Toggle visibility: link vs select strategia. Usiamo style.display per il link
+            // cosi' resta 'inline-block' (hitbox = solo testo) invece di 'block' (hitbox tutta la riga).
+            document.getElementById('strat-link').style.display = stratChosen ? 'inline-block' : 'none';
             document.getElementById('strat-select-wrap').classList.toggle('hidden', stratChosen);
 
             if (stratChosen) {
