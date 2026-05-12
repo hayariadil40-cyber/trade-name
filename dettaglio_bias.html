@@ -301,6 +301,22 @@
                             <textarea id="bias-commento" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-4 py-3 text-sm text-tp-text/90 outline-none min-h-[150px] resize-none focus:border-tp-accent transition-colors leading-relaxed" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="Descrivi il reperto: commento, bias, conformazione, pattern o inefficienza individuata..."></textarea>
                         </div>
 
+                        <!-- Aggiornamenti -->
+                        <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
+                                <i data-lucide="clock" class="w-4 h-4 text-tp-accent"></i> Aggiornamenti
+                                <span class="text-[10px] font-normal text-tp-muted/70 normal-case tracking-normal">(monitoring sviluppo durante la giornata)</span>
+                            </label>
+                            <div id="aggiornamenti-list" class="space-y-2 mb-4"></div>
+                            <div class="flex gap-2 items-stretch">
+                                <input id="agg-ora" type="time" class="bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[120px]"/>
+                                <textarea id="agg-testo" rows="2" class="flex-1 bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Es: London ha rispettato 4720, prima reazione long visibile, bias confermato"></textarea>
+                                <button type="button" onclick="addAggiornamento()" id="agg-btn" class="px-4 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 hover:bg-tp-accent/20 uppercase transition-all flex items-center gap-2">
+                                    <i data-lucide="plus" class="w-4 h-4"></i> Aggiungi
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- Categorizzatore Universale -->
                         <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
                             <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
@@ -417,6 +433,7 @@
         let currentStato = 'aperto';
         let screenshots = [];
         let selectedTipi = [];
+        let aggiornamenti = [];
         let availableTipi = ['commento', 'bias', 'conformazione', 'appunto']; // default, sovrascritto da settings
 
         // Icone fisse per i tipi di default; gli altri usano un'icona generica
@@ -519,6 +536,12 @@
 
             screenshots = data.screenshots || [];
             renderScreenshots();
+
+            aggiornamenti = Array.isArray(data.aggiornamenti) ? data.aggiornamenti.slice() : [];
+            renderAggiornamenti();
+            // preset ora corrente (Casablanca = locale dell'utente)
+            const _now = new Date();
+            document.getElementById('agg-ora').value = String(_now.getHours()).padStart(2,'0') + ':' + String(_now.getMinutes()).padStart(2,'0');
 
             // Restore categorizzatori selections
             if (data.categorizzatori) {
@@ -744,6 +767,62 @@
             renderScreenshots();
         }
 
+        // --- AGGIORNAMENTI ---
+        function escapeAggHtml(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
+        function renderAggiornamenti() {
+            const list = document.getElementById('aggiornamenti-list');
+            if (!list) return;
+            if (!aggiornamenti.length) {
+                list.innerHTML = '<p class="text-xs text-tp-muted/60 italic">Nessun aggiornamento. Aggiungilo sotto man mano che il reperto si sviluppa.</p>';
+                return;
+            }
+            list.innerHTML = aggiornamenti.map((a, i) => `
+                <div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 flex items-start gap-3">
+                    <span class="text-xs font-bold text-tp-accent tracking-wide whitespace-nowrap mt-0.5">${escapeAggHtml(a.ora)}</span>
+                    <p class="flex-1 text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escapeAggHtml(a.testo)}</p>
+                    <button type="button" onclick="removeAggiornamento(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors flex-shrink-0" title="Rimuovi">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        async function addAggiornamento() {
+            if (currentStato === 'chiuso') return;
+            const oraEl = document.getElementById('agg-ora');
+            const testoEl = document.getElementById('agg-testo');
+            const ora = (oraEl.value || '').trim();
+            const testo = (testoEl.value || '').trim();
+            if (!ora || !testo) { alert('Compila orario e testo prima di aggiungere'); return; }
+            aggiornamenti.push({ora, testo});
+            aggiornamenti.sort((a,b) => (a.ora || '').localeCompare(b.ora || ''));
+            testoEl.value = '';
+            renderAggiornamenti();
+            const {error} = await db.from('bias').update({aggiornamenti}).eq('id', biasId);
+            if (error) {
+                alert('Errore salvataggio aggiornamento: ' + error.message);
+                const idx = aggiornamenti.findIndex(x => x.ora === ora && x.testo === testo);
+                if (idx >= 0) aggiornamenti.splice(idx, 1);
+                renderAggiornamenti();
+            }
+        }
+
+        async function removeAggiornamento(i) {
+            if (currentStato === 'chiuso') return;
+            const removed = aggiornamenti.splice(i, 1)[0];
+            renderAggiornamenti();
+            const {error} = await db.from('bias').update({aggiornamenti}).eq('id', biasId);
+            if (error) {
+                alert('Errore rimozione: ' + error.message);
+                aggiornamenti.splice(i, 0, removed);
+                renderAggiornamenti();
+            }
+        }
+
         // --- COLLECT PAYLOAD (riusato da save e close) ---
         function collectPayload() {
             return {
@@ -752,6 +831,7 @@
                 direzione: currentDirection,
                 tipo: selectedTipi,
                 commento: document.getElementById('bias-commento').value,
+                aggiornamenti: aggiornamenti,
                 esito: currentEsito || null,
                 screenshots: screenshots,
                 categorizzatori: {

@@ -98,8 +98,8 @@ serve(async (req) => {
 
     const biasLimit = assistantMode === "giornaliero" ? 5 : assistantMode === "coach" ? 12 : 25;
     const { data: bias } = await supabase.from("bias")
-      .select("asset, direzione, commento, data").order("data", { ascending: false }).limit(biasLimit);
-    if (bias && bias.length) dbContext += "\n\n## BIAS:\n" + JSON.stringify(bias);
+      .select("asset, direzione, tipo, commento, aggiornamenti, esito, stato, data").order("data", { ascending: false }).limit(biasLimit);
+    if (bias && bias.length) dbContext += "\n\n## REPERTI (1 per coin/giorno; il campo `aggiornamenti` è una timeline di {ora, testo} accodata cronologicamente — leggi il commento iniziale e poi gli aggiornamenti in ordine per capire l'evoluzione del bias):\n" + JSON.stringify(bias);
 
     if (assistantMode === "coach" || assistantMode === "power") {
       const { data: strategie } = await supabase.from("strategie")
@@ -167,12 +167,17 @@ Azioni supportate (USA ESATTAMENTE QUESTI VALORI di "action"):
 \`\`\`
 IMPORTANTE: NON usare MAI insert su "sessioni". Le 3 righe (asia, london, newyork) sono create automaticamente quando l'utente apre la giornata (trigger su giornate) o dal cron apertura-sessione. Se devi compilare dati di sessione usa SEMPRE update o update_coin con match {"data":"YYYY-MM-DD","nome":"london|newyork|asia"}. Il backend rifiuta gli insert su sessioni.
 
+REGOLE REPERTI (tabella bias): MASSIMO 1 reperto per coin per data. Prima di insert su bias, controlla nel contesto sopra (## REPERTI) se esiste gia una riga con stesso asset+data. Se esiste, NON fare insert: fai update accodando un elemento all'array \`aggiornamenti\`. Formato aggiornamenti: array jsonb di {"ora":"HH:MM","testo":"..."} ordinato cronologicamente. Per accodare devi passare l'array INTERO con il nuovo elemento appeso (mai append parziale, sovrascrive tutto). Il \`commento\` resta il blocco iniziale (daily + bias giornata); gli \`aggiornamenti\` raccontano l'evoluzione intraday (conferma, invalidazione, flip direzione, monitoring). Esempio:
+\`\`\`db_actions
+[{"table":"bias","action":"update","match":{"asset":"XAUUSD","data":"2026-05-12"},"data":{"aggiornamenti":[{"ora":"10:45","testo":"London ha rispettato 4720, prima reazione long, bias confermato"},{"ora":"14:30","testo":"NY open ha bucato 4708, bias invalidato"}]}}]
+\`\`\`
+
 3. update_coin - merge non-distruttivo su una chiave dentro coin_data jsonb. Funziona per sessioni E cronache (entrambe hanno colonna coin_data). Mantiene i campi esistenti (commento/sentiment/screenshot) e sovrascrive solo quelli passati in "data":
 \`\`\`db_actions
 [{"table":"cronache","action":"update_coin","match":{"data":"2026-04-24"},"coin":"XAUUSD","data":{"low":"4657.69","high":"4740.42","open":"4692.44","close":"4707.41","percentuale":"+0.32"}}]
 \`\`\`
 
-Tabelle scrittura: sessioni (coin_data, mood, nome, data), giornate (mindset, volatilita, note_domani, fajr, marea, day_tags), trades (note, mood, volatilita, tag - solo se non completato), bias (asset, direzione, commento), cronache (coin_data, titolo), settimane (review, note), strategie (nome, ipotesi, regole_ingresso, sessione, tipo_mercato, dove_entro, dove_esco_sl, dove_esco_tp, gestione_operazione, da_osservare, asset, tipo, timeframe, note, stato, winrate, gestione_rischio[LEGACY], take_profit[LEGACY]), allert (SOLO valore_effettivo, screenshot).
+Tabelle scrittura: sessioni (coin_data, mood, nome, data), giornate (mindset, volatilita, note_domani, fajr, marea, day_tags), trades (note, mood, volatilita, tag - solo se non completato), bias (asset, direzione, commento, aggiornamenti), cronache (coin_data, titolo), settimane (review, note), strategie (nome, ipotesi, regole_ingresso, sessione, tipo_mercato, dove_entro, dove_esco_sl, dove_esco_tp, gestione_operazione, da_osservare, asset, tipo, timeframe, note, stato, winrate, gestione_rischio[LEGACY], take_profit[LEGACY]), allert (SOLO valore_effettivo, screenshot).
 
 REGOLE STRATEGIE (split campi):
 - ipotesi: cosa vede il setup, perche dovrebbe funzionare (testo libero, 3-8 righe).
