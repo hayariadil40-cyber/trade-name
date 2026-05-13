@@ -285,22 +285,24 @@ VINCOLI HARD:
     if (info.scope === "lifestyle") {
       const { data: giornata } = await supabase.from("giornate")
         .select("marea").eq("data", today).maybeSingle();
-      const marea = (giornata?.marea || "").toString().toLowerCase();
+      const mareaOra = (giornata?.marea || "").toString();
+      const mareaHH = parseInt((mareaOra.split(":")[0] || "-1"), 10);
+      const mareaInPausa = mareaHH >= 11 && mareaHH < 15;
       try {
         const prompt = `Sei Rodrigo, assistente operativo del Trade Desk.
 
 L'utente ha appena chiuso la sessione di Londra (sono le 11:00 Casablanca). Ha qualche ora di pausa prima della sessione di New York alle 14:30.
 
-MAREA DI OGGI: ${marea || "n.d."}
+BASSA MAREA OGGI A RABAT: ${mareaOra || "n.d."} (il campo "marea" contiene SEMPRE l'orario della bassa marea, mai dell'alta — non inventare un'alta marea).
 
 Suggeriscigli in UNA sola frase asciutta come passare la pausa:
-- Se la marea e' "bassa" (o simili): proponigli di andare al mare.
+- Se la bassa marea cade nella pausa (11:00-14:30 Casablanca): proponigli di andare al mare.
 - Altrimenti: scegli tra "fare sport" o "passare tempo con la famiglia". Variabile, non sempre la stessa.
 
 Italiano. Una frase. Niente motivazione vuota, niente parolacce, niente formule fatte. Tono pratico da compagno operativo.`;
         rodrigoBlock.testo = (await callClaude(prompt, ANTHROPIC_API_KEYS, 100)).trim();
       } catch (e) {
-        rodrigoBlock.testo = marea.includes("bassa") ? "Marea bassa. Vai al mare." : "Pausa: muoviti un'ora o stai con la famiglia.";
+        rodrigoBlock.testo = mareaInPausa ? `Bassa marea alle ${mareaOra}. Vai al mare.` : "Pausa: muoviti un'ora o stai con la famiglia.";
       }
     } else {
       // Compilazione check (NY 16:30)

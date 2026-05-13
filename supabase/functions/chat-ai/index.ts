@@ -58,7 +58,8 @@ serve(async (req) => {
     const { data: giornata } = await supabase.from("giornate")
       .select("data, mindset, volatilita, note_domani, fajr, marea, tags, day_tags")
       .eq("data", today).single();
-    if (giornata) dbContext += "\n\n## GIORNATA DI OGGI:\n" + JSON.stringify(giornata);
+    if (giornata) dbContext += "\n\n## GIORNATA DI OGGI:\n" + JSON.stringify(giornata)
+      + "\n(NB: il campo 'marea' contiene SEMPRE l'orario della BASSA marea a Rabat, mai dell'alta. Se ne parli, dilla come 'bassa marea alle HH:MM' — non inventare un'alta marea.)";
 
     const smileLimit = assistantMode === "giornaliero" ? 10 : assistantMode === "coach" ? 20 : 40;
     const { data: smile } = await supabase.from("monitora_smile")

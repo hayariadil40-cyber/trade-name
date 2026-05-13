@@ -510,6 +510,7 @@
         let strategia = null;     // riga strategie (template padre, per opzioni)
         let osservazioni = [];    // [{domanda, tags:[]}] copia in memoria
         let strategieList = [];   // tutte le strategie disponibili (per il select)
+        let flagFreq = { dove_entro: {}, dove_esco_sl: {}, dove_esco_tp: {} }; // conteggi storici per ordinare le opzioni
         let fractalData = {};     // {15m,1h,4h,1d -> 'green'|'red'}
         let currentDir = '';      // 'LONG' | 'SHORT' | ''
         let tradesCollegati = []; // [{id, asset, direzione, stato, esito, pnl, data, osservazioni}]
@@ -529,6 +530,7 @@
             await loadStrategieList();
             if (ipotesi.strategia_id) {
                 await loadStrategia();
+                await loadFlagFreq();
             }
             renderAll();
         });
@@ -559,6 +561,24 @@
             const { data, error } = await db.from('strategie').select('*').eq('id', ipotesi.strategia_id).single();
             if (error || !data) { console.error('Strategia padre non trovata', error); return; }
             strategia = data;
+        }
+
+        // Conteggi storici dei flag su tutte le ipotesi della stessa strategia.
+        // Servono a ordinare dove_entro/sl/tp dalla voce piu' usata alla meno usata.
+        async function loadFlagFreq() {
+            flagFreq = { dove_entro: {}, dove_esco_sl: {}, dove_esco_tp: {} };
+            if (!strategia || !strategia.id) return;
+            const { data, error } = await db.from('ipotesi_trading')
+                .select('dove_entro_flagged, dove_esco_sl_flagged, dove_esco_tp_flagged')
+                .eq('strategia_id', strategia.id);
+            if (error || !data) return;
+            data.forEach(r => {
+                ['dove_entro','dove_esco_sl','dove_esco_tp'].forEach(k => {
+                    const arr = r[k + '_flagged'];
+                    if (!Array.isArray(arr)) return;
+                    arr.forEach(v => { flagFreq[k][v] = (flagFreq[k][v] || 0) + 1; });
+                });
+            });
         }
 
         function renderAll() {
@@ -750,23 +770,39 @@
         }
 
         // --- FLAG ROW HELPERS (per voci checkbox-style) ---
+        // sourceField in [dove_entro, dove_esco_sl, dove_esco_tp]:
+        //   - ordina le opzioni per frequenza di flag storico (piu' usata in alto)
+        //   - mostra riga "+ aggiungi" che persiste sulla strategia padre
+        // regole_ingresso resta nell'ordine definito sulla strategia (checklist = sequenza).
         function renderFlagList(containerId, sourceField, ipotesiField) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
-            const opts = (strategia && Array.isArray(strategia[sourceField])) ? strategia[sourceField] : [];
+            const opts = (strategia && Array.isArray(strategia[sourceField])) ? strategia[sourceField].slice() : [];
             if (!Array.isArray(ipotesi[ipotesiField])) ipotesi[ipotesiField] = [];
 
-            if (!opts.length) {
+            const sortable = (sourceField === 'dove_entro' || sourceField === 'dove_esco_sl' || sourceField === 'dove_esco_tp');
+            if (sortable) {
+                const freq = flagFreq[sourceField] || {};
+                opts.sort((a, b) => (freq[b] || 0) - (freq[a] || 0));
+            }
+
+            if (!opts.length && !sortable) {
                 container.innerHTML = `<p class="text-[11px] text-tp-muted/50 italic py-2 px-2">Nessuna voce nella strategia padre.</p>`;
                 return;
             }
+
             opts.forEach(v => {
                 const isOn = ipotesi[ipotesiField].includes(v);
                 const row = document.createElement('div');
                 row.className = 'flag-row' + (isOn ? ' on' : '');
+                const cnt = (flagFreq[sourceField] && flagFreq[sourceField][v]) || 0;
+                const countHtml = sortable
+                    ? `<span class="text-[10px] text-tp-muted/60 ml-auto shrink-0 self-center tabular-nums" title="usata ${cnt} volte">${cnt}</span>`
+                    : '';
                 row.innerHTML = `
                     <div class="check-box"><i data-lucide="check" class="w-3 h-3"></i></div>
                     <span class="flag-text">${escHtml(v)}</span>
+                    ${countHtml}
                 `;
                 row.onclick = () => {
                     const i = ipotesi[ipotesiField].indexOf(v);
@@ -775,7 +811,64 @@
                 };
                 container.appendChild(row);
             });
+
+            if (sortable) {
+                if (!opts.length) {
+                    const empty = document.createElement('p');
+                    empty.className = 'text-[11px] text-tp-muted/50 italic px-2 pb-1';
+                    empty.textContent = 'Nessuna voce nella strategia padre.';
+                    container.appendChild(empty);
+                }
+                const addWrap = document.createElement('div');
+                addWrap.className = 'flex items-center gap-2 mt-2 px-1';
+                addWrap.innerHTML = `
+                    <i data-lucide="plus" class="w-3.5 h-3.5 text-tp-muted/60"></i>
+                    <input type="text" placeholder="aggiungi voce alla strategia (Invio)" class="flex-1 bg-transparent text-[11px] text-white outline-none border-b border-tp-border/30 px-1 py-1 placeholder-tp-border/70">
+                `;
+                const input = addWrap.querySelector('input');
+                input.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const v = (input.value || '').trim();
+                        if (!v) return;
+                        input.value = '';
+                        addStrategiaOption(sourceField, ipotesiField, v, containerId);
+                    }
+                };
+                container.appendChild(addWrap);
+            }
+
             lucide.createIcons();
+        }
+
+        // Aggiunge una nuova voce alla strategia padre (dove_entro / dove_esco_sl / dove_esco_tp)
+        // e la flagga automaticamente sull'ipotesi corrente. Idempotente: se la voce esiste gia'
+        // sulla strategia, fa solo il flag.
+        async function addStrategiaOption(sourceField, ipotesiField, value, containerId) {
+            if (!strategia || !strategia.id) { alert('Strategia non collegata.'); return; }
+            if (ipotesi && ipotesi.stato === 'osservata') { alert('Ipotesi osservata: bloccata.'); return; }
+            const current = Array.isArray(strategia[sourceField]) ? strategia[sourceField].slice() : [];
+            let stratChanged = false;
+            if (!current.includes(value)) {
+                current.push(value);
+                stratChanged = true;
+            }
+            if (stratChanged) {
+                const { error: e1 } = await db.from('strategie').update({ [sourceField]: current }).eq('id', strategia.id);
+                if (e1) { alert('Errore aggiornamento strategia: ' + e1.message); return; }
+                strategia[sourceField] = current;
+            }
+            if (!Array.isArray(ipotesi[ipotesiField])) ipotesi[ipotesiField] = [];
+            if (!ipotesi[ipotesiField].includes(value)) ipotesi[ipotesiField].push(value);
+            const { error: e2 } = await db.from('ipotesi_trading').update({
+                [ipotesiField]: ipotesi[ipotesiField],
+                updated_at: new Date().toISOString()
+            }).eq('id', ipotesiId);
+            if (e2) { alert('Errore flag ipotesi: ' + e2.message); return; }
+            // La nuova voce parte con count = 1 (questa ipotesi).
+            if (!flagFreq[sourceField]) flagFreq[sourceField] = {};
+            flagFreq[sourceField][value] = (flagFreq[sourceField][value] || 0) + 1;
+            renderFlagList(containerId, sourceField, ipotesiField);
         }
 
         function renderCheckListFlag()    { renderFlagList('check-list-flag-container',    'regole_ingresso', 'check_list_flagged'); }
@@ -788,11 +881,14 @@
             const container = document.getElementById('osservazioni-container');
             const oss = getActiveOsservazioni();
             container.innerHTML = '';
+            const isTemplate = (activeOssTab === '__template__');
             if (!oss.length) {
-                const placeholder = activeOssTab === '__template__'
+                const placeholder = isTemplate
                     ? 'Nessuna domanda template (la strategia padre non ne ha al momento dello snapshot).'
                     : 'Nessuna domanda per questo trade. Verra` popolata dal template quando ricolleghi il trade.';
                 container.innerHTML = `<p class="text-[11px] text-tp-muted/50 italic">${placeholder}</p>`;
+                if (strategia && strategia.id) appendAddDomandaRow(container);
+                lucide.createIcons();
                 return;
             }
             oss.forEach((o, i) => {
@@ -819,8 +915,53 @@
                 `;
                 container.appendChild(div);
             });
+            if (strategia && strategia.id) appendAddDomandaRow(container);
             lucide.createIcons();
         }
+
+        function appendAddDomandaRow(container) {
+            const wrap = document.createElement('div');
+            wrap.className = 'flex items-center gap-2 pt-2 border-t border-tp-border/30';
+            wrap.innerHTML = `
+                <i data-lucide="plus" class="w-3.5 h-3.5 text-tp-warning/70 shrink-0"></i>
+                <input type="text" placeholder="aggiungi domanda alla strategia (Invio)" class="flex-1 bg-transparent text-[11px] text-white outline-none border-b border-tp-border/30 px-1 py-1 placeholder-tp-border/70">
+            `;
+            const input = wrap.querySelector('input');
+            input.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const v = (input.value || '').trim();
+                    if (!v) return;
+                    input.value = '';
+                    addStrategiaDomanda(v);
+                }
+            };
+            container.appendChild(wrap);
+        }
+
+        // Aggiunge una nuova domanda al da_osservare della strategia padre e
+        // la propaga nello snapshot osservazioni dell'ipotesi corrente (tab __template__).
+        async function addStrategiaDomanda(domanda) {
+            if (!strategia || !strategia.id) { alert('Strategia non collegata.'); return; }
+            if (ipotesi && ipotesi.stato === 'osservata') { alert('Ipotesi osservata: bloccata.'); return; }
+            const currentStrat = Array.isArray(strategia.da_osservare) ? strategia.da_osservare.slice() : [];
+            const exists = currentStrat.some(o => ((o && o.domanda) ? o.domanda : String(o || '')) === domanda);
+            if (!exists) {
+                currentStrat.push({ domanda, tags: [] });
+                const { error: e1 } = await db.from('strategie').update({ da_osservare: currentStrat }).eq('id', strategia.id);
+                if (e1) { alert('Errore aggiornamento strategia: ' + e1.message); return; }
+                strategia.da_osservare = currentStrat;
+            }
+            // Propago nello snapshot osservazioni se non c'e' gia
+            if (!Array.isArray(osservazioni)) osservazioni = [];
+            const existsSnap = osservazioni.some(o => (o && o.domanda) === domanda);
+            if (!existsSnap) osservazioni.push({ domanda, tags: [] });
+            await persistActiveOsservazioni(osservazioni);
+            renderOsservazioni();
+            renderOsservazioniTabs();
+            renderStatoActions();
+        }
+
         async function addOsservazioneTag(i, inputEl) {
             const v = (inputEl.value || '').trim();
             if (!v) return;
