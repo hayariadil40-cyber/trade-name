@@ -132,7 +132,7 @@
             const today = fmt(t);
             if (period === 'oggi') return { from: today, to: today };
             if (period === 'ieri') { const y = new Date(t); y.setDate(t.getDate()-1); const ys = fmt(y); return { from: ys, to: ys }; }
-            if (period === 'settimana') { const mon = new Date(t); mon.setDate(t.getDate() - (t.getDay()===0?6:t.getDay()-1)); return { from: fmt(mon), to: today }; }
+            if (period === 'settimana') { const mon = new Date(t); mon.setDate(t.getDate() - (t.getDay()===0?6:t.getDay()-1)); const fri = new Date(mon); fri.setDate(mon.getDate()+4); return { from: fmt(mon), to: fmt(fri) }; }
             if (period === 'mese') { return { from: `${t.getFullYear()}-${pad(t.getMonth()+1)}-01`, to: today }; }
             return null;
         }
