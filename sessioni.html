@@ -188,7 +188,7 @@
                 const borderColor = s.nome === 'newyork' ? 'hover:border-tp-loss/50' : s.nome === 'london' ? 'hover:border-purple-400/50' : 'hover:border-tp-accent/50';
                 const barColor = s.nome === 'newyork' ? 'bg-tp-loss' : s.nome === 'london' ? 'bg-purple-400' : 'bg-tp-accent';
                 const dateStr = s.data ? new Date(s.data + 'T00:00:00').toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' }) : '--';
-                const coins = s.coin_data ? Object.keys(s.coin_data).filter(c => s.coin_data[c].high || s.coin_data[c].commento) : [];
+                const coins = Array.isArray(s.coin_keys) ? s.coin_keys : [];
                 const moodIcon = s.mood === 'positive' ? 'smile' : s.mood === 'negative' ? 'frown' : 'meh';
                 const moodColor = s.mood === 'positive' ? 'text-tp-accent' : s.mood === 'negative' ? 'text-tp-loss' : 'text-tp-warning';
 

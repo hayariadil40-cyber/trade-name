@@ -159,7 +159,9 @@
             // Cronache passate non completate diventano "nuovo" (da lavorare)
             var todayStr = new Date().getFullYear() + '-' + String(new Date().getMonth()+1).padStart(2,'0') + '-' + String(new Date().getDate()).padStart(2,'0');
             await db.from('cronache').update({ stato: 'nuovo' }).lt('data', todayStr).neq('stato', 'completato').neq('stato', 'ignorato');
-            const { data: rawData, error } = await db.from('cronache').select('*').order('data', { ascending: true });
+            var since = new Date(); since.setDate(since.getDate() - 60);
+            var sinceStr = since.getFullYear() + '-' + String(since.getMonth()+1).padStart(2,'0') + '-' + String(since.getDate()).padStart(2,'0');
+            const { data: rawData, error } = await db.from('cronache').select('*').gte('data', sinceStr).order('data', { ascending: true });
             // Raggruppa per settimana (lun-ven), poi ordina settimane decrescenti
             function getWeekMonday(dateStr) {
                 var d = new Date(dateStr + 'T12:00:00');
