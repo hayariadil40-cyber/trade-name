@@ -126,14 +126,21 @@
         let activeTimeCronache = 'settimana';
 
         function getCronacheDateRange(period) {
-            const t = new Date();
             const pad = n => String(n).padStart(2,'0');
-            const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-            const today = fmt(t);
-            if (period === 'oggi') return { from: today, to: today };
-            if (period === 'ieri') { const y = new Date(t); y.setDate(t.getDate()-1); const ys = fmt(y); return { from: ys, to: ys }; }
-            if (period === 'settimana') { const mon = new Date(t); mon.setDate(t.getDate() - (t.getDay()===0?6:t.getDay()-1)); const fri = new Date(mon); fri.setDate(mon.getDate()+4); return { from: fmt(mon), to: fmt(fri) }; }
-            if (period === 'mese') { return { from: `${t.getFullYear()}-${pad(t.getMonth()+1)}-01`, to: today }; }
+            const fmtTs = ts => { const d = new Date(ts); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+            const now = Date.now();
+            const DAY = 86400000;
+            const todayStr = fmtTs(now);
+            if (period === 'oggi') return { from: todayStr, to: todayStr };
+            if (period === 'ieri') { const s = fmtTs(now - DAY); return { from: s, to: s }; }
+            if (period === 'settimana') {
+                const d = new Date(); const dow = d.getDay(); // 0=dom
+                const daysToMon = dow === 0 ? 6 : dow - 1;
+                const monTs = now - daysToMon * DAY;
+                const friTs = monTs + 4 * DAY;
+                return { from: fmtTs(monTs), to: fmtTs(friTs) };
+            }
+            if (period === 'mese') { const d = new Date(); return { from: `${d.getFullYear()}-${pad(d.getMonth()+1)}-01`, to: todayStr }; }
             return null;
         }
 

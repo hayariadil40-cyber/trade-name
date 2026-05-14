@@ -171,23 +171,19 @@
         });
 
         function getDateRange(period) {
-            const t = new Date();
             const pad = n => String(n).padStart(2,'0');
-            const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-            const today = fmt(t);
-            if (period === 'oggi') return { from: today, to: today };
-            if (period === 'ieri') {
-                const y = new Date(t); y.setDate(t.getDate()-1); const ys = fmt(y);
-                return { from: ys, to: ys };
-            }
+            const fmtTs = ts => { const d = new Date(ts); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+            const now = Date.now();
+            const DAY = 86400000;
+            const todayStr = fmtTs(now);
+            if (period === 'oggi') return { from: todayStr, to: todayStr };
+            if (period === 'ieri') { const s = fmtTs(now - DAY); return { from: s, to: s }; }
             if (period === 'settimana') {
-                const mon = new Date(t); const day = t.getDay();
-                mon.setDate(t.getDate() - (day === 0 ? 6 : day - 1));
-                return { from: fmt(mon), to: today };
+                const dow = new Date().getDay();
+                const daysToMon = dow === 0 ? 6 : dow - 1;
+                return { from: fmtTs(now - daysToMon * DAY), to: todayStr };
             }
-            if (period === 'mese') {
-                return { from: `${t.getFullYear()}-${pad(t.getMonth()+1)}-01`, to: today };
-            }
+            if (period === 'mese') { const d = new Date(); return { from: `${d.getFullYear()}-${pad(d.getMonth()+1)}-01`, to: todayStr }; }
             return null;
         }
 
