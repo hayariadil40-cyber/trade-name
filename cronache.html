@@ -226,7 +226,7 @@
 
             const range = getCronacheDateRange(activeTimeCronache);
             const filtered = range
-                ? allCronache.filter(c => c.data >= range.from && c.data <= range.to)
+                ? allCronache.filter(c => { const d = (c.data||'').substring(0,10); return d >= range.from && d <= range.to; })
                 : allCronache;
 
             if (!filtered.length) { empty.classList.remove('hidden'); grid.innerHTML = ''; return; }

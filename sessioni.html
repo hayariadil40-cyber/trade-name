@@ -279,7 +279,7 @@
             let sessions = allSessions;
             if (activeTypeFilter !== 'all') sessions = sessions.filter(s => s.nome === activeTypeFilter);
             const range = getDateRange(activeTimeFilter);
-            if (range) sessions = sessions.filter(s => s.data >= range.from && s.data <= range.to);
+            if (range) sessions = sessions.filter(s => { const d = (s.data||'').substring(0,10); return d >= range.from && d <= range.to; });
             renderList(sessions);
         }
     </script>
