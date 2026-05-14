@@ -1213,6 +1213,20 @@
                 .eq('ipotesi_id', ipotesiId)
                 .order('data', { ascending: true });
             tradesCollegati = trades || [];
+
+            // Per ogni trade senza domande, inizializza dal template (domande uguali, tags vuoti).
+            const templateOss = Array.isArray(osservazioni) ? osservazioni : [];
+            if (templateOss.length) {
+                const init = [];
+                for (const t of tradesCollegati) {
+                    if (!Array.isArray(t.osservazioni) || !t.osservazioni.length) {
+                        t.osservazioni = templateOss.map(o => ({ domanda: o.domanda, tags: [] }));
+                        init.push(db.from('trades').update({ osservazioni: t.osservazioni }).eq('id', t.id));
+                    }
+                }
+                if (init.length) await Promise.all(init);
+            }
+
             renderTradePills();
             // Default tab: primo trade collegato se esiste, altrimenti template
             if (tradesCollegati.length && (activeOssTab === '__template__' || !tradesCollegati.find(t => t.id === activeOssTab))) {
