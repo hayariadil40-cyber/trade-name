@@ -1225,7 +1225,7 @@
             container.innerHTML = items.map(a => {
                 const ora = a.ora ? a.ora.substring(0, 5) : (a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' }) : '--:--');
                 const desc = a.descrizione || '';
-                return `<div class="bg-[#0a0c10] border border-tp-border hover:border-[#eab308]/40 rounded-lg p-2.5 transition-all group relative overflow-hidden">
+                return `<div data-allert-id="${a.id}" class="bg-[#0a0c10] border border-tp-border hover:border-[#eab308]/40 rounded-lg p-2.5 transition-all group relative overflow-hidden">
                     <div class="absolute inset-y-0 left-0 w-1 bg-[#eab308]/60"></div>
                     <div class="flex justify-between items-center pl-2 gap-2">
                         <div class="flex flex-col flex-1 min-w-0">
@@ -1263,26 +1263,22 @@
             await Promise.all([loadAllertOggi(), loadAllertEAGiornata()]);
         }
 
-        // Ignora in batch tutti gli allert EA della giornata mostrati (stato='nuovo' + filtro isEaAllert).
+        // Ignora in batch tutti gli allert EA visibili — legge gli ID dal DOM, nessuna query extra.
         async function ignoraTuttiAllertEAGiornata() {
-            if (!giornataDate) { alert('Data giornata non caricata, ricarica la pagina.'); return; }
-            const { data: prezzoData, error: qErr } = await db.from('allert_prezzo')
-                .select('*')
-                .gte('created_at', giornataDate + 'T00:00:00')
-                .lte('created_at', giornataDate + 'T23:59:59')
-                .in('stato', ['nuovo'])
-                .order('created_at', { ascending: false });
-            if (qErr) { alert('Errore lettura allert: ' + qErr.message); return; }
-            const items = (prezzoData || []).filter(isEaAllert);
-            if (!items.length) { alert('Nessun allert EA da ignorare per questa giornata.'); return; }
-            const ids = items.map(a => a.id);
+            const cards = document.querySelectorAll('#allert-ea-list [data-allert-id]');
+            if (!cards.length) { alert('Nessun allert EA da ignorare.'); return; }
+            const ids = Array.from(cards).map(c => c.dataset.allertId);
             showConfirm(
                 `Ignorare ${ids.length} allert EA?`,
                 `Tutti gli allert EA della giornata saranno marcati come "ignorato" e rimossi dalla lista.`,
                 async () => {
-                    const { error } = await db.from('allert_prezzo').update({ stato: 'ignorato' }).in('id', ids);
-                    if (error) { alert('Errore aggiornamento: ' + error.message); return; }
-                    await Promise.all([loadAllertOggi(), loadAllertEAGiornata()]);
+                    try {
+                        const { error } = await db.from('allert_prezzo').update({ stato: 'ignorato' }).in('id', ids);
+                        if (error) throw error;
+                        await Promise.all([loadAllertOggi(), loadAllertEAGiornata()]);
+                    } catch (err) {
+                        alert('Errore: ' + (err.message || err));
+                    }
                 }
             );
         }
