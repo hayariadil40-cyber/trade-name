@@ -132,7 +132,15 @@
                     </button>
                 </div>
 
-                <!-- Filtri -->
+                <!-- Filtri periodo -->
+                <div class="flex gap-2 mb-2 flex-wrap">
+                    <button onclick="filterTime('oggi')" id="tf-oggi" class="time-filter-btn text-tp-accent bg-tp-accent/10 border border-tp-accent/30 px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors">Oggi</button>
+                    <button onclick="filterTime('ieri')" id="tf-ieri" class="time-filter-btn text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">Ieri</button>
+                    <button onclick="filterTime('settimana')" id="tf-settimana" class="time-filter-btn text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">Settimana</button>
+                    <button onclick="filterTime('mese')" id="tf-mese" class="time-filter-btn text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">Mese</button>
+                    <button onclick="filterTime('tutti')" id="tf-tutti" class="time-filter-btn text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">Tutti</button>
+                </div>
+                <!-- Filtri tipo sessione -->
                 <div class="flex gap-2 mb-6">
                     <button onclick="filterList('all')" class="filter-btn text-tp-accent bg-tp-accent/10 border border-tp-accent/30 px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors">Tutte</button>
                     <button onclick="filterList('asia')" class="filter-btn text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">Asia</button>
@@ -153,11 +161,35 @@
     <script src="app.js"></script>
     <script>
         let allSessions = [];
+        let activeTypeFilter = 'all';
+        let activeTimeFilter = 'oggi';
+
         document.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
             if (!db) return;
             await loadSessions();
         });
+
+        function getDateRange(period) {
+            const t = new Date();
+            const pad = n => String(n).padStart(2,'0');
+            const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+            const today = fmt(t);
+            if (period === 'oggi') return { from: today, to: today };
+            if (period === 'ieri') {
+                const y = new Date(t); y.setDate(t.getDate()-1); const ys = fmt(y);
+                return { from: ys, to: ys };
+            }
+            if (period === 'settimana') {
+                const mon = new Date(t); const day = t.getDay();
+                mon.setDate(t.getDate() - (day === 0 ? 6 : day - 1));
+                return { from: fmt(mon), to: today };
+            }
+            if (period === 'mese') {
+                return { from: `${t.getFullYear()}-${pad(t.getMonth()+1)}-01`, to: today };
+            }
+            return null;
+        }
 
         async function loadSessions() {
             const { data, error } = await db.from('sessioni_list').select('*').order('data', { ascending: false });
@@ -167,7 +199,7 @@
                 return;
             }
             allSessions = data || [];
-            renderList(allSessions);
+            applyFilters();
         }
 
         function renderList(sessions) {
@@ -222,15 +254,33 @@
         }
 
         function filterList(type) {
+            activeTypeFilter = type;
             document.querySelectorAll('.filter-btn').forEach(b => {
                 b.classList.remove('text-tp-accent', 'bg-tp-accent/10', 'border-tp-accent/30');
                 b.classList.add('text-tp-muted', 'border-tp-border');
             });
             event.target.classList.add('text-tp-accent', 'bg-tp-accent/10', 'border-tp-accent/30');
             event.target.classList.remove('text-tp-muted', 'border-tp-border');
+            applyFilters();
+        }
 
-            if (type === 'all') renderList(allSessions);
-            else renderList(allSessions.filter(s => s.nome === type));
+        function filterTime(period) {
+            activeTimeFilter = period;
+            document.querySelectorAll('.time-filter-btn').forEach(b => {
+                b.classList.remove('text-tp-accent', 'bg-tp-accent/10', 'border-tp-accent/30');
+                b.classList.add('text-tp-muted', 'border-tp-border');
+            });
+            document.getElementById('tf-' + period).classList.add('text-tp-accent', 'bg-tp-accent/10', 'border-tp-accent/30');
+            document.getElementById('tf-' + period).classList.remove('text-tp-muted', 'border-tp-border');
+            applyFilters();
+        }
+
+        function applyFilters() {
+            let sessions = allSessions;
+            if (activeTypeFilter !== 'all') sessions = sessions.filter(s => s.nome === activeTypeFilter);
+            const range = getDateRange(activeTimeFilter);
+            if (range) sessions = sessions.filter(s => s.data >= range.from && s.data <= range.to);
+            renderList(sessions);
         }
     </script>
 </body>

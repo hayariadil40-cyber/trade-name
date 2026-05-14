@@ -78,19 +78,24 @@
         <!-- Contenuto -->
         <div class="flex-1 overflow-y-auto p-3 lg:p-8 scroll-smooth">
             <div class="max-w-[1600px] mx-auto">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-6">
-                        <h2 class="text-sm text-tp-muted font-medium">Archivio Daily</h2>
-                        <!-- Selettore Coin -->
-                        <div class="flex bg-tp-panel border border-tp-border rounded-lg p-1 gap-1" id="coin-filters">
-                            <button onclick="setCoinFilter('XAUUSD')" class="filter-btn active text-xs font-bold px-3 py-1 rounded transition-colors">XAUUSD</button>
-                            <button onclick="setCoinFilter('US30')" class="filter-btn text-xs font-bold px-3 py-1 rounded text-tp-muted hover:text-white transition-colors">US30</button>
-                            <button onclick="setCoinFilter('GER30')" class="filter-btn text-xs font-bold px-3 py-1 rounded text-tp-muted hover:text-white transition-colors">GER30</button>
-                            <button onclick="setCoinFilter('NAS100')" class="filter-btn text-xs font-bold px-3 py-1 rounded text-tp-muted hover:text-white transition-colors">NAS100</button>
-                            <button onclick="setCoinFilter('BTCUSD')" class="filter-btn text-xs font-bold px-3 py-1 rounded text-tp-muted hover:text-white transition-colors">BTCUSD</button>
-                        </div>
+                <div class="flex flex-wrap items-center gap-3 mb-6">
+                    <h2 class="text-sm text-tp-muted font-medium">Archivio Daily</h2>
+                    <!-- Filtro periodo -->
+                    <div class="flex gap-1 flex-wrap">
+                        <button onclick="setTimeFilter('oggi')" id="ctf-oggi" class="time-filter-btn text-tp-muted border border-tp-border px-3 py-1 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">Oggi</button>
+                        <button onclick="setTimeFilter('ieri')" id="ctf-ieri" class="time-filter-btn text-tp-muted border border-tp-border px-3 py-1 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">Ieri</button>
+                        <button onclick="setTimeFilter('settimana')" id="ctf-settimana" class="time-filter-btn text-tp-accent bg-tp-accent/10 border border-tp-accent/30 px-3 py-1 rounded-lg text-xs font-bold uppercase transition-colors">Settimana</button>
+                        <button onclick="setTimeFilter('mese')" id="ctf-mese" class="time-filter-btn text-tp-muted border border-tp-border px-3 py-1 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">Mese</button>
+                        <button onclick="setTimeFilter('tutti')" id="ctf-tutti" class="time-filter-btn text-tp-muted border border-tp-border px-3 py-1 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">Tutti</button>
                     </div>
-                    <!-- Cronache si auto-creano ogni giorno (lun-ven) -->
+                    <!-- Selettore Coin -->
+                    <div class="flex bg-tp-panel border border-tp-border rounded-lg p-1 gap-1 ml-auto" id="coin-filters">
+                        <button onclick="setCoinFilter('XAUUSD')" class="filter-btn active text-xs font-bold px-3 py-1 rounded transition-colors">XAUUSD</button>
+                        <button onclick="setCoinFilter('US30')" class="filter-btn text-xs font-bold px-3 py-1 rounded text-tp-muted hover:text-white transition-colors">US30</button>
+                        <button onclick="setCoinFilter('GER30')" class="filter-btn text-xs font-bold px-3 py-1 rounded text-tp-muted hover:text-white transition-colors">GER30</button>
+                        <button onclick="setCoinFilter('NAS100')" class="filter-btn text-xs font-bold px-3 py-1 rounded text-tp-muted hover:text-white transition-colors">NAS100</button>
+                        <button onclick="setCoinFilter('BTCUSD')" class="filter-btn text-xs font-bold px-3 py-1 rounded text-tp-muted hover:text-white transition-colors">BTCUSD</button>
+                    </div>
                 </div>
 
                 <!-- Labels giorni -->
@@ -118,6 +123,30 @@
         const COINS = ['XAUUSD','US30','GER30','NAS100','BTCUSD'];
         let allCronache = [];
         let activeCoin = 'XAUUSD';
+        let activeTimeCronache = 'settimana';
+
+        function getCronacheDateRange(period) {
+            const t = new Date();
+            const pad = n => String(n).padStart(2,'0');
+            const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+            const today = fmt(t);
+            if (period === 'oggi') return { from: today, to: today };
+            if (period === 'ieri') { const y = new Date(t); y.setDate(t.getDate()-1); const ys = fmt(y); return { from: ys, to: ys }; }
+            if (period === 'settimana') { const mon = new Date(t); mon.setDate(t.getDate() - (t.getDay()===0?6:t.getDay()-1)); return { from: fmt(mon), to: today }; }
+            if (period === 'mese') { return { from: `${t.getFullYear()}-${pad(t.getMonth()+1)}-01`, to: today }; }
+            return null;
+        }
+
+        function setTimeFilter(period) {
+            activeTimeCronache = period;
+            document.querySelectorAll('.time-filter-btn').forEach(b => {
+                b.classList.remove('text-tp-accent','bg-tp-accent/10','border-tp-accent/30');
+                b.classList.add('text-tp-muted','border-tp-border');
+            });
+            document.getElementById('ctf-' + period).classList.add('text-tp-accent','bg-tp-accent/10','border-tp-accent/30');
+            document.getElementById('ctf-' + period).classList.remove('text-tp-muted','border-tp-border');
+            renderCards();
+        }
         const DAYS_IT = ['Domenica','Lunedi','Martedi','Mercoledi','Giovedi','Venerdi','Sabato'];
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -159,9 +188,7 @@
             // Cronache passate non completate diventano "nuovo" (da lavorare)
             var todayStr = new Date().getFullYear() + '-' + String(new Date().getMonth()+1).padStart(2,'0') + '-' + String(new Date().getDate()).padStart(2,'0');
             await db.from('cronache').update({ stato: 'nuovo' }).lt('data', todayStr).neq('stato', 'completato').neq('stato', 'ignorato');
-            var since = new Date(); since.setDate(since.getDate() - 60);
-            var sinceStr = since.getFullYear() + '-' + String(since.getMonth()+1).padStart(2,'0') + '-' + String(since.getDate()).padStart(2,'0');
-            const { data: rawData, error } = await db.from('cronache').select('*').gte('data', sinceStr).order('data', { ascending: true });
+            const { data: rawData, error } = await db.from('cronache').select('*').order('data', { ascending: true });
             // Raggruppa per settimana (lun-ven), poi ordina settimane decrescenti
             function getWeekMonday(dateStr) {
                 var d = new Date(dateStr + 'T12:00:00');
@@ -197,11 +224,16 @@
             const grid = document.getElementById('cards-grid');
             const empty = document.getElementById('empty-state');
 
-            if (!allCronache.length) { empty.classList.remove('hidden'); grid.innerHTML = ''; return; }
+            const range = getCronacheDateRange(activeTimeCronache);
+            const filtered = range
+                ? allCronache.filter(c => c.data >= range.from && c.data <= range.to)
+                : allCronache;
+
+            if (!filtered.length) { empty.classList.remove('hidden'); grid.innerHTML = ''; return; }
             empty.classList.add('hidden');
 
             // Raggruppa per settimana e ordina per giorno
-            grid.innerHTML = allCronache.map(c => {
+            grid.innerHTML = filtered.map(c => {
                 const coinInfo = c.coin_data?.[activeCoin] || {};
                 const screenshot = coinInfo.screenshot || '';
                 const percentuale = coinInfo.percentuale || '';
