@@ -160,8 +160,12 @@
         });
 
         async function loadSessions() {
-            const { data, error } = await db.from('sessioni').select('*').order('data', { ascending: false });
-            if (error) { console.error(error); return; }
+            const { data, error } = await db.from('sessioni_list').select('*').order('data', { ascending: false });
+            if (error) {
+                console.error('[loadSessions]', error);
+                document.getElementById('sess-count').textContent = 'Errore: ' + (error.message || error.code || 'caricamento fallito');
+                return;
+            }
             allSessions = data || [];
             renderList(allSessions);
         }

@@ -117,6 +117,18 @@
 
                 <!-- TAB 3: ALLERT EA (automatici da EA MT4: %, FVG, EMA60) -->
                 <div id="tab-allertperc" class="tab-content hidden max-w-7xl mx-auto">
+                    <!-- FILTRI EA -->
+                    <div class="mb-4 flex flex-wrap gap-2 items-center">
+                        <div id="ea-asset-btns" class="flex flex-wrap gap-1"></div>
+                        <div class="w-px h-5 bg-tp-border self-center mx-1"></div>
+                        <button onclick="toggleEaKw('FVG',this)" class="ea-kw-btn text-tp-muted border border-tp-border px-2.5 py-1 rounded text-xs font-bold uppercase hover:text-white transition-colors">FVG</button>
+                        <button onclick="toggleEaKw('EMA60',this)" class="ea-kw-btn text-tp-muted border border-tp-border px-2.5 py-1 rounded text-xs font-bold uppercase hover:text-white transition-colors">EMA60</button>
+                        <button onclick="toggleEaKw('Superato',this)" class="ea-kw-btn text-tp-muted border border-tp-border px-2.5 py-1 rounded text-xs font-bold uppercase hover:text-white transition-colors">Superato</button>
+                        <button onclick="toggleEaKw('Si avvicina',this)" class="ea-kw-btn text-tp-muted border border-tp-border px-2.5 py-1 rounded text-xs font-bold uppercase hover:text-white transition-colors">Avvicina</button>
+                        <div class="w-px h-5 bg-tp-border self-center mx-1"></div>
+                        <input id="ea-search" type="text" placeholder="Cerca..." oninput="applyEaFilters()"
+                            class="bg-[#0a0c10] border border-tp-border rounded px-3 py-1 text-xs text-white outline-none focus:border-tp-accent transition-colors w-36 placeholder-tp-muted">
+                    </div>
                     <div id="allertperc-list" class="space-y-2"></div>
                     <div id="allertperc-empty" class="hidden text-center py-16 text-tp-muted"><i data-lucide="bot" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm font-bold">Nessun allert EA</p></div>
                 </div>
@@ -310,11 +322,79 @@
             allAllerts=data||[]; renderAllerts(allAllerts);
         }
 
+        // === FILTRI EA ===
+        let eaActiveAssets = new Set(); // vuoto = tutti
+        let eaActiveKws = new Set();    // vuoto = nessun filtro keyword
+
+        function buildEaAssetBtns(eaItems) {
+            const coins = [...new Set(eaItems.map(a => a.coin).filter(Boolean))].sort();
+            const container = document.getElementById('ea-asset-btns');
+            container.innerHTML = '';
+            // Bottone "Tutti"
+            const all = document.createElement('button');
+            all.textContent = 'Tutti';
+            all.className = 'ea-asset-btn text-tp-accent bg-tp-accent/10 border border-tp-accent/30 px-2.5 py-1 rounded text-xs font-bold uppercase transition-colors';
+            all.dataset.asset = '__all__';
+            all.onclick = () => { eaActiveAssets.clear(); updateEaAssetBtns(); applyEaFilters(); };
+            container.appendChild(all);
+            coins.forEach(coin => {
+                const btn = document.createElement('button');
+                btn.textContent = coin;
+                btn.className = 'ea-asset-btn text-tp-muted border border-tp-border px-2.5 py-1 rounded text-xs font-bold uppercase hover:text-white transition-colors';
+                btn.dataset.asset = coin;
+                btn.onclick = () => {
+                    if (eaActiveAssets.has(coin)) eaActiveAssets.delete(coin);
+                    else eaActiveAssets.add(coin);
+                    updateEaAssetBtns();
+                    applyEaFilters();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function updateEaAssetBtns() {
+            document.querySelectorAll('#ea-asset-btns .ea-asset-btn').forEach(btn => {
+                const asset = btn.dataset.asset;
+                const active = asset === '__all__' ? eaActiveAssets.size === 0 : eaActiveAssets.has(asset);
+                btn.className = active
+                    ? 'ea-asset-btn text-tp-accent bg-tp-accent/10 border border-tp-accent/30 px-2.5 py-1 rounded text-xs font-bold uppercase transition-colors'
+                    : 'ea-asset-btn text-tp-muted border border-tp-border px-2.5 py-1 rounded text-xs font-bold uppercase hover:text-white transition-colors';
+            });
+        }
+
+        function toggleEaKw(kw, btn) {
+            if (eaActiveKws.has(kw)) eaActiveKws.delete(kw);
+            else eaActiveKws.add(kw);
+            btn.className = eaActiveKws.has(kw)
+                ? 'ea-kw-btn text-tp-warning bg-tp-warning/10 border border-tp-warning/30 px-2.5 py-1 rounded text-xs font-bold uppercase transition-colors'
+                : 'ea-kw-btn text-tp-muted border border-tp-border px-2.5 py-1 rounded text-xs font-bold uppercase hover:text-white transition-colors';
+            applyEaFilters();
+        }
+
+        function applyEaFilters() {
+            const ea = allAllerts.filter(a => isPercAllert(a));
+            const text = (document.getElementById('ea-search').value || '').toLowerCase().trim();
+            const filtered = ea.filter(a => {
+                const coin = (a.coin || '').toUpperCase();
+                const desc = (a.descrizione || '').toLowerCase();
+                if (eaActiveAssets.size > 0 && !eaActiveAssets.has(coin)) return false;
+                if (eaActiveKws.size > 0) {
+                    const match = [...eaActiveKws].some(kw => (a.descrizione || '').toLowerCase().includes(kw.toLowerCase()));
+                    if (!match) return false;
+                }
+                if (text && !coin.toLowerCase().includes(text) && !desc.includes(text)) return false;
+                return true;
+            });
+            renderAllertList(filtered, 'allertperc-list', 'allertperc-empty');
+            lucide.createIcons();
+        }
+
         function renderAllerts(items) {
             const tv = items.filter(a => !isPercAllert(a));
             const ea = items.filter(a => isPercAllert(a));
             renderAllertList(tv, 'allert-list', 'allert-empty');
-            renderAllertList(ea, 'allertperc-list', 'allertperc-empty');
+            buildEaAssetBtns(ea);
+            applyEaFilters();
             lucide.createIcons();
         }
 

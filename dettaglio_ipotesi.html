@@ -608,7 +608,6 @@
                 loadTradesCollegati(); // carica trades + render pills + tabs + osservazioni attive
                 loadLinkedBiasAllert();
                 document.getElementById('ip-note').value = ipotesi.note || '';
-                document.getElementById('ip-commento-post').value = ipotesi.commento_post || '';
                 document.querySelectorAll('.notion-textarea').forEach(ta => { ta.style.height = ''; ta.style.height = ta.scrollHeight + 'px'; });
                 fractalData = {
                     '15m': ipotesi.candle_m15 || null,
@@ -940,7 +939,7 @@
         }
 
         // Aggiunge una nuova domanda al da_osservare della strategia padre e
-        // la propaga nello snapshot osservazioni dell'ipotesi corrente (tab __template__).
+        // la propaga nel tab attivo (template OPPURE trade specifico).
         async function addStrategiaDomanda(domanda) {
             if (!strategia || !strategia.id) { alert('Strategia non collegata.'); return; }
             if (ipotesi && ipotesi.stato === 'osservata') { alert('Ipotesi osservata: bloccata.'); return; }
@@ -952,11 +951,17 @@
                 if (e1) { alert('Errore aggiornamento strategia: ' + e1.message); return; }
                 strategia.da_osservare = currentStrat;
             }
-            // Propago nello snapshot osservazioni se non c'e' gia
-            if (!Array.isArray(osservazioni)) osservazioni = [];
-            const existsSnap = osservazioni.some(o => (o && o.domanda) === domanda);
-            if (!existsSnap) osservazioni.push({ domanda, tags: [] });
-            await persistActiveOsservazioni(osservazioni);
+            // Propago nel tab attivo (non sempre nel template)
+            const activeOss = getActiveOsservazioni().slice();
+            const existsActive = activeOss.some(o => (o && o.domanda) === domanda);
+            if (!existsActive) activeOss.push({ domanda, tags: [] });
+            if (activeOssTab === '__template__') {
+                osservazioni = activeOss;
+            } else {
+                const t = tradesCollegati.find(x => x.id === activeOssTab);
+                if (t) t.osservazioni = activeOss;
+            }
+            await persistActiveOsservazioni(activeOss);
             renderOsservazioni();
             renderOsservazioniTabs();
             renderStatoActions();
@@ -1204,7 +1209,7 @@
         // --- TRADES COLLEGATI (multi-pill nel title row + tabs osservazioni) ---
         async function loadTradesCollegati() {
             const { data: trades } = await db.from('trades')
-                .select('id, asset, direzione, stato, esito, pnl, data, osservazioni')
+                .select('id, asset, direzione, stato, esito, pnl, data, osservazioni, commento_post')
                 .eq('ipotesi_id', ipotesiId)
                 .order('data', { ascending: true });
             tradesCollegati = trades || [];
@@ -1217,6 +1222,7 @@
             }
             renderOsservazioniTabs();
             renderOsservazioni();
+            loadCommentoPost();
             renderStatoActions();
         }
 
@@ -1274,9 +1280,38 @@
         }
 
         function setOsservazioniTab(tabId) {
+            saveCommentoPost(); // salva commento del tab corrente prima di cambiare
             activeOssTab = tabId;
             renderOsservazioniTabs();
             renderOsservazioni();
+            loadCommentoPost();
+        }
+
+        function loadCommentoPost() {
+            const ta = document.getElementById('ip-commento-post');
+            if (!ta) return;
+            if (activeOssTab === '__template__') {
+                ta.value = (ipotesi && ipotesi.commento_post) || '';
+            } else {
+                const t = tradesCollegati.find(x => x.id === activeOssTab);
+                ta.value = (t && t.commento_post) || '';
+            }
+            ta.style.height = ''; ta.style.height = ta.scrollHeight + 'px';
+        }
+
+        async function saveCommentoPost() {
+            if (ipotesi && ipotesi.stato === 'osservata') return;
+            const val = document.getElementById('ip-commento-post')?.value || null;
+            if (activeOssTab === '__template__') {
+                if (ipotesi) ipotesi.commento_post = val;
+                await db.from('ipotesi_trading').update({ commento_post: val }).eq('id', ipotesiId);
+            } else {
+                const t = tradesCollegati.find(x => x.id === activeOssTab);
+                if (t) {
+                    t.commento_post = val;
+                    await db.from('trades').update({ commento_post: val }).eq('id', activeOssTab);
+                }
+            }
         }
 
         function getActiveOsservazioni() {
@@ -1303,6 +1338,7 @@
                 alert('Ipotesi osservata: bloccata, non modificabile.');
                 return;
             }
+            await saveCommentoPost();
             const btn = document.getElementById('save-btn');
             btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvando...';
             btn.disabled = true;
@@ -1317,7 +1353,7 @@
                 dove_esco_tp_flagged: ipotesi.dove_esco_tp_flagged || [],
                 osservazioni: osservazioni,
                 note: document.getElementById('ip-note').value,
-                commento_post: document.getElementById('ip-commento-post').value || null,
+                commento_post: activeOssTab === '__template__' ? (document.getElementById('ip-commento-post').value || null) : (ipotesi.commento_post || null),
                 screenshot: ipotesi.screenshot || null,
                 screenshot_post: ipotesi.screenshot_post || null,
                 candle_m15: fractalData['15m'] || null,

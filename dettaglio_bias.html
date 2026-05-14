@@ -49,6 +49,11 @@
         .dir-btn.active-long { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
         .dir-btn.active-short { background: rgba(244,63,94,0.15); border-color: #f43f5e; color: #f43f5e; }
         .dir-btn.active-neutral { background: rgba(234,179,8,0.15); border-color: #eab308; color: #eab308; }
+        .agg-dir-btn { padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; border: 1px solid rgba(128,128,128,0.3); color: rgba(128,128,128,0.45); text-transform: uppercase; transition: all 0.15s; cursor: pointer; }
+        .agg-dir-btn:hover { opacity: 0.8; }
+        .agg-dir-btn.agg-long  { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
+        .agg-dir-btn.agg-short { background: rgba(244,63,94,0.15);  border-color: #f43f5e; color: #f43f5e; }
+        .agg-dir-btn.agg-neutro{ background: rgba(234,179,8,0.15);  border-color: #eab308; color: #eab308; }
         .tipo-btn.active { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
         .cat-tab.active { opacity: 1; }
         .cat-tab:not(.active) { opacity: 0.5; }
@@ -229,6 +234,7 @@
                                         <option value="GBPUSD">GBPUSD</option>
                                         <option value="US30">US30 (Dow Jones)</option>
                                         <option value="NAS100">NAS100 (Nasdaq)</option>
+                                        <option value="GER30">GER30 (DAX)</option>
                                         <option value="DXY">DXY (Dollar Index)</option>
                                         <option value="USDJPY">USDJPY</option>
                                         <option value="BTCUSD">BTCUSD</option>
@@ -309,8 +315,15 @@
                             </label>
                             <div id="aggiornamenti-list" class="space-y-2 mb-4"></div>
                             <div class="flex gap-2 items-stretch">
-                                <input id="agg-ora" type="time" class="bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[120px]"/>
-                                <textarea id="agg-testo" rows="2" class="flex-1 bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Es: London ha rispettato 4720, prima reazione long visibile, bias confermato"></textarea>
+                                <div class="flex flex-col gap-1.5 flex-shrink-0">
+                                    <input id="agg-ora" type="time" class="bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[110px]"/>
+                                    <div class="flex gap-1 justify-between">
+                                        <button type="button" id="nagg-long"   onclick="setNewAggDir('long')"   class="agg-dir-btn flex-1">L</button>
+                                        <button type="button" id="nagg-short"  onclick="setNewAggDir('short')"  class="agg-dir-btn flex-1">S</button>
+                                        <button type="button" id="nagg-neutro" onclick="setNewAggDir('neutro')" class="agg-dir-btn flex-1">N</button>
+                                    </div>
+                                </div>
+                                <textarea id="agg-testo" rows="2" class="flex-1 bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Es: London ha rispettato 4720, prima reazione long visibile, bias confermato" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'"></textarea>
                                 <button type="button" onclick="addAggiornamento()" id="agg-btn" class="px-4 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 hover:bg-tp-accent/20 uppercase transition-all flex items-center gap-2">
                                     <i data-lucide="plus" class="w-4 h-4"></i> Aggiungi
                                 </button>
@@ -434,6 +447,7 @@
         let screenshots = [];
         let selectedTipi = [];
         let aggiornamenti = [];
+        let newAggDirezione = null;
         let availableTipi = ['commento', 'bias', 'conformazione', 'appunto']; // default, sovrascritto da settings
 
         // Icone fisse per i tipi di default; gli altri usano un'icona generica
@@ -783,12 +797,38 @@
                 <div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 flex items-start gap-3">
                     <span class="text-xs font-bold text-tp-accent tracking-wide whitespace-nowrap mt-0.5">${escapeAggHtml(a.ora)}</span>
                     <p class="flex-1 text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escapeAggHtml(a.testo)}</p>
-                    <button type="button" onclick="removeAggiornamento(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors flex-shrink-0" title="Rimuovi">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
+                    <div class="flex items-center gap-1 flex-shrink-0">
+                        <button type="button" onclick="setAggDirezione(${i},'long')"   class="agg-dir-btn ${a.direzione==='long'  ?'agg-long':''}">L</button>
+                        <button type="button" onclick="setAggDirezione(${i},'short')"  class="agg-dir-btn ${a.direzione==='short' ?'agg-short':''}">S</button>
+                        <button type="button" onclick="setAggDirezione(${i},'neutro')" class="agg-dir-btn ${a.direzione==='neutro'?'agg-neutro':''}">N</button>
+                        <button type="button" onclick="removeAggiornamento(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors ml-1" title="Rimuovi">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
             `).join('');
             if (window.lucide) lucide.createIcons();
+        }
+
+        function setNewAggDir(dir) {
+            newAggDirezione = (newAggDirezione === dir) ? null : dir;
+            ['long','short','neutro'].forEach(d => {
+                const btn = document.getElementById('nagg-' + d);
+                if (!btn) return;
+                btn.className = 'agg-dir-btn flex-1' + (newAggDirezione === d ? ' agg-' + d : '');
+            });
+        }
+
+        async function setAggDirezione(i, dir) {
+            if (currentStato === 'chiuso') return;
+            aggiornamenti[i].direzione = (aggiornamenti[i].direzione === dir) ? null : dir;
+            renderAggiornamenti();
+            const {error} = await db.from('bias').update({aggiornamenti}).eq('id', biasId);
+            if (error) {
+                alert('Errore salvataggio direzione: ' + error.message);
+                aggiornamenti[i].direzione = dir === aggiornamenti[i].direzione ? null : dir;
+                renderAggiornamenti();
+            }
         }
 
         async function addAggiornamento() {
@@ -798,9 +838,14 @@
             const ora = (oraEl.value || '').trim();
             const testo = (testoEl.value || '').trim();
             if (!ora || !testo) { alert('Compila orario e testo prima di aggiungere'); return; }
-            aggiornamenti.push({ora, testo});
+            aggiornamenti.push({ora, testo, direzione: newAggDirezione});
             aggiornamenti.sort((a,b) => (a.ora || '').localeCompare(b.ora || ''));
             testoEl.value = '';
+            newAggDirezione = null;
+            ['long','short','neutro'].forEach(d => {
+                const btn = document.getElementById('nagg-' + d);
+                if (btn) btn.className = 'agg-dir-btn flex-1';
+            });
             renderAggiornamenti();
             const {error} = await db.from('bias').update({aggiornamenti}).eq('id', biasId);
             if (error) {

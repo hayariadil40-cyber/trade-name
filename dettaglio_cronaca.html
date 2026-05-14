@@ -525,7 +525,7 @@
                 document.querySelectorAll('input, textarea, select').forEach(function(el) {
                     el.disabled = true; el.classList.add('opacity-60','cursor-not-allowed');
                 });
-                document.querySelectorAll('.coin-tab, [onclick*="addSbil"], [onclick*="addVolume"], [onclick*="handleCoinScreenshot"], [onclick*="removeCoinScreenshot"]').forEach(function(el) {
+                document.querySelectorAll('[onclick*="addSbil"], [onclick*="addVolume"], [onclick*="handleCoinScreenshot"], [onclick*="removeCoinScreenshot"]').forEach(function(el) {
                     el.style.pointerEvents = 'none'; el.classList.add('opacity-50');
                 });
                 document.getElementById('save-btn').style.display = 'none';
