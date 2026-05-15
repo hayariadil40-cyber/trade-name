@@ -100,9 +100,31 @@ serve(async (req) => {
     const biasLimit = assistantMode === "giornaliero" ? 5 : assistantMode === "coach" ? 12 : 25;
     const { data: bias } = await supabase.from("bias")
       .select("asset, direzione, tipo, commento, aggiornamenti, esito, stato, data").order("data", { ascending: false }).limit(biasLimit);
-    if (bias && bias.length) dbContext += "\n\n## REPERTI (1 per coin/giorno; il campo `aggiornamenti` è una timeline di {ora, testo} accodata cronologicamente — leggi il commento iniziale e poi gli aggiornamenti in ordine per capire l'evoluzione del bias):\n" + JSON.stringify(bias);
+    if (bias && bias.length) dbContext += "\n\n## REPERTI (1 per coin/giorno; il campo `aggiornamenti` è una timeline di {ora, testo, direzione?} accodata cronologicamente — `direzione` è opzionale: 'long'|'short'|'neutro', indica la lettura direzionale dell'utente al momento di quell'aggiornamento. Leggi il commento iniziale e poi gli aggiornamenti in ordine per capire l'evoluzione del bias):\n" + JSON.stringify(bias);
 
     if (assistantMode === "coach" || assistantMode === "power") {
+      const ipotesiLimit = assistantMode === "power" ? 20 : 10;
+      const { data: ipotesi } = await supabase.from("ipotesi_trading")
+        .select("id, asset, direzione, sessione, stato, note, osservazioni, commento_post, created_at, strategia_id")
+        .order("created_at", { ascending: false }).limit(ipotesiLimit);
+      if (ipotesi && ipotesi.length) {
+        // Arricchisci ogni ipotesi con i trade collegati (osservazioni per-trade + commento_post)
+        const ipotesiIds = ipotesi.map((ip: any) => ip.id);
+        const { data: tradesIpotesi } = await supabase.from("trades")
+          .select("id, ipotesi_id, asset, direzione, esito, pnl, data, osservazioni, commento_post")
+          .in("ipotesi_id", ipotesiIds).order("data", { ascending: true });
+        const tradesByIpotesi: Record<string, any[]> = {};
+        (tradesIpotesi || []).forEach((t: any) => {
+          if (!tradesByIpotesi[t.ipotesi_id]) tradesByIpotesi[t.ipotesi_id] = [];
+          tradesByIpotesi[t.ipotesi_id].push(t);
+        });
+        const ipotesiRich = ipotesi.map((ip: any) => ({
+          ...ip,
+          trades_collegati: tradesByIpotesi[ip.id] || []
+        }));
+        dbContext += "\n\n## IPOTESI DI TRADING (con osservazioni template + per-trade e commento_post per trade):\n" + JSON.stringify(ipotesiRich);
+      }
+
       const { data: strategie } = await supabase.from("strategie")
         .select("id, nome, stato, sessione, ipotesi, regole_ingresso, tipo_mercato, dove_entro, dove_esco_sl, dove_esco_tp, gestione_operazione, da_osservare, gestione_rischio, note, asset, tipo, timeframe, winrate")
         .limit(10);
@@ -168,7 +190,7 @@ Azioni supportate (USA ESATTAMENTE QUESTI VALORI di "action"):
 \`\`\`
 IMPORTANTE: NON usare MAI insert su "sessioni". Le 3 righe (asia, london, newyork) sono create automaticamente quando l'utente apre la giornata (trigger su giornate) o dal cron apertura-sessione. Se devi compilare dati di sessione usa SEMPRE update o update_coin con match {"data":"YYYY-MM-DD","nome":"london|newyork|asia"}. Il backend rifiuta gli insert su sessioni.
 
-REGOLE REPERTI (tabella bias): MASSIMO 1 reperto per coin per data. Prima di insert su bias, controlla nel contesto sopra (## REPERTI) se esiste gia una riga con stesso asset+data. Se esiste, NON fare insert: fai update accodando un elemento all'array \`aggiornamenti\`. Formato aggiornamenti: array jsonb di {"ora":"HH:MM","testo":"..."} ordinato cronologicamente. Per accodare devi passare l'array INTERO con il nuovo elemento appeso (mai append parziale, sovrascrive tutto). Il \`commento\` resta il blocco iniziale (daily + bias giornata); gli \`aggiornamenti\` raccontano l'evoluzione intraday (conferma, invalidazione, flip direzione, monitoring). Esempio:
+REGOLE REPERTI (tabella bias): MASSIMO 1 reperto per coin per data. Prima di insert su bias, controlla nel contesto sopra (## REPERTI) se esiste gia una riga con stesso asset+data. Se esiste, NON fare insert: fai update accodando un elemento all'array \`aggiornamenti\`. Formato aggiornamenti: array jsonb di {"ora":"HH:MM","testo":"...","direzione":"long"|"short"|"neutro"} — `direzione` è opzionale, includila solo se l'utente indica esplicitamente la sua lettura direzionale in quell'aggiornamento. Ordinato cronologicamente. Per accodare devi passare l'array INTERO con il nuovo elemento appeso (mai append parziale, sovrascrive tutto). Il \`commento\` resta il blocco iniziale (daily + bias giornata); gli \`aggiornamenti\` raccontano l'evoluzione intraday (conferma, invalidazione, flip direzione, monitoring). Esempio:
 \`\`\`db_actions
 [{"table":"bias","action":"update","match":{"asset":"XAUUSD","data":"2026-05-12"},"data":{"aggiornamenti":[{"ora":"10:45","testo":"London ha rispettato 4720, prima reazione long, bias confermato"},{"ora":"14:30","testo":"NY open ha bucato 4708, bias invalidato"}]}}]
 \`\`\`
@@ -287,7 +309,8 @@ IL TUO RUOLO:
 - Individui dove l'utente inizia a deviare, anche in modo sottile.
 - Evidenzi giustificazioni e auto-inganni nelle note dei trade.
 - Identifichi il primo momento della giornata in cui la qualita decisionale e peggiorata.
-- Incroci trade, stato emotivo (MonitoraSmile), strategie, bias e compilazione per trovare pattern ricorrenti.
+- Incroci trade, stato emotivo (MonitoraSmile), strategie, bias, ipotesi e compilazione per trovare pattern ricorrenti.
+- Leggi le ipotesi di trading (## IPOTESI DI TRADING): ogni ipotesi ha osservazioni template (domande dalla strategia + tag-risposte aggregate) e trades_collegati con le osservazioni per-trade e il commento_post. Usa questi dati per valutare se l'utente sta rispettando il processo ipotesi→esecuzione e se le risposte post-trade rivelano pattern cognitivi.
 - Ragioni esclusivamente con i dati. Mai in astratto. Mai per analogia.
 
 REGOLE CRITICHE DI POSTURA (l'utente le ha richieste esplicitamente):

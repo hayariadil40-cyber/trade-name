@@ -152,9 +152,17 @@
             });
             document.getElementById('ctf-' + period).classList.add('text-tp-accent','bg-tp-accent/10','border-tp-accent/30');
             document.getElementById('ctf-' + period).classList.remove('text-tp-muted','border-tp-border');
-            renderCards();
+            fetchCronache(period);
         }
         const DAYS_IT = ['Domenica','Lunedi','Martedi','Mercoledi','Giovedi','Venerdi','Sabato'];
+
+        function getWeekMonday(dateStr) {
+            var d = new Date(dateStr + 'T12:00:00');
+            var day = d.getDay();
+            var diff = day === 0 ? -6 : 1 - day;
+            d.setDate(d.getDate() + diff);
+            return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        }
 
         document.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
@@ -165,26 +173,18 @@
         // Auto-crea tutta la settimana lun-ven se non esiste
         async function autoCreateSettimana() {
             var today = new Date();
-            var dayOfWeek = today.getDay(); // 0=dom, 1=lun, ..., 6=sab
-
-            // Trova il lunedi di questa settimana
+            var dayOfWeek = today.getDay();
             var monday = new Date(today);
-            var diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // dom = vai a lun precedente
+            var diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
             monday.setDate(monday.getDate() + diff);
-
             var giorni = ['','Lunedi','Martedi','Mercoledi','Giovedi','Venerdi'];
             var mesi = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
-
-            // Crea lun-ven
             for (var i = 0; i < 5; i++) {
                 var d = new Date(monday);
                 d.setDate(d.getDate() + i);
                 var dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-
-                // Controlla se esiste gia
                 var { data: existing } = await db.from('cronache').select('id').eq('data', dateStr);
                 if (existing && existing.length > 0) continue;
-
                 var titolo = giorni[i+1] + ' ' + d.getDate() + ' ' + mesi[d.getMonth()];
                 await db.from('cronache').insert({ data: dateStr, titolo: titolo, stato: 'in_corso' });
             }
@@ -192,30 +192,27 @@
 
         async function loadCronache() {
             await autoCreateSettimana();
-            // Cronache passate non completate diventano "nuovo" (da lavorare)
             var todayStr = new Date().getFullYear() + '-' + String(new Date().getMonth()+1).padStart(2,'0') + '-' + String(new Date().getDate()).padStart(2,'0');
             await db.from('cronache').update({ stato: 'nuovo' }).lt('data', todayStr).neq('stato', 'completato').neq('stato', 'ignorato');
-            const { data: rawData, error } = await db.from('cronache').select('*').order('data', { ascending: true });
-            // Raggruppa per settimana (lun-ven), poi ordina settimane decrescenti
-            function getWeekMonday(dateStr) {
-                var d = new Date(dateStr + 'T12:00:00');
-                var day = d.getDay();
-                var diff = day === 0 ? -6 : 1 - day;
-                d.setDate(d.getDate() + diff);
-                return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-            }
+            await fetchCronache(activeTimeCronache);
+        }
+
+        // Ogni cambio filtro fa una nuova query al DB per quel periodo soltanto
+        async function fetchCronache(period) {
+            const range = getCronacheDateRange(period);
+            var query = db.from('cronache_list').select('*').order('data', { ascending: true });
+            if (range) query = query.gte('data', range.from).lte('data', range.to);
+            const { data: rawData, error } = await query;
+            if (error) { console.error(error); return; }
             var weeks = {};
             (rawData || []).forEach(function(c) {
                 var mon = getWeekMonday(c.data);
                 if (!weeks[mon]) weeks[mon] = [];
                 weeks[mon].push(c);
             });
-            // Ordina settimane decrescenti, giorni dentro ogni settimana crescenti
             var sortedWeeks = Object.keys(weeks).sort().reverse();
-            var data = [];
-            sortedWeeks.forEach(function(w) { data = data.concat(weeks[w]); });
-            if (error) { console.error(error); return; }
-            allCronache = data || [];
+            allCronache = [];
+            sortedWeeks.forEach(function(w) { allCronache = allCronache.concat(weeks[w]); });
             renderCards();
         }
 
@@ -230,11 +227,7 @@
         function renderCards() {
             const grid = document.getElementById('cards-grid');
             const empty = document.getElementById('empty-state');
-
-            const range = getCronacheDateRange(activeTimeCronache);
-            const filtered = range
-                ? allCronache.filter(c => { const d = (c.data||'').substring(0,10); return d >= range.from && d <= range.to; })
-                : allCronache;
+            const filtered = allCronache;
 
             if (!filtered.length) { empty.classList.remove('hidden'); grid.innerHTML = ''; return; }
             empty.classList.add('hidden');
@@ -242,7 +235,6 @@
             // Raggruppa per settimana e ordina per giorno
             grid.innerHTML = filtered.map(c => {
                 const coinInfo = c.coin_data?.[activeCoin] || {};
-                const screenshot = coinInfo.screenshot || '';
                 const percentuale = coinInfo.percentuale || '';
                 const sentiment = coinInfo.sentiment || '';
                 const commento = coinInfo.commento || c.contenuto || '';
@@ -252,22 +244,27 @@
                 const isPositive = percentuale.includes('+');
                 const pctColor = isPositive ? 'text-tp-accent bg-tp-accent/10 border-tp-accent/20' : percentuale.includes('-') ? 'text-tp-loss bg-tp-loss/10 border-tp-loss/20' : 'text-tp-muted bg-tp-border border-tp-border';
 
+                const sentimentColor = sentiment.includes('rialzista') ? 'text-tp-accent' : sentiment.includes('ribassista') ? 'text-tp-loss' : 'text-tp-warning';
+                const statoColor = c.stato === 'completato' ? 'border-tp-accent/40' : c.stato === 'nuovo' ? 'border-tp-warning/40' : 'border-tp-border';
                 return `
-                    <div onclick="window.location.href='dettaglio_cronaca.html?id=${c.id}'" class="bg-tp-panel border border-tp-border rounded-xl hover:border-tp-accent/50 hover:shadow-lg transition-all cursor-pointer group flex flex-col h-[340px] relative overflow-hidden">
-                        <!-- Screenshot preview 16:9 -->
-                        <div class="w-full border-b border-tp-border bg-[#0a0c10] flex items-center justify-center overflow-hidden" style="aspect-ratio:16/9">
-                            ${screenshot
-                                ? `<img src="${screenshot}" class="w-full h-full object-cover" alt="">`
-                                : `<i data-lucide="image" class="w-10 h-10 text-tp-muted/20"></i>`
-                            }
-                        </div>
-                        <!-- Dati compatti -->
-                        <div class="p-3 flex flex-col flex-1">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-xs font-bold text-tp-muted">${dayName.substring(0,3)} ${dateStr}</span>
-                                ${percentuale ? `<span class="text-sm font-black ${isPositive ? 'text-tp-accent' : 'text-tp-loss'}">${percentuale}</span>` : ''}
+                    <div onclick="window.location.href='dettaglio_cronaca.html?id=${c.id}'" class="bg-tp-panel border ${statoColor} rounded-xl hover:border-tp-accent/50 hover:shadow-lg transition-all cursor-pointer group flex flex-col h-[200px] relative overflow-hidden">
+                        <!-- Header giorno -->
+                        <div class="px-4 pt-4 pb-2 border-b border-tp-border/50 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs font-black text-white uppercase tracking-wide">${dayName.substring(0,3)}</span>
+                                <span class="text-xs text-tp-muted ml-1">${dateStr}</span>
                             </div>
-                            <p class="text-[10px] text-tp-muted line-clamp-2">${commento || ''}</p>
+                            ${percentuale ? `<span class="text-base font-black ${isPositive ? 'text-tp-accent' : 'text-tp-loss'}">${percentuale}</span>` : '<span class="text-xs text-tp-muted/40">--</span>'}
+                        </div>
+                        <!-- Body -->
+                        <div class="p-3 flex flex-col flex-1 gap-2">
+                            ${sentiment ? `<span class="text-[10px] font-bold uppercase tracking-widest ${sentimentColor}">${sentiment}</span>` : '<span class="text-[10px] text-tp-muted/40 uppercase tracking-widest">sentiment --</span>'}
+                            <p class="text-[10px] text-tp-muted/70 line-clamp-3 leading-relaxed">${commento || ''}</p>
+                        </div>
+                        <!-- Footer stato -->
+                        <div class="px-3 pb-2 flex items-center gap-1">
+                            <i data-lucide="${c.stato === 'completato' ? 'check-circle' : c.stato === 'nuovo' ? 'clock' : 'edit-3'}" class="w-3 h-3 ${c.stato === 'completato' ? 'text-tp-accent' : 'text-tp-warning'}"></i>
+                            <span class="text-[9px] font-bold uppercase tracking-widest ${c.stato === 'completato' ? 'text-tp-accent/60' : 'text-tp-warning/60'}">${c.stato}</span>
                         </div>
                     </div>
                 `;

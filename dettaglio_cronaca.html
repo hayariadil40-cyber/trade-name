@@ -337,7 +337,8 @@
         // --- PICCHI VOLUME ---
         function renderVolume() {
             const container = document.getElementById('vol-container');
-            const items = coinData[currentCoin].picchi_volume || [];
+            const raw = coinData[currentCoin].picchi_volume;
+            const items = Array.isArray(raw) ? raw : [];
             container.innerHTML = items.map((v, i) => `
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-tp-accent/10 border border-tp-accent/30 text-tp-accent text-xs font-bold">
                     ${v}
@@ -365,7 +366,8 @@
         // --- SBILANCIAMENTI ---
         function renderSbilanciamenti() {
             const container = document.getElementById('sbil-container');
-            const items = coinData[currentCoin].sbilanciamenti || [];
+            const raw = coinData[currentCoin].sbilanciamenti;
+            const items = Array.isArray(raw) ? raw : [];
             container.innerHTML = items.map((s, i) => `
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-tp-warning/10 border border-tp-warning/30 text-tp-warning text-xs font-bold">
                     ${s}
@@ -379,6 +381,7 @@
             const input = document.getElementById('sbil-input');
             const val = input.value.trim();
             if (!val) return;
+            if (!Array.isArray(coinData[currentCoin].sbilanciamenti)) coinData[currentCoin].sbilanciamenti = [];
             coinData[currentCoin].sbilanciamenti.push(val);
             input.value = '';
             renderSbilanciamenti();
@@ -496,11 +499,14 @@
 
         async function chiudiCronaca() {
             saveCoinToMemory();
+            // Verifica sentiment su tutte le coin
+            var coinsSenzaSentiment = COINS.filter(function(c) { return !coinData[c]?.sentiment; });
+            if (coinsSenzaSentiment.length) {
+                showConfirm('Sentiment mancante', 'Compila il sentiment per: ' + coinsSenzaSentiment.join(', '), function(){});
+                return;
+            }
             // Verifica che almeno una coin abbia screenshot
-            var hasScreen = false;
-            COINS.forEach(function(c) {
-                if (coinData[c] && coinData[c].screenshot) hasScreen = true;
-            });
+            var hasScreen = COINS.some(function(c) { return coinData[c]?.screenshot; });
             if (!hasScreen) {
                 showConfirm('Screenshot mancante', 'Inserisci almeno uno screenshot prima di chiudere la cronaca.', function(){});
                 return;
