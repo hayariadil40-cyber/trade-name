@@ -1363,11 +1363,15 @@
                     : '<span class="text-[9px] italic text-tp-muted/60">-- nessun tipo --</span>';
                 const ora = b.created_at ? new Date(b.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' }) : '--:--';
 
-                const isLong = b.direzione === 'LONG';
-                const isShort = b.direzione === 'SHORT';
+                const aggList = Array.isArray(b.aggiornamenti) ? b.aggiornamenti : [];
+                const lastAggDir = [...aggList].reverse().find(a => a.direzione);
+                const effectiveDir = lastAggDir ? lastAggDir.direzione.toUpperCase() : (b.direzione || '');
+                const isLong = effectiveDir === 'LONG';
+                const isShort = effectiveDir === 'SHORT';
+                const isNeutro = effectiveDir === 'NEUTRO';
                 const isChiuso = b.stato === 'chiuso';
-                const dirColor = isLong ? 'text-tp-accent bg-[#14231f] border-tp-accent/20' : isShort ? 'text-tp-loss bg-tp-loss/10 border-tp-loss/20' : 'text-tp-muted bg-[#0a0c10] border-tp-border';
-                const dirText = isLong ? 'L' : isShort ? 'S' : '-';
+                const dirColor = isLong ? 'text-tp-accent bg-[#14231f] border-tp-accent/20' : isShort ? 'text-tp-loss bg-tp-loss/10 border-tp-loss/20' : isNeutro ? 'text-tp-warning bg-tp-warning/10 border-tp-warning/20' : 'text-tp-muted bg-[#0a0c10] border-tp-border';
+                const dirText = isLong ? 'L' : isShort ? 'S' : isNeutro ? 'N' : '-';
                 const esito = b.esito || '';
                 const statoBadgeClass = isChiuso ? 'stato-badge-chiuso' : 'stato-badge-aperto';
                 const statoLabel = isChiuso ? 'Chiuso' : 'Aperto';

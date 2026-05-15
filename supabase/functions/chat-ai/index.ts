@@ -100,7 +100,7 @@ serve(async (req) => {
     const biasLimit = assistantMode === "giornaliero" ? 5 : assistantMode === "coach" ? 12 : 25;
     const { data: bias } = await supabase.from("bias")
       .select("asset, direzione, tipo, commento, aggiornamenti, esito, stato, data").order("data", { ascending: false }).limit(biasLimit);
-    if (bias && bias.length) dbContext += "\n\n## REPERTI (1 per coin/giorno; il campo `aggiornamenti` è una timeline di {ora, testo, direzione?} accodata cronologicamente — `direzione` è opzionale: 'long'|'short'|'neutro', indica la lettura direzionale dell'utente al momento di quell'aggiornamento. Leggi il commento iniziale e poi gli aggiornamenti in ordine per capire l'evoluzione del bias):\n" + JSON.stringify(bias);
+    if (bias && bias.length) dbContext += "\n\n## REPERTI (1 per coin/giorno; il campo `aggiornamenti` è una timeline di {ora, testo, direzione?} accodata cronologicamente — `direzione` è opzionale: 'long'|'short'|'neutro', indica la lettura direzionale dell'utente al momento di quell'aggiornamento. REGOLA: la direzione operativa CORRENTE del bias è l'ultima `direzione` non-null presente in `aggiornamenti`; se nessun aggiornamento ha direzione, usa `b.direzione`. Leggi il commento iniziale e poi gli aggiornamenti in ordine per capire l'evoluzione: una sequenza long→neutro→short indica un flip intraday):\n" + JSON.stringify(bias);
 
     if (assistantMode === "coach" || assistantMode === "power") {
       const ipotesiLimit = assistantMode === "power" ? 20 : 10;
