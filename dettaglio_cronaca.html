@@ -402,11 +402,22 @@
             else { empty.classList.remove('hidden'); filled.classList.add('hidden'); }
         }
 
-        function handleCoinScreenshot(files) {
+        async function handleCoinScreenshot(files) {
             if (!files.length) return;
-            const reader = new FileReader();
-            reader.onload = (e) => { coinData[currentCoin].screenshot = e.target.result; renderScreenshot(); lucide.createIcons(); };
-            reader.readAsDataURL(files[0]);
+            const file = files[0];
+            const ext = (file.name.split('.').pop() || 'png').toLowerCase();
+            const path = `cronache/${cronacaId}/${currentCoin}_${Date.now()}.${ext}`;
+            const empty = document.getElementById('coin-screen-empty');
+            empty.innerHTML = '<div class="flex flex-col items-center gap-2"><i data-lucide="loader" class="w-8 h-8 text-tp-muted/40 animate-spin mx-auto"></i><span class="text-xs font-bold text-tp-muted uppercase tracking-widest">Caricamento...</span></div>';
+            lucide.createIcons();
+            const { error } = await db.storage.from('trade-screenshots').upload(path, file, { upsert: true });
+            if (error) {
+                alert('Errore upload screenshot: ' + error.message);
+                renderScreenshot(); lucide.createIcons(); return;
+            }
+            const { data: { publicUrl } } = db.storage.from('trade-screenshots').getPublicUrl(path);
+            coinData[currentCoin].screenshot = publicUrl;
+            renderScreenshot(); lucide.createIcons();
         }
 
         // Ctrl+V per incollare screenshot

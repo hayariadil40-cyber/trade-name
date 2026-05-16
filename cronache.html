@@ -197,7 +197,6 @@
             await fetchCronache(activeTimeCronache);
         }
 
-        // Ogni cambio filtro fa una nuova query al DB per quel periodo soltanto
         async function fetchCronache(period) {
             const range = getCronacheDateRange(period);
             var query = db.from('cronache_list').select('*').order('data', { ascending: true });
@@ -238,33 +237,32 @@
                 const percentuale = coinInfo.percentuale || '';
                 const sentiment = coinInfo.sentiment || '';
                 const commento = coinInfo.commento || c.contenuto || '';
+                const screenshot = coinInfo.screenshot || '';
                 const dateObj = new Date(c.data + 'T00:00:00');
                 const dayName = DAYS_IT[dateObj.getDay()];
                 const dateStr = dateObj.toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
                 const isPositive = percentuale.includes('+');
-                const pctColor = isPositive ? 'text-tp-accent bg-tp-accent/10 border-tp-accent/20' : percentuale.includes('-') ? 'text-tp-loss bg-tp-loss/10 border-tp-loss/20' : 'text-tp-muted bg-tp-border border-tp-border';
-
                 const sentimentColor = sentiment.includes('rialzista') ? 'text-tp-accent' : sentiment.includes('ribassista') ? 'text-tp-loss' : 'text-tp-warning';
                 const statoColor = c.stato === 'completato' ? 'border-tp-accent/40' : c.stato === 'nuovo' ? 'border-tp-warning/40' : 'border-tp-border';
                 return `
-                    <div onclick="window.location.href='dettaglio_cronaca.html?id=${c.id}'" class="bg-tp-panel border ${statoColor} rounded-xl hover:border-tp-accent/50 hover:shadow-lg transition-all cursor-pointer group flex flex-col h-[200px] relative overflow-hidden">
-                        <!-- Header giorno -->
-                        <div class="px-4 pt-4 pb-2 border-b border-tp-border/50 flex items-center justify-between">
-                            <div>
-                                <span class="text-xs font-black text-white uppercase tracking-wide">${dayName.substring(0,3)}</span>
-                                <span class="text-xs text-tp-muted ml-1">${dateStr}</span>
-                            </div>
-                            ${percentuale ? `<span class="text-base font-black ${isPositive ? 'text-tp-accent' : 'text-tp-loss'}">${percentuale}</span>` : '<span class="text-xs text-tp-muted/40">--</span>'}
-                        </div>
-                        <!-- Body -->
-                        <div class="p-3 flex flex-col flex-1 gap-2">
-                            ${sentiment ? `<span class="text-[10px] font-bold uppercase tracking-widest ${sentimentColor}">${sentiment}</span>` : '<span class="text-[10px] text-tp-muted/40 uppercase tracking-widest">sentiment --</span>'}
-                            <p class="text-[10px] text-tp-muted/70 line-clamp-3 leading-relaxed">${commento || ''}</p>
-                        </div>
-                        <!-- Footer stato -->
-                        <div class="px-3 pb-2 flex items-center gap-1">
+                    <div onclick="window.location.href='dettaglio_cronaca.html?id=${c.id}'" class="bg-tp-bg border ${statoColor} rounded-xl hover:border-tp-accent/50 hover:shadow-lg transition-all cursor-pointer overflow-hidden relative" style="aspect-ratio:16/9">
+                        <!-- Screenshot di sfondo -->
+                        ${screenshot ? `<img src="${screenshot}" class="absolute inset-0 w-full h-full object-cover">` : '<div class="absolute inset-0 flex items-center justify-center"><i data-lucide="image-off" class="w-8 h-8 text-tp-muted/20"></i></div>'}
+                        <!-- Overlay gradiente -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/30"></div>
+                        <!-- Badge stato in alto a sinistra -->
+                        <div class="absolute top-2 left-2">
                             <i data-lucide="${c.stato === 'completato' ? 'check-circle' : c.stato === 'nuovo' ? 'clock' : 'edit-3'}" class="w-3 h-3 ${c.stato === 'completato' ? 'text-tp-accent' : 'text-tp-warning'}"></i>
-                            <span class="text-[9px] font-bold uppercase tracking-widest ${c.stato === 'completato' ? 'text-tp-accent/60' : 'text-tp-warning/60'}">${c.stato}</span>
+                        </div>
+                        <!-- Percentuale in alto a destra -->
+                        ${percentuale ? `<div class="absolute top-2 right-2"><span class="text-sm font-black ${isPositive ? 'text-tp-accent' : 'text-tp-loss'} drop-shadow">${percentuale}</span></div>` : ''}
+                        <!-- Info in basso -->
+                        <div class="absolute bottom-0 left-0 right-0 p-2">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-black text-white uppercase tracking-wide drop-shadow">${dayName.substring(0,3)} <span class="font-normal text-white/70">${dateStr}</span></span>
+                                ${sentiment ? `<span class="text-[9px] font-bold uppercase tracking-widest ${sentimentColor} drop-shadow">${sentiment}</span>` : ''}
+                            </div>
+                            ${commento ? `<p class="text-[9px] text-white/60 line-clamp-2 leading-relaxed">${commento}</p>` : ''}
                         </div>
                     </div>
                 `;
