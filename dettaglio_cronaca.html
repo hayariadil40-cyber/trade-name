@@ -410,13 +410,21 @@
             const empty = document.getElementById('coin-screen-empty');
             empty.innerHTML = '<div class="flex flex-col items-center gap-2"><i data-lucide="loader" class="w-8 h-8 text-tp-muted/40 animate-spin mx-auto"></i><span class="text-xs font-bold text-tp-muted uppercase tracking-widest">Caricamento...</span></div>';
             lucide.createIcons();
-            const { error } = await db.storage.from('trade-screenshots').upload(path, file, { upsert: true });
-            if (error) {
-                alert('Errore upload screenshot: ' + error.message);
+            const { data: { session } } = await db.auth.getSession();
+            const form = new FormData();
+            form.append('file', file);
+            form.append('path', path);
+            const res = await fetch(`${SUPABASE_URL}/functions/v1/storage-upload`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${session.access_token}` },
+                body: form
+            });
+            const json = await res.json();
+            if (!res.ok || json.error) {
+                alert('Errore upload screenshot: ' + (json.error || res.statusText));
                 renderScreenshot(); lucide.createIcons(); return;
             }
-            const { data: { publicUrl } } = db.storage.from('trade-screenshots').getPublicUrl(path);
-            coinData[currentCoin].screenshot = publicUrl;
+            coinData[currentCoin].screenshot = json.url;
             renderScreenshot(); lucide.createIcons();
         }
 
