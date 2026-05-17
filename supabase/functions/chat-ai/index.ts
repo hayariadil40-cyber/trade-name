@@ -102,6 +102,19 @@ serve(async (req) => {
       .select("asset, direzione, tipo, commento, aggiornamenti, esito, stato, data").order("data", { ascending: false }).limit(biasLimit);
     if (bias && bias.length) dbContext += "\n\n## REPERTI (1 per coin/giorno; il campo `aggiornamenti` è una timeline di {ora, testo, direzione?} accodata cronologicamente — `direzione` è opzionale: 'long'|'short'|'neutro', indica la lettura direzionale dell'utente al momento di quell'aggiornamento. REGOLA: la direzione operativa CORRENTE del bias è l'ultima `direzione` non-null presente in `aggiornamenti`; se nessun aggiornamento ha direzione, usa `b.direzione`. Leggi il commento iniziale e poi gli aggiornamenti in ordine per capire l'evoluzione: una sequenza long→neutro→short indica un flip intraday):\n" + JSON.stringify(bias);
 
+    // Ipotesi per Rodrigo: ultime 48h (possono essere aperte da ieri)
+    if (assistantMode === "giornaliero") {
+      const twoDaysAgo = new Date(Date.now() - 2 * 86400000).toISOString().split("T")[0];
+      const { data: ipotesiR } = await supabase.from("ipotesi_trading")
+        .select("id, asset, direzione, sessione, stato, note, strategia_id, created_at")
+        .gte("created_at", twoDaysAgo + "T00:00:00")
+        .order("created_at", { ascending: false }).limit(20);
+      if (ipotesiR && ipotesiR.length) dbContext += "\n\n## IPOTESI (ultimi 2gg):\n" + JSON.stringify(ipotesiR);
+      // Strategie (solo id+nome): servono per collegare ipotesi a strategia per id
+      const { data: strategieR } = await supabase.from("strategie").select("id, nome").order("nome");
+      if (strategieR && strategieR.length) dbContext += "\n\n## STRATEGIE (id+nome per collegamento):\n" + JSON.stringify(strategieR);
+    }
+
     if (assistantMode === "coach" || assistantMode === "power") {
       const ipotesiLimit = assistantMode === "power" ? 20 : 10;
       const { data: ipotesi } = await supabase.from("ipotesi_trading")
@@ -200,7 +213,7 @@ REGOLE REPERTI (tabella bias): MASSIMO 1 reperto per coin per data. Prima di ins
 [{"table":"cronache","action":"update_coin","match":{"data":"2026-04-24"},"coin":"XAUUSD","data":{"low":"4657.69","high":"4740.42","open":"4692.44","close":"4707.41","percentuale":"+0.32"}}]
 \`\`\`
 
-Tabelle scrittura: sessioni (coin_data, mood, nome, data), giornate (mindset, volatilita, note_domani, fajr, marea, day_tags), trades (note, mood, volatilita, tag - solo se non completato), bias (asset, direzione, commento, aggiornamenti), cronache (coin_data, titolo), settimane (review, note), strategie (nome, ipotesi, regole_ingresso, sessione, tipo_mercato, dove_entro, dove_esco_sl, dove_esco_tp, gestione_operazione, da_osservare, asset, tipo, timeframe, note, stato, winrate, gestione_rischio[LEGACY], take_profit[LEGACY]), allert (SOLO valore_effettivo, screenshot).
+Tabelle scrittura: sessioni (coin_data, mood, nome, data), giornate (mindset, volatilita, note_domani, fajr, marea, day_tags), trades (note, mood, volatilita, tag, ipotesi_id - solo se non completato), bias (asset, direzione, commento, aggiornamenti), cronache (coin_data, titolo), settimane (review, note), strategie (nome, ipotesi, regole_ingresso, sessione, tipo_mercato, dove_entro, dove_esco_sl, dove_esco_tp, gestione_operazione, da_osservare, asset, tipo, timeframe, note, stato, winrate, gestione_rischio[LEGACY], take_profit[LEGACY]), allert (SOLO valore_effettivo, screenshot), ipotesi_trading (asset, direzione, sessione, stato, note, strategia_id).
 
 REGOLE STRATEGIE (split campi):
 - ipotesi: cosa vede il setup, perche dovrebbe funzionare (testo libero, 3-8 righe).
@@ -237,6 +250,36 @@ NOTIZIE MACRO (tabella allert):
 Esempio:
 \`\`\`db_actions
 [{"table":"allert","action":"update","match":{"id":"2b6f4d0a-d293-4a95-8daf-e85cfda9b0e8"},"data":{"valore_effettivo":"2.0%"}}]
+\`\`\`
+
+REGOLE IPOTESI (tabella ipotesi_trading):
+- Struttura: asset (es. "XAUUSD"), direzione ("LONG"|"SHORT"|"NEUTRO"), sessione ("london"|"newyork"|"asia"), stato, note, strategia_id (UUID, opzionale).
+- Stati validi: "ipotesi" (formulata, da eseguire), "eseguita" (trade preso), "invalidata" (setup saltato/bucato), "scaduta" (sessione passata senza esecuzione).
+- L'id delle strategie disponibili e' nel blocco ## STRATEGIE (id+nome per collegamento) sopra.
+
+Creare una nuova ipotesi:
+\`\`\`db_actions
+[{"table":"ipotesi_trading","action":"insert","data":{"asset":"XAUUSD","direzione":"LONG","sessione":"london","stato":"ipotesi","note":"Attendo retest 4720 con rejection M15"}}]
+\`\`\`
+
+Aggiornare stato o note (usa SEMPRE l'id come match, preso da ## IPOTESI sopra):
+\`\`\`db_actions
+[{"table":"ipotesi_trading","action":"update","match":{"id":"<uuid>"},"data":{"stato":"invalidata"}}]
+\`\`\`
+
+Collegare un trade a un'ipotesi (aggiorna ipotesi_id sul trade, non sull'ipotesi):
+\`\`\`db_actions
+[{"table":"trades","action":"update","match":{"id":"<trade_uuid>"},"data":{"ipotesi_id":"<ipotesi_uuid>"}}]
+\`\`\`
+
+Collegare una strategia a un'ipotesi:
+\`\`\`db_actions
+[{"table":"ipotesi_trading","action":"update","match":{"id":"<ipotesi_uuid>"},"data":{"strategia_id":"<strategia_uuid>"}}]
+\`\`\`
+
+Aggiornare le note di un'ipotesi appena eseguita (es. dopo che il trade e' partito):
+\`\`\`db_actions
+[{"table":"ipotesi_trading","action":"update","match":{"id":"<uuid>"},"data":{"stato":"eseguita","note":"<note aggiornate>"}}]
 \`\`\`
 
 NOTA strategie.regole_ingresso e' un ARRAY JSONB di stringhe. Per modificarlo via update, includi nell'UPDATE l'array INTERO con la modifica applicata: leggi l'array dal contesto sopra, ricostruiscilo con la modifica e passalo per intero. Esempio: per aggiungere "EURUSD" alla riga "Strumenti ammessi: XAU, BTC" della strategia "Chiusura FVG", invia un update con il nuovo array completo che include la riga modificata "Strumenti ammessi: XAU, BTC, EURUSD". MAI passare un array parziale, sovrascrive tutto.
@@ -291,6 +334,7 @@ IL TUO RUOLO:
 
 LIMITI DI ACCESSO:
 - NON hai accesso alla tabella watchlist. Non e dato di tua competenza.
+- HAI accesso alle ipotesi (tabella ipotesi_trading): puoi crearle, aggiornarle, collegare trade e strategie seguendo le REGOLE IPOTESI nel blocco DB_ACTIONS.
 
 ${REGOLE_COMUNI}
 

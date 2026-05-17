@@ -777,6 +777,111 @@ window.selectVol = function(btn, type) {
 })();
 
 // ==========================================
+// 10. CANDELA 4H REMINDER
+// ==========================================
+(function() {
+    var CLOSE_HOURS_CASA = [3, 7, 11, 15, 19];
+    var STORAGE_KEY = 'td_candle4h_shown';
+
+    function getShown() {
+        try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); }
+        catch (e) { return new Set(); }
+    }
+    function markShown(key) {
+        var shown = getShown();
+        shown.add(key);
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(shown))); } catch (e) {}
+    }
+
+    function isWeekday() {
+        var day = new Date().toLocaleDateString('en-US', { timeZone: 'Africa/Casablanca', weekday: 'short' });
+        return day !== 'Sat' && day !== 'Sun';
+    }
+
+    function getCasaTime() {
+        var now = new Date();
+        var parts = new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'Africa/Casablanca',
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', hour12: false
+        }).formatToParts(now);
+        var get = function(t) { return parseInt((parts.find(function(p) { return p.type === t; }) || {}).value || '0', 10); };
+        var date = (parts.find(function(p) { return p.type === 'year'; }) || {}).value + '-' +
+                   String(get('month')).padStart(2, '0') + '-' +
+                   String(get('day')).padStart(2, '0');
+        return { hour: get('hour'), minute: get('minute'), date: date };
+    }
+
+    function injectStyles() {
+        if (document.getElementById('candle4h-styles')) return;
+        var style = document.createElement('style');
+        style.id = 'candle4h-styles';
+        style.textContent = [
+            '.candle4h-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;animation:c4hFadeIn 0.3s ease}',
+            '@keyframes c4hFadeIn{from{opacity:0}to{opacity:1}}',
+            '.candle4h-card{background:linear-gradient(135deg,#1a1200 0%,#161920 100%);border:2px solid #f59e0b;border-radius:16px;padding:40px;max-width:540px;width:100%;box-shadow:0 0 80px rgba(245,158,11,0.4);text-align:center;animation:c4hScale 0.4s cubic-bezier(0.34,1.56,0.64,1)}',
+            '@keyframes c4hScale{from{transform:scale(0.85);opacity:0}to{transform:scale(1);opacity:1}}',
+            '.candle4h-badge{display:inline-block;background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.4);border-radius:999px;padding:6px 14px;font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:24px}',
+            '.candle4h-title{font-size:22px;font-weight:700;color:#f8fafc;margin:0 0 8px 0}',
+            '.candle4h-sub{font-size:13px;color:#94a3b8;margin:0 0 32px 0}',
+            '.candle4h-btn{background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);color:#0f172a;border:none;padding:14px 36px;border-radius:10px;font-size:13px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;font-family:inherit}',
+            '.candle4h-btn:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(245,158,11,0.4)}',
+            '.candle4h-btn:active{transform:translateY(0)}'
+        ].join('\n');
+        document.head.appendChild(style);
+    }
+
+    function showAlert(closeHour, alertKey) {
+        if (document.getElementById('candle4h-overlay')) return;
+        injectStyles();
+        var closeTime = String(closeHour).padStart(2, '0') + ':00';
+        var overlay = document.createElement('div');
+        overlay.className = 'candle4h-overlay';
+        overlay.id = 'candle4h-overlay';
+        overlay.innerHTML =
+            '<div class="candle4h-card">' +
+                '<div class="candle4h-badge">Candela 4H</div>' +
+                '<p class="candle4h-title">Chiude alle ' + closeTime + '</p>' +
+                '<p class="candle4h-sub">5 minuti alla chiusura &mdash; guarda il grafico.</p>' +
+                '<button class="candle4h-btn" type="button">Ho visto</button>' +
+            '</div>';
+        document.body.appendChild(overlay);
+
+        var btn = overlay.querySelector('.candle4h-btn');
+        btn.addEventListener('click', function() {
+            markShown(alertKey);
+            overlay.style.animation = 'c4hFadeIn 0.2s ease reverse';
+            setTimeout(function() { overlay.remove(); }, 200);
+        });
+        document.addEventListener('keydown', function escHandler(ev) {
+            if (ev.key === 'Escape' && document.body.contains(overlay)) {
+                btn.click();
+                document.removeEventListener('keydown', escHandler);
+            }
+        });
+    }
+
+    function check() {
+        if (!isWeekday()) return;
+        var t = getCasaTime();
+        for (var i = 0; i < CLOSE_HOURS_CASA.length; i++) {
+            var closeHour = CLOSE_HOURS_CASA[i];
+            if (t.hour === closeHour - 1 && t.minute >= 55) {
+                var key = t.date + '_4h_' + closeHour;
+                if (!getShown().has(key)) showAlert(closeHour, key);
+                break;
+            }
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() { check(); setInterval(check, 30000); });
+    } else {
+        check(); setInterval(check, 30000);
+    }
+})();
+
+// ==========================================
 // Navigazione: vai al dettaglio della giornata di oggi (crea se manca)
 // ==========================================
 window.goToOggi = async function(ev) {

@@ -406,7 +406,8 @@
                 const st=a.stato||'nuovo';
                 const badge=st==='completato'?'<span class="text-[9px] px-2 py-0.5 rounded bg-tp-accent/10 text-tp-accent border border-tp-accent/20 font-bold uppercase">Completato</span>':st==='ignorato'?'<span class="text-[9px] px-2 py-0.5 rounded bg-tp-border text-tp-muted font-bold uppercase">Ignorato</span>':'<span class="text-[9px] px-2 py-0.5 rounded bg-tp-warning/10 text-tp-warning border border-tp-warning/20 font-bold uppercase">Da lavorare</span>';
                 const t=a.ora?a.ora.substring(0,5):new Date(a.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Casablanca'});
-                return `<div onclick="openAllertModal('${a.id}')" class="group grid grid-cols-2 gap-y-2 lg:flex lg:items-center p-3 lg:p-4 pl-5 lg:pl-4 bg-tp-panel border border-tp-border hover:border-tp-warning/50 rounded-lg cursor-pointer shadow-sm relative overflow-hidden"><div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-warning"></div><div class="lg:w-1/4 lg:pl-3 flex items-center gap-2 lg:gap-3"><span class="font-bold text-sm text-white group-hover:text-tp-warning">${a.coin||'--'}</span><span class="text-xs font-bold text-tp-warning">${a.prezzo||''}</span></div><div class="lg:w-1/4 flex justify-end lg:justify-start">${badge}</div><div class="col-span-2 lg:w-1/4 text-[11px] lg:text-xs text-tp-muted">${t} - ${a.descrizione||''}</div><div class="hidden lg:flex lg:w-1/4 lg:justify-end"><i data-lucide="chevron-right" class="w-4 h-4 text-tp-muted group-hover:text-tp-warning"></i></div></div>`;
+                const d=a.created_at?new Date(a.created_at).toLocaleDateString('it-IT',{day:'2-digit',month:'short',timeZone:'Africa/Casablanca'}):'';
+                return `<div onclick="openAllertModal('${a.id}')" class="group grid grid-cols-2 gap-y-2 lg:flex lg:items-center p-3 lg:p-4 pl-5 lg:pl-4 bg-tp-panel border border-tp-border hover:border-tp-warning/50 rounded-lg cursor-pointer shadow-sm relative overflow-hidden"><div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-warning"></div><div class="lg:w-1/4 lg:pl-3 flex items-center gap-2 lg:gap-3"><span class="font-bold text-sm text-white group-hover:text-tp-warning">${a.coin||'--'}</span><span class="text-xs font-bold text-tp-warning">${a.prezzo||''}</span></div><div class="lg:w-1/4 flex justify-end lg:justify-start">${badge}</div><div class="col-span-2 lg:w-1/4 text-[11px] lg:text-xs text-tp-muted"><span class="text-white font-bold">${d}</span> ${t} &mdash; ${a.descrizione||''}</div><div class="hidden lg:flex lg:w-1/4 lg:justify-end"><i data-lucide="chevron-right" class="w-4 h-4 text-tp-muted group-hover:text-tp-warning"></i></div></div>`;
             }).join('');
         }
 
@@ -414,7 +415,9 @@
             currentAllertId=id; const a=allAllerts.find(x=>x.id===id); if(!a)return;
             document.getElementById('ma-coin').textContent=a.coin||'--';
             document.getElementById('ma-prezzo').textContent=a.prezzo||'--';
-            document.getElementById('ma-ora').textContent = a.ora ? a.ora.substring(0,5) : (a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Casablanca'}) : '--');
+            var _d = a.created_at ? new Date(a.created_at).toLocaleDateString('it-IT',{day:'2-digit',month:'short',timeZone:'Africa/Casablanca'}) : '';
+            var _t = a.ora ? a.ora.substring(0,5) : (a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Casablanca'}) : '--');
+            document.getElementById('ma-ora').textContent = (_d ? _d + ' ' : '') + _t;
             document.getElementById('ma-desc').textContent=a.descrizione||'--';
             document.getElementById('ma-commento').value=a.commento||'';
             document.getElementById('modal-allert-title').textContent=`Allert: ${a.coin||''} ${a.prezzo||''}`;

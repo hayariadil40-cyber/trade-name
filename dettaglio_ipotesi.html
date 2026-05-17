@@ -59,6 +59,10 @@
         .locked-readonly #ipotesi-canvas { pointer-events: none; opacity: 0.7; filter: saturate(0.8); }
         .locked-readonly #ipotesi-canvas #stato-actions,
         .locked-readonly #ipotesi-canvas #ipotesi-stato-badge { pointer-events: auto; opacity: 1; filter: none; }
+        /* Screenshot: tab navigabili + pane a piena visibilita' anche da osservata (upload resta bloccato) */
+        .locked-readonly #ipotesi-canvas .screen-tab { pointer-events: auto; opacity: 1; filter: none; }
+        .locked-readonly #ipotesi-canvas #screen-pane-prima,
+        .locked-readonly #ipotesi-canvas #screen-pane-dopo { opacity: 1; filter: none; }
         /* Screenshot tabs (Prima / Dopo) - stesso stile delle dashboard tabs */
         .screen-tab.active { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
         .screen-tab:not(.active) { background: transparent; border-color: #252932; color: #848d97; }
