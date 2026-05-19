@@ -882,6 +882,101 @@ window.selectVol = function(btn, type) {
 })();
 
 // ==========================================
+// 11. TRADE LOCKOUT COUNTDOWN
+// ==========================================
+(function() {
+    var LOCKOUT_MS  = 13 * 60 * 1000;
+    var STORAGE_KEY = 'td_lockout_last_close';
+
+    function getLastClose() {
+        var v = localStorage.getItem(STORAGE_KEY);
+        return v ? new Date(v).getTime() : 0;
+    }
+
+    function setLastClose(isoStr) {
+        var ts = new Date(isoStr).getTime();
+        if (ts > getLastClose()) localStorage.setItem(STORAGE_KEY, isoStr);
+    }
+
+    function injectStyles() {
+        if (document.getElementById('lockout-styles')) return;
+        var s = document.createElement('style');
+        s.id = 'lockout-styles';
+        s.textContent =
+            '#lockout-badge{display:none;align-items:center;gap:5px;background:rgba(244,63,94,0.1);' +
+            'border:1px solid rgba(244,63,94,0.35);border-radius:8px;padding:3px 10px;' +
+            'font-size:12px;font-weight:700;color:#f43f5e;font-family:monospace;margin-left:12px;' +
+            'transition:background 0.3s}' +
+            '#lockout-badge.active{display:flex}' +
+            '#lockout-badge.pulse{animation:lk-pulse 1s infinite}' +
+            '@keyframes lk-pulse{0%,100%{opacity:1}50%{opacity:0.55}}';
+        document.head.appendChild(s);
+    }
+
+    function injectBadge() {
+        if (document.getElementById('lockout-badge')) return;
+        var clockEl = document.getElementById('digital-clock');
+        if (!clockEl) return;
+        var badge = document.createElement('div');
+        badge.id = 'lockout-badge';
+        badge.title = 'Lockout attivo: attendi prima del prossimo trade';
+        badge.innerHTML =
+            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">' +
+            '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
+            '<span id="lockout-countdown">00:00</span>';
+        clockEl.insertAdjacentElement('afterend', badge);
+    }
+
+    function tick() {
+        var badge = document.getElementById('lockout-badge');
+        if (!badge) return;
+        var lastClose = getLastClose();
+        if (!lastClose) { badge.classList.remove('active', 'pulse'); return; }
+        var remaining = LOCKOUT_MS - (Date.now() - lastClose);
+        if (remaining <= 0) { badge.classList.remove('active', 'pulse'); return; }
+        var mins = Math.floor(remaining / 60000);
+        var secs = Math.floor((remaining % 60000) / 1000);
+        var cd = document.getElementById('lockout-countdown');
+        if (cd) cd.textContent = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+        badge.classList.add('active');
+        badge.classList.toggle('pulse', remaining < 60000);
+        badge.style.background = remaining < 60000
+            ? 'rgba(244,63,94,0.22)'
+            : 'rgba(244,63,94,0.1)';
+    }
+
+    async function initFromDb() {
+        if (typeof db === 'undefined' || !db) return;
+        try {
+            var res = await db.from('trades').select('created_at').order('created_at', { ascending: false }).limit(1).maybeSingle();
+            if (res.data && res.data.created_at) setLastClose(res.data.created_at);
+        } catch(e) { console.warn('lockout init:', e); }
+    }
+
+    function subscribeRealtime() {
+        if (typeof db === 'undefined' || !db) return;
+        try {
+            db.channel('lockout_trades_ch')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'trades' }, function(payload) {
+                    if (payload.new && payload.new.created_at) {
+                        setLastClose(payload.new.created_at);
+                        tick();
+                    }
+                })
+                .subscribe();
+        } catch(e) { console.warn('lockout subscribe:', e); }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        injectStyles();
+        injectBadge();
+        initFromDb().then(function() { tick(); });
+        subscribeRealtime();
+        setInterval(tick, 1000);
+    });
+})();
+
+// ==========================================
 // Navigazione: vai al dettaglio della giornata di oggi (crea se manca)
 // ==========================================
 window.goToOggi = async function(ev) {

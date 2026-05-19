@@ -784,12 +784,13 @@
             if (!Array.isArray(ipotesi[ipotesiField])) ipotesi[ipotesiField] = [];
 
             const sortable = (sourceField === 'dove_entro' || sourceField === 'dove_esco_sl' || sourceField === 'dove_esco_tp');
+            const addable = sortable || sourceField === 'regole_ingresso';
             if (sortable) {
                 const freq = flagFreq[sourceField] || {};
                 opts.sort((a, b) => (freq[b] || 0) - (freq[a] || 0));
             }
 
-            if (!opts.length && !sortable) {
+            if (!opts.length && !addable) {
                 container.innerHTML = `<p class="text-[11px] text-tp-muted/50 italic py-2 px-2">Nessuna voce nella strategia padre.</p>`;
                 return;
             }
@@ -815,7 +816,7 @@
                 container.appendChild(row);
             });
 
-            if (sortable) {
+            if (addable) {
                 if (!opts.length) {
                     const empty = document.createElement('p');
                     empty.className = 'text-[11px] text-tp-muted/50 italic px-2 pb-1';
@@ -1217,6 +1218,12 @@
                 .eq('ipotesi_id', ipotesiId)
                 .order('data', { ascending: true });
             tradesCollegati = trades || [];
+
+            // Se ci sono trade collegati e lo stato e' ancora 'ipotesi', avanza automaticamente a 'ingresso'.
+            if (tradesCollegati.length && ipotesi.stato === 'ipotesi') {
+                await db.from('ipotesi_trading').update({ stato: 'ingresso', updated_at: new Date().toISOString() }).eq('id', ipotesiId);
+                ipotesi.stato = 'ingresso';
+            }
 
             // Per ogni trade senza domande, inizializza dal template (domande uguali, tags vuoti).
             const templateOss = Array.isArray(osservazioni) ? osservazioni : [];

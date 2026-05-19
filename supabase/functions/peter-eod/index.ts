@@ -111,7 +111,7 @@ serve(async (req) => {
     const giornata = giornataRows && giornataRows.length > 0 ? giornataRows[0] : null;
 
     const { data: repertiRaw } = await supabase
-      .from("bias").select("asset, direzione, tipo").eq("data", today);
+      .from("bias").select("asset, direzione, tipo, commento").eq("data", today);
     const reperti = repertiRaw || [];
 
     const inizio30gg = new Date(Date.now() - 30 * 86400000).toISOString();
@@ -145,7 +145,12 @@ serve(async (req) => {
         mindset: giornata?.mindset ?? null,
         stato_giornata: giornata?.stato ?? "non_aperta",
         note_domani_scritte: !!(giornata?.note_domani),
-        reperti_creati: reperti.length,
+        reperti_oggi: reperti.map((r) => ({
+          asset: r.asset,
+          direzione: r.direzione,
+          tipo: r.tipo,
+          commento: r.commento ? String(r.commento).slice(0, 400) : null,
+        })),
       },
       baseline_30gg: { n_trade: n30, winrate_pct: wr30, net_pnl: pnl30, pnl_medio_per_trade: avgPnl30 },
       trade_dettaglio_oggi: tradesOggi.map((t) => ({
