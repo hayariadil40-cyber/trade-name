@@ -141,6 +141,15 @@
                     </button>
                 </div>
 
+                <!-- Filtri periodo -->
+                <div class="flex items-center gap-2 mb-3 flex-wrap">
+                    <span class="text-[10px] uppercase tracking-widest font-bold text-tp-muted/70 mr-1">Periodo</span>
+                    <button class="filter-btn active" data-periodo="oggi" onclick="setFilterPeriodo('oggi')">Oggi</button>
+                    <button class="filter-btn" data-periodo="settimana" onclick="setFilterPeriodo('settimana')">Settimana</button>
+                    <button class="filter-btn" data-periodo="mese" onclick="setFilterPeriodo('mese')">Mese</button>
+                    <button class="filter-btn" data-periodo="tutte" onclick="setFilterPeriodo('tutte')">Tutte</button>
+                </div>
+
                 <!-- Filtri stato -->
                 <div class="flex items-center gap-2 mb-4 flex-wrap">
                     <span class="text-[10px] uppercase tracking-widest font-bold text-tp-muted/70 mr-1">Stato</span>
@@ -178,6 +187,7 @@
         let strategieMap = {};   // id → nome
         let filterStato = 'all';
         let filterStrategia = 'all';
+        let filterPeriodo = 'oggi';
 
         document.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
@@ -217,6 +227,39 @@
             filterStrategia = id;
             render();
         }
+        function setFilterPeriodo(periodo) {
+            filterPeriodo = periodo;
+            document.querySelectorAll('.filter-btn[data-periodo]').forEach(b => {
+                b.classList.toggle('active', b.dataset.periodo === periodo);
+            });
+            render();
+        }
+
+        function casaDateStr(date) {
+            // Africa/Casablanca = UTC+1 fisso, no DST
+            const d = new Date(new Date(date).getTime() + 60 * 60000);
+            return d.toISOString().split('T')[0];
+        }
+
+        function matchPeriodo(ip) {
+            if (filterPeriodo === 'tutte') return true;
+            const ipDate = casaDateStr(ip.created_at);
+            const now = new Date();
+            const casaNow = new Date(now.getTime() + 60 * 60000);
+            const todayStr = casaNow.toISOString().split('T')[0];
+            if (filterPeriodo === 'oggi') return ipDate === todayStr;
+            if (filterPeriodo === 'settimana') {
+                const dow = casaNow.getUTCDay();
+                const diffMon = dow === 0 ? -6 : 1 - dow;
+                const monStr = new Date(casaNow.getTime() + diffMon * 86400000).toISOString().split('T')[0];
+                return ipDate >= monStr && ipDate <= todayStr;
+            }
+            if (filterPeriodo === 'mese') {
+                const monthStart = todayStr.substring(0, 7) + '-01';
+                return ipDate >= monthStart && ipDate <= todayStr;
+            }
+            return true;
+        }
 
         function render() {
             const list = document.getElementById('ipotesi-list');
@@ -224,6 +267,7 @@
             const count = document.getElementById('ipotesi-count');
 
             const filtered = ipotesiAll.filter(ip => {
+                if (!matchPeriodo(ip)) return false;
                 if (filterStato !== 'all' && ip.stato !== filterStato) return false;
                 if (filterStrategia !== 'all' && ip.strategia_id !== filterStrategia) return false;
                 return true;

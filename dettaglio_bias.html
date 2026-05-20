@@ -220,10 +220,21 @@
                                 <span id="bias-stato-badge" class="stato-badge-aperto text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded">Aperto</span>
                             </div>
 
+                            <!-- Tipo Reperto — guida la struttura del form -->
+                            <div class="mb-5 pb-4 border-b border-tp-border/30">
+                                <label class="block text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-2">Tipo Reperto</label>
+                                <div class="flex gap-2 flex-wrap" id="tipo-selector">
+                                    <button type="button" onclick="setTipo('bias')" data-tipo="bias" class="tipo-btn px-4 py-2 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-accent/50 flex items-center gap-2"><i data-lucide="compass" class="w-3.5 h-3.5"></i> Bias</button>
+                                    <button type="button" onclick="setTipo('commento')" data-tipo="commento" class="tipo-btn px-4 py-2 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-accent/50 flex items-center gap-2"><i data-lucide="message-square" class="w-3.5 h-3.5"></i> Commento</button>
+                                    <button type="button" onclick="setTipo('asianbox')" data-tipo="asianbox" class="tipo-btn px-4 py-2 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-accent/50 flex items-center gap-2"><i data-lucide="box" class="w-3.5 h-3.5"></i> Asian Box</button>
+                                    <button type="button" onclick="setTipo('appunto')" data-tipo="appunto" class="tipo-btn px-4 py-2 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-accent/50 flex items-center gap-2"><i data-lucide="sticky-note" class="w-3.5 h-3.5"></i> Appunto</button>
+                                </div>
+                            </div>
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                                 <!-- Asset -->
-                                <div>
+                                <div id="field-asset">
                                     <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
                                         <i data-lucide="coins" class="w-4 h-4 text-tp-accent"></i> Asset
                                     </label>
@@ -250,7 +261,7 @@
                                 </div>
 
                                 <!-- Direzione -->
-                                <div class="md:col-span-2">
+                                <div id="field-direzione" class="md:col-span-2">
                                     <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
                                         <i data-lucide="arrow-up-down" class="w-4 h-4 text-tp-accent"></i> Direzione
                                     </label>
@@ -269,19 +280,8 @@
                             </div>
                         </div>
 
-                        <!-- Tipo Reperto (multi-select) -->
-                        <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
-                                <i data-lucide="tags" class="w-4 h-4 text-tp-accent"></i> Tipo Reperto
-                                <span class="text-[10px] font-normal text-tp-muted/70 normal-case tracking-normal">(seleziona uno o piu tipi)</span>
-                            </label>
-                            <div class="flex flex-wrap gap-2" id="tipo-buttons">
-                                <!-- Bottoni caricati dinamicamente da impostazioni -->
-                            </div>
-                        </div>
-
                         <!-- Esito a posteriori (richiesto per chiudere) -->
-                        <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
+                        <div id="card-esito" class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
                             <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
                                 <i data-lucide="check-circle-2" class="w-4 h-4 text-tp-accent"></i> Esito a posteriori
                                 <span class="text-[10px] font-normal text-tp-muted/70 normal-case tracking-normal">(richiesto per chiudere il reperto)</span>
@@ -300,24 +300,24 @@
                         </div>
 
                         <!-- Commento -->
-                        <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
+                        <div id="card-commento" class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
                             <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
                                 <i data-lucide="align-left" class="w-4 h-4 text-tp-accent"></i> Commento
                             </label>
                             <textarea id="bias-commento" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-4 py-3 text-sm text-tp-text/90 outline-none min-h-[150px] resize-none focus:border-tp-accent transition-colors leading-relaxed" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="Descrivi il reperto: commento, bias, conformazione, pattern o inefficienza individuata..."></textarea>
                         </div>
 
-                        <!-- Aggiornamenti -->
-                        <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
+                        <!-- Aggiornamenti / Commenti / Note -->
+                        <div id="card-aggiornamenti" class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
                             <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
-                                <i data-lucide="clock" class="w-4 h-4 text-tp-accent"></i> Aggiornamenti
-                                <span class="text-[10px] font-normal text-tp-muted/70 normal-case tracking-normal">(monitoring sviluppo durante la giornata)</span>
+                                <i data-lucide="clock" class="w-4 h-4 text-tp-accent"></i> <span id="aggiornamenti-label">Aggiornamenti</span>
+                                <span class="text-[10px] font-normal text-tp-muted/70 normal-case tracking-normal" id="aggiornamenti-sublabel">(monitoring sviluppo durante la giornata)</span>
                             </label>
                             <div id="aggiornamenti-list" class="space-y-2 mb-4"></div>
                             <div class="flex gap-2 items-stretch">
                                 <div class="flex flex-col gap-1.5 flex-shrink-0">
                                     <input id="agg-ora" type="time" class="bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[110px]"/>
-                                    <div class="flex gap-1 justify-between">
+                                    <div id="agg-dir-row" class="flex gap-1 justify-between">
                                         <button type="button" id="nagg-long"   onclick="setNewAggDir('long')"   class="agg-dir-btn flex-1">L</button>
                                         <button type="button" id="nagg-short"  onclick="setNewAggDir('short')"  class="agg-dir-btn flex-1">S</button>
                                         <button type="button" id="nagg-neutro" onclick="setNewAggDir('neutro')" class="agg-dir-btn flex-1">N</button>
@@ -331,7 +331,7 @@
                         </div>
 
                         <!-- Categorizzatore Universale -->
-                        <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
+                        <div id="card-categorizzatore" class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
                             <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
                                 <i data-lucide="link" class="w-4 h-4 text-tp-accent"></i> Categorizzatore Universale
                             </label>
@@ -368,6 +368,21 @@
                                     <!-- Caricato da Supabase -->
                                 </select>
                                 <p class="text-[10px] text-tp-muted mt-1">Ctrl+Click per selezione multipla</p>
+                            </div>
+                        </div>
+
+                        <!-- Asian Box -->
+                        <div id="card-asianbox" class="hidden bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
+                            <div class="flex items-center justify-between mb-4">
+                                <label class="text-xs font-bold uppercase tracking-wider text-tp-muted flex items-center gap-2">
+                                    <i data-lucide="box" class="w-4 h-4 text-tp-accent"></i> Asset Analizzati
+                                </label>
+                                <button type="button" onclick="addAsianboxAsset()" class="text-[10px] font-bold text-tp-accent border border-tp-accent/30 rounded-lg px-3 py-1.5 hover:bg-tp-accent/10 transition-colors flex items-center gap-1.5">
+                                    <i data-lucide="plus" class="w-3 h-3"></i> Aggiungi Asset
+                                </button>
+                            </div>
+                            <div id="asianbox-assets" class="space-y-4">
+                                <p class="text-xs text-tp-muted/60 italic">Nessun asset. Clicca "Aggiungi Asset".</p>
                             </div>
                         </div>
 
@@ -444,63 +459,47 @@
         let currentDirection = '';
         let currentEsito = '';
         let currentStato = 'aperto';
+        let currentTipo = 'bias';
         let screenshots = [];
-        let selectedTipi = [];
         let aggiornamenti = [];
+        let asianboxAssets = [];
         let newAggDirezione = null;
-        let availableTipi = ['commento', 'bias', 'conformazione', 'appunto']; // default, sovrascritto da settings
 
-        // Icone fisse per i tipi di default; gli altri usano un'icona generica
-        const TIPO_ICONS = {
-            commento: 'message-square',
-            bias: 'compass',
-            conformazione: 'git-branch',
-            appunto: 'sticky-note'
-        };
-
-        function buildTipoButtons() {
-            const container = document.getElementById('tipo-buttons');
-            if (!container) return;
-            // Unione: tipi configurati + eventuali tipi "legacy" gia salvati nel reperto ma rimossi dalle impostazioni
-            const merged = availableTipi.slice();
-            selectedTipi.forEach(t => { if (merged.indexOf(t) < 0) merged.push(t); });
-            container.innerHTML = merged.map(t => {
-                const icon = TIPO_ICONS[t] || 'tag';
-                const label = t.charAt(0).toUpperCase() + t.slice(1);
-                return `<button type="button" data-tipo="${t}" onclick="toggleTipo('${t}')" class="tipo-btn px-4 py-2 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-accent/50 flex items-center gap-2">
-                    <i data-lucide="${icon}" class="w-3.5 h-3.5"></i> ${label}
-                </button>`;
-            }).join('');
-            lucide.createIcons({ nodes: [container] });
+        function setTipo(tipo) {
+            currentTipo = tipo;
             renderTipoButtons();
-        }
-
-        function toggleTipo(tipo) {
-            const idx = selectedTipi.indexOf(tipo);
-            if (idx >= 0) selectedTipi.splice(idx, 1);
-            else selectedTipi.push(tipo);
-            renderTipoButtons();
+            adaptForm(tipo);
         }
 
         function renderTipoButtons() {
-            document.querySelectorAll('.tipo-btn').forEach(function(btn) {
-                const t = btn.getAttribute('data-tipo');
-                if (selectedTipi.indexOf(t) >= 0) btn.classList.add('active');
-                else btn.classList.remove('active');
+            document.querySelectorAll('#tipo-selector .tipo-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tipo === currentTipo);
             });
+        }
+
+        function adaptForm(tipo) {
+            const s = (id, v) => { const el = document.getElementById(id); if (el) el.classList.toggle('hidden', !v); };
+            s('field-asset',          tipo === 'bias');
+            s('field-direzione',      tipo === 'bias');
+            s('card-esito',           tipo === 'bias');
+            s('card-commento',        tipo === 'bias' || tipo === 'appunto');
+            s('card-aggiornamenti',   tipo !== 'appunto');
+            s('card-asianbox',        tipo === 'asianbox');
+            s('card-categorizzatore', tipo !== 'appunto');
+            const lbl = document.getElementById('aggiornamenti-label');
+            if (lbl) lbl.textContent = tipo === 'commento' ? 'Commenti della giornata' : tipo === 'asianbox' ? 'Note di sessione' : 'Aggiornamenti';
+            const sub = document.getElementById('aggiornamenti-sublabel');
+            if (sub) sub.textContent = tipo === 'commento' ? '(aggiungi un commento ogni volta che vuoi documentare la giornata)' : tipo === 'asianbox' ? '(osservazioni live durante le sessioni)' : '(monitoring sviluppo durante la giornata)';
+            s('agg-dir-row', tipo === 'bias');
+            renderAggiornamenti();
+            updateCloseButton();
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
 
             if (!db) { alert('Supabase non inizializzato.'); return; }
-
-            // Carica i tipi reperto configurati in impostazioni (fallback: 4 default)
-            try {
-                const tipi = await getSetting('td_tipi_reperto', availableTipi);
-                if (Array.isArray(tipi) && tipi.length) availableTipi = tipi;
-            } catch(e) { console.warn('Tipi reperto da settings non caricati:', e); }
-            buildTipoButtons();
+            renderTipoButtons();
 
             if (!biasId) {
                 // Nuovo reperto
@@ -539,8 +538,17 @@
 
             if (data.direzione) setDirection(data.direzione);
 
-            selectedTipi = Array.isArray(data.tipo) ? data.tipo.slice() : [];
-            buildTipoButtons(); // include eventuali tipi legacy e marca quelli attivi
+            // Tipo: legacy 'conformazione' → 'asianbox'
+            let loadedTipo = (Array.isArray(data.tipo) && data.tipo.length > 0) ? data.tipo[0] : 'bias';
+            if (loadedTipo === 'conformazione') loadedTipo = 'asianbox';
+            currentTipo = loadedTipo;
+            renderTipoButtons();
+
+            // AsianBox: assets salvati in commento come JSON
+            if (currentTipo === 'asianbox') {
+                try { asianboxAssets = JSON.parse(data.commento || '[]'); } catch(e) { asianboxAssets = []; }
+                if (!Array.isArray(asianboxAssets)) asianboxAssets = [];
+            }
 
             currentEsito = data.esito || '';
             currentStato = data.stato || 'aperto';
@@ -552,10 +560,13 @@
             renderScreenshots();
 
             aggiornamenti = Array.isArray(data.aggiornamenti) ? data.aggiornamenti.slice() : [];
-            renderAggiornamenti();
             // preset ora corrente (Casablanca = locale dell'utente)
             const _now = new Date();
             document.getElementById('agg-ora').value = String(_now.getHours()).padStart(2,'0') + ':' + String(_now.getMinutes()).padStart(2,'0');
+
+            // Adatta il form al tipo (chiama renderAggiornamenti internamente)
+            adaptForm(currentTipo);
+            if (currentTipo === 'asianbox') renderAsianboxAssets();
 
             // Restore categorizzatori selections
             if (data.categorizzatori) {
@@ -616,7 +627,8 @@
         function updateCloseButton() {
             const closeBtn = document.getElementById('close-btn');
             if (!closeBtn) return;
-            closeBtn.disabled = !currentEsito || currentStato === 'chiuso';
+            const needsEsito = currentTipo === 'bias';
+            closeBtn.disabled = (needsEsito && !currentEsito) || currentStato === 'chiuso';
         }
 
         // --- STATO (aperto / chiuso) ---
@@ -648,7 +660,7 @@
         }
 
         async function closeBias() {
-            if (!currentEsito) {
+            if (currentTipo === 'bias' && !currentEsito) {
                 alert('Seleziona prima un esito (corretto / parziale / sbagliato).');
                 return;
             }
@@ -790,17 +802,25 @@
             const list = document.getElementById('aggiornamenti-list');
             if (!list) return;
             if (!aggiornamenti.length) {
-                list.innerHTML = '<p class="text-xs text-tp-muted/60 italic">Nessun aggiornamento. Aggiungilo sotto man mano che il reperto si sviluppa.</p>';
+                const emptyMsg = currentTipo === 'commento'
+                    ? 'Nessun commento. Aggiungine uno sotto man mano che si sviluppa la giornata.'
+                    : currentTipo === 'asianbox'
+                    ? 'Nessuna nota ancora. Aggiungila sotto.'
+                    : 'Nessun aggiornamento. Aggiungilo sotto man mano che il reperto si sviluppa.';
+                list.innerHTML = `<p class="text-xs text-tp-muted/60 italic">${emptyMsg}</p>`;
                 return;
             }
+            const showDir = currentTipo === 'bias';
             list.innerHTML = aggiornamenti.map((a, i) => `
                 <div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 flex items-start gap-3">
                     <span class="text-xs font-bold text-tp-accent tracking-wide whitespace-nowrap mt-0.5">${escapeAggHtml(a.ora)}</span>
                     <p class="flex-1 text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escapeAggHtml(a.testo)}</p>
                     <div class="flex items-center gap-1 flex-shrink-0">
+                        ${showDir ? `
                         <button type="button" onclick="setAggDirezione(${i},'long')"   class="agg-dir-btn ${a.direzione==='long'  ?'agg-long':''}">L</button>
                         <button type="button" onclick="setAggDirezione(${i},'short')"  class="agg-dir-btn ${a.direzione==='short' ?'agg-short':''}">S</button>
                         <button type="button" onclick="setAggDirezione(${i},'neutro')" class="agg-dir-btn ${a.direzione==='neutro'?'agg-neutro':''}">N</button>
+                        ` : ''}
                         <button type="button" onclick="removeAggiornamento(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors ml-1" title="Rimuovi">
                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                         </button>
@@ -868,23 +888,107 @@
             }
         }
 
+        // --- ASIAN BOX ---
+        const AB_ASSETS = ['XAUUSD','EURUSD','GBPUSD','US30','NAS100','GER30','USDJPY','BTCUSD','GER40'];
+
+        function renderAsianboxAssets() {
+            const container = document.getElementById('asianbox-assets');
+            if (!container) return;
+            if (!asianboxAssets.length) {
+                container.innerHTML = '<p class="text-xs text-tp-muted/60 italic">Nessun asset. Clicca "Aggiungi Asset".</p>';
+                return;
+            }
+            const posColor = { sopra: 'text-tp-accent border-tp-accent bg-tp-accent/10', dentro: 'text-tp-warning border-tp-warning bg-tp-warning/10', sotto: 'text-tp-loss border-tp-loss bg-tp-loss/10' };
+            const posNeutral = 'text-tp-muted border-tp-border bg-transparent';
+            container.innerHTML = asianboxAssets.map((a, i) => `
+                <div class="bg-[#0a0c10] border border-tp-border rounded-xl p-4">
+                    <div class="flex items-center gap-3 mb-4">
+                        <select onchange="updateABField(${i},'asset',this.value)" class="bg-tp-panel border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent flex-1">
+                            <option value="">Asset...</option>
+                            ${AB_ASSETS.map(opt => `<option value="${opt}" ${a.asset===opt?'selected':''}>${opt}</option>`).join('')}
+                        </select>
+                        <button type="button" onclick="removeABAsset(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors p-1">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <!-- Asian Range -->
+                    <div class="mb-3">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-2">Asian Range</p>
+                        <div class="flex gap-2 flex-wrap">
+                            <button type="button" onclick="updateABField(${i},'compressione',${!a.compressione})"
+                                class="px-3 py-2 rounded-lg text-xs font-bold border transition-all ${a.compressione ? 'border-purple-400 bg-purple-400/10 text-purple-400' : 'border-tp-border text-tp-muted'}">
+                                Compressione: ${a.compressione ? 'Si' : 'No'}
+                            </button>
+                            ${['sopra','dentro','sotto'].map(v => `
+                            <button type="button" onclick="updateABField(${i},'trade','${v === a.trade ? '' : v}')"
+                                class="flex-1 px-3 py-2 rounded-lg text-xs font-bold border transition-all ${a.trade===v ? posColor[v] : posNeutral}">
+                                Trade ${v}
+                            </button>`).join('')}
+                        </div>
+                    </div>
+                    <!-- London / New York -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-2">London</p>
+                            <div class="flex gap-1">
+                                ${['sopra','dentro','sotto'].map(v => `
+                                <button type="button" onclick="updateABField(${i},'london','${v === a.london ? '' : v}')"
+                                    class="flex-1 px-2 py-2 rounded-lg text-xs font-bold border transition-all ${a.london===v ? posColor[v] : posNeutral}">
+                                    ${v}
+                                </button>`).join('')}
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-2">New York</p>
+                            <div class="flex gap-1">
+                                ${['sopra','dentro','sotto'].map(v => `
+                                <button type="button" onclick="updateABField(${i},'newyork','${v === a.newyork ? '' : v}')"
+                                    class="flex-1 px-2 py-2 rounded-lg text-xs font-bold border transition-all ${a.newyork===v ? posColor[v] : posNeutral}">
+                                    ${v}
+                                </button>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function addAsianboxAsset() {
+            asianboxAssets.push({ asset: '', compressione: false, trade: '', london: '', newyork: '' });
+            renderAsianboxAssets();
+        }
+
+        function removeABAsset(i) {
+            asianboxAssets.splice(i, 1);
+            renderAsianboxAssets();
+        }
+
+        function updateABField(i, field, value) {
+            asianboxAssets[i][field] = value;
+            renderAsianboxAssets();
+        }
+
         // --- COLLECT PAYLOAD (riusato da save e close) ---
         function collectPayload() {
+            const commentoVal = currentTipo === 'asianbox'
+                ? JSON.stringify(asianboxAssets)
+                : document.getElementById('bias-commento').value;
             return {
-                asset: document.getElementById('bias-asset').value,
+                asset: currentTipo === 'bias' ? document.getElementById('bias-asset').value : '',
                 data: document.getElementById('bias-data').value,
-                direzione: currentDirection,
-                tipo: selectedTipi,
-                commento: document.getElementById('bias-commento').value,
+                direzione: currentTipo === 'bias' ? currentDirection : '',
+                tipo: [currentTipo],
+                commento: commentoVal,
                 aggiornamenti: aggiornamenti,
-                esito: currentEsito || null,
+                esito: currentTipo === 'bias' ? (currentEsito || null) : null,
                 screenshots: screenshots,
-                categorizzatori: {
+                categorizzatori: currentTipo !== 'appunto' ? {
                     cronache: getSelectedValues('sel-cronache'),
                     strategie: getSelectedValues('sel-strategie'),
                     trades: getSelectedValues('sel-trades'),
                     ipotesi: getSelectedValues('sel-ipotesi')
-                }
+                } : {}
             };
         }
 

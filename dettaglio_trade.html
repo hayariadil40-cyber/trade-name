@@ -519,13 +519,12 @@
             const { data: ip } = await db.from('ipotesi_trading').select('stato, osservazioni').eq('id', ipotesiId).single();
             if (!ip) return;
 
-            // Determina se questo trade e' un link nuovo (mai osservazioni seedate prima per questo trade)
-            const { data: t } = await db.from('trades').select('osservazioni').eq('id', tradeId).single();
+            // Leggi osservazioni + esito/pnl (i trade dall'EA arrivano con esito/pnl ma stato ancora 'nuovo')
+            const { data: t } = await db.from('trades').select('osservazioni, esito, pnl').eq('id', tradeId).single();
             const tHasOss = t && Array.isArray(t.osservazioni) && t.osservazioni.length > 0;
-            const isNewLink = !tHasOss;
 
-            // Seed trade.osservazioni dal template ipotesi se ancora vuoto
-            if (isNewLink && Array.isArray(ip.osservazioni) && ip.osservazioni.length > 0) {
+            // Seed trade.osservazioni dal template ipotesi se ancora vuote
+            if (!tHasOss && Array.isArray(ip.osservazioni) && ip.osservazioni.length > 0) {
                 const seed = ip.osservazioni.map(o => ({
                     domanda: (o && o.domanda) ? o.domanda : String(o || ''),
                     tags: []
@@ -533,29 +532,28 @@
                 await db.from('trades').update({ osservazioni: seed }).eq('id', tradeId);
             }
 
-            // Calcola nuovo stato in base a apertura/chiusura del trade
-            const nuovoStato = tradeChiuso ? 'da_osservare' : 'ingresso';
+            // Trade concluso se: stato=completato OPPURE ha gia esito o pnl (trade EA arrivati chiusi)
+            const tradeEffChiuso = tradeChiuso || !!(t && (t.esito || t.pnl != null));
+            const nuovoStato = tradeEffChiuso ? 'da_osservare' : 'ingresso';
 
-            if (ip.stato === 'osservata' || ip.stato === 'non_eseguito') {
-                if (isNewLink) {
-                    // Nuovo trade collegato a ipotesi gia conclusa = incremento → riapri ipotesi per nuovo review
-                    await db.from('ipotesi_trading').update({
-                        stato: nuovoStato,
-                        trade_id: tradeId,
-                        updated_at: new Date().toISOString()
-                    }).eq('id', ipotesiId);
-                } else {
-                    // Stesso trade gia linkato in passato: mantieni stato finale, aggiorna solo trade_id legacy
-                    await db.from('ipotesi_trading').update({ trade_id: tradeId, updated_at: new Date().toISOString() }).eq('id', ipotesiId);
-                }
+            // Invariante: trade concluso con osservazioni non tutte compilate → sempre da_osservare
+            const tOss = tHasOss ? t.osservazioni : [];
+            const ossComplete = tOss.length > 0 && tOss.every(o => Array.isArray(o.tags) && o.tags.length > 0);
+            if (tradeEffChiuso && !ossComplete) {
+                await db.from('ipotesi_trading').update({ stato: 'da_osservare', updated_at: new Date().toISOString() }).eq('id', ipotesiId);
                 return;
             }
-            // Stati non finali: transizione normale
-            await db.from('ipotesi_trading').update({
-                stato: nuovoStato,
-                trade_id: tradeId,
-                updated_at: new Date().toISOString()
-            }).eq('id', ipotesiId);
+
+            // Trade aperto collegato a ipotesi gia conclusa → riapri a ingresso
+            if (!tradeEffChiuso && ip.stato === 'osservata') {
+                await db.from('ipotesi_trading').update({ stato: 'ingresso', updated_at: new Date().toISOString() }).eq('id', ipotesiId);
+                return;
+            }
+
+            // Transizione normale per stati non finali
+            if (ip.stato !== 'osservata') {
+                await db.from('ipotesi_trading').update({ stato: nuovoStato, updated_at: new Date().toISOString() }).eq('id', ipotesiId);
+            }
         }
 
         async function saveTrade() {

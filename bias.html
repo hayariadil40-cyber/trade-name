@@ -48,6 +48,9 @@
         .stato-badge-aperto { background: rgba(32,201,151,0.1); border: 1px solid rgba(32,201,151,0.4); color: #20c997; }
         .stato-badge-chiuso { background: rgba(132,141,151,0.15); border: 1px solid rgba(132,141,151,0.4); color: #848d97; }
         .card-chiuso { opacity: 0.7; }
+        .filter-btn { padding:6px 12px; border-radius:8px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; border:1px solid #252932; color:#848d97; cursor:pointer; transition: all .15s; background: transparent; }
+        .filter-btn:hover { color:#fff; border-color: rgba(32,201,151,0.4); }
+        .filter-btn.active { background: rgba(32,201,151,0.10); color:#20c997; border-color: rgba(32,201,151,0.5); }
     </style>
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -185,6 +188,15 @@
                     </button>
                 </div>
 
+                <!-- Filtri periodo -->
+                <div class="flex items-center gap-2 mb-4 flex-wrap">
+                    <span class="text-[10px] uppercase tracking-widest font-bold text-tp-muted/70 mr-1">Periodo</span>
+                    <button class="filter-btn active" data-periodo="oggi" onclick="setFilterPeriodo('oggi')">Oggi</button>
+                    <button class="filter-btn" data-periodo="settimana" onclick="setFilterPeriodo('settimana')">Settimana</button>
+                    <button class="filter-btn" data-periodo="mese" onclick="setFilterPeriodo('mese')">Mese</button>
+                    <button class="filter-btn" data-periodo="tutte" onclick="setFilterPeriodo('tutte')">Tutte</button>
+                </div>
+
                 <div id="bias-list" class="space-y-2">
                     <!-- Caricato dinamicamente -->
                 </div>
@@ -219,11 +231,42 @@
 
     <script src="app.js"></script>
     <script>
+        let biasAll = [];
+        let filterPeriodo = 'oggi';
+
         document.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
             if (!db) return;
             await loadBiasList();
         });
+
+        function casaTodayStr() {
+            const d = new Date(new Date().getTime() + 60 * 60000);
+            return d.toISOString().split('T')[0];
+        }
+
+        function matchPeriodo(b) {
+            if (filterPeriodo === 'tutte') return true;
+            const bDate = (b.data || '').substring(0, 10);
+            const today = casaTodayStr();
+            if (filterPeriodo === 'oggi') return bDate === today;
+            if (filterPeriodo === 'settimana') {
+                const casaNow = new Date(new Date().getTime() + 60 * 60000);
+                const dow = casaNow.getUTCDay();
+                const monStr = new Date(casaNow.getTime() + (dow === 0 ? -6 : 1 - dow) * 86400000).toISOString().split('T')[0];
+                return bDate >= monStr && bDate <= today;
+            }
+            if (filterPeriodo === 'mese') return bDate >= today.substring(0, 7) + '-01' && bDate <= today;
+            return true;
+        }
+
+        function setFilterPeriodo(periodo) {
+            filterPeriodo = periodo;
+            document.querySelectorAll('.filter-btn[data-periodo]').forEach(b => {
+                b.classList.toggle('active', b.dataset.periodo === periodo);
+            });
+            renderBiasList();
+        }
 
         async function loadBiasList() {
             const { data: biasEntries, error } = await db
@@ -232,16 +275,24 @@
                 .order('data', { ascending: false });
 
             if (error) { console.error(error); return; }
+            biasAll = biasEntries || [];
+            renderBiasList();
+        }
 
+        function renderBiasList() {
+            const biasEntries = biasAll.filter(matchPeriodo);
             const list = document.getElementById('bias-list');
             const empty = document.getElementById('empty-state');
             const count = document.getElementById('bias-count');
 
-            if (!biasEntries || biasEntries.length === 0) {
+            if (!biasEntries.length) {
+                list.innerHTML = '';
                 empty.classList.remove('hidden');
-                count.textContent = '0 reperti archiviati';
+                count.textContent = '0 reperti';
+                lucide.createIcons();
                 return;
             }
+            empty.classList.add('hidden');
 
             count.textContent = `${biasEntries.length} repert${biasEntries.length === 1 ? 'o' : 'i'} archiviat${biasEntries.length === 1 ? 'o' : 'i'}`;
 
@@ -329,7 +380,9 @@
             const newEsito = (cur.esito === value) ? null : value;
             const { error } = await db.from('bias').update({ esito: newEsito }).eq('id', id);
             if (error) { alert('Errore: ' + error.message); return; }
-            await loadBiasList();
+            const idx = biasAll.findIndex(x => x.id === id);
+            if (idx >= 0) biasAll[idx].esito = newEsito;
+            renderBiasList();
         }
 
         async function quickClose(id) {
