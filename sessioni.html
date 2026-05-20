@@ -17,6 +17,17 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #252932; border-radius: 4px; }
+        .asset-tab.active { color: #20c997 !important; background: rgba(32,201,151,0.1); border-color: rgba(32,201,151,0.4) !important; }
+        .bias-btn.act-long  { background: rgba(32,201,151,0.15); color: #20c997 !important; border-color: #20c997 !important; }
+        .bias-btn.act-short { background: rgba(244,63,94,0.15);  color: #f43f5e !important; border-color: #f43f5e !important; }
+        .bias-btn.act-neutro{ background: rgba(234,179,8,0.15);  color: #eab308 !important; border-color: #eab308 !important; }
+        .agg-dir-act-sopra { background: rgba(32,201,151,0.15); color: #20c997 !important; border-color: #20c997 !important; }
+        .agg-dir-act-dentro{ background: rgba(234,179,8,0.15);  color: #eab308 !important; border-color: #eab308 !important; }
+        .agg-dir-act-sotto { background: rgba(244,63,94,0.15);  color: #f43f5e !important; border-color: #f43f5e !important; }
+        .save-flash  { animation: flashGreen 0.55s ease; }
+        .paste-ready { outline: 2px solid var(--paste-color); outline-offset: 2px; }
+        @keyframes flashGreen { 0%{box-shadow:0 0 0 rgba(32,201,151,0)} 50%{box-shadow:0 0 14px rgba(32,201,151,0.5)} 100%{box-shadow:0 0 0 rgba(32,201,151,0)} }
+        @keyframes flashGreen { 0%{box-shadow:0 0 0 rgba(32,201,151,0)} 50%{box-shadow:0 0 14px rgba(32,201,151,0.5)} 100%{box-shadow:0 0 0 rgba(32,201,151,0)} }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
@@ -33,40 +44,23 @@
         </div>
         <nav class="flex-1 overflow-x-hidden overflow-y-auto py-6 space-y-2 flex flex-col w-full group">
             <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span></a>
-
             <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span></a>
-
             <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span></a>
-
             <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span></a>
-
             <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span></a>
-
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-
-            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span></a>
-
+            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg bg-[#161920] text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0 text-tp-accent"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span></a>
             <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Reperti</span></a>
-
             <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span></a>
-
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-
             <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span></a>
-
             <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span></a>
             <a href="ipotesi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Ipotesi</span></a>
-
             <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
-
             <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Peter</span></a>
-
             <a href="steve.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Steve</span></a>
-
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-
             <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span></a>
-
         </nav>
     </aside>
 
@@ -119,164 +113,576 @@
             </div>
         </header>
 
-        <!-- Lista Sessioni -->
-        <div class="flex-1 overflow-y-auto p-3 lg:p-8 scroll-smooth">
-            <div class="max-w-5xl mx-auto">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="sun" class="w-5 h-5 text-tp-accent"></i> Archivio Sessioni</h2>
-                        <p class="text-sm text-tp-muted mt-1" id="sess-count">Caricamento...</p>
-                    </div>
-                    <button onclick="window.location.href='dettaglio_sessione.html'" class="bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] px-4 py-2 text-xs font-bold uppercase rounded-lg flex items-center gap-2 transition-colors">
-                        <i data-lucide="plus" class="w-4 h-4"></i> Nuova Sessione
-                    </button>
-                </div>
+        <!-- Date nav + Asset tabs -->
+        <div class="flex items-center gap-3 px-4 lg:px-6 py-2.5 border-b border-tp-border bg-tp-panel flex-shrink-0 flex-wrap">
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+                <button onclick="changeDate(-1)" class="w-7 h-7 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-white hover:border-tp-muted flex items-center justify-center transition-colors">
+                    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                </button>
+                <span id="date-display" class="text-white font-bold text-xs w-52 text-center select-none">—</span>
+                <button onclick="changeDate(1)" class="w-7 h-7 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-white hover:border-tp-muted flex items-center justify-center transition-colors">
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="goToToday()" class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-tp-accent hover:border-tp-accent/40 transition-colors">Oggi</button>
+            </div>
+            <div class="w-px h-5 bg-tp-border flex-shrink-0"></div>
+            <div class="flex gap-1.5 flex-wrap" id="asset-tabs"></div>
+        </div>
 
-                <!-- Filtri periodo -->
-                <div class="flex gap-2 mb-2 flex-wrap">
-                    <button onclick="filterTime('oggi')" id="tf-oggi" class="time-filter-btn text-tp-accent bg-tp-accent/10 border border-tp-accent/30 px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors">Oggi</button>
-                    <button onclick="filterTime('ieri')" id="tf-ieri" class="time-filter-btn text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">Ieri</button>
-                    <button onclick="filterTime('settimana')" id="tf-settimana" class="time-filter-btn text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">Settimana</button>
-                    <button onclick="filterTime('mese')" id="tf-mese" class="time-filter-btn text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">Mese</button>
-                    <button onclick="filterTime('tutti')" id="tf-tutti" class="time-filter-btn text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">Tutti</button>
-                </div>
-                <!-- Filtri tipo sessione -->
-                <div class="flex gap-2 mb-6">
-                    <button onclick="filterList('all')" class="filter-btn text-tp-accent bg-tp-accent/10 border border-tp-accent/30 px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors">Tutte</button>
-                    <button onclick="filterList('asia')" class="filter-btn text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">Asia</button>
-                    <button onclick="filterList('london')" class="filter-btn text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">London</button>
-                    <button onclick="filterList('newyork')" class="filter-btn text-tp-muted border border-tp-border px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors hover:text-white">New York</button>
-                </div>
+        <!-- Main content -->
+        <div class="flex-1 overflow-y-auto p-4 lg:p-6">
+            <div id="sessions-grid" class="grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-screen-xl mx-auto hidden"></div>
 
-                <div id="sess-list" class="space-y-2"></div>
-
-                <div id="empty-state" class="hidden text-center py-16 text-tp-muted">
-                    <i data-lucide="sun" class="w-12 h-12 mx-auto mb-3 opacity-30"></i>
-                    <p class="text-sm font-bold">Nessuna sessione archiviata</p>
+            <div id="empty-state" class="hidden flex-col items-center justify-center py-24 text-center">
+                <div class="w-14 h-14 rounded-2xl bg-tp-panel border border-tp-border flex items-center justify-center mb-4">
+                    <i data-lucide="sun" class="w-7 h-7 text-tp-muted opacity-30"></i>
                 </div>
+                <p class="text-sm font-bold text-tp-muted mb-1">Nessuna sessione per questa data</p>
+                <p class="text-xs text-tp-muted/50 mb-6">Le sessioni vengono create automaticamente quando esiste una giornata</p>
+                <button onclick="createSessions()" class="bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] px-4 py-2 text-xs font-bold uppercase rounded-lg transition-colors inline-flex items-center gap-2">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Crea Sessioni
+                </button>
             </div>
         </div>
     </main>
 
+    <!-- Image modal -->
+    <div id="img-modal" class="hidden fixed inset-0 bg-black/85 z-50 flex items-center justify-center backdrop-blur-sm" onclick="closeImgModal()">
+        <div class="relative" onclick="event.stopPropagation()">
+            <img id="img-modal-src" src="" alt="" class="max-w-[92vw] max-h-[92vh] rounded-xl shadow-2xl object-contain" />
+            <button onclick="closeImgModal()" class="absolute top-3 right-3 w-8 h-8 bg-black/60 rounded-full flex items-center justify-center text-white hover:bg-black/90 transition-colors">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
     <script src="app.js"></script>
     <script>
-        let allSessions = [];
-        let activeTypeFilter = 'all';
-        let activeTimeFilter = 'oggi';
+        const ASSETS = ['XAUUSD', 'EURUSD', 'US30', 'NAS100', 'GER40', 'GER30', 'BTCUSD', 'DXY', 'USDJPY'];
+        const SESSION_NAMES  = ['asia', 'london', 'newyork'];
+        const SESSION_LABELS = { asia: 'Asia', london: 'London', newyork: 'New York' };
+        const SESSION_TIMES  = { asia: '01:00 – 06:00', london: '08:00 – 12:30', newyork: '14:30 – 18:30' };
+        const SESSION_COLORS = { asia: '#20c997', london: '#c084fc', newyork: '#f43f5e' };
+        const SESSION_ICONS  = { asia: 'sunrise', london: 'landmark', newyork: 'building-2' };
+
+        function casaTodayStr() {
+            return new Date(Date.now() + 60 * 60000).toISOString().split('T')[0];
+        }
+
+        let currentDateStr = casaTodayStr();
+        let activeAsset    = 'XAUUSD';
+        let sessionsRows   = {};
+        let localChanges   = {};
+        const AGG_POS = ['sopra','dentro','sotto'];
+        let aggDirs        = { asia: '', london: '', newyork: '' };
+        let pasteTarget    = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
-            if (!db) return;
+            renderAssetTabs();
             await loadSessions();
         });
 
-        function getDateRange(period) {
-            const pad = n => String(n).padStart(2,'0');
-            const fmtTs = ts => { const d = new Date(ts); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
-            const now = Date.now();
-            const DAY = 86400000;
-            const todayStr = fmtTs(now);
-            if (period === 'oggi') return { from: todayStr, to: todayStr };
-            if (period === 'ieri') { const s = fmtTs(now - DAY); return { from: s, to: s }; }
-            if (period === 'settimana') {
-                const dow = new Date().getDay();
-                const daysToMon = dow === 0 ? 6 : dow - 1;
-                return { from: fmtTs(now - daysToMon * DAY), to: todayStr };
-            }
-            if (period === 'mese') { const d = new Date(); return { from: `${d.getFullYear()}-${pad(d.getMonth()+1)}-01`, to: todayStr }; }
-            return null;
+        // ─── Date ────────────────────────────────────────────────────────────
+
+        function changeDate(delta) {
+            const d = new Date(currentDateStr + 'T00:00:00Z');
+            d.setUTCDate(d.getUTCDate() + delta);
+            currentDateStr = d.toISOString().split('T')[0];
+            loadSessions();
         }
+
+        function goToToday() { currentDateStr = casaTodayStr(); loadSessions(); }
+        function goToOggi(e) { if (e) e.preventDefault(); goToToday(); }
+
+        function updateDateDisplay() {
+            const d = new Date(currentDateStr + 'T00:00:00Z');
+            const s = d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+            document.getElementById('date-display').textContent = s.charAt(0).toUpperCase() + s.slice(1);
+        }
+
+        // ─── Asset tabs ───────────────────────────────────────────────────────
+
+        function renderAssetTabs() {
+            const extra = new Set();
+            SESSION_NAMES.forEach(n => {
+                const cd = sessionsRows[n]?.coin_data || {};
+                Object.keys(cd).forEach(a => extra.add(a));
+            });
+            const all = [...new Set([...ASSETS, ...extra])];
+            document.getElementById('asset-tabs').innerHTML = all.map(a => `
+                <button onclick="setActiveAsset('${a}')" data-asset="${a}"
+                    class="asset-tab text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors ${a === activeAsset ? 'active' : ''}">
+                    ${a}
+                </button>
+            `).join('');
+        }
+
+        function setActiveAsset(a) { activeAsset = a; renderAssetTabs(); renderPanels(); }
+
+        // ─── Load ─────────────────────────────────────────────────────────────
 
         async function loadSessions() {
-            const { data, error } = await db.from('sessioni_list').select('*').order('data', { ascending: false });
-            if (error) {
-                console.error('[loadSessions]', error);
-                document.getElementById('sess-count').textContent = 'Errore: ' + (error.message || error.code || 'caricamento fallito');
-                return;
-            }
-            allSessions = data || [];
-            applyFilters();
+            sessionsRows = {};
+            localChanges = {};
+            updateDateDisplay();
+
+            const { data, error } = await db.from('sessioni').select('*').eq('data', currentDateStr).in('nome', SESSION_NAMES);
+            if (error) { console.error('[loadSessions]', error); return; }
+            (data || []).forEach(s => { sessionsRows[s.nome] = s; });
+
+            // Mostra sempre la griglia — i campi sono editabili anche senza righe DB
+            document.getElementById('sessions-grid').classList.remove('hidden');
+            document.getElementById('empty-state').classList.remove('flex');
+            document.getElementById('empty-state').classList.add('hidden');
+
+            renderAssetTabs();
+            renderPanels();
         }
 
-        function renderList(sessions) {
-            const list = document.getElementById('sess-list');
-            const empty = document.getElementById('empty-state');
-            const count = document.getElementById('sess-count');
+        // ─── Panels ───────────────────────────────────────────────────────────
 
-            if (!sessions.length) { empty.classList.remove('hidden'); list.innerHTML = ''; count.textContent = '0 sessioni'; return; }
-            empty.classList.add('hidden');
-            count.textContent = `${sessions.length} session${sessions.length === 1 ? 'e' : 'i'}`;
+        function getAssetData(nome) {
+            const s  = sessionsRows[nome];
+            const cd = (s?.coin_data  || {})[activeAsset] || {};
+            const ad = (s?.auto_data  || {})[activeAsset] || {};
+            // auto_data è scritto dall'EA — usato come fallback per high/low se coin_data è vuoto
+            return {
+                high:          cd.high          || ad.high || '',
+                low:           cd.low           || ad.low  || '',
+                apertura:      cd.apertura      || '',
+                chiusura:      cd.chiusura      || '',
+                bias:          cd.bias          || '',
+                aggiornamenti: cd.aggiornamenti || [],
+                screenshot:    cd.screenshot    || ''
+            };
+        }
 
-            const sessionIcons = { asia: 'sunrise', london: 'landmark', newyork: 'tower-control' };
-            const sessionColors = { asia: 'tp-accent', london: 'purple-400', newyork: 'tp-loss' };
+        function getField(nome, field) {
+            return localChanges[nome]?.[field] !== undefined
+                ? localChanges[nome][field]
+                : (getAssetData(nome)[field] ?? '');
+        }
 
-            list.innerHTML = sessions.map(s => {
-                const icon = sessionIcons[s.nome] || 'sun';
-                const color = sessionColors[s.nome] || 'tp-accent';
-                const borderColor = s.nome === 'newyork' ? 'hover:border-tp-loss/50' : s.nome === 'london' ? 'hover:border-purple-400/50' : 'hover:border-tp-accent/50';
-                const barColor = s.nome === 'newyork' ? 'bg-tp-loss' : s.nome === 'london' ? 'bg-purple-400' : 'bg-tp-accent';
-                const dateStr = s.data ? new Date(s.data + 'T00:00:00').toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' }) : '--';
-                const coins = Array.isArray(s.coin_keys) ? s.coin_keys : [];
-                const moodIcon = s.mood === 'positive' ? 'smile' : s.mood === 'negative' ? 'frown' : 'meh';
-                const moodColor = s.mood === 'positive' ? 'text-tp-accent' : s.mood === 'negative' ? 'text-tp-loss' : 'text-tp-warning';
+        function escHtml(s) {
+            return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
 
-                return `
-                    <div onclick="window.location.href='dettaglio_sessione.html?id=${s.id}'" data-session="${s.nome}" class="session-row group flex items-center flex-wrap lg:flex-nowrap gap-y-2 p-3 lg:p-4 pl-5 lg:pl-2 bg-tp-panel border border-tp-border ${borderColor} rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
-                        <div class="w-1 absolute left-0 top-0 bottom-0 ${barColor}"></div>
-                        <div class="flex items-center gap-3 lg:gap-4 w-1/2 lg:w-1/4">
-                            <div class="w-9 h-9 lg:w-10 lg:h-10 rounded-lg bg-tp-bg flex items-center justify-center border border-tp-border shrink-0">
-                                <i data-lucide="${icon}" class="w-5 h-5 text-${color}"></i>
-                            </div>
-                            <div class="flex flex-col min-w-0">
-                                <span class="text-sm font-bold text-white group-hover:text-${color} transition-colors capitalize">${s.nome}</span>
-                                <span class="text-[10px] text-tp-muted font-bold tracking-widest truncate">${dateStr}</span>
-                            </div>
+        function renderPanels() {
+            const grid = document.getElementById('sessions-grid');
+            grid.innerHTML = SESSION_NAMES.map(n => buildPanel(n)).join('');
+            lucide.createIcons();
+
+            // Screenshot: imposta img.src dopo innerHTML per evitare base64 enormi nel template
+            SESSION_NAMES.forEach(nome => {
+                const shot  = getAssetData(nome).screenshot || '';
+                const show  = shot.startsWith('http') || (shot.startsWith('data:') && nome === 'newyork');
+                const wrap  = document.getElementById('shot-wrap-'  + nome);
+                const img   = document.getElementById('shot-img-'   + nome);
+                const empty = document.getElementById('shot-empty-' + nome);
+                if (show && shot && wrap && img) {
+                    img.src = shot;
+                    wrap.classList.remove('hidden');
+                    if (empty) empty.classList.add('hidden');
+                }
+            });
+
+            computeAllRanges();
+
+            // Textarea auto-resize
+            grid.querySelectorAll('textarea').forEach(ta => {
+                ta.style.height = 'auto';
+                ta.style.height = ta.scrollHeight + 'px';
+                ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; });
+            });
+        }
+
+        function buildPanel(nome) {
+            const s     = sessionsRows[nome];
+            const color = SESSION_COLORS[nome];
+            const high  = escHtml(getField(nome, 'high'));
+            const low   = escHtml(getField(nome, 'low'));
+            const bias  = getField(nome, 'bias');
+            const apertura = escHtml(getField(nome, 'apertura'));
+            const chiusura = escHtml(getField(nome, 'chiusura'));
+            const bL    = bias === 'LONG'    ? 'act-long'   : '';
+            const bS    = bias === 'SHORT'   ? 'act-short'  : '';
+            const bN    = bias === 'NEUTRAL' ? 'act-neutro' : '';
+            const nowT  = currentTimeStr();
+
+            const isPaste = pasteTarget === nome;
+            return `
+            <div class="bg-tp-panel border border-tp-border rounded-xl overflow-hidden flex flex-col ${isPaste ? 'paste-ready' : ''}" style="border-top:3px solid ${color};${isPaste ? '--paste-color:'+color : ''}" onclick="setPasteTarget('${nome}')">
+                <div class="flex items-center justify-between px-4 py-3 border-b border-tp-border">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:${color}18;border:1px solid ${color}35">
+                            <i data-lucide="${SESSION_ICONS[nome]}" class="w-4 h-4" style="color:${color}"></i>
                         </div>
-                        <div class="w-1/2 lg:w-1/4 flex justify-end lg:justify-start items-center gap-2">
-                            <i data-lucide="${moodIcon}" class="w-5 h-5 ${moodColor}"></i>
-                            <i data-lucide="chevron-right" class="w-5 h-5 text-tp-muted group-hover:text-${color} transition-colors lg:hidden"></i>
-                        </div>
-                        <div class="w-full lg:w-1/4 flex gap-1.5 flex-wrap">
-                            ${coins.map(c => `<span class="text-[10px] font-bold px-1.5 py-0.5 bg-tp-bg rounded border border-tp-border text-tp-muted">${c}</span>`).join('')}
-                            ${!coins.length ? '<span class="text-[10px] text-tp-muted/50">Nessun dato</span>' : ''}
-                        </div>
-                        <div class="hidden lg:block lg:w-1/4 lg:flex lg:justify-end pr-2">
-                            <i data-lucide="chevron-right" class="w-5 h-5 text-tp-muted group-hover:text-${color} transition-colors"></i>
+                        <div>
+                            <div class="text-sm font-bold text-white">${SESSION_LABELS[nome]}</div>
+                            <div class="text-[10px] text-tp-muted font-bold tracking-wide">${SESSION_TIMES[nome]}</div>
                         </div>
                     </div>
-                `;
+                    ${isPaste ? `<span class="text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded border mr-1" style="color:${color};border-color:${color};background:${color}18"><i data-lucide="clipboard" class="w-3 h-3 inline -mt-0.5"></i> Paste</span>` : ''}
+                    <button id="save-btn-${nome}" onclick="saveSession('${nome}')"
+                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 transition-colors">
+                        <i data-lucide="save" class="w-3.5 h-3.5"></i> Salva
+                    </button>
+                </div>
+
+                <div class="p-4 flex flex-col gap-3 flex-1">
+
+                    <!-- High / Low / Range -->
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-[9px] font-bold uppercase tracking-wider text-tp-muted block mb-1">High</label>
+                            <input type="text" id="inp-${nome}-high" value="${high}"
+                                oninput="setChange('${nome}','high',this.value);computeRange('${nome}')"
+                                placeholder="—"
+                                class="w-full bg-tp-bg border border-tp-border rounded-lg px-2.5 py-1.5 text-sm text-white font-mono focus:outline-none focus:border-white/20 transition-colors" />
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-bold uppercase tracking-wider text-tp-muted block mb-1">Low</label>
+                            <input type="text" id="inp-${nome}-low" value="${low}"
+                                oninput="setChange('${nome}','low',this.value);computeRange('${nome}')"
+                                placeholder="—"
+                                class="w-full bg-tp-bg border border-tp-border rounded-lg px-2.5 py-1.5 text-sm text-white font-mono focus:outline-none focus:border-white/20 transition-colors" />
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-bold uppercase tracking-wider text-tp-muted block mb-1">Range</label>
+                            <div id="range-${nome}" class="w-full bg-tp-bg border border-tp-border/50 rounded-lg px-2.5 py-1.5 text-sm font-mono text-tp-accent text-center">—</div>
+                        </div>
+                    </div>
+
+                    <!-- Apertura / Chiusura -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[9px] font-bold uppercase tracking-wider text-tp-muted block mb-1 flex items-center gap-1">
+                                Apertura <i data-lucide="clock" class="w-2.5 h-2.5 opacity-40"></i>
+                            </label>
+                            <input type="text" id="inp-${nome}-apertura" value="${apertura}"
+                                oninput="setChange('${nome}','apertura',this.value)"
+                                placeholder="auto"
+                                class="w-full bg-tp-bg border border-tp-border rounded-lg px-2.5 py-1.5 text-sm text-white font-mono focus:outline-none focus:border-white/20 transition-colors placeholder-tp-muted/30" />
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-bold uppercase tracking-wider text-tp-muted block mb-1 flex items-center gap-1">
+                                Chiusura <i data-lucide="clock" class="w-2.5 h-2.5 opacity-40"></i>
+                            </label>
+                            <input type="text" id="inp-${nome}-chiusura" value="${chiusura}"
+                                oninput="setChange('${nome}','chiusura',this.value)"
+                                placeholder="auto"
+                                class="w-full bg-tp-bg border border-tp-border rounded-lg px-2.5 py-1.5 text-sm text-white font-mono focus:outline-none focus:border-white/20 transition-colors placeholder-tp-muted/30" />
+                        </div>
+                    </div>
+
+                    <!-- Bias -->
+                    <div>
+                        <label class="text-[9px] font-bold uppercase tracking-wider text-tp-muted block mb-1.5">Bias</label>
+                        <div class="flex gap-1.5">
+                            <button onclick="setBias('${nome}','LONG')"    data-bias="${nome}-LONG"    class="bias-btn ${bL} flex-1 py-1.5 text-xs font-bold rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors">L</button>
+                            <button onclick="setBias('${nome}','SHORT')"   data-bias="${nome}-SHORT"   class="bias-btn ${bS} flex-1 py-1.5 text-xs font-bold rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors">S</button>
+                            <button onclick="setBias('${nome}','NEUTRAL')" data-bias="${nome}-NEUTRAL" class="bias-btn ${bN} flex-1 py-1.5 text-xs font-bold rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors">N</button>
+                        </div>
+                    </div>
+
+                    <!-- Aggiornamenti -->
+                    <div>
+                        <label class="text-[9px] font-bold uppercase tracking-wider text-tp-muted block mb-1.5">Aggiornamenti</label>
+                        <div class="space-y-1 mb-2" id="agg-list-${nome}">${buildAggiornamenti(nome)}</div>
+                        <div class="bg-tp-bg border border-tp-border rounded-lg p-2.5 space-y-2">
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="agg-time-${nome}" value="${nowT}"
+                                    class="w-14 bg-transparent text-[11px] font-mono text-tp-muted border border-tp-border/50 rounded px-1.5 py-1 focus:outline-none focus:border-white/20" />
+                                <div class="flex gap-1 flex-1">
+                                    ${AGG_POS.map(v => `<button onclick="setAggDir('${nome}','${v}')" id="agg-dir-${v}-${nome}"
+                                        class="agg-dir-btn flex-1 py-1 text-[10px] font-bold rounded border border-tp-border text-tp-muted hover:text-white transition-colors ${aggDirs[nome]===v?'agg-dir-act-'+v:''}">${v}</button>`).join('')}
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <textarea id="agg-text-${nome}" rows="2" placeholder="nota..."
+                                    onkeydown="if(event.ctrlKey&&event.key==='Enter'){addAggiornamento('${nome}');event.preventDefault()}"
+                                    class="flex-1 bg-transparent text-sm text-white resize-none focus:outline-none leading-relaxed placeholder-tp-muted/30"></textarea>
+                                <button onclick="addAggiornamento('${nome}')"
+                                    class="self-end w-7 h-7 rounded-lg bg-tp-accent/10 border border-tp-accent/40 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors flex items-center justify-center shrink-0">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Screenshot -->
+                    <label class="block cursor-pointer">
+                        <input type="file" accept="image/*" class="hidden" onchange="uploadScreenshot('${nome}',this)" />
+                        <div id="shot-wrap-${nome}" class="hidden rounded-lg overflow-hidden border border-tp-border relative group/shot" style="aspect-ratio:16/9">
+                            <img id="shot-img-${nome}" src="" alt="" class="w-full h-full object-cover block" />
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover/shot:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <i data-lucide="image" class="w-4 h-4 text-white drop-shadow"></i>
+                                <span class="text-[10px] text-white font-bold uppercase tracking-wider">Cambia</span>
+                            </div>
+                        </div>
+                        <div id="shot-empty-${nome}" class="rounded-lg border-2 border-dashed border-tp-border/40 flex flex-col items-center justify-center gap-1.5 hover:border-tp-accent/40 transition-colors" style="aspect-ratio:16/9">
+                            <i data-lucide="image-plus" class="w-5 h-5 text-tp-muted/30"></i>
+                            <span class="text-[9px] font-bold uppercase tracking-wider text-tp-muted/30">Screenshot</span>
+                        </div>
+                    </label>
+
+                </div>
+            </div>`;
+        }
+
+        // ─── Range ────────────────────────────────────────────────────────────
+
+        function computeRange(nome) {
+            const h = parseFloat(document.getElementById('inp-' + nome + '-high')?.value);
+            const l = parseFloat(document.getElementById('inp-' + nome + '-low')?.value);
+            const el = document.getElementById('range-' + nome);
+            if (!el) return;
+            if (isNaN(h) || isNaN(l) || h <= l) { el.textContent = '—'; return; }
+            const diff = h - l;
+            // Converti in pip in base all'asset
+            let pips, label;
+            if (['EURUSD','GBPUSD','AUDUSD','NZDUSD'].includes(activeAsset)) {
+                pips = Math.round(diff * 10000);
+                label = pips + ' pip';
+            } else if (['USDJPY','EURJPY'].includes(activeAsset)) {
+                pips = Math.round(diff * 100);
+                label = pips + ' pip';
+            } else if (['XAUUSD'].includes(activeAsset)) {
+                pips = Math.round(diff * 10);
+                label = pips + ' pip';
+            } else {
+                // US30, NAS100, GER40, BTCUSD ecc → punti interi
+                label = Math.round(diff) + ' pt';
+            }
+            el.textContent = label;
+        }
+
+        function computeAllRanges() {
+            SESSION_NAMES.forEach(n => computeRange(n));
+        }
+
+        // ─── Aggiornamenti ───────────────────────────────────────────────────
+
+        function currentTimeStr() {
+            return new Date(Date.now() + 60 * 60000).toISOString().slice(11, 16);
+        }
+
+        function buildAggiornamenti(nome) {
+            const aggs = getAssetData(nome).aggiornamenti || [];
+            if (!aggs.length) return '<p class="text-[10px] text-tp-muted/30 italic px-1">—</p>';
+            return aggs.map((a, i) => {
+                const posColor = { sopra: '#20c997', dentro: '#eab308', sotto: '#f43f5e' };
+                const col   = posColor[a.direzione] || '#848d97';
+                const label = a.direzione || '·';
+                return `<div class="flex gap-2 items-start group/agg py-0.5">
+                    <span class="text-[9px] font-mono text-tp-muted/50 pt-0.5 shrink-0 w-10">${escHtml(a.ora || '')}</span>
+                    <span class="text-[9px] font-bold shrink-0 pt-0.5 w-10 uppercase" style="color:${col}">${label}</span>
+                    <span class="text-xs text-white/80 flex-1 leading-relaxed">${escHtml(a.testo || '')}</span>
+                    <button onclick="deleteAggiornamento('${nome}',${i})" class="text-tp-muted/20 hover:text-tp-loss opacity-0 group-hover/agg:opacity-100 transition-all shrink-0 mt-0.5">
+                        <i data-lucide="x" class="w-3 h-3"></i>
+                    </button>
+                </div>`;
             }).join('');
-            lucide.createIcons();
         }
 
-        function filterList(type) {
-            activeTypeFilter = type;
-            document.querySelectorAll('.filter-btn').forEach(b => {
-                b.classList.remove('text-tp-accent', 'bg-tp-accent/10', 'border-tp-accent/30');
-                b.classList.add('text-tp-muted', 'border-tp-border');
+        function setAggDir(nome, dir) {
+            aggDirs[nome] = aggDirs[nome] === dir ? '' : dir;
+            AGG_POS.forEach(v => {
+                const btn = document.getElementById('agg-dir-' + v + '-' + nome);
+                if (!btn) return;
+                btn.classList.remove('agg-dir-act-sopra','agg-dir-act-dentro','agg-dir-act-sotto');
+                if (v === aggDirs[nome]) btn.classList.add('agg-dir-act-' + v);
             });
-            event.target.classList.add('text-tp-accent', 'bg-tp-accent/10', 'border-tp-accent/30');
-            event.target.classList.remove('text-tp-muted', 'border-tp-border');
-            applyFilters();
         }
 
-        function filterTime(period) {
-            activeTimeFilter = period;
-            document.querySelectorAll('.time-filter-btn').forEach(b => {
-                b.classList.remove('text-tp-accent', 'bg-tp-accent/10', 'border-tp-accent/30');
-                b.classList.add('text-tp-muted', 'border-tp-border');
+        async function addAggiornamento(nome) {
+            const textEl = document.getElementById('agg-text-' + nome);
+            const timeEl = document.getElementById('agg-time-' + nome);
+            const testo  = textEl?.value?.trim();
+            if (!testo) return;
+            const ora    = timeEl?.value?.trim() || currentTimeStr();
+            const entry  = { ora, testo, direzione: aggDirs[nome] || '' };
+
+            let s = sessionsRows[nome];
+            if (!s) {
+                const { data: { user } } = await db.auth.getUser();
+                if (!user) return;
+                const cd = {};
+                cd[activeAsset] = { aggiornamenti: [entry] };
+                const { data: newRow, error: insErr } = await db.from('sessioni')
+                    .insert({ user_id: user.id, data: currentDateStr, nome, coin_data: cd })
+                    .select().single();
+                if (insErr) { console.error('[addAggiornamento insert]', insErr); return; }
+                sessionsRows[nome] = newRow;
+                aggDirs[nome] = '';
+                renderPanels();
+                return;
+            }
+
+            const cd = JSON.parse(JSON.stringify(s.coin_data || {}));
+            if (!cd[activeAsset]) cd[activeAsset] = {};
+            if (!Array.isArray(cd[activeAsset].aggiornamenti)) cd[activeAsset].aggiornamenti = [];
+            cd[activeAsset].aggiornamenti.push(entry);
+
+            const { error } = await db.from('sessioni').update({ coin_data: cd }).eq('id', s.id);
+            if (error) { console.error('[addAggiornamento]', error); return; }
+
+            s.coin_data  = cd;
+            aggDirs[nome] = '';
+            renderPanels();
+        }
+
+        async function deleteAggiornamento(nome, idx) {
+            const s = sessionsRows[nome];
+            if (!s) return;
+            const cd = JSON.parse(JSON.stringify(s.coin_data || {}));
+            if (!Array.isArray(cd[activeAsset]?.aggiornamenti)) return;
+            cd[activeAsset].aggiornamenti.splice(idx, 1);
+            const { error } = await db.from('sessioni').update({ coin_data: cd }).eq('id', s.id);
+            if (!error) { s.coin_data = cd; renderPanels(); }
+        }
+
+        // ─── State ────────────────────────────────────────────────────────────
+
+        function setChange(nome, field, value) {
+            if (!localChanges[nome]) localChanges[nome] = {};
+            localChanges[nome][field] = value;
+        }
+
+        function setBias(nome, dir) {
+            const current = localChanges[nome]?.bias !== undefined ? localChanges[nome].bias : (getAssetData(nome).bias || '');
+            const next    = current === dir ? '' : dir;
+            setChange(nome, 'bias', next);
+            ['LONG','SHORT','NEUTRAL'].forEach(d => {
+                const btn = document.querySelector(`[data-bias="${nome}-${d}"]`);
+                if (!btn) return;
+                btn.classList.remove('act-long','act-short','act-neutro');
+                if (d === next) btn.classList.add(d === 'LONG' ? 'act-long' : d === 'SHORT' ? 'act-short' : 'act-neutro');
             });
-            document.getElementById('tf-' + period).classList.add('text-tp-accent', 'bg-tp-accent/10', 'border-tp-accent/30');
-            document.getElementById('tf-' + period).classList.remove('text-tp-muted', 'border-tp-border');
-            applyFilters();
         }
 
-        function applyFilters() {
-            let sessions = allSessions;
-            if (activeTypeFilter !== 'all') sessions = sessions.filter(s => s.nome === activeTypeFilter);
-            const range = getDateRange(activeTimeFilter);
-            if (range) sessions = sessions.filter(s => { const d = (s.data||'').substring(0,10); return d >= range.from && d <= range.to; });
-            renderList(sessions);
+        // ─── Save ─────────────────────────────────────────────────────────────
+
+        async function saveSession(nome) {
+            const changes = localChanges[nome] || {};
+            if (!Object.keys(changes).length) return;
+
+            let s = sessionsRows[nome];
+
+            if (!s) {
+                // Crea la riga sessione se non esiste
+                const { data: { user } } = await db.auth.getUser();
+                if (!user) return;
+                const cd = {};
+                cd[activeAsset] = { ...changes };
+                const { data: newRow, error: insErr } = await db.from('sessioni')
+                    .insert({ user_id: user.id, data: currentDateStr, nome, coin_data: cd })
+                    .select().single();
+                if (insErr) { console.error('[saveSession insert]', insErr); return; }
+                sessionsRows[nome] = newRow;
+                localChanges[nome] = {};
+                renderPanels();
+                return;
+            }
+
+            // Merge nel coin_data esistente (mai sovrascrivere altri asset)
+            const cd = JSON.parse(JSON.stringify(s.coin_data || {}));
+            if (!cd[activeAsset]) cd[activeAsset] = {};
+            Object.assign(cd[activeAsset], changes);
+
+            const { error } = await db.from('sessioni').update({ coin_data: cd }).eq('id', s.id);
+            if (error) { console.error('[saveSession]', error); return; }
+
+            s.coin_data    = cd;
+            localChanges[nome] = {};
+
+            const btn = document.getElementById('save-btn-' + nome);
+            if (btn) { btn.classList.add('save-flash'); setTimeout(() => btn.classList.remove('save-flash'), 600); }
+        }
+
+        // ─── Paste target ─────────────────────────────────────────────────────
+
+        function setPasteTarget(nome) {
+            if (pasteTarget === nome) return;
+            pasteTarget = nome;
+            renderPanels();
+        }
+
+        window.addEventListener('paste', async (e) => {
+            if (!pasteTarget) return;
+            const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+            if (!item) return;
+            e.preventDefault();
+            const file = item.getAsFile();
+            if (file) await uploadScreenshotFile(pasteTarget, file);
+        });
+
+        // ─── Screenshot upload ────────────────────────────────────────────────
+
+        async function uploadScreenshot(nome, input) {
+            const file = input.files?.[0];
+            if (file) await uploadScreenshotFile(nome, file);
+        }
+
+        async function uploadScreenshotFile(nome, file) {
+            // Crea riga sessione se non esiste
+            if (!sessionsRows[nome]) {
+                const { data: { user } } = await db.auth.getUser();
+                if (!user) return;
+                const { data: newRow, error: insErr } = await db.from('sessioni')
+                    .insert({ user_id: user.id, data: currentDateStr, nome, coin_data: {} })
+                    .select().single();
+                if (insErr) { console.error('[uploadScreenshotFile insert]', insErr); return; }
+                sessionsRows[nome] = newRow;
+            }
+
+            const path = `sessioni/${currentDateStr}/${nome}/${activeAsset}_${Date.now()}.jpg`;
+            const { error: upErr } = await db.storage.from('trade-screenshots').upload(path, file, { upsert: true, contentType: file.type });
+            if (upErr) { console.error('[uploadScreenshotFile]', upErr); return; }
+
+            const { data: urlData } = db.storage.from('trade-screenshots').getPublicUrl(path);
+            const publicUrl = urlData.publicUrl;
+
+            const s  = sessionsRows[nome];
+            const cd = JSON.parse(JSON.stringify(s.coin_data || {}));
+            if (!cd[activeAsset]) cd[activeAsset] = {};
+            cd[activeAsset].screenshot = publicUrl;
+
+            const { error } = await db.from('sessioni').update({ coin_data: cd }).eq('id', s.id);
+            if (!error) {
+                s.coin_data = cd;
+                const wrap  = document.getElementById('shot-wrap-'  + nome);
+                const img   = document.getElementById('shot-img-'   + nome);
+                const empty = document.getElementById('shot-empty-' + nome);
+                if (wrap && img) { img.src = publicUrl; wrap.classList.remove('hidden'); }
+                if (empty) empty.classList.add('hidden');
+            }
+        }
+
+        // ─── Image modal ──────────────────────────────────────────────────────
+
+        function openImgModal(nome) {
+            const url = getAssetData(nome).screenshot || '';
+            if (!url) return;
+            document.getElementById('img-modal-src').src = url;
+            document.getElementById('img-modal').classList.remove('hidden');
+        }
+
+        function closeImgModal() {
+            document.getElementById('img-modal').classList.add('hidden');
+            document.getElementById('img-modal-src').src = '';
+        }
+
+        // ─── Create sessions ──────────────────────────────────────────────────
+
+        async function createSessions() {
+            const { data: { user } } = await db.auth.getUser();
+            if (!user) return;
+            const rows = SESSION_NAMES.map(nome => ({ user_id: user.id, data: currentDateStr, nome, coin_data: {} }));
+            const { error } = await db.from('sessioni').insert(rows);
+            if (error) { console.error('[createSessions]', error); return; }
+            await loadSessions();
         }
     </script>
 </body>
