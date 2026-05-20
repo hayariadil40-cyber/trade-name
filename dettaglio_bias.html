@@ -214,98 +214,14 @@
                                     <i data-lucide="microscope" class="w-6 h-6 text-tp-accent"></i>
                                 </div>
                                 <div class="flex-1">
-                                    <h2 class="text-xl font-bold text-white">Reperto</h2>
+                                    <h2 class="text-xl font-bold text-white" id="bias-title">Reperto</h2>
                                     <span id="bias-id-display" class="text-[10px] font-bold text-tp-muted uppercase tracking-widest"></span>
                                 </div>
                                 <span id="bias-stato-badge" class="stato-badge-aperto text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded">Aperto</span>
                             </div>
 
-                            <!-- Tipo Reperto — guida la struttura del form -->
-                            <div class="mb-5 pb-4 border-b border-tp-border/30">
-                                <label class="block text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-2">Tipo Reperto</label>
-                                <div class="flex gap-2 flex-wrap" id="tipo-selector">
-                                    <button type="button" onclick="setTipo('bias')" data-tipo="bias" class="tipo-btn px-4 py-2 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-accent/50 flex items-center gap-2"><i data-lucide="compass" class="w-3.5 h-3.5"></i> Bias</button>
-                                    <button type="button" onclick="setTipo('commento')" data-tipo="commento" class="tipo-btn px-4 py-2 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-accent/50 flex items-center gap-2"><i data-lucide="message-square" class="w-3.5 h-3.5"></i> Commento</button>
-                                    <button type="button" onclick="setTipo('asianbox')" data-tipo="asianbox" class="tipo-btn px-4 py-2 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-accent/50 flex items-center gap-2"><i data-lucide="box" class="w-3.5 h-3.5"></i> Asian Box</button>
-                                    <button type="button" onclick="setTipo('appunto')" data-tipo="appunto" class="tipo-btn px-4 py-2 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-accent/50 flex items-center gap-2"><i data-lucide="sticky-note" class="w-3.5 h-3.5"></i> Appunto</button>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                                <!-- Asset -->
-                                <div id="field-asset">
-                                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
-                                        <i data-lucide="coins" class="w-4 h-4 text-tp-accent"></i> Asset
-                                    </label>
-                                    <select id="bias-asset" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2.5 text-sm text-white font-bold outline-none focus:border-tp-accent transition-colors">
-                                        <option value="">Seleziona...</option>
-                                        <option value="XAUUSD">XAUUSD (Gold)</option>
-                                        <option value="EURUSD">EURUSD</option>
-                                        <option value="GBPUSD">GBPUSD</option>
-                                        <option value="US30">US30 (Dow Jones)</option>
-                                        <option value="NAS100">NAS100 (Nasdaq)</option>
-                                        <option value="GER30">GER30 (DAX)</option>
-                                        <option value="DXY">DXY (Dollar Index)</option>
-                                        <option value="USDJPY">USDJPY</option>
-                                        <option value="BTCUSD">BTCUSD</option>
-                                    </select>
-                                </div>
-
-                                <!-- Data -->
-                                <div>
-                                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
-                                        <i data-lucide="calendar" class="w-4 h-4 text-tp-accent"></i> Data
-                                    </label>
-                                    <input id="bias-data" type="date" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2.5 text-sm text-white font-bold outline-none focus:border-tp-accent transition-colors">
-                                </div>
-
-                                <!-- Direzione -->
-                                <div id="field-direzione" class="md:col-span-2">
-                                    <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-2 flex items-center gap-2">
-                                        <i data-lucide="arrow-up-down" class="w-4 h-4 text-tp-accent"></i> Direzione
-                                    </label>
-                                    <div class="flex gap-3">
-                                        <button onclick="setDirection('LONG')" id="btn-long" class="dir-btn flex-1 px-4 py-3 rounded-lg text-sm font-bold border border-tp-border text-tp-muted uppercase transition-all flex items-center justify-center gap-2 hover:border-tp-accent/50">
-                                            <i data-lucide="trending-up" class="w-5 h-5"></i> Long
-                                        </button>
-                                        <button onclick="setDirection('SHORT')" id="btn-short" class="dir-btn flex-1 px-4 py-3 rounded-lg text-sm font-bold border border-tp-border text-tp-muted uppercase transition-all flex items-center justify-center gap-2 hover:border-tp-loss/50">
-                                            <i data-lucide="trending-down" class="w-5 h-5"></i> Short
-                                        </button>
-                                        <button onclick="setDirection('NEUTRAL')" id="btn-neutral" class="dir-btn flex-1 px-4 py-3 rounded-lg text-sm font-bold border border-tp-border text-tp-muted uppercase transition-all flex items-center justify-center gap-2 hover:border-tp-warning/50">
-                                            <i data-lucide="minus" class="w-5 h-5"></i> Neutro
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
-                        <!-- Esito a posteriori (richiesto per chiudere) -->
-                        <div id="card-esito" class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
-                                <i data-lucide="check-circle-2" class="w-4 h-4 text-tp-accent"></i> Esito a posteriori
-                                <span class="text-[10px] font-normal text-tp-muted/70 normal-case tracking-normal">(richiesto per chiudere il reperto)</span>
-                            </label>
-                            <div class="grid grid-cols-3 gap-3">
-                                <button type="button" onclick="setEsito('corretto')" id="esito-corretto" class="esito-btn px-4 py-3 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-accent/50 flex items-center justify-center gap-2">
-                                    <i data-lucide="check" class="w-4 h-4"></i> Corretto
-                                </button>
-                                <button type="button" onclick="setEsito('parziale')" id="esito-parziale" class="esito-btn px-4 py-3 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-warning/50 flex items-center justify-center gap-2">
-                                    <i data-lucide="circle-dot" class="w-4 h-4"></i> Parziale
-                                </button>
-                                <button type="button" onclick="setEsito('sbagliato')" id="esito-sbagliato" class="esito-btn px-4 py-3 rounded-lg text-xs font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-loss/50 flex items-center justify-center gap-2">
-                                    <i data-lucide="x" class="w-4 h-4"></i> Sbagliato
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Commento -->
-                        <div id="card-commento" class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
-                                <i data-lucide="align-left" class="w-4 h-4 text-tp-accent"></i> Commento
-                            </label>
-                            <textarea id="bias-commento" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-4 py-3 text-sm text-tp-text/90 outline-none min-h-[150px] resize-none focus:border-tp-accent transition-colors leading-relaxed" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" placeholder="Descrivi il reperto: commento, bias, conformazione, pattern o inefficienza individuata..."></textarea>
-                        </div>
 
                         <!-- Aggiornamenti / Commenti / Note -->
                         <div id="card-aggiornamenti" class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
@@ -371,59 +287,44 @@
                             </div>
                         </div>
 
-                        <!-- Asian Box -->
-                        <div id="card-asianbox" class="hidden bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
-                            <div class="flex items-center justify-between mb-4">
-                                <label class="text-xs font-bold uppercase tracking-wider text-tp-muted flex items-center gap-2">
-                                    <i data-lucide="box" class="w-4 h-4 text-tp-accent"></i> Asset Analizzati
-                                </label>
-                                <button type="button" onclick="addAsianboxAsset()" class="text-[10px] font-bold text-tp-accent border border-tp-accent/30 rounded-lg px-3 py-1.5 hover:bg-tp-accent/10 transition-colors flex items-center gap-1.5">
-                                    <i data-lucide="plus" class="w-3 h-3"></i> Aggiungi Asset
-                                </button>
-                            </div>
-                            <div id="asianbox-assets" class="space-y-4">
-                                <p class="text-xs text-tp-muted/60 italic">Nessun asset. Clicca "Aggiungi Asset".</p>
-                            </div>
-                        </div>
-
-                        <!-- Azioni -->
-                        <div class="flex gap-3" id="bias-actions">
-                            <button id="save-btn" onclick="saveBias()" class="flex-1 bg-tp-accent hover:bg-tp-accent/80 text-[#0a0c10] font-bold text-sm py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
-                                <i data-lucide="save" class="w-4 h-4"></i> Salva Reperto
-                            </button>
-                            <button id="close-btn" onclick="closeBias()" disabled class="flex-1 bg-tp-warning/10 border border-tp-warning/30 text-tp-warning hover:bg-tp-warning hover:text-[#0a0c10] font-bold text-sm py-3 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-tp-warning/10 disabled:hover:text-tp-warning">
-                                <i data-lucide="lock" class="w-4 h-4"></i> Chiudi Reperto
-                            </button>
-                            <button id="delete-btn" onclick="deleteBias()" class="bg-tp-bg border border-tp-loss/30 hover:bg-tp-loss/10 text-tp-loss font-bold text-sm px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </div>
                     </div>
 
-                    <!-- DESTRA: Screenshot -->
+                    <!-- DESTRA: Azioni + Screenshot -->
                     <div class="flex flex-col gap-6">
-                        <div class="bg-tp-panel border border-tp-border rounded-xl flex flex-col p-6 shadow-xl">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2">
-                                    <i data-lucide="image" class="w-4 h-4"></i> Screenshot
-                                </h3>
-                                <label class="text-[10px] text-tp-accent hover:text-white uppercase font-bold tracking-widest transition-colors flex items-center gap-1 cursor-pointer">
-                                    <i data-lucide="upload" class="w-3 h-3"></i> Carica
-                                    <input type="file" accept="image/*" multiple class="hidden" onchange="handleScreenshots(this.files)">
-                                </label>
-                            </div>
 
-                            <div id="screenshots-grid" class="grid grid-cols-1 gap-4">
-                                <!-- Screenshots caricati dinamicamente -->
-
-                                <!-- Dropzone -->
-                                <label class="border-2 border-dashed border-tp-border rounded-xl flex flex-col items-center justify-center text-tp-muted cursor-pointer hover:border-tp-accent/50 hover:text-tp-accent hover:bg-tp-accent/5 transition-all min-h-[300px]">
-                                    <i data-lucide="upload-cloud" class="w-12 h-12 mb-3 opacity-40"></i>
-                                    <span class="text-sm font-bold">Clicca o trascina screenshot</span>
-                                    <span class="text-[10px] mt-1 opacity-60">PNG, JPG, WebP</span>
-                                    <input type="file" accept="image/*" multiple class="hidden" onchange="handleScreenshots(this.files)">
-                                </label>
+                        <!-- Barra azioni -->
+                        <div class="flex items-center gap-2" id="bias-actions">
+                            <!-- Esito pillole (solo tipo=bias) -->
+                            <div id="card-esito" class="flex gap-1">
+                                <button type="button" onclick="setEsito('corretto')"  id="esito-corretto"  class="esito-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-accent/50 flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> C</button>
+                                <button type="button" onclick="setEsito('parziale')"  id="esito-parziale"  class="esito-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-warning/50 flex items-center gap-1"><i data-lucide="circle-dot" class="w-3 h-3"></i> P</button>
+                                <button type="button" onclick="setEsito('sbagliato')" id="esito-sbagliato" class="esito-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-loss/50 flex items-center gap-1"><i data-lucide="x" class="w-3 h-3"></i> S</button>
                             </div>
+                            <div class="flex-1"></div>
+                            <button id="save-btn" onclick="saveBias()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 transition-colors">
+                                <i data-lucide="save" class="w-3.5 h-3.5"></i> Salva
+                            </button>
+                            <button id="close-btn" onclick="closeBias()" disabled class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-warning/30 text-tp-warning bg-tp-warning/10 hover:bg-tp-warning hover:text-[#0a0c10] transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-tp-warning/10 disabled:hover:text-tp-warning">
+                                <i data-lucide="lock" class="w-3.5 h-3.5"></i> Chiudi
+                            </button>
+                            <button id="delete-btn" onclick="deleteBias()" class="p-1.5 rounded-lg border border-tp-loss/30 text-tp-loss hover:bg-tp-loss/10 transition-colors">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+
+                        <!-- Asset tabs bias -->
+                        <div id="field-bias-tabs" class="hidden bg-tp-panel border border-tp-border rounded-xl p-4 shadow-xl flex flex-col gap-3">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <div id="bias-asset-tabs" class="flex gap-1 flex-wrap flex-1"></div>
+                                <button type="button" onclick="openAddAssetMenu()" id="bias-add-asset-btn" class="flex items-center gap-1 text-[10px] font-bold text-tp-accent border border-tp-accent/30 rounded-lg px-3 py-1.5 hover:bg-tp-accent/10 transition-colors whitespace-nowrap">
+                                    <i data-lucide="plus" class="w-3 h-3"></i> Asset
+                                </button>
+                            </div>
+                            <!-- Menu selezione asset -->
+                            <div id="bias-asset-menu" class="hidden bg-[#0a0c10] border border-tp-border rounded-xl p-3 flex flex-wrap gap-2"></div>
+                            <!-- Pannello asset attivo -->
+                            <div id="bias-asset-panel" class="hidden"></div>
+                            <p id="bias-no-asset-msg" class="text-xs text-tp-muted/60 italic">Nessun asset aggiunto. Premi "+ Asset" per iniziare.</p>
                         </div>
                     </div>
 
@@ -459,38 +360,22 @@
         let currentDirection = '';
         let currentEsito = '';
         let currentStato = 'aperto';
-        let currentTipo = 'bias';
-        let screenshots = [];
+        let biasDataField = ''; // valore colonna `data`, gestito lato server, non editabile
         let aggiornamenti = [];
         let asianboxAssets = [];
         let newAggDirezione = null;
 
-        function setTipo(tipo) {
-            currentTipo = tipo;
-            renderTipoButtons();
-            adaptForm(tipo);
-        }
-
-        function renderTipoButtons() {
-            document.querySelectorAll('#tipo-selector .tipo-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.tipo === currentTipo);
-            });
-        }
-
-        function adaptForm(tipo) {
+        function adaptForm() {
             const s = (id, v) => { const el = document.getElementById(id); if (el) el.classList.toggle('hidden', !v); };
-            s('field-asset',          tipo === 'bias');
-            s('field-direzione',      tipo === 'bias');
-            s('card-esito',           tipo === 'bias');
-            s('card-commento',        tipo === 'bias' || tipo === 'appunto');
-            s('card-aggiornamenti',   tipo !== 'appunto');
-            s('card-asianbox',        tipo === 'asianbox');
-            s('card-categorizzatore', tipo !== 'appunto');
+            s('field-bias-tabs',      true);
+            s('card-esito',           true);
+            s('card-aggiornamenti',   true);
+            s('card-categorizzatore', true);
             const lbl = document.getElementById('aggiornamenti-label');
-            if (lbl) lbl.textContent = tipo === 'commento' ? 'Commenti della giornata' : tipo === 'asianbox' ? 'Note di sessione' : 'Aggiornamenti';
+            if (lbl) lbl.textContent = 'Commenti della giornata';
             const sub = document.getElementById('aggiornamenti-sublabel');
-            if (sub) sub.textContent = tipo === 'commento' ? '(aggiungi un commento ogni volta che vuoi documentare la giornata)' : tipo === 'asianbox' ? '(osservazioni live durante le sessioni)' : '(monitoring sviluppo durante la giornata)';
-            s('agg-dir-row', tipo === 'bias');
+            if (sub) sub.textContent = '';
+            s('agg-dir-row', false);
             renderAggiornamenti();
             updateCloseButton();
         }
@@ -499,7 +384,6 @@
             lucide.createIcons();
 
             if (!db) { alert('Supabase non inizializzato.'); return; }
-            renderTipoButtons();
 
             if (!biasId) {
                 // Nuovo reperto
@@ -531,24 +415,22 @@
 
             if (error || !data) { console.error(error); return; }
 
+            biasDataField = data.data || '';
+            const createdAt = data.created_at ? new Date(data.created_at) : new Date();
+            const dateLabel = createdAt.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
+            document.getElementById('bias-title').textContent = `Reperto — ${dateLabel}`;
             document.getElementById('bias-id-display').textContent = `ID: ${data.id.substring(0, 8)}`;
-            document.getElementById('bias-asset').value = data.asset || '';
-            document.getElementById('bias-data').value = data.data || '';
-            document.getElementById('bias-commento').value = data.commento || data.confluenze || '';
-
-            if (data.direzione) setDirection(data.direzione);
-
-            // Tipo: legacy 'conformazione' → 'asianbox'
-            let loadedTipo = (Array.isArray(data.tipo) && data.tipo.length > 0) ? data.tipo[0] : 'bias';
-            if (loadedTipo === 'conformazione') loadedTipo = 'asianbox';
-            currentTipo = loadedTipo;
-            renderTipoButtons();
-
-            // AsianBox: assets salvati in commento come JSON
-            if (currentTipo === 'asianbox') {
-                try { asianboxAssets = JSON.parse(data.commento || '[]'); } catch(e) { asianboxAssets = []; }
-                if (!Array.isArray(asianboxAssets)) asianboxAssets = [];
+            // coin_data per asset tabs
+            coinData = (data.coin_data && typeof data.coin_data === 'object' && !Array.isArray(data.coin_data))
+                ? JSON.parse(JSON.stringify(data.coin_data))
+                : {};
+            // Migrazione legacy: asset singolo → coin_data
+            if (!Object.keys(coinData).length && data.asset) {
+                coinData[data.asset] = {
+                    aggiornamenti: Array.isArray(data.aggiornamenti) ? data.aggiornamenti : []
+                };
             }
+            activeAsset = Object.keys(coinData)[0] || null;
 
             currentEsito = data.esito || '';
             currentStato = data.stato || 'aperto';
@@ -556,19 +438,14 @@
             applyStatoUI();
             updateCloseButton();
 
-            screenshots = data.screenshots || [];
-            renderScreenshots();
-
             aggiornamenti = Array.isArray(data.aggiornamenti) ? data.aggiornamenti.slice() : [];
-            // preset ora corrente (Casablanca = locale dell'utente)
             const _now = new Date();
             document.getElementById('agg-ora').value = String(_now.getHours()).padStart(2,'0') + ':' + String(_now.getMinutes()).padStart(2,'0');
 
-            // Adatta il form al tipo (chiama renderAggiornamenti internamente)
-            adaptForm(currentTipo);
-            if (currentTipo === 'asianbox') renderAsianboxAssets();
+            adaptForm();
+            renderBiasAssetTabs();
+            if (activeAsset) renderBiasAssetPanel();
 
-            // Restore categorizzatori selections
             if (data.categorizzatori) {
                 setTimeout(() => {
                     restoreSelections('sel-cronache', data.categorizzatori.cronache || []);
@@ -577,11 +454,6 @@
                     restoreSelections('sel-ipotesi', data.categorizzatori.ipotesi || []);
                 }, 500);
             }
-
-            // Auto-resize textarea
-            const ta = document.getElementById('bias-commento');
-            ta.style.height = '';
-            ta.style.height = ta.scrollHeight + 'px';
         }
 
         function restoreSelections(selectId, ids) {
@@ -627,8 +499,7 @@
         function updateCloseButton() {
             const closeBtn = document.getElementById('close-btn');
             if (!closeBtn) return;
-            const needsEsito = currentTipo === 'bias';
-            closeBtn.disabled = (needsEsito && !currentEsito) || currentStato === 'chiuso';
+            closeBtn.disabled = !currentEsito || currentStato === 'chiuso';
         }
 
         // --- STATO (aperto / chiuso) ---
@@ -660,7 +531,7 @@
         }
 
         async function closeBias() {
-            if (currentTipo === 'bias' && !currentEsito) {
+            if (!currentEsito) {
                 alert('Seleziona prima un esito (corretto / parziale / sbagliato).');
                 return;
             }
@@ -742,57 +613,6 @@
             return Array.from(sel.selectedOptions).map(o => o.value);
         }
 
-        // --- SCREENSHOTS ---
-        function renderScreenshots() {
-            const grid = document.getElementById('screenshots-grid');
-            const dropzone = grid.querySelector('label');
-            grid.querySelectorAll('.screenshot-item').forEach(el => el.remove());
-
-            screenshots.forEach((src, i) => {
-                const div = document.createElement('div');
-                div.className = 'screenshot-item relative group rounded-xl overflow-hidden border border-tp-border';
-                div.innerHTML = `
-                    <img src="${src}" class="w-full max-h-[400px] object-contain bg-[#0a0c10]" alt="Screenshot">
-                    <button onclick="removeScreenshot(${i})" class="absolute top-2 right-2 bg-black/70 text-tp-loss p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
-                `;
-                grid.insertBefore(div, dropzone);
-            });
-            lucide.createIcons();
-        }
-
-        function handleScreenshots(files) {
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    screenshots.push(e.target.result);
-                    renderScreenshots();
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // Ctrl+V per incollare screenshot
-        document.addEventListener('paste', function(e) {
-            var items = e.clipboardData?.items;
-            if (!items) return;
-            for (var i = 0; i < items.length; i++) {
-                if (items[i].type.indexOf('image') !== -1) {
-                    e.preventDefault();
-                    var dt = new DataTransfer();
-                    dt.items.add(items[i].getAsFile());
-                    handleScreenshots(dt.files);
-                    return;
-                }
-            }
-        });
-
-        function removeScreenshot(index) {
-            screenshots.splice(index, 1);
-            renderScreenshots();
-        }
-
         // --- AGGIORNAMENTI ---
         function escapeAggHtml(s) {
             return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -802,15 +622,10 @@
             const list = document.getElementById('aggiornamenti-list');
             if (!list) return;
             if (!aggiornamenti.length) {
-                const emptyMsg = currentTipo === 'commento'
-                    ? 'Nessun commento. Aggiungine uno sotto man mano che si sviluppa la giornata.'
-                    : currentTipo === 'asianbox'
-                    ? 'Nessuna nota ancora. Aggiungila sotto.'
-                    : 'Nessun aggiornamento. Aggiungilo sotto man mano che il reperto si sviluppa.';
-                list.innerHTML = `<p class="text-xs text-tp-muted/60 italic">${emptyMsg}</p>`;
+                list.innerHTML = `<p class="text-xs text-tp-muted/60 italic">Nessun commento ancora.</p>`;
                 return;
             }
-            const showDir = currentTipo === 'bias';
+            const showDir = false;
             list.innerHTML = aggiornamenti.map((a, i) => `
                 <div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 flex items-start gap-3">
                     <span class="text-xs font-bold text-tp-accent tracking-wide whitespace-nowrap mt-0.5">${escapeAggHtml(a.ora)}</span>
@@ -886,6 +701,168 @@
                 aggiornamenti.splice(i, 0, removed);
                 renderAggiornamenti();
             }
+        }
+
+        // --- BIAS TABBED PER ASSET ---
+        const BIAS_ASSETS = ['XAUUSD','EURUSD','GBPUSD','US30','NAS100','GER30','GER40','USDJPY','BTCUSD','DXY'];
+        let coinData = {};        // { XAUUSD: {aggiornamenti:[{ora,testo,direzione}]} }
+        let activeAsset = null;   // tab attivo
+        let newBiasAggDir = null; // direzione L/S/N in corso per nuovo aggiornamento
+
+        function buildBiasAssetMenu() {
+            const menu = document.getElementById('bias-asset-menu');
+            if (!menu) return;
+            menu.innerHTML = BIAS_ASSETS.map(a => {
+                const already = Object.keys(coinData).includes(a);
+                return `<button type="button" onclick="addBiasAsset('${a}')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${already ? 'border-tp-accent/30 text-tp-accent/40 cursor-default' : 'border-tp-border text-tp-muted hover:border-tp-accent hover:text-tp-accent'}">
+                    ${a}
+                </button>`;
+            }).join('');
+        }
+
+        function openAddAssetMenu() {
+            const menu = document.getElementById('bias-asset-menu');
+            if (!menu) return;
+            buildBiasAssetMenu();
+            menu.classList.toggle('hidden');
+        }
+
+        function addBiasAsset(asset) {
+            if (coinData[asset]) return;
+            coinData[asset] = { aggiornamenti: [] };
+            document.getElementById('bias-asset-menu').classList.add('hidden');
+            renderBiasAssetTabs();
+            switchBiasAsset(asset);
+        }
+
+        function removeBiasAsset(asset) {
+            if (!coinData[asset]) return;
+            delete coinData[asset];
+            if (activeAsset === asset) {
+                const keys = Object.keys(coinData);
+                activeAsset = keys.length ? keys[0] : null;
+            }
+            renderBiasAssetTabs();
+            if (activeAsset) switchBiasAsset(activeAsset);
+            else document.getElementById('bias-asset-panel').innerHTML = '';
+        }
+
+        function switchBiasAsset(asset) {
+            activeAsset = asset;
+            renderBiasAssetTabs();
+            renderBiasAssetPanel();
+        }
+
+        function renderBiasAssetTabs() {
+            const tabsEl = document.getElementById('bias-asset-tabs');
+            const msgEl  = document.getElementById('bias-no-asset-msg');
+            const panelEl = document.getElementById('bias-asset-panel');
+            const keys = Object.keys(coinData);
+            if (!keys.length) {
+                tabsEl.innerHTML = '';
+                msgEl.classList.remove('hidden');
+                panelEl.classList.add('hidden');
+                return;
+            }
+            msgEl.classList.add('hidden');
+            panelEl.classList.remove('hidden');
+            tabsEl.innerHTML = keys.map(a => {
+                const isActive = a === activeAsset;
+                return `<button type="button" onclick="switchBiasAsset('${a}')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${isActive ? 'border-tp-accent bg-tp-accent/10 text-white' : 'border-tp-border text-tp-muted hover:border-tp-accent/50'}">
+                    ${a}
+                </button>`;
+            }).join('');
+        }
+
+        function renderBiasAssetPanel() {
+            const panel = document.getElementById('bias-asset-panel');
+            if (!panel || !activeAsset || !coinData[activeAsset]) return;
+            const d = coinData[activeAsset];
+            const aggs = Array.isArray(d.aggiornamenti) ? d.aggiornamenti : [];
+            const nowH = new Date().getHours().toString().padStart(2,'0');
+            const nowM = new Date().getMinutes().toString().padStart(2,'0');
+            const dirClass = (v) => ({
+                long:   newBiasAggDir === v ? 'agg-long'   : 'agg-dir-btn flex-1',
+                short:  newBiasAggDir === v ? 'agg-short'  : 'agg-dir-btn flex-1',
+                neutro: newBiasAggDir === v ? 'agg-neutro' : 'agg-dir-btn flex-1'
+            })[v] || 'agg-dir-btn flex-1';
+            panel.innerHTML = `
+                <div class="bg-[#0a0c10] border border-tp-border rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">${activeAsset}</label>
+                        <button onclick="removeBiasAsset('${activeAsset}')" class="text-tp-muted/50 hover:text-tp-loss transition-colors" title="Rimuovi asset">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                    <!-- Lista aggiornamenti -->
+                    <div id="bias-panel-agg-list" class="space-y-2">
+                        ${aggs.length ? aggs.map((a,i) => {
+                            const dc = a.direzione === 'long' ? 'agg-long' : a.direzione === 'short' ? 'agg-short' : a.direzione === 'neutro' ? 'agg-neutro' : '';
+                            return `<div class="bg-tp-panel border border-tp-border rounded-lg p-2.5 flex items-start gap-2">
+                                <span class="text-xs font-bold text-tp-accent whitespace-nowrap mt-0.5">${escapeAggHtml(a.ora)}</span>
+                                <p class="flex-1 text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escapeAggHtml(a.testo)}</p>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <button type="button" onclick="setBiasAggDir(${i},'long')"   class="agg-dir-btn ${a.direzione==='long'  ?'agg-long':''}">L</button>
+                                    <button type="button" onclick="setBiasAggDir(${i},'short')"  class="agg-dir-btn ${a.direzione==='short' ?'agg-short':''}">S</button>
+                                    <button type="button" onclick="setBiasAggDir(${i},'neutro')" class="agg-dir-btn ${a.direzione==='neutro'?'agg-neutro':''}">N</button>
+                                    <button type="button" onclick="removeBiasAgg(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors ml-1">
+                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                            </div>`;
+                        }).join('') : '<p class="text-xs text-tp-muted/60 italic">Nessun aggiornamento ancora.</p>'}
+                    </div>
+                    <!-- Input nuovo aggiornamento -->
+                    <div class="flex gap-2 items-stretch">
+                        <div class="flex flex-col gap-1 shrink-0">
+                            <input id="bias-agg-ora" type="time" value="${nowH}:${nowM}" class="bg-tp-panel border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[100px]"/>
+                            <div class="flex gap-1">
+                                <button type="button" onclick="setNewBiasAggDir('long')"   id="bnagg-long"   class="agg-dir-btn flex-1 ${newBiasAggDir==='long'  ?'agg-long':''}">L</button>
+                                <button type="button" onclick="setNewBiasAggDir('short')"  id="bnagg-short"  class="agg-dir-btn flex-1 ${newBiasAggDir==='short' ?'agg-short':''}">S</button>
+                                <button type="button" onclick="setNewBiasAggDir('neutro')" id="bnagg-neutro" class="agg-dir-btn flex-1 ${newBiasAggDir==='neutro'?'agg-neutro':''}">N</button>
+                            </div>
+                        </div>
+                        <textarea id="bias-agg-testo" rows="2" class="flex-1 bg-tp-panel border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Es: 4H ha rotto struttura, daily 4720 tenuto..."></textarea>
+                        <button type="button" onclick="addBiasAgg()" class="px-4 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 hover:bg-tp-accent/20 uppercase transition-all flex items-center gap-1.5 shrink-0">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Add
+                        </button>
+                    </div>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function setNewBiasAggDir(dir) {
+            newBiasAggDir = newBiasAggDir === dir ? null : dir;
+            renderBiasAssetPanel();
+        }
+
+        function setBiasAggDir(i, dir) {
+            if (!activeAsset || !coinData[activeAsset]) return;
+            const aggs = coinData[activeAsset].aggiornamenti;
+            aggs[i].direzione = aggs[i].direzione === dir ? null : dir;
+            renderBiasAssetPanel();
+        }
+
+        function addBiasAgg() {
+            if (!activeAsset || !coinData[activeAsset]) return;
+            const ora   = (document.getElementById('bias-agg-ora').value   || '').trim();
+            const testo = (document.getElementById('bias-agg-testo').value || '').trim();
+            if (!ora || !testo) { alert('Compila orario e testo.'); return; }
+            if (!Array.isArray(coinData[activeAsset].aggiornamenti)) coinData[activeAsset].aggiornamenti = [];
+            coinData[activeAsset].aggiornamenti.push({ ora, testo, direzione: newBiasAggDir });
+            coinData[activeAsset].aggiornamenti.sort((a,b) => (a.ora||'').localeCompare(b.ora||''));
+            document.getElementById('bias-agg-testo').value = '';
+            newBiasAggDir = null;
+            renderBiasAssetPanel();
+        }
+
+        function removeBiasAgg(i) {
+            if (!activeAsset || !coinData[activeAsset]) return;
+            coinData[activeAsset].aggiornamenti.splice(i, 1);
+            renderBiasAssetPanel();
         }
 
         // --- ASIAN BOX ---
@@ -971,25 +948,22 @@
 
         // --- COLLECT PAYLOAD (riusato da save e close) ---
         function collectPayload() {
-            const commentoVal = currentTipo === 'asianbox'
-                ? JSON.stringify(asianboxAssets)
-                : document.getElementById('bias-commento').value;
-            return {
-                asset: currentTipo === 'bias' ? document.getElementById('bias-asset').value : '',
-                data: document.getElementById('bias-data').value,
-                direzione: currentTipo === 'bias' ? currentDirection : '',
-                tipo: [currentTipo],
-                commento: commentoVal,
-                aggiornamenti: aggiornamenti,
-                esito: currentTipo === 'bias' ? (currentEsito || null) : null,
-                screenshots: screenshots,
-                categorizzatori: currentTipo !== 'appunto' ? {
+            const payload = {
+                data: biasDataField,
+                tipo: ['bias'],
+                esito: currentEsito || null,
+                categorizzatori: {
                     cronache: getSelectedValues('sel-cronache'),
                     strategie: getSelectedValues('sel-strategie'),
                     trades: getSelectedValues('sel-trades'),
                     ipotesi: getSelectedValues('sel-ipotesi')
-                } : {}
+                }
             };
+            payload.coin_data = coinData;
+            payload.aggiornamenti = aggiornamenti;
+            const keys = Object.keys(coinData);
+            if (keys.length) payload.asset = keys[0];
+            return payload;
         }
 
         // --- SAVE (NON tocca stato) ---
