@@ -280,10 +280,14 @@
                 const wrap  = document.getElementById('shot-wrap-'  + nome);
                 const img   = document.getElementById('shot-img-'   + nome);
                 const empty = document.getElementById('shot-empty-' + nome);
+                const del   = document.getElementById('shot-del-'   + nome);
                 if (show && shot && wrap && img) {
                     img.src = shot;
                     wrap.classList.remove('hidden');
                     if (empty) empty.classList.add('hidden');
+                    if (del) del.classList.remove('hidden');
+                } else {
+                    if (del) del.classList.add('hidden');
                 }
             });
 
@@ -312,7 +316,7 @@
 
             const isPaste = pasteTarget === nome;
             return `
-            <div class="bg-tp-panel border border-tp-border rounded-xl overflow-hidden flex flex-col ${isPaste ? 'paste-ready' : ''}" style="border-top:3px solid ${color};${isPaste ? '--paste-color:'+color : ''}" onclick="setPasteTarget('${nome}')">
+            <div id="session-card-${nome}" class="bg-tp-panel border border-tp-border rounded-xl overflow-hidden flex flex-col ${isPaste ? 'paste-ready' : ''}" style="border-top:3px solid ${color};${isPaste ? '--paste-color:'+color : ''}" tabindex="0" onclick="setPasteTarget('${nome}')">
                 <div class="flex items-center justify-between px-4 py-3 border-b border-tp-border">
                     <div class="flex items-center gap-2.5">
                         <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:${color}18;border:1px solid ${color}35">
@@ -323,7 +327,7 @@
                             <div class="text-[10px] text-tp-muted font-bold tracking-wide">${SESSION_TIMES[nome]}</div>
                         </div>
                     </div>
-                    ${isPaste ? `<span class="text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded border mr-1" style="color:${color};border-color:${color};background:${color}18"><i data-lucide="clipboard" class="w-3 h-3 inline -mt-0.5"></i> Paste</span>` : ''}
+                    <button id="paste-badge-${nome}" onclick="pasteFromClipboard('${nome}');event.stopPropagation()" class="text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded border mr-1 cursor-pointer hover:opacity-80 transition-opacity ${isPaste ? '' : 'hidden'}" style="color:${color};border-color:${color};background:${color}18"><i data-lucide="clipboard" class="w-3 h-3 inline -mt-0.5"></i> Paste</button>
                     <button id="save-btn-${nome}" onclick="saveSession('${nome}')"
                         class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 transition-colors">
                         <i data-lucide="save" class="w-3.5 h-3.5"></i> Salva
@@ -331,6 +335,36 @@
                 </div>
 
                 <div class="p-4 flex flex-col gap-3 flex-1">
+
+                    <!-- Screenshot -->
+                    <div class="relative group/shot">
+                        <label class="block cursor-pointer">
+                            <input type="file" accept="image/*" class="hidden" onchange="uploadScreenshot('${nome}',this)" />
+                            <div id="shot-wrap-${nome}" class="hidden rounded-lg overflow-hidden border border-tp-border relative" style="aspect-ratio:16/9">
+                                <img id="shot-img-${nome}" src="" alt="" class="w-full h-full object-cover block" />
+                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover/shot:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                    <i data-lucide="image" class="w-4 h-4 text-white drop-shadow"></i>
+                                    <span class="text-[10px] text-white font-bold uppercase tracking-wider">Cambia</span>
+                                </div>
+                            </div>
+                            <div id="shot-empty-${nome}" class="rounded-lg border-2 border-dashed border-tp-border/40 flex flex-col items-center justify-center gap-1.5 hover:border-tp-accent/40 transition-colors" style="aspect-ratio:16/9">
+                                <i data-lucide="image-plus" class="w-5 h-5 text-tp-muted/30"></i>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-tp-muted/30">Screenshot</span>
+                            </div>
+                        </label>
+                        <button onclick="deleteScreenshot('${nome}');event.stopPropagation()"
+                            class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/70 text-white items-center justify-center opacity-0 group-hover/shot:opacity-100 transition-opacity hidden"
+                            id="shot-del-${nome}">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+
+                    <!-- Bias -->
+                    <div class="flex gap-1.5">
+                        <button onclick="setBias('${nome}','LONG')"    data-bias="${nome}-LONG"    class="bias-btn ${bL} flex-1 py-1.5 text-xs font-bold rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors">L</button>
+                        <button onclick="setBias('${nome}','SHORT')"   data-bias="${nome}-SHORT"   class="bias-btn ${bS} flex-1 py-1.5 text-xs font-bold rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors">S</button>
+                        <button onclick="setBias('${nome}','NEUTRAL')" data-bias="${nome}-NEUTRAL" class="bias-btn ${bN} flex-1 py-1.5 text-xs font-bold rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors">N</button>
+                    </div>
 
                     <!-- High / Low / Range -->
                     <div class="grid grid-cols-3 gap-2">
@@ -376,16 +410,6 @@
                         </div>
                     </div>
 
-                    <!-- Bias -->
-                    <div>
-                        <label class="text-[9px] font-bold uppercase tracking-wider text-tp-muted block mb-1.5">Bias</label>
-                        <div class="flex gap-1.5">
-                            <button onclick="setBias('${nome}','LONG')"    data-bias="${nome}-LONG"    class="bias-btn ${bL} flex-1 py-1.5 text-xs font-bold rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors">L</button>
-                            <button onclick="setBias('${nome}','SHORT')"   data-bias="${nome}-SHORT"   class="bias-btn ${bS} flex-1 py-1.5 text-xs font-bold rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors">S</button>
-                            <button onclick="setBias('${nome}','NEUTRAL')" data-bias="${nome}-NEUTRAL" class="bias-btn ${bN} flex-1 py-1.5 text-xs font-bold rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors">N</button>
-                        </div>
-                    </div>
-
                     <!-- Aggiornamenti -->
                     <div>
                         <label class="text-[9px] font-bold uppercase tracking-wider text-tp-muted block mb-1.5">Aggiornamenti</label>
@@ -410,22 +434,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Screenshot -->
-                    <label class="block cursor-pointer">
-                        <input type="file" accept="image/*" class="hidden" onchange="uploadScreenshot('${nome}',this)" />
-                        <div id="shot-wrap-${nome}" class="hidden rounded-lg overflow-hidden border border-tp-border relative group/shot" style="aspect-ratio:16/9">
-                            <img id="shot-img-${nome}" src="" alt="" class="w-full h-full object-cover block" />
-                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover/shot:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                <i data-lucide="image" class="w-4 h-4 text-white drop-shadow"></i>
-                                <span class="text-[10px] text-white font-bold uppercase tracking-wider">Cambia</span>
-                            </div>
-                        </div>
-                        <div id="shot-empty-${nome}" class="rounded-lg border-2 border-dashed border-tp-border/40 flex flex-col items-center justify-center gap-1.5 hover:border-tp-accent/40 transition-colors" style="aspect-ratio:16/9">
-                            <i data-lucide="image-plus" class="w-5 h-5 text-tp-muted/30"></i>
-                            <span class="text-[9px] font-bold uppercase tracking-wider text-tp-muted/30">Screenshot</span>
-                        </div>
-                    </label>
 
                 </div>
             </div>`;
@@ -520,7 +528,7 @@
                 return;
             }
 
-            const cd = JSON.parse(JSON.stringify(s.coin_data || {}));
+            const cd = await freshCoinData(s.id);
             if (!cd[activeAsset]) cd[activeAsset] = {};
             if (!Array.isArray(cd[activeAsset].aggiornamenti)) cd[activeAsset].aggiornamenti = [];
             cd[activeAsset].aggiornamenti.push(entry);
@@ -536,7 +544,7 @@
         async function deleteAggiornamento(nome, idx) {
             const s = sessionsRows[nome];
             if (!s) return;
-            const cd = JSON.parse(JSON.stringify(s.coin_data || {}));
+            const cd = await freshCoinData(s.id);
             if (!Array.isArray(cd[activeAsset]?.aggiornamenti)) return;
             cd[activeAsset].aggiornamenti.splice(idx, 1);
             const { error } = await db.from('sessioni').update({ coin_data: cd }).eq('id', s.id);
@@ -564,6 +572,13 @@
 
         // ─── Save ─────────────────────────────────────────────────────────────
 
+        // Legge sempre coin_data fresco dal DB prima di mergere — evita che le
+        // scritture JS sovrascrivano i campi già scritti dal pg_cron (apertura/chiusura).
+        async function freshCoinData(id) {
+            const { data } = await db.from('sessioni').select('coin_data').eq('id', id).single();
+            return data?.coin_data || {};
+        }
+
         async function saveSession(nome) {
             const changes = localChanges[nome] || {};
             if (!Object.keys(changes).length) return;
@@ -571,7 +586,6 @@
             let s = sessionsRows[nome];
 
             if (!s) {
-                // Crea la riga sessione se non esiste
                 const { data: { user } } = await db.auth.getUser();
                 if (!user) return;
                 const cd = {};
@@ -586,15 +600,14 @@
                 return;
             }
 
-            // Merge nel coin_data esistente (mai sovrascrivere altri asset)
-            const cd = JSON.parse(JSON.stringify(s.coin_data || {}));
+            const cd = await freshCoinData(s.id);
             if (!cd[activeAsset]) cd[activeAsset] = {};
             Object.assign(cd[activeAsset], changes);
 
             const { error } = await db.from('sessioni').update({ coin_data: cd }).eq('id', s.id);
             if (error) { console.error('[saveSession]', error); return; }
 
-            s.coin_data    = cd;
+            s.coin_data = cd;
             localChanges[nome] = {};
 
             const btn = document.getElementById('save-btn-' + nome);
@@ -604,9 +617,18 @@
         // ─── Paste target ─────────────────────────────────────────────────────
 
         function setPasteTarget(nome) {
-            if (pasteTarget === nome) return;
             pasteTarget = nome;
-            renderPanels();
+            // Aggiorna solo il visuale senza rifare tutto il DOM
+            SESSION_NAMES.forEach(n => {
+                const card = document.getElementById('session-card-' + n);
+                if (!card) return;
+                const color = SESSION_COLORS[n];
+                const active = n === nome;
+                card.style.setProperty('--paste-color', active ? color : 'transparent');
+                card.classList.toggle('paste-ready', active);
+                const badge = document.getElementById('paste-badge-' + n);
+                if (badge) badge.classList.toggle('hidden', !active);
+            });
         }
 
         window.addEventListener('paste', async (e) => {
@@ -617,6 +639,23 @@
             const file = item.getAsFile();
             if (file) await uploadScreenshotFile(pasteTarget, file);
         });
+
+        async function pasteFromClipboard(nome) {
+            try {
+                const items = await navigator.clipboard.read();
+                for (const item of items) {
+                    const imageType = item.types.find(t => t.startsWith('image/'));
+                    if (imageType) {
+                        const blob = await item.getType(imageType);
+                        const file = new File([blob], 'paste.jpg', { type: imageType });
+                        await uploadScreenshotFile(nome, file);
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.error('[pasteFromClipboard]', err);
+            }
+        }
 
         // ─── Screenshot upload ────────────────────────────────────────────────
 
@@ -638,26 +677,39 @@
             }
 
             const path = `sessioni/${currentDateStr}/${nome}/${activeAsset}_${Date.now()}.jpg`;
-            const { error: upErr } = await db.storage.from('trade-screenshots').upload(path, file, { upsert: true, contentType: file.type });
-            if (upErr) { console.error('[uploadScreenshotFile]', upErr); return; }
 
-            const { data: urlData } = db.storage.from('trade-screenshots').getPublicUrl(path);
-            const publicUrl = urlData.publicUrl;
+            // Upload via edge function (bypass Storage RLS)
+            const reader = new FileReader();
+            const base64 = await new Promise(res => { reader.onload = e => res(e.target.result.split(',')[1]); reader.readAsDataURL(file); });
+            const { data: { session } } = await db.auth.getSession();
+            const fnRes = await fetch(`https://fzxjbxeadiqwfpctiyom.supabase.co/functions/v1/upload-screenshot`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+                body: JSON.stringify({ base64, path, contentType: file.type || 'image/jpeg' })
+            });
+            const fnData = await fnRes.json();
+            if (!fnRes.ok || !fnData.publicUrl) { console.error('[uploadScreenshotFile]', fnData); return; }
+            const publicUrl = fnData.publicUrl;
 
             const s  = sessionsRows[nome];
-            const cd = JSON.parse(JSON.stringify(s.coin_data || {}));
+            const cd = await freshCoinData(s.id);
             if (!cd[activeAsset]) cd[activeAsset] = {};
             cd[activeAsset].screenshot = publicUrl;
 
             const { error } = await db.from('sessioni').update({ coin_data: cd }).eq('id', s.id);
-            if (!error) {
-                s.coin_data = cd;
-                const wrap  = document.getElementById('shot-wrap-'  + nome);
-                const img   = document.getElementById('shot-img-'   + nome);
-                const empty = document.getElementById('shot-empty-' + nome);
-                if (wrap && img) { img.src = publicUrl; wrap.classList.remove('hidden'); }
-                if (empty) empty.classList.add('hidden');
-            }
+            if (error) { console.error('[uploadScreenshotFile update]', error); return; }
+            s.coin_data = cd;
+            renderPanels();
+        }
+
+        async function deleteScreenshot(nome) {
+            const s = sessionsRows[nome];
+            if (!s) return;
+            const cd = await freshCoinData(s.id);
+            if (!cd[activeAsset]) return;
+            delete cd[activeAsset].screenshot;
+            const { error } = await db.from('sessioni').update({ coin_data: cd }).eq('id', s.id);
+            if (!error) { s.coin_data = cd; renderPanels(); }
         }
 
         // ─── Image modal ──────────────────────────────────────────────────────
