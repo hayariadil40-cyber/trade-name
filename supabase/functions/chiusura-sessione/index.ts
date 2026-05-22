@@ -184,22 +184,38 @@ serve(async (req) => {
 
         const biasOggiLines = biasOggi.length > 0
           ? biasOggi.map((b: any) => {
-              const assets = Object.keys(b.coin_data || {}).join(",") || "?";
-              const lastAgg = Array.isArray(b.commenti_giornata) && b.commenti_giornata.length
-                ? b.commenti_giornata[b.commenti_giornata.length - 1]
-                : null;
-              const snippet = lastAgg?.testo ? ` — "${lastAgg.testo.substring(0, 100)}"` : "";
-              return `- asset: ${assets}${snippet}`;
+              const coinData = b.coin_data || {};
+              const assets = Object.keys(coinData);
+              const out: string[] = [`- asset: ${assets.join(",") || "?"} (stato: ${b.stato})`];
+              // commenti_giornata: timeline top-level (no direzione)
+              if (Array.isArray(b.commenti_giornata) && b.commenti_giornata.length) {
+                out.push("  commenti giornata:");
+                b.commenti_giornata.forEach((c: any) => {
+                  out.push(`    [${c.ora || ""}] ${(c.testo || "").substring(0, 150)}`);
+                });
+              }
+              // aggiornamenti per-asset con direzione (L/N/S)
+              for (const asset of assets) {
+                const aggs = Array.isArray(coinData[asset]?.aggiornamenti) ? coinData[asset].aggiornamenti : [];
+                if (aggs.length > 0) {
+                  out.push(`  ${asset}:`);
+                  aggs.forEach((a: any) => {
+                    const dir = a.direzione ? ` [${a.direzione.toUpperCase()}]` : "";
+                    out.push(`    [${a.ora || ""}]${dir} ${(a.testo || "").substring(0, 120)}`);
+                  });
+                }
+              }
+              return out.join("\n");
             }).join("\n")
           : "(nessun bias creato oggi)";
 
         const biasStoriciLines = bias.length > biasOggi.length
           ? bias.filter((b: any) => b.data !== today).slice(0, 6).map((b: any) => {
               const assets = Object.keys(b.coin_data || {}).join(",") || "?";
-              const lastAgg = Array.isArray(b.commenti_giornata) && b.commenti_giornata.length
+              const lastC = Array.isArray(b.commenti_giornata) && b.commenti_giornata.length
                 ? b.commenti_giornata[b.commenti_giornata.length - 1]
                 : null;
-              const snippet = lastAgg?.testo ? ` — "${lastAgg.testo.substring(0, 80)}"` : "";
+              const snippet = lastC?.testo ? ` — "${lastC.testo.substring(0, 80)}"` : "";
               return `- [${b.data}] asset: ${assets}${snippet}`;
             }).join("\n")
           : "(solo bias di oggi)";
@@ -252,7 +268,7 @@ DEBRIEF SESSIONE ${info.label.toUpperCase()} (oggi ${today}, ${info.oraStart}-${
 TRADE DELLA SESSIONE (${tradesSessione.length}, completed=${completed.length}, winrate=${winrate}%, net PnL=${netPnl.toFixed(2)}):
 ${tradeLines}
 
-BIAS BIAS DI OGGI (lettura del mercato del giorno):
+BIAS DI OGGI (lettura mercato — commenti_giornata=top-level no-dir, aggiornamenti per-asset=con direzione L/N/S):
 ${biasOggiLines}
 
 IPOTESI FORMULATE OGGI (anello tra bias e trade):
