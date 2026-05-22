@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -53,6 +53,10 @@
         .tp-check:checked { border-color: #20c997; }
         .tp-check:checked::before { transform: scale(1); }
 
+        .session-asset-pill { border-color: #252932; color: #848d97; }
+        .session-asset-pill:hover { border-color: rgba(255,255,255,0.2); color: #fff; }
+        .session-asset-pill.active { border-color: rgba(32,201,151,0.5); color: #20c997; background: rgba(32,201,151,0.08); }
+
         /* Timeline Marker Pulse */
         @keyframes pulse-ring {
             0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(32, 201, 151, 0.7); }
@@ -62,15 +66,14 @@
         .timeline-cursor {
             animation: pulse-ring 2s infinite;
         }
-        /* Reperti quick-action */
-        .esito-mini { width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #252932; color: #848d97; transition: all 0.15s; }
-        .esito-mini:hover { border-color: rgba(132,141,151,0.6); }
-        .esito-mini.active-corretto { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
-        .esito-mini.active-parziale { background: rgba(234,179,8,0.15); border-color: #eab308; color: #eab308; }
-        .esito-mini.active-sbagliato { background: rgba(244,63,94,0.15); border-color: #f43f5e; color: #f43f5e; }
         .stato-badge-aperto { background: rgba(32,201,151,0.1); border: 1px solid rgba(32,201,151,0.4); color: #20c997; }
         .stato-badge-chiuso { background: rgba(132,141,151,0.15); border: 1px solid rgba(132,141,151,0.4); color: #848d97; }
         .card-chiuso { opacity: 0.7; }
+        .agg-dir-btn { padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; border: 1px solid rgba(128,128,128,0.3); color: rgba(128,128,128,0.45); text-transform: uppercase; transition: all 0.15s; cursor: pointer; }
+        .agg-dir-btn:hover { opacity: 0.8; }
+        .agg-dir-btn.agg-long  { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
+        .agg-dir-btn.agg-short { background: rgba(244,63,94,0.15);  border-color: #f43f5e; color: #f43f5e; }
+        .agg-dir-btn.agg-neutro{ background: rgba(234,179,8,0.15);  border-color: #eab308; color: #eab308; }
 
         /* Hub tabs (Corano / ODG / Dati Giornata) */
         .dash-tab.active { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
@@ -139,7 +142,7 @@
 
             <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
                 <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Reperti</span>
+                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span>
             </a>
 
             <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
@@ -315,18 +318,16 @@
                         </ul>
                     </div>
 
-                    <!-- 2. Reperti Giornalieri -->
+                    <!-- 2. Commenti Giornata -->
                     <div class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col shadow-lg">
                         <div class="flex items-center justify-between border-b border-tp-border pb-2 mb-4">
                             <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2">
-                                <i data-lucide="compass" class="w-4 h-4"></i> Reperti Giornalieri
+                                <i data-lucide="message-square" class="w-4 h-4"></i> Commenti Giornata
                             </h3>
-                            <a id="btn-nuovo-bias" href="#" class="bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] px-2 py-1 text-[10px] font-bold uppercase rounded flex items-center gap-1.5 transition-colors shadow-sm">
-                                <i data-lucide="plus" class="w-3 h-3"></i> Nuovo
-                            </a>
+                            <a id="btn-nuovo-bias" href="#" class="text-[9px] text-tp-muted/50 hover:text-tp-muted transition-colors uppercase tracking-widest hidden">apri bias</a>
                         </div>
-                        <div id="bias-list" class="space-y-3">
-                            <p class="text-xs text-tp-muted italic text-center py-4">Caricamento reperti...</p>
+                        <div id="bias-list" class="space-y-0">
+                            <p class="text-xs text-tp-muted italic text-center py-4">Caricamento...</p>
                         </div>
                     </div>
 
@@ -474,69 +475,73 @@
                     <div>
                         <h2 class="text-lg font-bold border-b border-tp-border pb-2 text-white mb-4 flex items-center gap-2">
                             <i data-lucide="layers" class="w-5 h-5 text-tp-muted"></i> Sessioni
+                            <div class="ml-auto flex items-center gap-1" id="session-asset-btns">
+                                <button onclick="selectSessionAsset('XAUUSD')" class="session-asset-pill active text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded border transition-colors">XAU</button>
+                                <button onclick="selectSessionAsset('US30')"   class="session-asset-pill text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded border transition-colors">US30</button>
+                                <button onclick="selectSessionAsset('GER30')"  class="session-asset-pill text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded border transition-colors">GER30</button>
+                                <button onclick="selectSessionAsset('NAS100')" class="session-asset-pill text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded border transition-colors">NAS</button>
+                                <button onclick="selectSessionAsset('BTCUSD')" class="session-asset-pill text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded border transition-colors">BTC</button>
+                                <button onclick="selectSessionAsset('EURUSD')" class="session-asset-pill text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded border transition-colors">EUR</button>
+                            </div>
                         </h2>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="sessioni-cards">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="sessioni-cards">
                             <!-- Asia Card -->
-                            <div onclick="openSession('asia')" class="session-card bg-tp-bg/60 border-2 border-[#f43f5e]/30 rounded-xl hover:border-[#f43f5e] transition-all cursor-pointer group flex flex-col min-h-[260px] relative overflow-hidden" data-session-name="asia">
-                                <div class="flex-[3] bg-[#0a0c10] rounded-t-xl flex items-center justify-center overflow-hidden relative" id="session-thumb-asia">
-                                    <div class="flex flex-col items-center gap-2 text-tp-muted group-hover:text-[#f43f5e] transition-colors">
-                                        <i data-lucide="image-plus" class="w-8 h-8"></i>
-                                        <span class="text-[10px] font-bold uppercase tracking-wider">No Screenshot</span>
-                                    </div>
+                            <div onclick="openSession('asia')" class="session-card relative rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-all" data-session-name="asia" style="aspect-ratio:16/9;border:2px solid #f43f5e30">
+                                <div id="session-thumb-asia" class="absolute inset-0 bg-[#0a0c10] flex items-center justify-center">
+                                    <i data-lucide="image-off" class="w-8 h-8" style="color:#f43f5e20"></i>
                                 </div>
-                                <div class="flex-[2] p-4 flex flex-col justify-center">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-sm font-bold uppercase tracking-widest text-[#f43f5e]">Asia</span>
-                                        <span class="text-[10px] font-bold uppercase text-tp-muted" id="session-status-asia">Non Iniziata</span>
-                                    </div>
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/30"></div>
+                                <div id="session-range-asia" class="absolute top-2 left-2.5 hidden"><span class="text-[11px] font-bold px-1.5 py-0.5 rounded bg-black/60"></span></div>
+                                <div class="absolute bottom-0 left-0 right-0 p-2.5 flex items-end justify-between">
+                                    <span class="text-xs font-black uppercase tracking-widest drop-shadow" style="color:#f43f5e">Asia</span>
+                                    <span class="text-[9px] font-bold uppercase tracking-wider text-tp-muted" id="session-status-asia">Non Iniziata</span>
                                 </div>
                             </div>
 
                             <!-- London Card -->
-                            <div onclick="openSession('london')" class="session-card bg-tp-bg/60 border-2 border-[#eab308]/30 rounded-xl hover:border-[#eab308] transition-all cursor-pointer group flex flex-col min-h-[260px] relative overflow-hidden" data-session-name="london">
-                                <div class="flex-[3] bg-[#0a0c10] rounded-t-xl flex items-center justify-center overflow-hidden relative" id="session-thumb-london">
-                                    <div class="flex flex-col items-center gap-2 text-tp-muted group-hover:text-[#eab308] transition-colors">
-                                        <i data-lucide="image-plus" class="w-8 h-8"></i>
-                                        <span class="text-[10px] font-bold uppercase tracking-wider">No Screenshot</span>
-                                    </div>
+                            <div onclick="openSession('london')" class="session-card relative rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-all" data-session-name="london" style="aspect-ratio:16/9;border:2px solid #eab30830">
+                                <div id="session-thumb-london" class="absolute inset-0 bg-[#0a0c10] flex items-center justify-center">
+                                    <i data-lucide="image-off" class="w-8 h-8" style="color:#eab30820"></i>
                                 </div>
-                                <div class="flex-[2] p-4 flex flex-col justify-center">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-sm font-bold uppercase tracking-widest text-[#eab308]">London</span>
-                                        <span class="text-[10px] font-bold uppercase text-tp-muted" id="session-status-london">Non Iniziata</span>
-                                    </div>
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/30"></div>
+                                <div id="session-range-london" class="absolute top-2 left-2.5 hidden"><span class="text-[11px] font-bold px-1.5 py-0.5 rounded bg-black/60"></span></div>
+                                <div class="absolute bottom-0 left-0 right-0 p-2.5 flex items-end justify-between">
+                                    <span class="text-xs font-black uppercase tracking-widest drop-shadow" style="color:#eab308">London</span>
+                                    <span class="text-[9px] font-bold uppercase tracking-wider text-tp-muted" id="session-status-london">Non Iniziata</span>
                                 </div>
                             </div>
 
                             <!-- New York Card -->
-                            <div onclick="openSession('newyork')" class="session-card bg-tp-bg/60 border-2 border-[#20c997]/30 rounded-xl hover:border-[#20c997] transition-all cursor-pointer group flex flex-col min-h-[260px] relative overflow-hidden" data-session-name="newyork">
-                                <div class="flex-[3] bg-[#0a0c10] rounded-t-xl flex items-center justify-center overflow-hidden relative" id="session-thumb-newyork">
-                                    <div class="flex flex-col items-center gap-2 text-tp-muted group-hover:text-[#20c997] transition-colors">
-                                        <i data-lucide="image-plus" class="w-8 h-8"></i>
-                                        <span class="text-[10px] font-bold uppercase tracking-wider">No Screenshot</span>
-                                    </div>
+                            <div onclick="openSession('newyork')" class="session-card relative rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-all" data-session-name="newyork" style="aspect-ratio:16/9;border:2px solid #20c99730">
+                                <div id="session-thumb-newyork" class="absolute inset-0 bg-[#0a0c10] flex items-center justify-center">
+                                    <i data-lucide="image-off" class="w-8 h-8" style="color:#20c99720"></i>
                                 </div>
-                                <div class="flex-[2] p-4 flex flex-col justify-center">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-sm font-bold uppercase tracking-widest text-[#20c997]">New York</span>
-                                        <span class="text-[10px] font-bold uppercase text-tp-muted" id="session-status-newyork">Non Iniziata</span>
-                                    </div>
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/30"></div>
+                                <div id="session-range-newyork" class="absolute top-2 left-2.5 hidden"><span class="text-[11px] font-bold px-1.5 py-0.5 rounded bg-black/60"></span></div>
+                                <div class="absolute bottom-0 left-0 right-0 p-2.5 flex items-end justify-between">
+                                    <span class="text-xs font-black uppercase tracking-widest drop-shadow" style="color:#20c997">New York</span>
+                                    <span class="text-[9px] font-bold uppercase tracking-wider text-tp-muted" id="session-status-newyork">Non Iniziata</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 1b. Ordine del Giorno (popolato dalla routine cloud alle 07:00 Casablanca) -->
-                    <div class="bg-gradient-to-br from-[#0e1a18] via-tp-panel to-[#0a0c10] rounded-xl border border-tp-accent/30 p-5 flex flex-col shadow-[0_0_20px_rgba(32,201,151,0.06)]">
-                        <div class="flex items-center justify-between mb-3 border-b border-tp-border/50 pb-2">
-                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-accent flex items-center gap-2">
-                                <i data-lucide="sunrise" class="w-4 h-4"></i> Ordine del Giorno
+                    <!-- 1c. Analisi Bias per Asset -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-5 shadow-lg">
+                        <div class="flex items-center gap-3 border-b border-tp-border pb-2 mb-4">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2">
+                                <i data-lucide="target" class="w-4 h-4"></i> Analisi Bias
                             </h3>
-                            <span id="odg-time" class="text-[9px] text-tp-muted"></span>
+                            <div id="gj-asset-tabs" class="flex flex-wrap gap-1.5 flex-1"></div>
+                            <div class="relative shrink-0">
+                                <button onclick="gjOpenMenu()" class="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border border-tp-border text-tp-muted hover:border-tp-accent hover:text-tp-accent transition-colors flex items-center gap-1">
+                                    <i data-lucide="plus" class="w-3 h-3"></i> Asset
+                                </button>
+                                <div id="gj-asset-menu" class="hidden absolute right-0 top-full mt-1 bg-[#161920] border border-tp-border rounded-lg shadow-xl z-20 p-2 flex flex-wrap gap-1.5 w-[220px]"></div>
+                            </div>
                         </div>
-                        <div id="odg-content" class="text-xs text-tp-text/85 leading-relaxed">
-                            <p class="text-tp-muted/50 italic">Nessun ordine del giorno salvato per questa giornata.</p>
-                        </div>
+                        <p id="gj-no-asset-msg" class="text-xs text-tp-muted/50 italic">Nessun asset aggiunto. Usa + Asset per iniziare.</p>
+                        <div id="gj-asset-panel" class="hidden"></div>
                     </div>
 
                 </div>
@@ -631,7 +636,7 @@
 
     </main>
 
-    <!-- Modal Conferma generico (reperti) -->
+    <!-- Modal Conferma generico (bias) -->
     <div id="modal-confirm" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeConfirm()"></div>
         <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-lg mx-4 relative z-10 shadow-2xl overflow-hidden flex flex-col">
@@ -824,7 +829,6 @@
             }
 
             // Render ordine del giorno (se presente)
-            renderOrdineDelGiorno(data.ordine_del_giorno);
 
             // Restore tags as session toggles
             if (data.tags && Array.isArray(data.tags)) {
@@ -1287,159 +1291,376 @@
         // ============================================
         // SESSIONI CARDS
         // ============================================
+        const SESSION_ASSETS = ['XAUUSD','US30','NAS100','GER30','EURUSD','BTCUSD'];
+        let activeSessionAsset = 'XAUUSD';
+        let loadedSessions = {};
+
+        function selectSessionAsset(asset) {
+            activeSessionAsset = asset;
+            document.querySelectorAll('.session-asset-pill').forEach(b => {
+                b.classList.toggle('active', b.textContent.trim() === { XAUUSD:'XAU', US30:'US30', GER30:'GER30', NAS100:'NAS', BTCUSD:'BTC', EURUSD:'EUR' }[asset]);
+            });
+            renderSessionThumbs();
+        }
+
+        function renderSessionThumbs() {
+            ['asia','london','newyork'].forEach(name => {
+                const session = loadedSessions[name];
+                const thumbEl = document.getElementById('session-thumb-' + name);
+                const rangeEl = document.getElementById('session-range-' + name);
+                if (!thumbEl) return;
+                const ad = session?.coin_data?.[activeSessionAsset] || {};
+                const screenshot = ad.screenshot || '';
+                const placeholderColor = { asia:'#f43f5e20', london:'#eab30820', newyork:'#20c99720' }[name];
+
+                // screenshot
+                if (screenshot) {
+                    thumbEl.innerHTML = '<img src="' + screenshot + '" class="absolute inset-0 w-full h-full object-cover" alt="">';
+                } else {
+                    thumbEl.innerHTML = '<i data-lucide="image-off" class="w-8 h-8" style="color:' + placeholderColor + '"></i>';
+                    if (window.lucide) lucide.createIcons();
+                }
+
+                // range pip: coin_data prima, auto_data come fallback
+                if (rangeEl) {
+                    const autoAd = session?.auto_data?.[activeSessionAsset] || {};
+                    const high = parseFloat(ad.high || autoAd.high) || 0;
+                    const low  = parseFloat(ad.low  || autoAd.low)  || 0;
+                    const pips = (high && low) ? (high - low).toFixed(1) : '';
+                    const open  = parseFloat(ad.apertura) || 0;
+                    const close = parseFloat(ad.chiusura) || 0;
+                    let pipColor = '#ffffff';
+                    if (open && close) {
+                        pipColor = close >= open ? '#20c997' : '#f43f5e';
+                    } else if (close && high && low && high !== low) {
+                        pipColor = ((close - low) / (high - low)) >= 0.5 ? '#20c997' : '#f43f5e';
+                    }
+                    const span = rangeEl.querySelector('span');
+                    if (pips) {
+                        span.textContent = pips + ' pip';
+                        span.style.color = pipColor;
+                        rangeEl.classList.remove('hidden');
+                    } else {
+                        rangeEl.classList.add('hidden');
+                    }
+                }
+            });
+        }
+
         async function loadSessioniCards() {
             if (!giornataDate) return;
-            const { data: sessioni } = await db.from('sessioni').select('*').eq('data', giornataDate);
+            const { data: sessioni } = await db.from('sessioni').select('id,nome,stato,mood,coin_data,auto_data').eq('data', giornataDate);
 
             const sessionNames = ['asia', 'london', 'newyork'];
             for (const name of sessionNames) {
                 const session = sessioni ? sessioni.find(s => s.nome === name) : null;
-                const statusEl = document.getElementById(`session-status-${name}`);
-                const thumbEl = document.getElementById(`session-thumb-${name}`);
+                loadedSessions[name] = session || null;
+                const statusEl = document.getElementById('session-status-' + name);
+                const thumbEl  = document.getElementById('session-thumb-' + name);
 
                 if (session) {
-                    // Verifica se la sessione è effettivamente compilata
-                    // Serve: almeno una coin con screenshot O (high+low), E mood selezionato
-                    var coinData = session.coin_data || {};
-                    var hasCoinData = Object.values(coinData).some(function(c) {
-                        return c && (c.screenshot || (c.high && c.low));
-                    });
-                    var isCompiled = hasCoinData && session.mood;
-
+                    const coinData = session.coin_data || {};
+                    const hasCoinData = Object.values(coinData).some(c => c && (c.screenshot || (c.high && c.low)));
+                    const isCompiled = hasCoinData && session.mood;
                     if (statusEl) {
                         statusEl.textContent = isCompiled ? 'Compilata' : 'Aperta';
-                        statusEl.classList.remove('text-tp-muted', 'text-tp-accent', 'text-tp-warning');
+                        statusEl.classList.remove('text-tp-muted','text-tp-accent','text-tp-warning');
                         statusEl.classList.add(isCompiled ? 'text-tp-accent' : 'text-tp-warning');
                     }
-                    // Load first coin screenshot from coin_data
-                    if (session.coin_data) {
-                        const firstScreen = Object.values(session.coin_data).find(c => c && c.screenshot);
-                        if (firstScreen && firstScreen.screenshot) {
-                            thumbEl.innerHTML = '<img src="' + firstScreen.screenshot + '" class="w-full h-full object-cover" alt="">';
-                        }
-                    }
-                    // Store session ID for navigation
-                    const card = thumbEl.closest('.session-card');
+                    const card = thumbEl?.closest('.session-card');
                     if (card) card.dataset.sessionId = session.id;
                 }
             }
+            renderSessionThumbs();
         }
 
         function openSession(name) {
             if (!giornataDate) return;
-            const card = document.querySelector('.session-card[data-session-name="' + name + '"]');
-            const existingId = card ? card.dataset.sessionId : null;
-            if (existingId) {
-                window.location.href = 'dettaglio_sessione.html?id=' + existingId + '&from=giornata&gid=' + giornataId;
-            } else {
-                window.location.href = 'dettaglio_sessione.html?session=' + name + '&date=' + giornataDate + '&from=giornata&gid=' + giornataId;
-            }
+            window.location.href = 'sessioni.html?date=' + giornataDate;
         }
 
         // ============================================
-        // BIAS GIORNALIERO
+        // BIAS GIORNALIERO — log commenti giornata
         // ============================================
+        let _biasGiornataId = null;
+        let _biasGiornataAgg = [];
+
         async function loadBiasGiornaliero() {
             if (!giornataDate) return;
             const container = document.getElementById('bias-list');
-            const { data, error } = await db.from('bias').select('*').eq('data', giornataDate).order('created_at', { ascending: false });
 
-            if (error || !data || data.length === 0) {
-                container.innerHTML = '<p class="text-xs text-tp-muted italic text-center py-4">Nessun reperto registrato per oggi.</p>';
-                return;
+            const { data } = await db.from('bias').select('id, commenti_giornata, coin_data').eq('data', giornataDate).order('created_at', { ascending: true }).limit(1);
+            const bias = data?.[0] || null;
+            _biasGiornataId = bias?.id || null;
+            _biasGiornataAgg = Array.isArray(bias?.commenti_giornata) ? bias.commenti_giornata : [];
+
+            // Init coin_data per analisi bias
+            const _gjRaw = bias?.coin_data || {};
+            const _gjPref = ['XAUUSD','US30','GER30','NAS100','BTCUSD','EURUSD'];
+            gjCoinData = {};
+            _gjPref.forEach(a => { gjCoinData[a] = _gjRaw[a] || { aggiornamenti: [] }; });
+            Object.keys(_gjRaw).forEach(a => { if (!_gjPref.includes(a)) gjCoinData[a] = _gjRaw[a]; });
+            if (!gjActiveAsset || !gjCoinData[gjActiveAsset]) gjActiveAsset = 'XAUUSD';
+            renderGjAssetTabs();
+            if (gjActiveAsset) renderGjAssetPanel();
+
+            const btnLink = document.getElementById('btn-nuovo-bias');
+            if (btnLink) {
+                if (_biasGiornataId) {
+                    btnLink.href = `dettaglio_bias.html?id=${_biasGiornataId}&from=giornata&gid=${giornataId}`;
+                    btnLink.classList.remove('hidden');
+                } else {
+                    btnLink.classList.add('hidden');
+                }
             }
 
-            const tipoColors = {
-                commento: 'bg-tp-accent/10 text-tp-accent border-tp-accent/30',
-                bias: 'bg-tp-warning/10 text-tp-warning border-tp-warning/30',
-                conformazione: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-                appunto: 'bg-tp-muted/10 text-tp-muted border-tp-muted/30'
-            };
+            renderBiasGiornataList();
+        }
 
-            container.innerHTML = data.map(b => {
-                const tipi = Array.isArray(b.tipo) ? b.tipo : [];
-                const tipoBadges = tipi.length
-                    ? tipi.map(t => `<span class="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${tipoColors[t] || 'bg-tp-border text-tp-muted border-tp-border'}">${t}</span>`).join('')
-                    : '<span class="text-[9px] italic text-tp-muted/60">-- nessun tipo --</span>';
-                const ora = b.created_at ? new Date(b.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' }) : '--:--';
+        function renderBiasGiornataList() {
+            const container = document.getElementById('bias-list');
+            if (!container) return;
 
-                const aggList = Array.isArray(b.aggiornamenti) ? b.aggiornamenti : [];
-                const lastAggDir = [...aggList].reverse().find(a => a.direzione);
-                const isLong = b.direzione === 'LONG';
-                const isShort = b.direzione === 'SHORT';
-                const isChiuso = b.stato === 'chiuso';
-                const dirColor = isLong ? 'text-tp-accent bg-[#14231f] border-tp-accent/20' : isShort ? 'text-tp-loss bg-tp-loss/10 border-tp-loss/20' : 'text-tp-muted bg-[#0a0c10] border-tp-border';
-                const dirText = isLong ? 'L' : isShort ? 'S' : '-';
-                const aggDir = lastAggDir ? lastAggDir.direzione : null;
-                const aggDirColor = aggDir === 'long' ? 'text-tp-accent border-tp-accent/40' : aggDir === 'short' ? 'text-tp-loss border-tp-loss/40' : 'text-tp-warning border-tp-warning/40';
-                const aggDirText = aggDir === 'long' ? 'L' : aggDir === 'short' ? 'S' : 'N';
-                const aggDirBadge = aggDir ? `<span class="text-[9px] font-bold border rounded px-1 py-0.5 ${aggDirColor}" title="ultimo aggiornamento">${aggDirText}</span>` : '';
-                const esito = b.esito || '';
-                const statoBadgeClass = isChiuso ? 'stato-badge-chiuso' : 'stato-badge-aperto';
-                const statoLabel = isChiuso ? 'Chiuso' : 'Aperto';
-                const cardOpacity = isChiuso ? 'card-chiuso' : '';
+            const now = new Date();
+            const nowH = String(now.toLocaleString('en-US', { hour: '2-digit', hour12: false, timeZone: 'Africa/Casablanca' })).padStart(2,'0');
+            const nowM = String(now.getMinutes()).padStart(2,'0');
+            const nowTime = `${nowH}:${nowM}`;
 
-                const esitoBtns = ['corretto','parziale','sbagliato'].map(v => {
-                    const icon = v === 'corretto' ? 'check' : v === 'parziale' ? 'circle-dot' : 'x';
-                    const active = esito === v ? `active-${v}` : '';
-                    const handler = isChiuso ? '' : `onclick="event.stopPropagation(); event.preventDefault(); biasQuickSetEsito('${b.id}', '${v}')"`;
-                    const cursor = isChiuso ? 'cursor-default' : 'cursor-pointer';
-                    return `<button type="button" ${handler} title="${v}" class="esito-mini ${active} ${cursor}"><i data-lucide="${icon}" class="w-3 h-3"></i></button>`;
-                }).join('');
+            const rows = _biasGiornataAgg.map((a, i) => `
+                <div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 flex items-start gap-3">
+                    <span class="text-xs font-bold text-tp-accent tracking-wide whitespace-nowrap mt-0.5">${a.ora || ''}</span>
+                    <p class="flex-1 min-w-0 text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed break-words">${(a.testo || '').replace(/</g,'&lt;')}</p>
+                    <button type="button" onclick="removeBiasGiornataAgg(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors ml-1 shrink-0 mt-0.5" title="Rimuovi">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>`).join('');
 
-                const closeBtn = isChiuso ? '' : `
-                    <button type="button" onclick="event.stopPropagation(); event.preventDefault(); biasQuickClose('${b.id}')" ${esito ? '' : 'disabled'} title="Chiudi reperto" class="ml-1 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border border-tp-warning/40 text-tp-warning hover:bg-tp-warning hover:text-[#0a0c10] transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-tp-warning">
-                        <i data-lucide="lock" class="w-3 h-3"></i> Chiudi
-                    </button>`;
+            const addForm = `<div class="flex gap-1.5 items-stretch mt-1">
+                <input id="bias-new-ora" type="time" value="${nowTime}" class="bg-[#0a0c10] border border-tp-border rounded-lg px-1.5 py-2 text-xs text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[72px] shrink-0"/>
+                <textarea id="bias-new-testo" rows="2" class="flex-1 bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Aggiungi commento..." oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" onkeydown="if(event.key==='Enter'&&(event.metaKey||event.ctrlKey)){event.preventDefault();addBiasInline()}"></textarea>
+                <button type="button" onclick="addBiasInline()" class="w-8 shrink-0 rounded-lg border border-tp-accent text-tp-accent bg-tp-accent/10 hover:bg-tp-accent/20 transition-all flex items-center justify-center">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                </button>
+            </div>`;
 
-                return `<a href="dettaglio_bias.html?id=${b.id}&from=giornata&gid=${giornataId}" class="${cardOpacity} bg-tp-panel border border-tp-border rounded-lg hover:border-tp-accent/30 transition-colors cursor-pointer block">
-                    <div class="flex items-center gap-3 p-3">
-                        <span class="text-xs font-bold ${dirColor} border px-1.5 py-0.5 rounded shrink-0">${dirText}</span>
-                        <span class="text-sm font-bold text-white min-w-[72px] shrink-0">${b.asset || '--'}</span>
-                        ${aggDirBadge}
-                        <div class="flex-1 min-w-0 flex flex-wrap gap-1">${tipoBadges}</div>
-                        <span class="${statoBadgeClass} text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded shrink-0">${statoLabel}</span>
-                        <span class="text-xs text-tp-muted font-bold tabular-nums shrink-0">${ora}</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-3 pb-2 pt-0 border-t border-tp-border/40">
-                        <span class="text-[10px] font-bold uppercase tracking-widest text-tp-muted/70 mr-1">Esito:</span>
-                        ${esitoBtns}
-                        ${closeBtn}
-                    </div>
-                </a>`;
-            }).join('');
+            container.innerHTML = `<div class="space-y-2 mb-4">${rows || '<p class="text-xs text-tp-muted/60 italic">Nessun commento ancora.</p>'}</div>` + addForm;
             lucide.createIcons();
         }
 
-        // --- BIAS QUICK ACTIONS (inline sulla card della giornata) ---
-        async function biasQuickSetEsito(id, value) {
-            const { data: cur } = await db.from('bias').select('esito, stato').eq('id', id).single();
-            if (!cur || cur.stato === 'chiuso') return;
-            const newEsito = (cur.esito === value) ? null : value;
-            const { error } = await db.from('bias').update({ esito: newEsito }).eq('id', id);
-            if (error) { alert('Errore: ' + error.message); return; }
-            await loadBiasGiornaliero();
+        async function addBiasInline() {
+            const oraEl = document.getElementById('bias-new-ora');
+            const ta = document.getElementById('bias-new-testo');
+            const ora = (oraEl?.value || '').trim();
+            const testo = ta?.value?.trim();
+            if (!testo) { ta?.focus(); return; }
+
+            const newAgg = { ora, testo };
+            const updated = [..._biasGiornataAgg, newAgg].sort((a, b) => (a.ora || '').localeCompare(b.ora || ''));
+
+            if (_biasGiornataId) {
+                const { error } = await db.from('bias').update({ commenti_giornata: updated }).eq('id', _biasGiornataId);
+                if (error) { alert('Errore: ' + error.message); return; }
+            } else {
+                const { data: newB, error } = await db.from('bias').insert({ commenti_giornata: updated, data: giornataDate, stato: 'aperto' }).select('id').single();
+                if (error) { alert('Errore: ' + error.message); return; }
+                _biasGiornataId = newB.id;
+            }
+            _biasGiornataAgg = updated;
+            if (ta) ta.value = '';
+            renderBiasGiornataList();
         }
 
+        async function removeBiasGiornataAgg(i) {
+            if (!_biasGiornataId) return;
+            const updated = _biasGiornataAgg.filter((_, idx) => idx !== i);
+            const { error } = await db.from('bias').update({ commenti_giornata: updated }).eq('id', _biasGiornataId);
+            if (error) { alert('Errore: ' + error.message); return; }
+            _biasGiornataAgg = updated;
+            renderBiasGiornataList();
+        }
+
+        // ============================================
+        // ANALISI BIAS PER ASSET (coin_data del bias del giorno)
+        // ============================================
+        const GJ_ASSETS = ['XAUUSD','US30','GER30','NAS100','BTCUSD','EURUSD'];
+        let gjCoinData = {};
+        let gjActiveAsset = null;
+        let gjNewDir = null;
+
+        async function gjSaveCoinData() {
+            if (!_biasGiornataId) {
+                // Crea il bias se non esiste
+                const { data: newB, error } = await db.from('bias').insert({ coin_data: gjCoinData, data: giornataDate, stato: 'aperto' }).select('id').single();
+                if (error) { alert('Errore creazione bias: ' + error.message); return; }
+                _biasGiornataId = newB.id;
+                const btnLink = document.getElementById('btn-nuovo-bias');
+                if (btnLink) { btnLink.href = `dettaglio_bias.html?id=${_biasGiornataId}&from=giornata&gid=${giornataId}`; btnLink.classList.remove('hidden'); }
+                return;
+            }
+            // Merge coin_data per non sovrascrivere screenshot o altri campi
+            const { data: cur } = await db.from('bias').select('coin_data').eq('id', _biasGiornataId).single();
+            const merged = { ...(cur?.coin_data || {}), ...gjCoinData };
+            // Merge profondo per ogni asset
+            for (const asset of Object.keys(gjCoinData)) {
+                merged[asset] = { ...(cur?.coin_data?.[asset] || {}), ...gjCoinData[asset] };
+            }
+            const { error } = await db.from('bias').update({ coin_data: merged }).eq('id', _biasGiornataId);
+            if (error) { alert('Errore salvataggio: ' + error.message); }
+        }
+
+        function gjOpenMenu() {
+            const menu = document.getElementById('gj-asset-menu');
+            if (!menu) return;
+            menu.innerHTML = GJ_ASSETS.map(a => {
+                const has = !!gjCoinData[a];
+                return `<button type="button" onclick="gjAddAsset('${a}')" class="px-2.5 py-1 rounded text-xs font-bold border transition-all ${has ? 'border-tp-accent/30 text-tp-accent/40 cursor-default' : 'border-tp-border text-tp-muted hover:border-tp-accent hover:text-tp-accent'}">${a}</button>`;
+            }).join('');
+            menu.classList.toggle('hidden');
+        }
+
+        function gjAddAsset(asset) {
+            if (gjCoinData[asset]) return;
+            gjCoinData[asset] = { aggiornamenti: [] };
+            document.getElementById('gj-asset-menu')?.classList.add('hidden');
+            gjActiveAsset = asset;
+            renderGjAssetTabs();
+            renderGjAssetPanel();
+            gjSaveCoinData();
+        }
+
+        function gjRemoveAsset(asset) {
+            delete gjCoinData[asset];
+            const keys = Object.keys(gjCoinData);
+            gjActiveAsset = keys.length ? keys[0] : null;
+            renderGjAssetTabs();
+            gjActiveAsset ? renderGjAssetPanel() : (document.getElementById('gj-asset-panel').innerHTML = '');
+            gjSaveCoinData();
+        }
+
+        function gjSwitchAsset(asset) {
+            gjActiveAsset = asset;
+            renderGjAssetTabs();
+            renderGjAssetPanel();
+        }
+
+        function renderGjAssetTabs() {
+            const tabsEl = document.getElementById('gj-asset-tabs');
+            const msgEl  = document.getElementById('gj-no-asset-msg');
+            const panelEl = document.getElementById('gj-asset-panel');
+            const keys = Object.keys(gjCoinData);
+            if (!keys.length) {
+                if (tabsEl) tabsEl.innerHTML = '';
+                if (msgEl)  msgEl.classList.remove('hidden');
+                if (panelEl) panelEl.classList.add('hidden');
+                return;
+            }
+            if (msgEl)  msgEl.classList.add('hidden');
+            if (panelEl) panelEl.classList.remove('hidden');
+            if (tabsEl) tabsEl.innerHTML = keys.map(a => {
+                const active = a === gjActiveAsset;
+                return `<button type="button" onclick="gjSwitchAsset('${a}')" class="px-3 py-1 rounded-lg text-xs font-bold border transition-all ${active ? 'border-tp-accent bg-tp-accent/10 text-white' : 'border-tp-border text-tp-muted hover:border-tp-accent/50'}">${a}</button>`;
+            }).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function renderGjAssetPanel() {
+            const panel = document.getElementById('gj-asset-panel');
+            if (!panel || !gjActiveAsset || !gjCoinData[gjActiveAsset]) return;
+            const aggs = Array.isArray(gjCoinData[gjActiveAsset].aggiornamenti) ? gjCoinData[gjActiveAsset].aggiornamenti : [];
+            const now = new Date();
+            const nowH = String(now.toLocaleString('en-US', { hour: '2-digit', hour12: false, timeZone: 'Africa/Casablanca' })).padStart(2,'0');
+            const nowM = String(now.getMinutes()).padStart(2,'0');
+
+            const aggRows = aggs.length ? aggs.map((a, i) => `
+                <div class="bg-[#0a0c10] border border-tp-border rounded-lg p-2.5 flex items-start gap-2">
+                    <span class="text-xs font-bold text-tp-accent whitespace-nowrap mt-0.5">${a.ora || ''}</span>
+                    <p class="flex-1 min-w-0 text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed break-words">${(a.testo || '').replace(/</g,'&lt;')}</p>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button type="button" onclick="gjSetAggDir(${i},'long')"   class="agg-dir-btn ${a.direzione==='long'  ?'agg-long':''}">L</button>
+                        <button type="button" onclick="gjSetAggDir(${i},'short')"  class="agg-dir-btn ${a.direzione==='short' ?'agg-short':''}">S</button>
+                        <button type="button" onclick="gjSetAggDir(${i},'neutro')" class="agg-dir-btn ${a.direzione==='neutro'?'agg-neutro':''}">N</button>
+                        <button type="button" onclick="gjRemoveAgg(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors ml-1">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>`).join('') : '<p class="text-xs text-tp-muted/60 italic">Nessun aggiornamento ancora.</p>';
+
+            panel.innerHTML = `
+                <div class="bg-[#0a0c10] border border-tp-border rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">${gjActiveAsset}</label>
+                        <button onclick="gjRemoveAsset('${gjActiveAsset}')" class="text-tp-muted/50 hover:text-tp-loss transition-colors" title="Rimuovi asset">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                    <div id="gj-panel-agg-list" class="space-y-2">${aggRows}</div>
+                    <div class="flex gap-2 items-stretch">
+                        <div class="flex flex-col gap-1 shrink-0">
+                            <input id="gj-agg-ora" type="time" value="${nowH}:${nowM}" class="bg-tp-panel border border-tp-border rounded-lg px-2 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[90px]"/>
+                            <div class="flex gap-1">
+                                <button type="button" onclick="gjSetNewDir('long')"   class="agg-dir-btn flex-1 ${gjNewDir==='long'  ?'agg-long':''}">L</button>
+                                <button type="button" onclick="gjSetNewDir('short')"  class="agg-dir-btn flex-1 ${gjNewDir==='short' ?'agg-short':''}">S</button>
+                                <button type="button" onclick="gjSetNewDir('neutro')" class="agg-dir-btn flex-1 ${gjNewDir==='neutro'?'agg-neutro':''}">N</button>
+                            </div>
+                        </div>
+                        <textarea id="gj-agg-testo" rows="2" class="flex-1 bg-tp-panel border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Es: 4H ha rotto struttura, daily 4720 tenuto..."></textarea>
+                        <button type="button" onclick="gjAddAgg()" class="px-3 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 hover:bg-tp-accent/20 uppercase transition-all flex items-center gap-1 shrink-0">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>`;
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function gjSetNewDir(dir) {
+            gjNewDir = gjNewDir === dir ? null : dir;
+            renderGjAssetPanel();
+        }
+
+        function gjSetAggDir(i, dir) {
+            if (!gjActiveAsset || !gjCoinData[gjActiveAsset]) return;
+            const aggs = gjCoinData[gjActiveAsset].aggiornamenti;
+            aggs[i].direzione = aggs[i].direzione === dir ? null : dir;
+            renderGjAssetPanel();
+            gjSaveCoinData();
+        }
+
+        function gjAddAgg() {
+            if (!gjActiveAsset) return;
+            const ora   = (document.getElementById('gj-agg-ora')?.value || '').trim();
+            const testo = (document.getElementById('gj-agg-testo')?.value || '').trim();
+            if (!testo) { document.getElementById('gj-agg-testo')?.focus(); return; }
+            if (!gjCoinData[gjActiveAsset]) gjCoinData[gjActiveAsset] = { aggiornamenti: [] };
+            if (!Array.isArray(gjCoinData[gjActiveAsset].aggiornamenti)) gjCoinData[gjActiveAsset].aggiornamenti = [];
+            gjCoinData[gjActiveAsset].aggiornamenti.push({ ora, testo, direzione: gjNewDir });
+            gjCoinData[gjActiveAsset].aggiornamenti.sort((a, b) => (a.ora || '').localeCompare(b.ora || ''));
+            const ta = document.getElementById('gj-agg-testo');
+            if (ta) ta.value = '';
+            gjNewDir = null;
+            renderGjAssetPanel();
+            gjSaveCoinData();
+        }
+
+        function gjRemoveAgg(i) {
+            if (!gjActiveAsset || !gjCoinData[gjActiveAsset]) return;
+            gjCoinData[gjActiveAsset].aggiornamenti.splice(i, 1);
+            renderGjAssetPanel();
+            gjSaveCoinData();
+        }
+
+        // --- BIAS QUICK CLOSE ---
         async function biasQuickClose(id) {
-            const { data: cur } = await db.from('bias').select('esito, stato, asset, direzione, tipo, commento').eq('id', id).single();
+            const { data: cur } = await db.from('bias').select('stato').eq('id', id).single();
             if (!cur) return;
             if (cur.stato === 'chiuso') return;
-            if (!cur.esito) { alert('Imposta prima un esito.'); return; }
-            const asset = cur.asset || 'reperto';
-            const dir = cur.direzione || '';
-            const tipo = (cur.tipo && cur.tipo.length) ? cur.tipo[0] : 'bias';
-            const previewLabel = `${tipo.toUpperCase()} ${asset}${dir ? ' · ' + dir : ''} · esito: ${cur.esito}`;
             showConfirm(
-                'Chiudere il reperto?',
-                'Rileggi il commento prima di confermare. Una volta chiuso il reperto non sara piu modificabile ne eliminabile (correzioni minime su asset/screenshot consentite).',
+                'Chiudere il bias?',
+                'Una volta chiuso il bias non sara piu modificabile ne eliminabile.',
                 async function() {
                     const { error } = await db.from('bias').update({ stato: 'chiuso' }).eq('id', id);
                     if (error) { alert('Errore chiusura: ' + error.message); return; }
                     await loadBiasGiornaliero();
-                },
-                cur.commento || '',
-                previewLabel
+                }
             );
         }
 
@@ -1806,46 +2027,6 @@
         }
 
         // Render ordine del giorno (popolato dalla routine cloud)
-        function renderOrdineDelGiorno(b) {
-            const content = document.getElementById('odg-content');
-            const timeEl = document.getElementById('odg-time');
-            if (!content) return;
-            if (!b) {
-                content.innerHTML = '<p class="text-tp-muted/50 italic">Nessun ordine del giorno salvato per questa giornata.</p>';
-                return;
-            }
-            if (timeEl && b.generato_alle) {
-                const t = new Date(b.generato_alle);
-                timeEl.textContent = 'generato ' + t.toLocaleString('it-IT', {dateStyle:'short', timeStyle:'short'});
-            }
-            const macro = (b.macro_oggi||[]).map(e => '<li>'+(e.ora||'')+' - <b>'+(e.titolo||'')+'</b> ['+(e.impatto||'')+' '+(e.valuta||'')+']</li>').join('');
-            const trades= (b.ultimi_trade||[]).map(t => {
-                const c = (t.pnl>=0?'text-tp-accent':'text-tp-loss');
-                return '<li>'+(t.asset||'')+' '+(t.direzione||'')+' <span class="'+c+'">'+(t.pnl>=0?'+':'')+(Number(t.pnl)||0).toFixed(2)+'</span> ('+(t.esito||'')+')</li>';
-            }).join('');
-            const usd = b.usd_strength || {};
-            const usdValStr = (usd.attuale!==undefined&&usd.attuale!==null) ? Number(usd.attuale).toFixed(4) : (usd.valore!==undefined?Number(usd.valore).toFixed(4):'--');
-            const usdTrendStr = usd.trend_intraday || usd.trend_24h || '--';
-            const letture = b.letture || { count: 0, commento: '' };
-            const allertPrezzo = b.allert_prezzo || { count: 0, commento: '' };
-            const asia = b.sessione_asia || { ranges_today: {}, commento: '' };
-            const reminder = b.reminder || [];
-            const asiaCoins = Object.keys(asia.ranges_today || {});
-            const asiaRangeHtml = asiaCoins.length > 0
-                ? '<ul class="space-y-0.5 text-[10.5px] text-tp-text/85">'+asiaCoins.map(c => {const v=asia.ranges_today[c]; const ratio=(v.ratio!=null)?' <span class="text-tp-muted">('+(v.ratio*100).toFixed(0)+'%)</span>':''; return '<li><b>'+c+'</b>: '+v.range.toFixed(2)+' pts'+ratio+'</li>';}).join('')+'</ul>'
-                : '<p class="text-[10.5px] text-tp-muted/60 italic">nessun dato MT4</p>';
-            content.innerHTML =
-                (b.narrativa ? '<div class="mb-3 leading-relaxed text-[11.5px]">'+b.narrativa.replace(/\n/g,'<br>')+'</div>' : '') +
-                '<div class="space-y-2.5">' +
-                    (macro  ? '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Macro oggi</p><ul class="space-y-0.5 text-[10.5px] text-tp-text/85">'+macro+'</ul></div>' : '') +
-                    '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Sessione asiatica</p>'+asiaRangeHtml+(asia.commento?'<p class="text-[10.5px] text-tp-text/85 leading-relaxed mt-1.5 pt-1.5 border-t border-tp-border/40">'+asia.commento+'</p>':'')+'</div>' +
-                    (trades ? '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Ultimi trade</p><ul class="space-y-0.5 text-[10.5px] text-tp-text/85">'+trades+'</ul></div>' : '') +
-                    '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><div class="flex items-center justify-between mb-1"><p class="text-[9px] uppercase font-bold text-tp-accent tracking-wider">Forza USD intraday</p><p class="text-base font-bold text-white">'+usdValStr+'</p></div><p class="text-[10.5px] text-tp-text/85 leading-relaxed">'+(usd.descrizione||usdTrendStr)+'</p></div>' +
-                    '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Letture del giorno ('+letture.count+')</p><p class="text-[10.5px] text-tp-text/85 leading-relaxed">'+(letture.commento||'<i class="text-tp-muted/60">--</i>')+'</p></div>' +
-                    '<div class="bg-[#0a0c10] border border-tp-border/40 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-accent mb-1 tracking-wider">Allert prezzo (24h, '+allertPrezzo.count+')</p><p class="text-[10.5px] text-tp-text/85 leading-relaxed">'+(allertPrezzo.commento||'<i class="text-tp-muted/60">--</i>')+'</p></div>' +
-                    (reminder.length > 0 ? '<div class="bg-[#0a0c10] border border-tp-warning/30 rounded p-2"><p class="text-[9px] uppercase font-bold text-tp-warning mb-1 tracking-wider">Promemoria Rodrigo</p><ul class="space-y-0.5 text-[10.5px] text-tp-text/85">'+reminder.map(r=>'<li class="flex gap-1"><span class="text-tp-warning">▢</span>'+r+'</li>').join('')+'</ul></div>' : '') +
-                '</div>';
-        }
     </script>
 
 </body>

@@ -1,6 +1,6 @@
-// Rodrigo Morning - Edge Function
+﻿// Rodrigo Morning - Edge Function
 // Schedule: pg_cron `35 6 * * 1-5` UTC = 07:35 Casablanca (lun-ven)
-// Briefing operativo Rodrigo: stato giornata, reperti, allert macro, top articoli del giorno.
+// Briefing operativo Rodrigo: stato giornata, bias, allert macro, top articoli del giorno.
 // Output: messaggio Telegram firmato Rodrigo + INSERT su routine_events e assistant_messages.
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
@@ -66,7 +66,7 @@ CONTESTO: sono le 07:35 Casablanca. La giornata di trading inizia a breve (apert
 
 OBIETTIVO DEL MESSAGGIO:
 1. Saluto breve
-2. Stato checklist / giornata (fajr, ordine del giorno, reperti bias, ipotesi formulate)
+2. Stato checklist / giornata (fajr, ordine del giorno, bias bias, ipotesi formulate)
 3. Segnale eventi macro rilevanti di oggi
 4. Richiami operativi su cosa fare prima dell'apertura Londra
 
@@ -75,7 +75,7 @@ REGOLE OUTPUT:
 - Usa HTML Telegram semplice: <b>bold</b>, <i>italic</i>. Niente markdown.
 - Elenchi con trattini (-) brevi, max 1 riga ciascuno.
 - Se mancano cose, segnalale chiaramente. Se tutto in ordine, di' "setup OK".
-- Per "reperti bias" e "ipotesi": se il count e' 0, scrivi esattamente "assenti". Se >0, riporta brevemente quanti e su quali asset.
+- Per "bias bias" e "ipotesi": se il count e' 0, scrivi esattamente "assenti". Se >0, riporta brevemente quanti e su quali asset.
 - Non firmare alla fine.`;
 
 serve(async (req) => {
@@ -102,12 +102,12 @@ serve(async (req) => {
       .eq("data", today).limit(1);
     const giornata = giornataRows && giornataRows.length > 0 ? giornataRows[0] : null;
 
-    const { data: repertiRaw } = await supabase
+    const { data: biasRaw } = await supabase
       .from("bias")
-      .select("asset, direzione, tipo, created_at")
+      .select("commenti_giornata, coin_data, stato, data, created_at")
       .eq("data", today)
       .order("created_at", { ascending: false });
-    const reperti = repertiRaw || [];
+    const bias = biasRaw || [];
 
     const { data: ipotesiRaw } = await supabase
       .from("ipotesi_trading")
@@ -138,8 +138,14 @@ serve(async (req) => {
       fajr: giornata?.fajr ?? null,
       note_domani_ieri: giornata?.note_domani ?? null,
       ordine_del_giorno_disponibile: !!(giornata?.ordine_del_giorno),
-      reperti_oggi: reperti.map((r) => ({ asset: r.asset, direzione: r.direzione, tipo: r.tipo })),
-      reperti_oggi_count: reperti.length,
+      bias_oggi: bias.map((r) => ({
+        assets: Object.keys(r.coin_data || {}),
+        stato: r.stato,
+        ultimo_commento: Array.isArray(r.commenti_giornata) && r.commenti_giornata.length
+          ? r.commenti_giornata[r.commenti_giornata.length - 1]
+          : null,
+      })),
+      bias_oggi_count: bias.length,
       ipotesi_oggi: ipotesi.map((i: { asset: string; direzione: string; sessione: string; stato: string; strategia?: { nome?: string } | null }) => ({
         asset: i.asset, direzione: i.direzione, sessione: i.sessione, stato: i.stato,
         strategia: i.strategia?.nome ?? null,
@@ -162,11 +168,11 @@ serve(async (req) => {
 
     await supabase.from("routine_events").insert({
       slot: "rodrigo-morning", tipo: "ai-nudge", assistente: "rodrigo",
-      payload: { output: text, reperti: reperti.length, ipotesi: ipotesi.length, macro: allertOggi.length, articoli: articoli.length },
+      payload: { output: text, bias: bias.length, ipotesi: ipotesi.length, macro: allertOggi.length, articoli: articoli.length },
       telegram_sent: !!tg.ok, telegram_message_id: tg.messageId ?? null,
     });
 
-    return new Response(JSON.stringify({ ok: true, data: today, telegram: tg, counts: { reperti: reperti.length, ipotesi: ipotesi.length, macro: allertOggi.length, articoli: articoli.length } }), {
+    return new Response(JSON.stringify({ ok: true, data: today, telegram: tg, counts: { bias: bias.length, ipotesi: ipotesi.length, macro: allertOggi.length, articoli: articoli.length } }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {

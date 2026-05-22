@@ -1,9 +1,9 @@
-// Apertura Sessione - Edge Function
+﻿// Apertura Sessione - Edge Function
 // Schedule:
 //   pg_cron `0 7 * * *` UTC  = 08:00 Casablanca (Londra)   body: { sessione: "londra" }
 //   pg_cron `30 13 * * *` UTC = 14:30 Casablanca (New York) body: { sessione: "ny" }
 // Blocchi:
-//   1. reperti da attenzionare (Claude)
+//   1. bias da attenzionare (Claude)
 //   2. forza USD intraday
 //   3. allert prezzo non lavorati (lista cruda manuali) — sempre nel JSON
 //   3b. allert EA — sintesi narrativa Claude (SOLO NY: a 14:30 abbiamo flusso Asia+London;
@@ -103,32 +103,34 @@ serve(async (req) => {
     const nowIso = new Date().toISOString();
     const startOfDayIso = startOfDayCasablancaIso(today);
 
-    // ===== 1. Reperti (bias) - SOLO della giornata di oggi, tutti gli stati =====
-    // Un reperto e una lettura di mercato dell'utente per la giornata: aperto/chiuso indica
+    // ===== 1. Bias (bias) - SOLO della giornata di oggi, tutti gli stati =====
+    // Un bias e una lettura di mercato dell'utente per la giornata: aperto/chiuso indica
     // se ha finito di aggiornarlo, ma per Rodrigo conta comunque.
     const { data: biasRaw } = await supabase
       .from("bias")
-      .select("asset, direzione, tipo, data, commento, confluenze, esito, stato, created_at")
+      .select("data, stato, commenti_giornata, coin_data, created_at")
       .eq("data", today)
       .order("created_at", { ascending: true });
     const bias = biasRaw || [];
 
-    let repertiBlock = { count: bias.length, commento: "Nessun reperto registrato per oggi." };
+    let biasBlock = { count: bias.length, commento: "Nessun bias registrato per oggi." };
     if (bias.length > 0) {
       try {
         const biasText = bias.map((b, i) => {
-          const com = b.commento ? (b.commento.length > 250 ? b.commento.substring(0, 250) + "..." : b.commento) : "";
-          const conf = b.confluenze ? (b.confluenze.length > 150 ? b.confluenze.substring(0, 150) + "..." : b.confluenze) : "";
-          const tipoStr = b.tipo && Array.isArray(b.tipo) && b.tipo.length ? " (" + b.tipo.join(",") + ")" : "";
-          return `${i + 1}. ${b.asset || "?"} ${b.direzione || ""}${tipoStr}${com ? " - " + com : ""}${conf ? " | conf: " + conf : ""}`;
+          const assets = Object.keys(b.coin_data || {}).filter(k => Object.keys(b.coin_data[k] || {}).length > 0);
+          const lastAgg = Array.isArray(b.commenti_giornata) && b.commenti_giornata.length
+            ? b.commenti_giornata[b.commenti_giornata.length - 1]?.testo || ""
+            : "";
+          const preview = lastAgg.length > 200 ? lastAgg.substring(0, 200) + "..." : lastAgg;
+          return `${i + 1}. asset: ${assets.join(",") || "?"}${preview ? " - " + preview : ""}`;
         }).join("\n");
         const prompt = `Sei Rodrigo, assistente operativo del Trade Desk per uno scalper su XAU/USD, US30, NASDAQ, GER40.
 
 Sta per aprire la sessione di ${info.label} (${today}).
 
-I REPERTI qui sotto sono OSSERVAZIONI e LETTURE DI MERCATO che l'utente stesso ha annotato per la giornata di oggi. NON sono task da eseguire, NON sono cose da fare: sono cio che lui percepisce del mercato in questo momento.
+I BIAS qui sotto sono OSSERVAZIONI e LETTURE DI MERCATO che l'utente stesso ha annotato per la giornata di oggi. NON sono task da eseguire, NON sono cose da fare: sono cio che lui percepisce del mercato in questo momento.
 
-REPERTI di oggi:
+BIAS di oggi:
 ${biasText}
 
 Restituisci una sintesi (2-4 punti, una riga per punto) che RISPECCHI la lettura dell'utente per la sessione di ${info.label}. Esempio di tono: "Vedi XAU long: la sessione di ${info.label} e il primo banco di prova per questa lettura" oppure "Hai annotato compressione su NAS in pre-NY: osserva come si scarica all'apertura".
@@ -137,8 +139,8 @@ Regole:
 - NON dire "verifica se ancora valido", "monitorare X", "attenzionare Y" - non sono task.
 - Riferisciti alla lettura come se fosse SUA, perche lo e.
 - Asciutto, italiano, zero motivational speech, zero parolacce, niente segnali operativi.`;
-        repertiBlock.commento = (await callClaude(prompt, ANTHROPIC_API_KEYS, 450)).trim();
-      } catch (e) { repertiBlock.commento = `Errore commento reperti: ${(e as Error).message}`; }
+        biasBlock.commento = (await callClaude(prompt, ANTHROPIC_API_KEYS, 450)).trim();
+      } catch (e) { biasBlock.commento = `Errore commento bias: ${(e as Error).message}`; }
     }
 
     // ===== 2. Forza USD intraday =====
@@ -244,7 +246,7 @@ ${eaLines}`;
     const aperturaBrief = {
       generato_alle: nowIso,
       sessione,
-      reperti: repertiBlock,
+      bias: biasBlock,
       usd_strength: usdBlock,
       allert_prezzo_nuovi: allertBlock,
       allert_ea_sintesi: allertEaSintesi || null, // popolato solo per NY se Claude ok
@@ -303,7 +305,7 @@ ${eaLines}`;
 
     const msg =
       `${info.emoji} <b>Apertura ${info.label}</b> - <i>${today}</i>\n\n` +
-      `🧠 <b>Reperti di oggi</b>\n${repertiBlock.commento}\n\n` +
+      `🧠 <b>Bias di oggi</b>\n${biasBlock.commento}\n\n` +
       `💵 <b>Forza USD</b> (intraday)\n${usdBlock.descrizione}\n\n` +
       `${allertSezione}\n\n` +
       `🔔 <b>Promemoria Rodrigo</b>\n${reminderLines}`;
@@ -313,7 +315,7 @@ ${eaLines}`;
     return new Response(JSON.stringify({
       ok: true, sessione, data: today, sessione_id: sessioneId,
       counts: {
-        reperti: bias.length, usd_punti: usdSeries.length,
+        bias: bias.length, usd_punti: usdSeries.length,
         allert_nuovi: allertNuovi.length,
       },
       telegram: tg,

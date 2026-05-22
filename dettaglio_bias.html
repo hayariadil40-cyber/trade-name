@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trade Desk - Dettaglio Reperto</title>
+    <title>Trade Desk - Dettaglio Bias</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -54,12 +54,8 @@
         .agg-dir-btn.agg-long  { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
         .agg-dir-btn.agg-short { background: rgba(244,63,94,0.15);  border-color: #f43f5e; color: #f43f5e; }
         .agg-dir-btn.agg-neutro{ background: rgba(234,179,8,0.15);  border-color: #eab308; color: #eab308; }
-        .tipo-btn.active { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
         .cat-tab.active { opacity: 1; }
         .cat-tab:not(.active) { opacity: 0.5; }
-        .esito-btn.active-corretto { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
-        .esito-btn.active-parziale { background: rgba(234,179,8,0.15); border-color: #eab308; color: #eab308; }
-        .esito-btn.active-sbagliato { background: rgba(244,63,94,0.15); border-color: #f43f5e; color: #f43f5e; }
         .stato-badge-aperto { background: rgba(32,201,151,0.1); border: 1px solid rgba(32,201,151,0.4); color: #20c997; }
         .stato-badge-chiuso { background: rgba(132,141,151,0.15); border: 1px solid rgba(132,141,151,0.4); color: #848d97; }
         .bias-readonly input, .bias-readonly select, .bias-readonly textarea { pointer-events: none; opacity: 0.65; }
@@ -96,7 +92,7 @@
 
             <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span></a>
 
-            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Reperti</span></a>
+            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span></a>
 
             <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span></a>
 
@@ -126,7 +122,7 @@
         <header class="flex justify-between items-center px-4 py-3 lg:px-8 lg:py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
             <div class="flex items-center gap-4 w-auto min-w-max">
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Reperto</h1>
+                    <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Bias</h1>
                     <div class="flex gap-2.5 mt-1">
                         <a href="index.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i> Dashboard</a>
                         <a href="tabella_trades.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Tabella Trades</a>
@@ -185,7 +181,7 @@
         </header>
 
         <!-- ============================================ -->
-        <!-- CONTENUTO: Dettaglio Reperto / Bias          -->
+        <!-- CONTENUTO: Dettaglio Bias / Bias          -->
         <!-- ============================================ -->
         <div class="flex-1 overflow-y-auto p-3 lg:p-8 scroll-smooth">
             <div class="max-w-[1600px] mx-auto">
@@ -193,28 +189,28 @@
                 <!-- Torna indietro -->
                 <div class="flex items-center gap-2 mb-6 text-tp-muted hover:text-white transition-colors cursor-pointer w-fit" id="back-btn" onclick="goBack()">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                    <span class="text-xs font-bold uppercase tracking-widest" id="back-label">Torna ai Reperti</span>
+                    <span class="text-xs font-bold uppercase tracking-widest" id="back-label">Torna ai Bias</span>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
 
-                    <!-- SINISTRA: Dati Reperto -->
+                    <!-- SINISTRA: Dati Bias -->
                     <div id="bias-canvas" class="flex flex-col gap-6">
 
                         <!-- Banner readonly (visibile solo se stato=chiuso) -->
                         <div id="bias-readonly-banner" class="hidden bg-tp-warning/5 border border-tp-warning/30 text-tp-warning rounded-lg px-4 py-3 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
                             <i data-lucide="lock" class="w-4 h-4"></i>
-                            Reperto chiuso - non modificabile ne eliminabile
+                            Bias chiuso - non modificabile ne eliminabile
                         </div>
 
-                        <!-- Header Reperto -->
+                        <!-- Header Bias -->
                         <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
                             <div class="flex items-center gap-3 mb-6 pb-4 border-b border-tp-border/50">
                                 <div class="bg-tp-accent/10 p-2.5 rounded-lg border border-tp-accent/20">
                                     <i data-lucide="microscope" class="w-6 h-6 text-tp-accent"></i>
                                 </div>
                                 <div class="flex-1">
-                                    <h2 class="text-xl font-bold text-white" id="bias-title">Reperto</h2>
+                                    <h2 class="text-xl font-bold text-white" id="bias-title">Bias</h2>
                                     <span id="bias-id-display" class="text-[10px] font-bold text-tp-muted uppercase tracking-widest"></span>
                                 </div>
                                 <span id="bias-stato-badge" class="stato-badge-aperto text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded">Aperto</span>
@@ -231,14 +227,7 @@
                             </label>
                             <div id="aggiornamenti-list" class="space-y-2 mb-4"></div>
                             <div class="flex gap-2 items-stretch">
-                                <div class="flex flex-col gap-1.5 flex-shrink-0">
-                                    <input id="agg-ora" type="time" class="bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[110px]"/>
-                                    <div id="agg-dir-row" class="flex gap-1 justify-between">
-                                        <button type="button" id="nagg-long"   onclick="setNewAggDir('long')"   class="agg-dir-btn flex-1">L</button>
-                                        <button type="button" id="nagg-short"  onclick="setNewAggDir('short')"  class="agg-dir-btn flex-1">S</button>
-                                        <button type="button" id="nagg-neutro" onclick="setNewAggDir('neutro')" class="agg-dir-btn flex-1">N</button>
-                                    </div>
-                                </div>
+                                <input id="agg-ora" type="time" class="bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[110px] flex-shrink-0"/>
                                 <textarea id="agg-testo" rows="2" class="flex-1 bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Es: London ha rispettato 4720, prima reazione long visibile, bias confermato" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'"></textarea>
                                 <button type="button" onclick="addAggiornamento()" id="agg-btn" class="px-4 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 hover:bg-tp-accent/20 uppercase transition-all flex items-center gap-2">
                                     <i data-lucide="plus" class="w-4 h-4"></i> Aggiungi
@@ -294,12 +283,6 @@
 
                         <!-- Barra azioni -->
                         <div class="flex items-center gap-2" id="bias-actions">
-                            <!-- Esito pillole (solo tipo=bias) -->
-                            <div id="card-esito" class="flex gap-1">
-                                <button type="button" onclick="setEsito('corretto')"  id="esito-corretto"  class="esito-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-accent/50 flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> C</button>
-                                <button type="button" onclick="setEsito('parziale')"  id="esito-parziale"  class="esito-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-warning/50 flex items-center gap-1"><i data-lucide="circle-dot" class="w-3 h-3"></i> P</button>
-                                <button type="button" onclick="setEsito('sbagliato')" id="esito-sbagliato" class="esito-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-tp-border text-tp-muted uppercase transition-all hover:border-tp-loss/50 flex items-center gap-1"><i data-lucide="x" class="w-3 h-3"></i> S</button>
-                            </div>
                             <div class="flex-1"></div>
                             <button id="save-btn" onclick="saveBias()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 transition-colors">
                                 <i data-lucide="save" class="w-3.5 h-3.5"></i> Salva
@@ -339,7 +322,7 @@
     <script src="app.js"></script>
     <script>
         // ============================================
-        // DETTAGLIO BIAS / REPERTO - Supabase Logic
+        // DETTAGLIO BIAS / BIAS - Supabase Logic
         // ============================================
 
         const biasId = new URLSearchParams(window.location.search).get('id');
@@ -358,24 +341,20 @@
             if (lbl) lbl.textContent = 'Torna alla Giornata';
         }
         let currentDirection = '';
-        let currentEsito = '';
         let currentStato = 'aperto';
         let biasDataField = ''; // valore colonna `data`, gestito lato server, non editabile
-        let aggiornamenti = [];
+        let commentiGiornata = [];
         let asianboxAssets = [];
-        let newAggDirezione = null;
 
         function adaptForm() {
             const s = (id, v) => { const el = document.getElementById(id); if (el) el.classList.toggle('hidden', !v); };
             s('field-bias-tabs',      true);
-            s('card-esito',           true);
             s('card-aggiornamenti',   true);
             s('card-categorizzatore', true);
             const lbl = document.getElementById('aggiornamenti-label');
             if (lbl) lbl.textContent = 'Commenti della giornata';
             const sub = document.getElementById('aggiornamenti-sublabel');
             if (sub) sub.textContent = '';
-            s('agg-dir-row', false);
             renderAggiornamenti();
             updateCloseButton();
         }
@@ -386,7 +365,7 @@
             if (!db) { alert('Supabase non inizializzato.'); return; }
 
             if (!biasId) {
-                // Nuovo reperto
+                // Nuovo bias
                 try {
                     const today = new Date().toISOString().split('T')[0];
                     const { data, error } = await db
@@ -418,27 +397,28 @@
             biasDataField = data.data || '';
             const createdAt = data.created_at ? new Date(data.created_at) : new Date();
             const dateLabel = createdAt.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
-            document.getElementById('bias-title').textContent = `Reperto — ${dateLabel}`;
+            document.getElementById('bias-title').textContent = `Bias — ${dateLabel}`;
             document.getElementById('bias-id-display').textContent = `ID: ${data.id.substring(0, 8)}`;
             // coin_data per asset tabs
-            coinData = (data.coin_data && typeof data.coin_data === 'object' && !Array.isArray(data.coin_data))
+            const _raw = (data.coin_data && typeof data.coin_data === 'object' && !Array.isArray(data.coin_data))
                 ? JSON.parse(JSON.stringify(data.coin_data))
                 : {};
             // Migrazione legacy: asset singolo → coin_data
-            if (!Object.keys(coinData).length && data.asset) {
-                coinData[data.asset] = {
-                    aggiornamenti: Array.isArray(data.aggiornamenti) ? data.aggiornamenti : []
-                };
+            if (!Object.keys(_raw).length && data.asset) {
+                _raw[data.asset] = { aggiornamenti: Array.isArray(data.commenti_giornata) ? data.commenti_giornata : [] };
             }
-            activeAsset = Object.keys(coinData)[0] || null;
+            // Pre-popola i 6 preferiti in ordine fisso, poi appende gli extra
+            const _preferred = ['XAUUSD','US30','GER30','NAS100','BTCUSD','EURUSD'];
+            coinData = {};
+            _preferred.forEach(a => { coinData[a] = _raw[a] || { aggiornamenti: [] }; });
+            Object.keys(_raw).forEach(a => { if (!_preferred.includes(a)) coinData[a] = _raw[a]; });
+            activeAsset = Object.keys(coinData)[0];
 
-            currentEsito = data.esito || '';
             currentStato = data.stato || 'aperto';
-            renderEsitoButtons();
             applyStatoUI();
             updateCloseButton();
 
-            aggiornamenti = Array.isArray(data.aggiornamenti) ? data.aggiornamenti.slice() : [];
+            commentiGiornata = Array.isArray(data.commenti_giornata) ? data.commenti_giornata.slice() : [];
             const _now = new Date();
             document.getElementById('agg-ora').value = String(_now.getHours()).padStart(2,'0') + ':' + String(_now.getMinutes()).padStart(2,'0');
 
@@ -479,27 +459,10 @@
             if (dir === 'NEUTRAL') btnNeutral.classList.add('active-neutral');
         }
 
-        // --- ESITO (corretto / parziale / sbagliato) ---
-        function setEsito(value) {
-            // toggle: re-click sullo stesso azzera
-            currentEsito = (currentEsito === value) ? '' : value;
-            renderEsitoButtons();
-            updateCloseButton();
-        }
-
-        function renderEsitoButtons() {
-            ['corretto','parziale','sbagliato'].forEach(v => {
-                const btn = document.getElementById('esito-' + v);
-                if (!btn) return;
-                btn.classList.remove('active-corretto','active-parziale','active-sbagliato');
-                if (currentEsito === v) btn.classList.add('active-' + v);
-            });
-        }
-
         function updateCloseButton() {
             const closeBtn = document.getElementById('close-btn');
             if (!closeBtn) return;
-            closeBtn.disabled = !currentEsito || currentStato === 'chiuso';
+            closeBtn.disabled = currentStato === 'chiuso';
         }
 
         // --- STATO (aperto / chiuso) ---
@@ -531,18 +494,12 @@
         }
 
         async function closeBias() {
-            if (!currentEsito) {
-                alert('Seleziona prima un esito (corretto / parziale / sbagliato).');
-                return;
-            }
             showConfirm(
-                'Chiudere il reperto?',
+                'Chiudere il bias?',
                 'Una volta chiuso non sara piu modificabile ne eliminabile. Conferma solo se hai finito di aggiornarlo.',
                 async function() {
-                    // Salva eventuali modifiche pending + chiudi in un solo update
                     const payload = collectPayload();
                     payload.stato = 'chiuso';
-                    payload.esito = currentEsito;
                     const { error } = await db.from('bias').update(payload).eq('id', biasId);
                     if (error) { alert('Errore chiusura: ' + error.message); return; }
                     currentStato = 'chiuso';
@@ -621,49 +578,20 @@
         function renderAggiornamenti() {
             const list = document.getElementById('aggiornamenti-list');
             if (!list) return;
-            if (!aggiornamenti.length) {
+            if (!commentiGiornata.length) {
                 list.innerHTML = `<p class="text-xs text-tp-muted/60 italic">Nessun commento ancora.</p>`;
                 return;
             }
-            const showDir = false;
-            list.innerHTML = aggiornamenti.map((a, i) => `
+            list.innerHTML = commentiGiornata.map((a, i) => `
                 <div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 flex items-start gap-3">
                     <span class="text-xs font-bold text-tp-accent tracking-wide whitespace-nowrap mt-0.5">${escapeAggHtml(a.ora)}</span>
                     <p class="flex-1 text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escapeAggHtml(a.testo)}</p>
-                    <div class="flex items-center gap-1 flex-shrink-0">
-                        ${showDir ? `
-                        <button type="button" onclick="setAggDirezione(${i},'long')"   class="agg-dir-btn ${a.direzione==='long'  ?'agg-long':''}">L</button>
-                        <button type="button" onclick="setAggDirezione(${i},'short')"  class="agg-dir-btn ${a.direzione==='short' ?'agg-short':''}">S</button>
-                        <button type="button" onclick="setAggDirezione(${i},'neutro')" class="agg-dir-btn ${a.direzione==='neutro'?'agg-neutro':''}">N</button>
-                        ` : ''}
-                        <button type="button" onclick="removeAggiornamento(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors ml-1" title="Rimuovi">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </div>
+                    <button type="button" onclick="removeAggiornamento(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors flex-shrink-0" title="Rimuovi">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
                 </div>
             `).join('');
             if (window.lucide) lucide.createIcons();
-        }
-
-        function setNewAggDir(dir) {
-            newAggDirezione = (newAggDirezione === dir) ? null : dir;
-            ['long','short','neutro'].forEach(d => {
-                const btn = document.getElementById('nagg-' + d);
-                if (!btn) return;
-                btn.className = 'agg-dir-btn flex-1' + (newAggDirezione === d ? ' agg-' + d : '');
-            });
-        }
-
-        async function setAggDirezione(i, dir) {
-            if (currentStato === 'chiuso') return;
-            aggiornamenti[i].direzione = (aggiornamenti[i].direzione === dir) ? null : dir;
-            renderAggiornamenti();
-            const {error} = await db.from('bias').update({aggiornamenti}).eq('id', biasId);
-            if (error) {
-                alert('Errore salvataggio direzione: ' + error.message);
-                aggiornamenti[i].direzione = dir === aggiornamenti[i].direzione ? null : dir;
-                renderAggiornamenti();
-            }
         }
 
         async function addAggiornamento() {
@@ -673,32 +601,27 @@
             const ora = (oraEl.value || '').trim();
             const testo = (testoEl.value || '').trim();
             if (!ora || !testo) { alert('Compila orario e testo prima di aggiungere'); return; }
-            aggiornamenti.push({ora, testo, direzione: newAggDirezione});
-            aggiornamenti.sort((a,b) => (a.ora || '').localeCompare(b.ora || ''));
+            commentiGiornata.push({ ora, testo });
+            commentiGiornata.sort((a,b) => (a.ora || '').localeCompare(b.ora || ''));
             testoEl.value = '';
-            newAggDirezione = null;
-            ['long','short','neutro'].forEach(d => {
-                const btn = document.getElementById('nagg-' + d);
-                if (btn) btn.className = 'agg-dir-btn flex-1';
-            });
             renderAggiornamenti();
-            const {error} = await db.from('bias').update({aggiornamenti}).eq('id', biasId);
+            const { error } = await db.from('bias').update({ commenti_giornata: commentiGiornata }).eq('id', biasId);
             if (error) {
                 alert('Errore salvataggio aggiornamento: ' + error.message);
-                const idx = aggiornamenti.findIndex(x => x.ora === ora && x.testo === testo);
-                if (idx >= 0) aggiornamenti.splice(idx, 1);
+                const idx = commentiGiornata.findIndex(x => x.ora === ora && x.testo === testo);
+                if (idx >= 0) commentiGiornata.splice(idx, 1);
                 renderAggiornamenti();
             }
         }
 
         async function removeAggiornamento(i) {
             if (currentStato === 'chiuso') return;
-            const removed = aggiornamenti.splice(i, 1)[0];
+            const removed = commentiGiornata.splice(i, 1)[0];
             renderAggiornamenti();
-            const {error} = await db.from('bias').update({aggiornamenti}).eq('id', biasId);
+            const {error} = await db.from('bias').update({ commenti_giornata: commentiGiornata }).eq('id', biasId);
             if (error) {
                 alert('Errore rimozione: ' + error.message);
-                aggiornamenti.splice(i, 0, removed);
+                commentiGiornata.splice(i, 0, removed);
                 renderAggiornamenti();
             }
         }
@@ -769,8 +692,14 @@
             panelEl.classList.remove('hidden');
             tabsEl.innerHTML = keys.map(a => {
                 const isActive = a === activeAsset;
+                const hasAgg = Array.isArray(coinData[a]?.aggiornamenti) && coinData[a].aggiornamenti.length > 0;
+                const cls = isActive
+                    ? 'border-tp-accent bg-tp-accent/10 text-white'
+                    : hasAgg
+                        ? 'border-tp-warning bg-tp-warning/10 text-tp-warning hover:bg-tp-warning/20'
+                        : 'border-tp-loss/50 bg-tp-loss/5 text-tp-loss/70 hover:border-tp-loss hover:text-tp-loss';
                 return `<button type="button" onclick="switchBiasAsset('${a}')"
-                    class="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${isActive ? 'border-tp-accent bg-tp-accent/10 text-white' : 'border-tp-border text-tp-muted hover:border-tp-accent/50'}">
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${cls}">
                     ${a}
                 </button>`;
             }).join('');
@@ -788,12 +717,35 @@
                 short:  newBiasAggDir === v ? 'agg-short'  : 'agg-dir-btn flex-1',
                 neutro: newBiasAggDir === v ? 'agg-neutro' : 'agg-dir-btn flex-1'
             })[v] || 'agg-dir-btn flex-1';
+            const shotUrl = d.screenshot || '';
             panel.innerHTML = `
                 <div class="bg-[#0a0c10] border border-tp-border rounded-xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
                         <label class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">${activeAsset}</label>
                         <button onclick="removeBiasAsset('${activeAsset}')" class="text-tp-muted/50 hover:text-tp-loss transition-colors" title="Rimuovi asset">
                             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                    <!-- Screenshot -->
+                    <div class="relative group/shot">
+                        <label class="block cursor-pointer">
+                            <input type="file" accept="image/*" class="hidden" onchange="uploadBiasScreenshotFromFile('${activeAsset}',this)" />
+                            <div id="bias-shot-wrap" class="${shotUrl ? '' : 'hidden'} rounded-lg overflow-hidden border border-tp-border relative" style="aspect-ratio:16/9">
+                                <img id="bias-shot-img" src="${shotUrl}" alt="" class="w-full h-full object-cover block" />
+                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover/shot:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                    <i data-lucide="image" class="w-4 h-4 text-white drop-shadow"></i>
+                                    <span class="text-[10px] text-white font-bold uppercase tracking-wider">Cambia</span>
+                                </div>
+                            </div>
+                            <div id="bias-shot-empty" class="${shotUrl ? 'hidden' : ''} rounded-lg border-2 border-dashed border-tp-border/40 flex flex-col items-center justify-center gap-1.5 hover:border-tp-accent/40 transition-colors" style="aspect-ratio:16/9">
+                                <i data-lucide="image-plus" class="w-5 h-5 text-tp-muted/30"></i>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-tp-muted/30">Screenshot — Ctrl+V o click</span>
+                            </div>
+                        </label>
+                        <button onclick="deleteBiasScreenshot('${activeAsset}');event.stopPropagation()"
+                            class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/70 text-white ${shotUrl ? 'flex' : 'hidden'} items-center justify-center opacity-0 group-hover/shot:opacity-100 transition-opacity"
+                            id="bias-shot-del">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
                     <!-- Lista aggiornamenti -->
@@ -864,6 +816,55 @@
             coinData[activeAsset].aggiornamenti.splice(i, 1);
             renderBiasAssetPanel();
         }
+
+        // --- SCREENSHOT ASSET ---
+        const UPLOAD_FN = 'https://fzxjbxeadiqwfpctiyom.supabase.co/functions/v1/upload-screenshot';
+
+        async function uploadBiasScreenshot(asset, file) {
+            const path = `bias/${biasId}/${asset}_${Date.now()}.jpg`;
+            const reader = new FileReader();
+            const base64 = await new Promise(res => { reader.onload = e => res(e.target.result.split(',')[1]); reader.readAsDataURL(file); });
+            const { data: { session } } = await db.auth.getSession();
+            const fnRes = await fetch(UPLOAD_FN, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+                body: JSON.stringify({ base64, path, contentType: file.type || 'image/jpeg' })
+            });
+            const fnData = await fnRes.json();
+            if (!fnRes.ok || !fnData.publicUrl) { console.error('[uploadBiasScreenshot]', fnData); return; }
+            const { data: fresh } = await db.from('bias').select('coin_data').eq('id', biasId).single();
+            const cd = fresh?.coin_data || {};
+            if (!cd[asset]) cd[asset] = {};
+            cd[asset].screenshot = fnData.publicUrl;
+            if (!coinData[asset]) coinData[asset] = {};
+            coinData[asset].screenshot = fnData.publicUrl;
+            await db.from('bias').update({ coin_data: cd }).eq('id', biasId);
+            renderBiasAssetPanel();
+        }
+
+        async function deleteBiasScreenshot(asset) {
+            if (!coinData[asset]) return;
+            coinData[asset].screenshot = null;
+            const { data: fresh } = await db.from('bias').select('coin_data').eq('id', biasId).single();
+            const cd = fresh?.coin_data || {};
+            if (cd[asset]) delete cd[asset].screenshot;
+            await db.from('bias').update({ coin_data: cd }).eq('id', biasId);
+            renderBiasAssetPanel();
+        }
+
+        function uploadBiasScreenshotFromFile(asset, input) {
+            const file = input.files[0];
+            if (file) uploadBiasScreenshot(asset, file);
+        }
+
+        window.addEventListener('paste', async (e) => {
+            if (!activeAsset) return;
+            const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+            if (!item) return;
+            e.preventDefault();
+            const file = item.getAsFile();
+            if (file) await uploadBiasScreenshot(activeAsset, file);
+        });
 
         // --- ASIAN BOX ---
         const AB_ASSETS = ['XAUUSD','EURUSD','GBPUSD','US30','NAS100','GER30','USDJPY','BTCUSD','GER40'];
@@ -950,8 +951,6 @@
         function collectPayload() {
             const payload = {
                 data: biasDataField,
-                tipo: ['bias'],
-                esito: currentEsito || null,
                 categorizzatori: {
                     cronache: getSelectedValues('sel-cronache'),
                     strategie: getSelectedValues('sel-strategie'),
@@ -960,9 +959,7 @@
                 }
             };
             payload.coin_data = coinData;
-            payload.aggiornamenti = aggiornamenti;
-            const keys = Object.keys(coinData);
-            if (keys.length) payload.asset = keys[0];
+            payload.commenti_giornata = commentiGiornata;
             return payload;
         }
 
@@ -984,7 +981,7 @@
                 btn.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4"></i> Errore!';
                 btn.classList.replace('bg-tp-accent', 'bg-tp-loss');
                 setTimeout(() => {
-                    btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Salva Reperto';
+                    btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Salva Bias';
                     btn.classList.replace('bg-tp-loss', 'bg-tp-accent');
                     btn.disabled = false;
                     lucide.createIcons();
@@ -998,7 +995,7 @@
             canvas.classList.add('save-flash');
             setTimeout(() => canvas.classList.remove('save-flash'), 600);
             setTimeout(() => {
-                btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Salva Reperto';
+                btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Salva Bias';
                 btn.disabled = false;
                 lucide.createIcons();
             }, 1500);
@@ -1007,7 +1004,7 @@
         // --- DELETE ---
         async function deleteBias() {
             if (currentStato === 'chiuso') return;
-            showConfirm('Eliminare questo reperto?','Questa azione non puo essere annullata.',async function(){
+            showConfirm('Eliminare questo bias?','Questa azione non puo essere annullata.',async function(){
             const { error } = await db.from('bias').delete().eq('id', biasId);
             if(!error)window.location.href='bias.html';});
         }

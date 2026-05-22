@@ -1,4 +1,4 @@
-// Rodrigo Domani - Edge Function
+﻿// Rodrigo Domani - Edge Function
 // Schedule: pg_cron `0 20 * * *` UTC = 21:00 Casablanca
 // Prep prossima giornata operativa: salta sabato/domenica.
 // Output: messaggio Telegram firmato Rodrigo + INSERT su routine_events e assistant_messages.
@@ -99,8 +99,8 @@ serve(async (req) => {
     })();
 
     const { data: biasVecchiRaw } = await supabase
-      .from("bias").select("asset, direzione, data")
-      .is("esito", null).lte("data", cutoff2gg)
+      .from("bias").select("coin_data, data")
+      .eq("stato", "aperto").lte("data", cutoff2gg)
       .order("data", { ascending: true }).limit(10);
     const biasVecchi = biasVecchiRaw || [];
 
@@ -130,7 +130,7 @@ OUTPUT:
 - Struttura:
   1) Una riga di contesto breve (pending di oggi se ce ne sono, altrimenti "oggi chiuso pulito")
   2) Eventi macro high-impact di domani con orari (se ce ne sono)
-  3) Reperti aperti da oltre 2 giorni da rivalutare (solo se ce ne sono)
+  3) Bias aperti da oltre 2 giorni da rivalutare (solo se ce ne sono)
   4) Promemoria weekly review (solo se oggi e venerdi)
 
 REGOLE:
@@ -147,7 +147,7 @@ REGOLE:
         trade_senza_screenshot: tradesNonCompilati.length,
       },
       macro_domani: macroAlti.map((a) => ({ ora: a.ora_evento, titolo: a.titolo, valuta: a.valuta, impatto: a.impatto })),
-      bias_da_rivalutare: biasVecchi.map((b) => ({ asset: b.asset, direzione: b.direzione, data: b.data })),
+      bias_da_rivalutare: biasVecchi.map((b) => ({ assets: Object.keys(b.coin_data || {}), data: b.data })),
     };
 
     const text = await callClaude(systemPrompt, `Dati prep domani in JSON:\n${JSON.stringify(payload)}`, ANTHROPIC_API_KEYS, 1200);
