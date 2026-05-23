@@ -271,17 +271,6 @@ async function updateHeaderSmile() {
             }
         });
 
-        // Calcola score volatilita: high=+1, medium=0, low=-1
-        var volScore = 0;
-        var volCount = 0;
-        records.forEach(function(r) {
-            if (r.volatilita) {
-                volCount++;
-                if (r.volatilita === 'high') volScore += 1;
-                else if (r.volatilita === 'low') volScore -= 1;
-            }
-        });
-
         // Colori: score > 0 = verde (#20c997), score == 0 = viola (#8b5cf6), score < 0 = rosso (#f43f5e)
         function scoreToColor(score) {
             if (score > 0) return '#20c997';
@@ -306,24 +295,27 @@ async function updateHeaderSmile() {
             mindsetEl.style.filter = 'drop-shadow(0 0 8px ' + mColor + '80)';
         }
 
-        // Market icon (secondo) — usa lo stesso score mindset per ora
-        var marketEl = document.getElementById('market-icon-wrapper');
-        if (marketEl) {
-            var avgMindset = mindsetCount > 0 ? mindsetScore / mindsetCount : 0;
-            var mColor = scoreToColor(avgMindset > 0.3 ? 1 : avgMindset < -0.3 ? -1 : 0);
-            var mIcon = scoreToIcon(avgMindset > 0.3 ? 1 : avgMindset < -0.3 ? -1 : 0);
-            marketEl.setAttribute('data-lucide', mIcon);
-            marketEl.style.color = mColor;
-            marketEl.style.filter = 'drop-shadow(0 0 8px ' + mColor + '80)';
-        }
-
-        // Volatilita icon (terzo) — dollar sign, colora per score vol
-        var volEl = document.getElementById('volatility-icon-wrapper');
-        if (volEl) {
-            var avgVol = volCount > 0 ? volScore / volCount : 0;
-            var vColor = scoreToColor(avgVol > 0.3 ? 1 : avgVol < -0.3 ? -1 : 0);
-            volEl.style.color = vColor;
-            volEl.style.filter = 'drop-shadow(0 0 12px ' + vColor + '80)';
+        // Per-coin volatility pills in #volatility-coins
+        var coinsDiv = document.getElementById('volatility-coins');
+        if (coinsDiv) {
+            try {
+                var wlResult = await db.from('watchlist').select('simbolo, volatilita_auto').eq('active', true).order('simbolo');
+                var wlRows = wlResult.data || [];
+                var coinAbbr = { XAUUSD:'XAU', US30:'US30', GER30:'GER', NAS100:'NAS', BTCUSD:'BTC', EURUSD:'EUR', GBPUSD:'GBP', USDJPY:'JPY', USDCHF:'CHF', AUDUSD:'AUD' };
+                var volIconMap = { high:'trending-up', medium:'minus', low:'trending-down' };
+                var volColorMap = { high:'#20c997', medium:'#eab308', low:'#f43f5e' };
+                var html = '';
+                wlRows.forEach(function(r) {
+                    var abbr = coinAbbr[r.simbolo] || r.simbolo.slice(0, 3);
+                    var icon = volIconMap[r.volatilita_auto] || 'minus';
+                    var color = volColorMap[r.volatilita_auto] || '#848d97';
+                    html += '<div class="flex flex-col items-center gap-0.5" title="' + r.simbolo + ' — ' + (r.volatilita_auto || 'n.d.') + '">' +
+                        '<i data-lucide="' + icon + '" style="width:11px;height:11px;color:' + color + ';filter:drop-shadow(0 0 5px ' + color + '80)"></i>' +
+                        '<span style="font-size:8px;line-height:1;color:' + color + ';font-weight:600;letter-spacing:0.02em">' + abbr + '</span>' +
+                        '</div>';
+                });
+                coinsDiv.innerHTML = html;
+            } catch(e) { /* watchlist non disponibile */ }
         }
 
         // Refresh lucide icons
@@ -979,6 +971,34 @@ window.selectVol = function(btn, type) {
 // ==========================================
 // Navigazione: vai al dettaglio della giornata di oggi (crea se manca)
 // ==========================================
+window.goToIpotesiOggi = function(ev) {
+    if (ev && ev.preventDefault) ev.preventDefault();
+    var today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Casablanca' });
+    window.location.href = 'ipotesi.html?date=' + today;
+};
+
+window.goToSessioniOggi = function(ev) {
+    if (ev && ev.preventDefault) ev.preventDefault();
+    var today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Casablanca' });
+    window.location.href = 'sessioni.html?date=' + today;
+};
+
+window.goToBiasOggi = async function(ev) {
+    if (ev && ev.preventDefault) ev.preventDefault();
+    if (typeof db === 'undefined' || !db) return;
+    try {
+        var today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Casablanca' });
+        var existing = await db.from('bias').select('id').eq('data', today).order('created_at', { ascending: true }).limit(1).maybeSingle();
+        if (existing.data && existing.data.id) {
+            window.location.href = 'dettaglio_bias.html?id=' + existing.data.id;
+        } else {
+            window.location.href = 'bias.html';
+        }
+    } catch(e) {
+        console.error('goToBiasOggi:', e);
+    }
+};
+
 window.goToOggi = async function(ev) {
     if (ev && ev.preventDefault) ev.preventDefault();
     if (typeof db === 'undefined' || !db) { console.warn('goToOggi: db non disponibile'); return; }

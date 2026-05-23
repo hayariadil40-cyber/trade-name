@@ -1,4 +1,4 @@
-# Documentazione Trade Desk
+﻿# Documentazione Trade Desk
 
 ## 1. Entry & Autenticazione
 
@@ -62,7 +62,7 @@
 - **JS**: `loadStrategies()`, `createNewStrategy()`.
 
 ### `bias.html`
-- **Scopo**: reperti psicologici/market memory.
+- **Scopo**: bias psicologici/market memory.
 - **UI**: lista scrollabile (asset, LONG/SHORT, data, commento preview, #screenshot); barra sx verde LONG / rossa SHORT.
 - **Dati**: `bias.select('*')` con `asset`, `direzione`, `data`, `commento`, `confluenze`, `screenshots[]`.
 

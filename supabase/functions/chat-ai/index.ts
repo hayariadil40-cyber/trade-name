@@ -85,7 +85,7 @@ serve(async (req) => {
     if (smile && smile.length) dbContext += "\n\n## MONITORASMILE:\n" + JSON.stringify(smile);
 
     {
-      let sessioniQuery = supabase.from("sessioni").select("nome, data, mood, note, coin_data");
+      let sessioniQuery = supabase.from("sessioni").select("nome, data, mood, coin_data");
       if (assistantMode === "coach") {
         sessioniQuery = sessioniQuery.gte("data", fourteenDaysAgo).order("data", { ascending: false }).limit(30);
       } else {
@@ -247,31 +247,34 @@ serve(async (req) => {
 - Secondari: EURUSD, USDJPY
 - Regole di rischio: max 2-3 stop loss per sessione, max 0.5% perdita per sessione, max 0.75-1% rischio giornaliero`;
 
+    const BT = String.fromCharCode(96);
+    const B3 = BT + BT + BT;
+
     const DB_ACTIONS = `AZIONI DATABASE:
 Quando l'utente ti chiede di modificare dati, rispondi normalmente MA aggiungi alla fine del messaggio un blocco JSON db_actions con un array di azioni. Tutte le azioni dell'array sono eseguite in sequenza dal backend e ricevi feedback OK/ERRORE.
 
 Azioni supportate (USA ESATTAMENTE QUESTI VALORI di "action"):
 
 1. update - aggiorna campi di una riga esistente:
-\`\`\`db_actions
+${B3}db_actions
 [{"table":"giornate","action":"update","match":{"data":"2026-04-26"},"data":{"mindset":"focused"}}]
-\`\`\`
+${B3}
 
 2. insert - crea una nuova riga (NON usarlo se la riga gia esiste, fallisce per UNIQUE):
-\`\`\`db_actions
+${B3}db_actions
 [{"table":"bias","action":"insert","data":{"data":"2026-04-26","coin_data":{"XAUUSD":{}},"stato":"aperto"}}]
-\`\`\`
+${B3}
 IMPORTANTE: NON usare MAI insert su "sessioni". Le 3 righe (asia, london, newyork) sono create automaticamente quando l'utente apre la giornata (trigger su giornate) o dal cron apertura-sessione. Se devi compilare dati di sessione usa SEMPRE update o update_coin con match {"data":"YYYY-MM-DD","nome":"london|newyork|asia"}. Il backend rifiuta gli insert su sessioni.
 
-REGOLE BIAS (tabella bias): MASSIMO 1 bias per coin per data. Prima di insert su bias, controlla nel contesto sopra (## BIAS) se esiste gia una riga con stesso asset+data. Se esiste, NON fare insert: fai update accodando un elemento all'array \`aggiornamenti\`. Formato aggiornamenti: array jsonb di {"ora":"HH:MM","testo":"...","direzione":"long"|"short"|"neutro"} — `direzione` è opzionale, includila solo se l'utente indica esplicitamente la sua lettura direzionale in quell'aggiornamento. Ordinato cronologicamente. Per accodare devi passare l'array INTERO con il nuovo elemento appeso (mai append parziale, sovrascrive tutto). Gli \`aggiornamenti\` sono l'unico contenuto testuale del bias (conferma, invalidazione, flip direzione, monitoring). Esempio:
-\`\`\`db_actions
+REGOLE BIAS (tabella bias): MASSIMO 1 bias per coin per data. Prima di insert su bias, controlla nel contesto sopra (## BIAS) se esiste gia una riga con stesso asset+data. Se esiste, NON fare insert: fai update accodando un elemento all'array ${BT}aggiornamenti${BT}. Formato aggiornamenti: array jsonb di {"ora":"HH:MM","testo":"...","direzione":"long"|"short"|"neutro"} — ${BT}direzione${BT} è opzionale, includila solo se l'utente indica esplicitamente la sua lettura direzionale in quell'aggiornamento. Ordinato cronologicamente. Per accodare devi passare l'array INTERO con il nuovo elemento appeso (mai append parziale, sovrascrive tutto). Gli ${BT}aggiornamenti${BT} sono l'unico contenuto testuale del bias (conferma, invalidazione, flip direzione, monitoring). Esempio:
+${B3}db_actions
 [{"table":"bias","action":"update","match":{"data":"2026-05-12"},"data":{"commenti_giornata":[{"ora":"10:45","testo":"London ha rispettato 4720, prima reazione long, bias confermato"},{"ora":"14:30","testo":"NY open ha bucato 4708, bias invalidato"}]}}]
-\`\`\`
+${B3}
 
 3. update_coin - merge non-distruttivo su una chiave dentro coin_data jsonb. Funziona per sessioni E cronache (entrambe hanno colonna coin_data). Mantiene i campi esistenti (commento/sentiment/screenshot) e sovrascrive solo quelli passati in "data":
-\`\`\`db_actions
+${B3}db_actions
 [{"table":"cronache","action":"update_coin","match":{"data":"2026-04-24"},"coin":"XAUUSD","data":{"low":"4657.69","high":"4740.42","open":"4692.44","close":"4707.41","percentuale":"+0.32"}}]
-\`\`\`
+${B3}
 
 Tabelle scrittura: sessioni (coin_data, mood, nome, data), giornate (mindset, volatilita, note_domani, fajr, marea, day_tags), trades (note, mood, volatilita, tag, ipotesi_id - solo se non completato), bias (aggiornamenti, coin_data, stato), cronache (coin_data, titolo), settimane (review, note), strategie (nome, ipotesi, regole_ingresso, sessione, tipo_mercato, dove_entro, dove_esco_sl, dove_esco_tp, gestione_operazione, da_osservare, asset, tipo, timeframe, note, stato, winrate, gestione_rischio[LEGACY], take_profit[LEGACY]), allert (SOLO valore_effettivo, screenshot), ipotesi_trading (asset, direzione, sessione, stato, note, strategia_id).
 
@@ -308,9 +311,9 @@ NOTIZIE MACRO (tabella allert):
 - NON serve scrivere commento_rodrigo: un trigger Postgres lo genera in automatico ~5-10 secondi dopo l'update.
 - NON modificare data_evento, ora_evento, ff_id, impatto, titolo, valuta, valore_atteso, valore_precedente.
 Esempio:
-\`\`\`db_actions
+${B3}db_actions
 [{"table":"allert","action":"update","match":{"id":"2b6f4d0a-d293-4a95-8daf-e85cfda9b0e8"},"data":{"valore_effettivo":"2.0%"}}]
-\`\`\`
+${B3}
 
 REGOLE IPOTESI (tabella ipotesi_trading):
 - Struttura: asset (es. "XAUUSD"), direzione ("LONG"|"SHORT"|"NEUTRO"), sessione ("london"|"newyork"|"asia"), stato, note, strategia_id (UUID, opzionale).
@@ -318,29 +321,29 @@ REGOLE IPOTESI (tabella ipotesi_trading):
 - L'id delle strategie disponibili e' nel blocco ## STRATEGIE (id+nome per collegamento) sopra.
 
 Creare una nuova ipotesi:
-\`\`\`db_actions
+${B3}db_actions
 [{"table":"ipotesi_trading","action":"insert","data":{"asset":"XAUUSD","direzione":"LONG","sessione":"london","stato":"ipotesi","note":"Attendo retest 4720 con rejection M15"}}]
-\`\`\`
+${B3}
 
 Aggiornare stato o note (usa SEMPRE l'id come match, preso da ## IPOTESI sopra):
-\`\`\`db_actions
+${B3}db_actions
 [{"table":"ipotesi_trading","action":"update","match":{"id":"<uuid>"},"data":{"stato":"invalidata"}}]
-\`\`\`
+${B3}
 
 Collegare un trade a un'ipotesi (aggiorna ipotesi_id sul trade, non sull'ipotesi):
-\`\`\`db_actions
+${B3}db_actions
 [{"table":"trades","action":"update","match":{"id":"<trade_uuid>"},"data":{"ipotesi_id":"<ipotesi_uuid>"}}]
-\`\`\`
+${B3}
 
 Collegare una strategia a un'ipotesi:
-\`\`\`db_actions
+${B3}db_actions
 [{"table":"ipotesi_trading","action":"update","match":{"id":"<ipotesi_uuid>"},"data":{"strategia_id":"<strategia_uuid>"}}]
-\`\`\`
+${B3}
 
 Aggiornare le note di un'ipotesi appena eseguita (es. dopo che il trade e' partito):
-\`\`\`db_actions
+${B3}db_actions
 [{"table":"ipotesi_trading","action":"update","match":{"id":"<uuid>"},"data":{"stato":"eseguita","note":"<note aggiornate>"}}]
-\`\`\`
+${B3}
 
 NOTA strategie.regole_ingresso e' un ARRAY JSONB di stringhe. Per modificarlo via update, includi nell'UPDATE l'array INTERO con la modifica applicata: leggi l'array dal contesto sopra, ricostruiscilo con la modifica e passalo per intero. Esempio: per aggiungere "EURUSD" alla riga "Strumenti ammessi: XAU, BTC" della strategia "Chiusura FVG", invia un update con il nuovo array completo che include la riga modificata "Strumenti ammessi: XAU, BTC, EURUSD". MAI passare un array parziale, sovrascrive tutto.
 
@@ -576,9 +579,9 @@ Quando ricevi uno o entrambi questi dump, il tuo job e:
 4. Emettere AUTOMATICAMENTE un blocco db_actions con un solo update_coin per scrivere tutto in cronache.coin_data per la coin/data analizzata. RICORDATI: tutti i valori numerici come stringhe (vedi CONTRATTO coin_data sopra). picchi_volume e sbilanciamenti sono ARRAY DI STRINGHE.
 
 Esempio db_actions per XAU del 2026-04-24:
-\`\`\`db_actions
+${B3}db_actions
 [{"table":"cronache","action":"update_coin","match":{"data":"2026-04-24"},"coin":"XAUUSD","data":{"picchi_volume":["16:45 20.2k 4.8x 9pt DN NY","15:05 16.5k 3.9x 18pt UP NY"],"sbilanciamenti":["12:05-12:25 UP +38pt London","14:35-15:10 UP +39pt NY rally"],"commento":"Giornata bidirezionale..."}}]
-\`\`\`
+${B3}
 
 Mai chiedere conferma prima di compilare: l'utente ti manda il dump perche vuole che tu compili.
 

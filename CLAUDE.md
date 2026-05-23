@@ -48,7 +48,7 @@ Dal **sidebar** sinistro si accede a tutto. La sidebar è collassata di default 
 
 **Sessioni** (`sessioni.html`) è l'archivio delle sessioni Asia/London/NY. Ogni sessione ha asset operato, bias, range pips, P/L, mood, e un blocco `coin_data` JSONB con dati per coin (high/low di sessione, screenshot, ecc.).
 
-**Reperti** (`bias.html`) — qui si chiamano "Reperti" nel sidebar ma la tabella è `bias`. Sono le **memorie psicologiche e di mercato**: bias direzionali (LONG/SHORT) su un asset in una data, con confluenze, esito (corretto/sbagliato/parziale), commento, screenshot. Servono a riconoscere pattern ricorrenti del proprio modo di leggere il mercato.
+**Bias** (`bias.html`) — tabella `bias`. Sono le **memorie psicologiche e di mercato**: bias direzionali (LONG/SHORT) su un asset in una data, con confluenze, esito (corretto/sbagliato/parziale), commento, screenshot. Servono a riconoscere pattern ricorrenti del proprio modo di leggere il mercato.
 
 **Eventi** (`allert.html`) — la pagina **più importante per il sistema notizie**, vedi sezione dedicata sotto. Tre tab: Calendario news, Allert prezzo (crypto/coin con alert preimpostati), MonitoraSmile (registro stato emotivo + volatilità).
 
@@ -117,7 +117,7 @@ Le routine sono i **messaggi pianificati** che arrivano sul Telegram dell'utente
 
 **07:00 Casablanca — `ordine-del-giorno.ps1`** raccoglie macro del giorno, bias aperti da rivalutare, ultimi 5 trade, forza USD calcolata sui movimenti DXY. Salva in `giornate.ordine_del_giorno` (JSONB) e manda Telegram con header "Ordine del Giorno".
 
-**07:30 Casablanca — `routine-rodrigo-morning.ps1`** legge stato giornata, checklist, ordine del giorno, reperti, allert ad alto impatto del giorno, e produce un messaggio operativo firmato Rodrigo.
+**07:30 Casablanca — `routine-rodrigo-morning.ps1`** legge stato giornata, checklist, ordine del giorno, bias, allert ad alto impatto del giorno, e produce un messaggio operativo firmato Rodrigo.
 
 **11:15 e 16:45 Casablanca — `routine-peter-session-debrief.ps1`** debrief di fine sessione (Londra alle 11:15, NY alle 16:45). Conta trade, calcola win rate di sessione, P/L, dà un voto disciplina. Firmato Peter.
 

@@ -217,10 +217,10 @@
             <div class="flex items-center gap-4 w-auto min-w-max">
                 <div>
                     <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Giovedì 2 Aprile 2026</h1>
-                    <div class="flex gap-2.5 mt-1">
+                    <div class="flex flex-col gap-1 mt-1"><div class="flex gap-2">
                         <a href="index.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i> Dashboard</a>
                         <a href="tabella_trades.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Tabella Trades</a>
-                        <a href="#" onclick="goToOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Oggi</a>
+                        <a href="#" onclick="goToOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Oggi</a></div><div class="flex gap-2"><a href="#" onclick="goToSessioniOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="layers" class="w-3.5 h-3.5"></i> Sessioni</a><a href="#" onclick="goToBiasOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="brain" class="w-3.5 h-3.5"></i> Bias</a><a href="#" onclick="goToIpotesiOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="target" class="w-3.5 h-3.5"></i> Ipotesi</a></div>
                     </div>
                 </div>
             </div>
@@ -269,14 +269,7 @@
                     <div class="flex flex-col items-center gap-1 group relative w-10">
                         <i id="mindset-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i>
                     </div>
-                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
-                    <div class="flex flex-col items-center gap-1 group relative w-10">
-                        <i id="market-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i>
-                    </div>
-                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
-                    <div class="flex flex-col items-center gap-1 group relative w-10">
-                        <i id="volatility-icon-wrapper" data-lucide="dollar-sign" class="w-7 h-7 text-tp-accent drop-shadow-[0_0_12px_rgba(32,201,151,0.8)] transition-all duration-300 transform"></i>
-                    </div>
+                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div><div id="volatility-coins" class="flex items-center gap-3"></div>
                 </div>
                 <!-- Win Rate Invasivo e Tecnologico -->
                 <div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem] shadow-[0_0_15px_rgba(32,201,151,0.05)]">
@@ -349,6 +342,35 @@
                         </div>
                     </div>
 
+                    <!-- I Nomi di Allah (3 al giorno) -->
+                    <div class="bg-gradient-to-br from-[#161920] to-[#0a0c10] rounded-xl border border-[#20c997]/20 p-5 shadow-[0_0_15px_rgba(32,201,151,0.05)] relative overflow-hidden group">
+                        <div class="absolute -right-6 -top-6 opacity-10 rotate-12 transform group-hover:rotate-6 transition-transform duration-700 pointer-events-none">
+                            <span id="allah-bg-text" class="text-[10rem] font-display text-white">&#1575;&#1604;&#1604;&#1607;</span>
+                        </div>
+                        <div class="flex items-center justify-between mb-4 border-b border-tp-border/50 pb-3 relative z-10">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-[#20c997]">I Nomi di Allah</h3>
+                            <span class="text-[9px] text-tp-muted/70 uppercase tracking-wider font-bold">Oggi · 3</span>
+                        </div>
+                        <div class="relative z-10 mb-5">
+                            <p id="allah-index" class="text-tp-muted text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Nome 1/3 (1/99)</p>
+                            <h2 id="allah-title" class="text-3xl font-bold font-display text-white tracking-tight">Ar-Rahman</h2>
+                            <p id="allah-translation" class="text-base text-tp-accent italic font-serif opacity-90 mt-1">Il Compassionevole</p>
+                            <p id="allah-desc" class="text-xs text-tp-text/80 leading-relaxed italic border-l-2 border-tp-border pl-3 mt-3">Colui la cui misericordia abbraccia incondizionatamente ogni cosa creata.</p>
+                        </div>
+                        <div class="relative z-10 mb-5 border-t border-tp-border/40 pt-4">
+                            <p id="allah-index-2" class="text-tp-muted text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Nome 2/3 (2/99)</p>
+                            <h2 id="allah-title-2" class="text-3xl font-bold font-display text-white tracking-tight">Ar-Rahim</h2>
+                            <p id="allah-translation-2" class="text-base text-tp-accent italic font-serif opacity-90 mt-1">Il Misericordioso</p>
+                            <p id="allah-desc-2" class="text-xs text-tp-text/80 leading-relaxed italic border-l-2 border-tp-border pl-3 mt-3">Colui che elargisce misericordia costante e specifica ai Suoi servi devoti.</p>
+                        </div>
+                        <div class="relative z-10 border-t border-tp-border/40 pt-4">
+                            <p id="allah-index-3" class="text-tp-muted text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Nome 3/3 (3/99)</p>
+                            <h2 id="allah-title-3" class="text-3xl font-bold font-display text-white tracking-tight">Al-Malik</h2>
+                            <p id="allah-translation-3" class="text-base text-tp-accent italic font-serif opacity-90 mt-1">Il Sovrano</p>
+                            <p id="allah-desc-3" class="text-xs text-tp-text/80 leading-relaxed italic border-l-2 border-tp-border pl-3 mt-3">L'Assoluto detentore della sovranita su ogni reame visibile e invisibile.</p>
+                        </div>
+                    </div>
+
                     <!-- (Ordine del Giorno spostato nella sezione hub a tab in center column) -->
                     <!-- (Allert spostati a destra) -->
                 </div>
@@ -374,6 +396,10 @@
                             </button>
                             <button onclick="switchDashTab('dati')" id="dash-tab-dati" class="dash-tab px-4 py-2 rounded-t-lg text-xs font-bold border border-b-0 uppercase transition-all flex items-center gap-2">
                                 <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Dati Giornata
+                            </button>
+                            <button onclick="switchDashTab('processi')" id="dash-tab-processi" class="dash-tab px-4 py-2 rounded-t-lg text-xs font-bold border border-b-0 uppercase transition-all flex items-center gap-2">
+                                <i data-lucide="activity" class="w-3.5 h-3.5"></i> Processi
+                                <span id="processi-badge" class="ml-1 bg-tp-accent/20 text-tp-accent px-1.5 py-0.5 rounded text-[9px] font-bold border border-tp-accent/20"><span id="processi-count">0</span></span>
                             </button>
                         </div>
 
@@ -430,12 +456,6 @@
                                         <button onclick="setMindset('neutral',this)" class="mind-btn p-1 rounded text-tp-muted hover:bg-[#161920]"><i data-lucide="meh" class="w-4 h-4"></i></button>
                                         <button onclick="setMindset('negative',this)" class="mind-btn p-1 rounded text-tp-muted hover:bg-[#161920]"><i data-lucide="frown" class="w-4 h-4"></i></button>
                                     </div>
-                                    <div class="w-px h-5 bg-tp-border"></div>
-                                    <div class="flex gap-1">
-                                        <button onclick="setVolatility('low',this)" class="vol-btn text-[11px] font-bold px-1.5 py-0.5 rounded text-tp-muted hover:bg-[#161920]">$</button>
-                                        <button onclick="setVolatility('medium',this)" class="vol-btn text-[11px] font-bold px-1.5 py-0.5 rounded text-tp-muted hover:bg-[#161920]">$$</button>
-                                        <button onclick="setVolatility('high',this)" class="vol-btn text-[11px] font-bold px-1.5 py-0.5 rounded text-tp-muted hover:bg-[#161920]">$$$</button>
-                                    </div>
                                 </div>
                             </div>
                             <div class="flex items-center justify-between py-2 border-b border-tp-border/50">
@@ -468,6 +488,15 @@
                             </div>
                         </div>
                             </div> <!-- /dash-pane-dati -->
+
+                            <!-- Pane: Processi Attivi -->
+                            <div id="dash-pane-processi" class="dash-pane p-5">
+                                <div id="processi-list" class="space-y-3 pr-2 max-h-[450px] overflow-y-auto custom-scroll">
+                                    <div class="flex items-center justify-center h-32 text-tp-muted text-sm">
+                                        <i data-lucide="loader-2" class="w-5 h-5 animate-spin mr-2"></i> Caricamento...
+                                    </div>
+                                </div>
+                            </div>
                         </div> <!-- /pannello hub -->
                     </div> <!-- /hub flex flex-col -->
 
@@ -551,6 +580,25 @@
                      ========================================== -->
                 <div class="col-span-12 lg:col-span-3 flex flex-col gap-6">
 
+                    <!-- 0. Watchlist -->
+                    <div class="bg-tp-panel rounded-xl border border-tp-border p-4 flex flex-col shadow-lg">
+                        <div class="flex items-center justify-between mb-3 border-b border-tp-border/50 pb-2">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="activity" class="w-4 h-4 text-tp-accent"></i>
+                                <h3 class="text-xs font-bold uppercase tracking-widest text-tp-muted">Watchlist</h3>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button onclick="setWatchSort('default')" id="ws-default" class="ws-btn text-[9px] font-bold px-2 py-0.5 rounded bg-tp-border text-tp-text">Preferite</button>
+                                <button onclick="setWatchSort('pct_desc')" id="ws-pct-desc" class="ws-btn text-[9px] font-bold px-2 py-0.5 rounded text-tp-muted hover:text-white">% ▼</button>
+                                <button onclick="setWatchSort('pct_asc')" id="ws-pct-asc" class="ws-btn text-[9px] font-bold px-2 py-0.5 rounded text-tp-muted hover:text-white">% ▲</button>
+                                <span id="watchlist-updated" class="text-[9px] text-tp-muted/50 ml-1"></span>
+                            </div>
+                        </div>
+                        <div id="watchlist-items" class="space-y-1">
+                            <div class="flex items-center justify-center py-6 text-tp-muted text-xs"><i data-lucide="loader-2" class="w-4 h-4 animate-spin mr-2"></i> Caricamento...</div>
+                        </div>
+                    </div>
+
                     <!-- 1. Chart with Tabs -->
                     <div class="bg-tp-panel rounded-xl border border-tp-border p-5 flex flex-col shadow-lg">
                         <div class="flex items-center justify-between mb-2">
@@ -559,8 +607,6 @@
                             </h3>
                             <div class="flex gap-1 bg-[#0a0c10] border border-tp-border p-1 rounded-lg">
                                 <button onclick="switchDailyChart('usd', this)" class="daily-chart-btn bg-tp-accent/20 text-tp-accent px-2 py-1 rounded text-[10px] font-bold uppercase transition-colors">USD</button>
-                                <button onclick="switchDailyChart('mindset', this)" class="daily-chart-btn text-tp-muted hover:text-white px-2 py-1 rounded text-[10px] font-bold uppercase transition-colors">Mind</button>
-                                <button onclick="switchDailyChart('vol', this)" class="daily-chart-btn text-tp-muted hover:text-white px-2 py-1 rounded text-[10px] font-bold uppercase transition-colors">Vol</button>
                             </div>
                         </div>
                         <div class="relative w-full h-32">
@@ -682,12 +728,6 @@
                             <button onclick="setCloseMindset('neutral')" class="close-mind p-2 rounded-md text-tp-muted hover:bg-[#0a0c10]"><i data-lucide="meh" class="w-5 h-5"></i></button>
                             <button onclick="setCloseMindset('negative')" class="close-mind p-2 rounded-md text-tp-muted hover:bg-[#0a0c10]"><i data-lucide="frown" class="w-5 h-5"></i></button>
                         </div>
-                        <div class="w-px h-8 bg-tp-border"></div>
-                        <div class="flex items-center gap-1 bg-[#161920] p-1.5 rounded-lg border border-tp-border">
-                            <button onclick="setCloseVol('low')" class="close-vol p-2 rounded-md text-tp-muted hover:bg-[#0a0c10]"><i data-lucide="dollar-sign" class="w-5 h-5"></i></button>
-                            <button onclick="setCloseVol('medium')" class="close-vol p-2 rounded-md text-tp-muted hover:bg-[#0a0c10]"><div class="flex"><i data-lucide="dollar-sign" class="w-5 h-5"></i><i data-lucide="dollar-sign" class="w-5 h-5 -ml-2"></i></div></button>
-                            <button onclick="setCloseVol('high')" class="close-vol p-2 rounded-md text-tp-muted hover:bg-[#0a0c10]"><div class="flex"><i data-lucide="dollar-sign" class="w-5 h-5"></i><i data-lucide="dollar-sign" class="w-5 h-5 -ml-2"></i><i data-lucide="dollar-sign" class="w-5 h-5 -ml-2"></i></div></button>
-                        </div>
                     </div>
                 </div>
 
@@ -719,14 +759,13 @@
 
         // Selected values
         let selectedMindset = null;
-        let selectedVolatility = null;
         let activeSessions = { AS: false, LO: false, NY: false };
 
         // ============================================
         // HUB TABS (Corano / ODG / Dati Giornata)
         // ============================================
         window.switchDashTab = function(name) {
-            ['corano', 'dati'].forEach(n => {
+            ['corano', 'dati', 'processi'].forEach(n => {
                 const btn = document.getElementById('dash-tab-' + n);
                 const pane = document.getElementById('dash-pane-' + n);
                 if (!btn || !pane) return;
@@ -788,14 +827,6 @@
             }
 
             // Restore volatility
-            if (data.volatilita) {
-                selectedVolatility = data.volatilita;
-                const volMap = { low: 0, medium: 1, high: 2 };
-                const volColors = { low: 'text-[#f43f5e]', medium: 'text-[#eab308]', high: 'text-[#20c997]' };
-                document.querySelectorAll('.vol-btn').forEach(b => { b.classList.remove('text-[#f43f5e]','text-[#eab308]','text-[#20c997]'); b.classList.add('text-tp-muted'); });
-                const vbtn = document.querySelectorAll('.vol-btn')[volMap[data.volatilita]];
-                if (vbtn) { vbtn.classList.remove('text-tp-muted'); vbtn.classList.add(volColors[data.volatilita]); }
-            }
 
             // Restore note domani
             const noteDomani = document.getElementById('note-domani');
@@ -873,7 +904,7 @@
                 el.classList.add('opacity-60', 'cursor-not-allowed');
             });
             // Disabilita bottoni interattivi (non nav)
-            document.querySelectorAll('.mind-btn, .vol-btn, .session-tog, .tp-check, [onclick*="setFajr"], [onclick*="setMindset"], [onclick*="setVolatility"], [onclick*="toggleSession"]').forEach(function(el) {
+            document.querySelectorAll('.mind-btn, .session-tog, .tp-check, [onclick*="setFajr"], [onclick*="setMindset"], [onclick*="toggleSession"]').forEach(function(el) {
                 el.style.pointerEvents = 'none';
                 el.classList.add('opacity-50');
             });
@@ -1116,21 +1147,6 @@
             db.from('monitora_smile').insert({mindset:value,volatilita:null,sorgente:'giornata'});
         }
 
-        // ============================================
-        // VOLATILITY
-        // ============================================
-        function setVolatility(value, btn) {
-            selectedVolatility = value;
-            document.querySelectorAll('.vol-btn').forEach(b => {
-                b.classList.remove('text-[#f43f5e]','text-[#eab308]','text-[#20c997]');
-                b.classList.add('text-tp-muted');
-            });
-            const colors = { low: 'text-[#f43f5e]', medium: 'text-[#eab308]', high: 'text-[#20c997]' };
-            btn.classList.remove('text-tp-muted');
-            btn.classList.add(colors[value]);
-            // Salva in monitora_smile
-            db.from('monitora_smile').insert({mindset:null,volatilita:value,sorgente:'giornata'});
-        }
 
         // ============================================
         // ALLERT DI OGGI
@@ -1360,8 +1376,8 @@
 
                 if (session) {
                     const coinData = session.coin_data || {};
-                    const hasCoinData = Object.values(coinData).some(c => c && (c.screenshot || (c.high && c.low)));
-                    const isCompiled = hasCoinData && session.mood;
+                    const hasCoinData = Object.values(coinData).some(c => c && (c.high && c.low));
+                    const isCompiled = hasCoinData;
                     if (statusEl) {
                         statusEl.textContent = isCompiled ? 'Compilata' : 'Aperta';
                         statusEl.classList.remove('text-tp-muted','text-tp-accent','text-tp-warning');
@@ -1417,6 +1433,18 @@
             renderBiasGiornataList();
         }
 
+        let _biasNewMindset = null;
+        const _bnmColor = { positive:'#20c997', neutral:'#eab308', negative:'#f43f5e' };
+        const _bnmIcon  = { positive:'smile',   neutral:'meh',     negative:'frown' };
+
+        function setBiasNewMindset(type) {
+            _biasNewMindset = _biasNewMindset === type ? null : type;
+            ['positive','neutral','negative'].forEach(m => {
+                const btn = document.getElementById('bnm-' + m);
+                if (btn) btn.style.color = _biasNewMindset === m ? _bnmColor[m] : 'rgba(128,128,128,0.35)';
+            });
+        }
+
         function renderBiasGiornataList() {
             const container = document.getElementById('bias-list');
             if (!container) return;
@@ -1426,18 +1454,28 @@
             const nowM = String(now.getMinutes()).padStart(2,'0');
             const nowTime = `${nowH}:${nowM}`;
 
-            const rows = _biasGiornataAgg.map((a, i) => `
-                <div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 flex items-start gap-3">
+            const rows = _biasGiornataAgg.map((a, i) => {
+                const moodBadge = a.mindset
+                    ? `<i data-lucide="${_bnmIcon[a.mindset]}" style="width:13px;height:13px;color:${_bnmColor[a.mindset]};flex-shrink:0;margin-top:2px"></i>`
+                    : '';
+                return `<div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 flex items-start gap-3">
                     <span class="text-xs font-bold text-tp-accent tracking-wide whitespace-nowrap mt-0.5">${a.ora || ''}</span>
                     <p class="flex-1 min-w-0 text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed break-words">${(a.testo || '').replace(/</g,'&lt;')}</p>
+                    ${moodBadge}
                     <button type="button" onclick="removeBiasGiornataAgg(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors ml-1 shrink-0 mt-0.5" title="Rimuovi">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
-                </div>`).join('');
+                </div>`;
+            }).join('');
 
             const addForm = `<div class="flex gap-1.5 items-stretch mt-1">
                 <input id="bias-new-ora" type="time" value="${nowTime}" class="bg-[#0a0c10] border border-tp-border rounded-lg px-1.5 py-2 text-xs text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[72px] shrink-0"/>
                 <textarea id="bias-new-testo" rows="2" class="flex-1 bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Aggiungi commento..." oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" onkeydown="if(event.key==='Enter'&&(event.metaKey||event.ctrlKey)){event.preventDefault();addBiasInline()}"></textarea>
+                <div class="flex flex-col justify-center gap-0.5 shrink-0">
+                    <button type="button" onclick="setBiasNewMindset('positive')" id="bnm-positive" style="padding:1px;background:none;border:none;cursor:pointer;color:rgba(128,128,128,0.35)"><i data-lucide="smile" style="width:13px;height:13px"></i></button>
+                    <button type="button" onclick="setBiasNewMindset('neutral')"  id="bnm-neutral"  style="padding:1px;background:none;border:none;cursor:pointer;color:rgba(128,128,128,0.35)"><i data-lucide="meh"   style="width:13px;height:13px"></i></button>
+                    <button type="button" onclick="setBiasNewMindset('negative')" id="bnm-negative" style="padding:1px;background:none;border:none;cursor:pointer;color:rgba(128,128,128,0.35)"><i data-lucide="frown" style="width:13px;height:13px"></i></button>
+                </div>
                 <button type="button" onclick="addBiasInline()" class="w-8 shrink-0 rounded-lg border border-tp-accent text-tp-accent bg-tp-accent/10 hover:bg-tp-accent/20 transition-all flex items-center justify-center">
                     <i data-lucide="plus" class="w-4 h-4"></i>
                 </button>
@@ -1454,7 +1492,9 @@
             const testo = ta?.value?.trim();
             if (!testo) { ta?.focus(); return; }
 
-            const newAgg = { ora, testo };
+            const mindset = _biasNewMindset;
+            _biasNewMindset = null;
+            const newAgg = { ora, testo, mindset: mindset || null };
             const updated = [..._biasGiornataAgg, newAgg].sort((a, b) => (a.ora || '').localeCompare(b.ora || ''));
 
             if (_biasGiornataId) {
@@ -1467,6 +1507,10 @@
             }
             _biasGiornataAgg = updated;
             if (ta) ta.value = '';
+            if (mindset) {
+                const { error: smErr } = await db.from('monitora_smile').insert({ mindset, sorgente: 'bias_commento' });
+                if (smErr) console.error('monitora_smile insert:', smErr);
+            }
             renderBiasGiornataList();
         }
 
@@ -1862,9 +1906,8 @@
                 btn.classList.add('bg-tp-accent/20', 'text-tp-accent');
                 btn.classList.remove('text-tp-muted');
             }
-            var titles = { usd: 'Forza USD (%)', mindset: 'Andamento Mindset', vol: 'Andamento Volatilita' };
             var titleEl = document.getElementById('live-chart-title');
-            if (titleEl) titleEl.innerHTML = '<i data-lucide="line-chart" class="w-4 h-4"></i> ' + titles[type];
+            if (titleEl) titleEl.innerHTML = '<i data-lucide="line-chart" class="w-4 h-4"></i> Forza USD (%)';
             if (typeof lucide !== 'undefined') lucide.createIcons();
             loadDayChartData(type);
         }
@@ -1887,18 +1930,6 @@
                     }
                 } catch(e) {}
                 borderColor = '#f8fafc';
-            } else {
-                var field = type === 'mindset' ? 'mindset' : 'volatilita';
-                var map = type === 'mindset' ? { positive: 1, neutral: 0, negative: -1 } : { high: 3, medium: 2, low: 1 };
-                borderColor = type === 'mindset' ? '#eab308' : '#f43f5e';
-                try {
-                    var result = await db.from('monitora_smile').select('mindset, volatilita, created_at').order('created_at', { ascending: true }).limit(50);
-                    var rows = result.data || [];
-                    if (rows.length) {
-                        labels = rows.map(function(r, i) { return i; });
-                        data = rows.map(function(r) { return map[r[field]] || 0; });
-                    }
-                } catch(e) {}
             }
 
             if (dayChartInstance) dayChartInstance.destroy();
@@ -1922,7 +1953,6 @@
         // CHIUDI GIORNATA
         // ============================================
         var closeMindset = '';
-        var closeVol = '';
 
         async function saveGiornata() {
             if (!giornataId) return;
@@ -1937,7 +1967,6 @@
 
             var updateData = {
                 mindset: selectedMindset,
-                volatilita: selectedVolatility,
                 note_domani: document.getElementById('note-domani') ? document.getElementById('note-domani').value : null,
                 fajr: fajrState, // tri-stato: true=V, false=X, null=non scelto
                 marea: document.getElementById('inp-marea') ? document.getElementById('inp-marea').value : null,
@@ -1991,24 +2020,11 @@
             if (type === 'negative') { btns[2].classList.remove('text-tp-muted'); btns[2].classList.add('text-tp-loss'); }
         }
 
-        function setCloseVol(type) {
-            closeVol = type;
-            document.querySelectorAll('.close-vol').forEach(function(b) {
-                b.classList.remove('text-tp-accent', 'text-tp-warning', 'text-tp-loss');
-                b.classList.add('text-tp-muted');
-            });
-            var btns = document.querySelectorAll('.close-vol');
-            if (type === 'low') { btns[0].classList.remove('text-tp-muted'); btns[0].classList.add('text-tp-loss'); }
-            if (type === 'medium') { btns[1].classList.remove('text-tp-muted'); btns[1].classList.add('text-tp-warning'); }
-            if (type === 'high') { btns[2].classList.remove('text-tp-muted'); btns[2].classList.add('text-tp-accent'); }
-        }
-
         async function confirmChiudi() {
             // Salva MonitoraSmile finale
-            if (closeMindset || closeVol) {
+            if (closeMindset) {
                 await db.from('monitora_smile').insert({
-                    mindset: closeMindset || null,
-                    volatilita: closeVol || null,
+                    mindset: closeMindset,
                     sorgente: 'chiusura_giornata'
                 });
             }
@@ -2025,6 +2041,272 @@
             // Redirect a giornaliero
             window.location.href = 'giornaliero.html';
         }
+
+        // --- Processi Attivi ---
+        function isEaAllert(a) {
+            var d = (a && a.descrizione) || '';
+            return /^(?:Superato|Si avvicina a)\s*[+-]?[0-9]+(?:\.[0-9]+)?%/.test(d)
+                || /^FVG\s+(?:long|short)\s/i.test(d)
+                || /^EMA\d+\s/i.test(d);
+        }
+
+        async function loadProcessiAttivi() {
+            const container = document.getElementById('processi-list');
+            const countEl = document.getElementById('processi-count');
+            if (!container) return;
+            let tickets = [];
+            try {
+                const { data: giornate } = await db.from('giornate').select('id, data').eq('stato', 'nuovo');
+                if (giornate) giornate.forEach(g => tickets.push({ type: 'giornata', label: 'Giornata Da Compilare', title: 'Giornata ' + (g.data || ''), desc: 'Compilare la giornata con note, mindset e sessioni.', id: g.id, link: 'dettaglio_giornata.html?id=' + g.id, color: 'teal', table: 'giornate' }));
+                const { data: trades } = await db.from('trades').select('id, asset').eq('stato', 'nuovo');
+                if (trades) trades.forEach(t => tickets.push({ type: 'trade', label: 'Trade Da Lavorare', title: 'Trade ' + (t.asset || ''), desc: 'Trade da compilare con screenshot, strategia e mindset.', id: t.id, link: 'dettaglio_trade.html?id=' + t.id, color: 'warning', table: 'trades' }));
+                const now = new Date();
+                const today = now.toLocaleDateString('sv-SE', { timeZone: 'Africa/Casablanca' });
+                const nowHHMM = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+                const { data: allerts } = await db.from('allert').select('id, titolo, data_evento, ora_evento').eq('stato', 'nuovo').lte('data_evento', today);
+                ((allerts || []).filter(a => { if (!a.data_evento) return false; if (a.data_evento < today) return true; const ora = (a.ora_evento || '').substring(0,5); return !ora || ora <= nowHHMM; })).forEach(a => tickets.push({ type: 'allert', label: 'Notizia Da Validare', title: a.titolo || 'Notizia', desc: "L'orario e scattato. Inserire dati per archiviare.", id: a.id, link: 'allert.html?openNews=' + a.id, color: 'purple', table: 'allert' }));
+                const { data: allertPrezzo } = await db.from('allert_prezzo').select('id, coin, prezzo, ora, descrizione, created_at').eq('stato', 'nuovo');
+                ((allertPrezzo || []).filter(ap => !isEaAllert(ap))).forEach(ap => { const oraStr = ap.ora ? ap.ora.substring(0,5) : (ap.created_at ? new Date(ap.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Casablanca'}) : ''); tickets.push({ type: 'allert_prezzo', label: 'Allert Da Validare', title: (ap.coin || '') + ' @ ' + (ap.prezzo || ''), desc: (ap.descrizione || 'Alert prezzo triggerato') + (oraStr ? ' - ' + oraStr : ''), id: ap.id, link: 'allert.html?openAllert=' + ap.id, color: 'tp-warning', table: 'allert_prezzo' }); });
+                try {
+                    const { data: cronache } = await db.from('cronache').select('id, titolo').eq('stato', 'nuovo');
+                    if (cronache) cronache.forEach(c => tickets.push({ type: 'cronaca', label: 'Cronaca Da Compilare', title: c.titolo || 'Cronaca', desc: 'Cronaca da compilare con dettagli e analisi.', id: c.id, link: 'dettaglio_cronaca.html?id=' + c.id, color: 'teal', table: 'cronache' }));
+                } catch(e) {}
+            } catch(err) { console.error('Errore caricamento processi:', err); }
+            if (countEl) countEl.textContent = tickets.length;
+            if (tickets.length === 0) {
+                container.innerHTML = '<div class="flex flex-col items-center justify-center h-32 text-tp-muted text-sm"><i data-lucide="check-circle" class="w-8 h-8 mb-2 text-tp-accent"></i>Nessun processo in attesa</div>';
+                lucide.createIcons({ root: container });
+                return;
+            }
+            const colorMap = {
+                teal: { bar: 'bg-teal-500/80', badge: 'bg-teal-500/10 text-teal-400 border-teal-500/20', hover: 'hover:border-teal-500/40', btnHover: 'hover:bg-teal-500/20 hover:text-teal-400 hover:border-teal-500/30', txtHover: 'group-hover:text-teal-400' },
+                warning: { bar: 'bg-tp-warning/80', badge: 'bg-tp-warning/10 text-tp-warning border-tp-warning/20', hover: 'hover:border-tp-warning/40', btnHover: 'hover:bg-tp-warning/20 hover:text-tp-warning hover:border-tp-warning/30', txtHover: 'group-hover:text-tp-warning' },
+                purple: { bar: 'bg-purple-500/80', badge: 'bg-purple-500/10 text-purple-400 border-purple-500/20', hover: 'hover:border-purple-500/40', btnHover: 'hover:bg-purple-500/20 hover:text-purple-400 hover:border-purple-500/30', txtHover: 'group-hover:text-purple-400' },
+                'tp-warning': { bar: 'bg-tp-warning/80', badge: 'bg-tp-warning/10 text-tp-warning border-tp-warning/20', hover: 'hover:border-tp-warning/40', btnHover: 'hover:bg-tp-warning/20 hover:text-tp-warning hover:border-tp-warning/30', txtHover: 'group-hover:text-tp-warning' }
+            };
+            container.innerHTML = tickets.map(t => {
+                const c = colorMap[t.color] || colorMap.teal;
+                return `<div class="bg-[#0a0c10] border border-tp-border ${c.hover} rounded-lg p-3 transition-all group shadow-sm relative overflow-hidden" data-ticket-id="${t.id}" data-ticket-table="${t.table}">
+                    <div class="absolute inset-y-0 left-0 w-1 ${c.bar}"></div>
+                    <div class="flex justify-between items-start ml-2">
+                        <div class="flex flex-col gap-1 flex-1 pr-4">
+                            <div class="flex items-center gap-2"><span class="${c.badge} border px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest">${t.label}</span><h4 class="text-sm font-bold text-white ${c.txtHover} transition-colors">${t.title}</h4></div>
+                            <p class="text-[10px] text-tp-muted leading-relaxed">${t.desc}</p>
+                        </div>
+                        <div class="flex gap-1.5 mt-1 shrink-0">
+                            <button onclick="window.location.href='${t.link}'" class="bg-tp-border ${c.btnHover} text-tp-text rounded p-2 transition-colors border border-transparent" title="Apri"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="ignoreTicket(this,'${t.table}','${t.id}')" class="bg-tp-border hover:bg-tp-loss/20 hover:text-tp-loss text-tp-muted rounded p-2 transition-colors border border-transparent hover:border-tp-loss/30" title="Ignora"><i data-lucide="x" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            lucide.createIcons({ root: container });
+        }
+
+        async function ignoreTicket(btn, table, id) {
+            try {
+                await db.from(table).update({ stato: 'ignorato' }).eq('id', id);
+                const card = btn.closest('[data-ticket-id]');
+                if (card) card.remove();
+                const countEl = document.getElementById('processi-count');
+                const remaining = document.querySelectorAll('#processi-list [data-ticket-id]').length;
+                if (countEl) countEl.textContent = remaining;
+            } catch(err) { console.error('Errore ignore:', err); }
+        }
+        window.ignoreTicket = ignoreTicket;
+
+        loadProcessiAttivi();
+
+        // --- Watchlist ---
+        var watchlistData = [];
+        var watchSort = 'default';
+        var WATCH_ORDER = ['XAUUSD', 'US30', 'GER30', 'NAS100', 'BTCUSD'];
+
+        function setWatchSort(mode) {
+            watchSort = mode;
+            document.querySelectorAll('.ws-btn').forEach(function(b) { b.classList.remove('bg-tp-border', 'text-tp-text'); b.classList.add('text-tp-muted'); });
+            var btn = document.getElementById('ws-' + mode.replace('_', '-'));
+            if (btn) { btn.classList.add('bg-tp-border', 'text-tp-text'); btn.classList.remove('text-tp-muted'); }
+            renderWatchlist();
+        }
+
+        function renderWatchlist() {
+            var container = document.getElementById('watchlist-items');
+            if (!container || !watchlistData.length) return;
+            var sorted = watchlistData.slice();
+            if (watchSort === 'default') {
+                sorted.sort(function(a, b) { var ia = WATCH_ORDER.indexOf(a.simbolo); var ib = WATCH_ORDER.indexOf(b.simbolo); if (ia === -1) ia = 999; if (ib === -1) ib = 999; return ia - ib; });
+            } else if (watchSort === 'pct_desc') {
+                sorted.sort(function(a, b) { return parseFloat(b.pct_change || 0) - parseFloat(a.pct_change || 0); });
+            } else if (watchSort === 'pct_asc') {
+                sorted.sort(function(a, b) { return parseFloat(a.pct_change || 0) - parseFloat(b.pct_change || 0); });
+            }
+            container.innerHTML = sorted.map(function(w) {
+                var pct = w.pct_change || '0';
+                var pctNum = parseFloat(pct);
+                var isPos = pctNum > 0; var isNeg = pctNum < 0;
+                var pctColor = isPos ? 'text-tp-accent' : isNeg ? 'text-tp-loss' : 'text-tp-muted';
+                var bgColor = isPos ? 'bg-tp-accent/5' : isNeg ? 'bg-tp-loss/5' : 'bg-transparent';
+                var arrow = isPos ? '▲' : isNeg ? '▼' : '';
+                var pctDisplay = (isPos ? '+' : '') + pctNum.toFixed(2) + '%';
+                var posBadge = '';
+                if (w.posizione === 'sopra') posBadge = '<span class="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-tp-accent/15 text-tp-accent border border-tp-accent/40" title="Asian H ' + (w.asian_high || '?') + ' / L ' + (w.asian_low || '?') + '">↑ sopra</span>';
+                else if (w.posizione === 'sotto') posBadge = '<span class="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-tp-loss/15 text-tp-loss border border-tp-loss/40" title="Asian H ' + (w.asian_high || '?') + ' / L ' + (w.asian_low || '?') + '">↓ sotto</span>';
+                else if (w.posizione === 'dentro') posBadge = '<span class="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-tp-muted/15 text-tp-muted border border-tp-muted/40" title="Asian H ' + (w.asian_high || '?') + ' / L ' + (w.asian_low || '?') + '">= dentro</span>';
+                return '<div class="flex items-center justify-between px-3 py-2.5 rounded-lg ' + bgColor + ' hover:bg-tp-panelHover transition-colors">' +
+                    '<div class="flex items-center gap-2 min-w-0"><span class="text-sm font-bold text-white">' + (w.simbolo || '') + '</span>' + posBadge + '</div>' +
+                    '<div class="flex items-center gap-3"><span class="text-sm font-bold text-tp-text tabular-nums">' + (w.prezzo || '--') + '</span>' +
+                    '<span class="text-xs font-bold ' + pctColor + ' tabular-nums min-w-[65px] text-right">' + arrow + ' ' + pctDisplay + '</span></div></div>';
+            }).join('');
+        }
+
+        async function loadWatchlist() {
+            var container = document.getElementById('watchlist-items');
+            if (!container) return;
+            try {
+                var { data, error } = await db.from('watchlist').select('*');
+                if (error || !data || !data.length) { container.innerHTML = '<p class="text-xs text-tp-muted/50 italic text-center py-4">Nessun dato</p>'; return; }
+                watchlistData = data;
+                renderWatchlist();
+                var latest = data.reduce(function(max, w) { return w.updated_at > max ? w.updated_at : max; }, '');
+                if (latest) {
+                    var d = new Date(latest);
+                    document.getElementById('watchlist-updated').textContent = d.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit', timeZone:'Africa/Casablanca' });
+                }
+            } catch(e) { console.warn('Watchlist:', e); }
+        }
+
+        loadWatchlist();
+
+        // --- 99 Nomi di Allah ---
+        const ALLAH_NAMES_99 = [
+            { trans: "Ar-Rahman", arab: "الرَّحْمَنُ", meaning: "Il Compassionevole", desc: "Colui la cui misericordia abbraccia incondizionatamente ogni cosa creata, dal piu piccolo granello di sabbia alla piu vasta galassia. La Sua compassione precede ogni altra cosa ed e la fonte di ogni bene." },
+            { trans: "Ar-Rahim", arab: "الرَّحِيمُ", meaning: "Il Misericordioso", desc: "Colui che elargisce misericordia costante e specifica ai Suoi servi devoti. La Sua misericordia e un fiume inesauribile che scorre verso chi si volge a Lui con sincerita." },
+            { trans: "Al-Malik", arab: "الْمَلِكُ", meaning: "Il Sovrano", desc: "L'Assoluto detentore della sovranita su ogni reame visibile e invisibile. Il Suo dominio e perfetto, senza rivali ne limiti, e tutto esiste sotto la Sua autorita." },
+            { trans: "Al-Quddus", arab: "الْقُدُّوسُ", meaning: "Il Purissimo", desc: "Colui che e assolutamente puro e libero da ogni imperfezione, difetto o mancanza. La Sua santita trascende ogni comprensione umana ed e la fonte di ogni purificazione." },
+            { trans: "As-Salam", arab: "السَّلاَمُ", meaning: "La Pace", desc: "La fonte di ogni pace e sicurezza. Colui che salva le Sue creature da ogni pericolo e imperfezione. Da Lui emana la serenita che pervade i cuori dei credenti." },
+            { trans: "Al-Mu'min", arab: "الْمُؤْمِنُ", meaning: "Il Garante della Fede", desc: "Colui che conferma la verita e dona sicurezza ai cuori. Egli e il custode della fede, che illumina le anime e protegge dalla falsita e dal dubbio." },
+            { trans: "Al-Muhaymin", arab: "الْمُهَيْمِنُ", meaning: "Il Custode Vigilante", desc: "Colui che veglia su ogni cosa con attenzione assoluta. Nulla sfugge alla Sua osservazione, ed Egli protegge e preserva ogni creatura con cura infinita." },
+            { trans: "Al-Aziz", arab: "الْعَزِيزُ", meaning: "L'Eccelso in Potenza", desc: "Colui la cui potenza e invincibile e la cui dignita e ineguagliabile. Nessuna forza puo resistere alla Sua volonta, e la Sua gloria pervade l'intero creato." },
+            { trans: "Al-Jabbar", arab: "الْجَبَّارُ", meaning: "Il Riparatore Supremo", desc: "Colui che ripara cio che e spezzato e ristabilisce l'ordine. Egli risana i cuori afflitti e restaura cio che sembra irrimediabilmente perduto con la Sua potenza infinita." },
+            { trans: "Al-Mutakabbir", arab: "الْمُتَكَبِّرُ", meaning: "Il Supremo in Grandezza", desc: "Colui la cui grandezza trascende ogni immaginazione. Solo a Lui appartiene la vera grandezza, e ogni orgoglio nelle creature e un mero riflesso imperfetto della Sua maesta." },
+            { trans: "Al-Khaliq", arab: "الْخَالِقُ", meaning: "Il Creatore", desc: "Colui che porta all'esistenza dal nulla con la Sua sola volonta. Ogni forma di vita, ogni stella e ogni atomo esistono grazie al Suo atto creativo originale." },
+            { trans: "Al-Bari'", arab: "الْبَارِئُ", meaning: "Il Plasmatore dal Nulla", desc: "Colui che evolve e sviluppa le creature donando loro forma distinta e unica. Egli libera l'esistenza dal caos primordiale, plasmandola con ordine e bellezza." },
+            { trans: "Al-Musawwir", arab: "الْمُصَوِّرُ", meaning: "Il Modellatore delle Forme", desc: "Colui che da a ogni creatura la sua forma unica e irripetibile. Ogni volto, ogni foglia, ogni fiocco di neve porta l'impronta della Sua arte divina infinita." },
+            { trans: "Al-Ghaffar", arab: "الْغَفَّارُ", meaning: "Il Perdonatore", desc: "Colui che perdona ripetutamente e copre i peccati con il Suo velo di misericordia. La Sua capacita di perdonare non ha limiti e abbraccia ogni anima pentita." },
+            { trans: "Al-Qahhar", arab: "الْقَهَّارُ", meaning: "Il Dominatore Irresistibile", desc: "Colui che sottomette ogni cosa alla Sua volonta con potenza irresistibile. Nessuna forza nel creato puo opporsi al Suo decreto, e ogni tiranno e impotente davanti a Lui." },
+            { trans: "Al-Wahhab", arab: "الْوَهَّابُ", meaning: "Il Donatore Generoso", desc: "Colui che dona abbondantemente senza che Gli venga chiesto e senza aspettarsi ricompensa. I Suoi doni fluiscono incessantemente come pioggia benefica su tutta la creazione." },
+            { trans: "Ar-Razzaq", arab: "الرَّزَّاقُ", meaning: "Il Provveditore", desc: "Colui che provvede il sostentamento a ogni creatura vivente, dalla formica nascosta alla balena negli abissi. Il Suo provvedere e garantito e non conosce esaurimento." },
+            { trans: "Al-Fattah", arab: "الْفَتَّاحُ", meaning: "Colui che Apre", desc: "Colui che apre le porte della misericordia e della conoscenza. Egli rimuove gli ostacoli e dischiude i sentieri della comprensione a chi cerca con sincerita." },
+            { trans: "Al-'Alim", arab: "اَلْعَلِيْمُ", meaning: "L'Onnisciente", desc: "Colui la cui conoscenza abbraccia ogni cosa, dal visibile all'invisibile, dal passato al futuro. Nulla e nascosto alla Sua sapienza, nemmeno il piu segreto pensiero." },
+            { trans: "Al-Qabid", arab: "الْقَابِضُ", meaning: "Colui che Trattiene", desc: "Colui che contrae e trattiene per saggezza divina. Egli restringe il sostentamento o il cuore come prova, per poi espandere con generosita ancor piu grande." },
+            { trans: "Al-Basit", arab: "الْبَاسِطُ", meaning: "Colui che Espande", desc: "Colui che espande e allarga con generosita. Egli dilata i cuori con gioia e fede, e stende la Sua provvidenza su chi si rivolge a Lui con fiducia." },
+            { trans: "Al-Khafid", arab: "الْخَافِضُ", meaning: "Colui che Abbassa", desc: "Colui che abbassa gli arroganti e i tiranni dalla loro posizione elevata. La Sua giustizia ristabilisce l'equilibrio e umilia chi si e innalzato ingiustamente." },
+            { trans: "Ar-Rafi'", arab: "الرَّافِعُ", meaning: "Colui che Innalza", desc: "Colui che innalza i Suoi servi in rango e dignita. Egli eleva gli umili e i giusti, conferendo loro onore e stazione elevata presso di Se." },
+            { trans: "Al-Mu'izz", arab: "الْمُعِزُّ", meaning: "Il Datore di Onore", desc: "Colui che conferisce onore e dignita a chi vuole. L'onore vero proviene solo da Lui, e chi Egli onora non potra mai essere realmente umiliato." },
+            { trans: "Al-Mudhill", arab: "الْمُذِلُّ", meaning: "Colui che Umilia", desc: "Colui che toglie l'onore a chi persiste nella ribellione e nell'ingiustizia. Il Suo decreto porta umilta ai cuori induriti e giustizia dove regna l'oppressione." },
+            { trans: "As-Sami'", arab: "السَّمِيعُ", meaning: "L'Audiente", desc: "Colui che ascolta ogni suono, ogni sussurro, ogni preghiera silenziosa del cuore. Il Suo udito abbraccia l'intero universo e nessuna invocazione e mai ignorata." },
+            { trans: "Al-Basir", arab: "الْبَصِيرُ", meaning: "Il Vedente", desc: "Colui che vede ogni cosa con chiarezza assoluta, dal movimento dell'atomo nel buio piu profondo al volo dell'uccello nelle altezze del cielo. Nulla e celato al Suo sguardo." },
+            { trans: "Al-Hakam", arab: "الْحَكَمُ", meaning: "Il Giudice Supremo", desc: "Colui il cui giudizio e definitivo e perfettamente giusto. Le Sue sentenze sono irrevocabili e contengono una saggezza che trascende la comprensione umana." },
+            { trans: "Al-'Adl", arab: "الْعَدْلُ", meaning: "Il Giusto", desc: "Colui che e la giustizia stessa nella sua forma piu pura. Non vi e nemmeno l'ombra di ingiustizia nelle Sue azioni, e ogni Suo decreto porta equilibrio perfetto." },
+            { trans: "Al-Latif", arab: "اللَّطِيفُ", meaning: "Il Sottile e Gentile", desc: "Colui la cui gentilezza e cosi sottile e raffinata da essere impercettibile. Egli opera attraverso vie misteriose e delicate, portando bene anche dove non ci si aspetta." },
+            { trans: "Al-Khabir", arab: "الْخَبِيرُ", meaning: "Il Consapevole di Tutto", desc: "Colui che conosce la realta interiore di ogni cosa. La Sua consapevolezza penetra nelle profondita nascoste dell'esistenza, oltre ogni apparenza superficiale." },
+            { trans: "Al-Halim", arab: "الْحَلِيمُ", meaning: "Il Clemente", desc: "Colui che non affretta la punizione nonostante la disobbedienza delle creature. La Sua clemenza offre sempre il tempo per il pentimento e la correzione." },
+            { trans: "Al-'Azim", arab: "الْعَظِيمُ", meaning: "L'Immenso", desc: "Colui la cui grandezza e magnificenza sono oltre ogni misura e comprensione. La Sua immensita abbraccia tutto cio che esiste ed e fonte di venerazione infinita." },
+            { trans: "Al-Ghafur", arab: "الْغَفُورُ", meaning: "Il Perdonatore Copioso", desc: "Colui che perdona abbondantemente e ripetutamente. La Sua capacita di perdonare e come un oceano senza fondo che accoglie ogni pentimento sincero senza mai respingerlo." },
+            { trans: "Ash-Shakur", arab: "الشَّكُورُ", meaning: "Il Riconoscente", desc: "Colui che apprezza e ricompensa abbondantemente anche il piu piccolo atto di bene. La Sua gratitudine verso i servi moltiplica ogni buona azione in misura incommensurabile." },
+            { trans: "Al-'Aliyy", arab: "الْعَلِيُّ", meaning: "L'Altissimo", desc: "Colui che e al di sopra di tutto in rango, potere e perfezione. La Sua elevatezza non ha pari e trascende ogni concetto di altezza fisica o spirituale." },
+            { trans: "Al-Kabir", arab: "الْكَبِيرُ", meaning: "Il Grande", desc: "Colui la cui grandezza e incommensurabile e incomparabile. Tutto nel creato, per quanto vasto e maestoso, e infinitamente piccolo rispetto alla Sua magnificenza." },
+            { trans: "Al-Hafiz", arab: "الْحَفِيظُ", meaning: "Il Preservatore", desc: "Colui che preserva e protegge ogni cosa dall'annientamento. La Sua custodia mantiene l'equilibrio dell'universo e salvaguarda ogni creatura dal male." },
+            { trans: "Al-Muqit", arab: "الْمُقِيتُ", meaning: "Il Nutritore", desc: "Colui che sostenta e nutre ogni creatura con cio di cui ha bisogno, sia materialmente che spiritualmente. Il Suo nutrimento sostiene ogni forma di vita in ogni istante." },
+            { trans: "Al-Hasib", arab: "الْحَسِيبُ", meaning: "Colui che Tiene il Conto", desc: "Colui che tiene conto di ogni cosa con precisione infinita. Nessun atto, parola o pensiero sfugge al Suo calcolo, e il Suo rendiconto e perfetto e completo." },
+            { trans: "Al-Jalil", arab: "الْجَلِيلُ", meaning: "Il Maestoso", desc: "Colui la cui maesta ispira reverenza e venerazione. La Sua grandezza e accompagnata da una bellezza che riempie i cuori di timore reverenziale e meraviglia." },
+            { trans: "Al-Karim", arab: "الْكَرِيمُ", meaning: "Il Generoso", desc: "Colui la cui generosita non ha limiti e non richiede contropartita. Egli dona senza misura, perdona senza condizione e onora senza che il servo lo meriti." },
+            { trans: "Ar-Raqib", arab: "الرَّقِيبُ", meaning: "Il Vigilante", desc: "Colui che osserva ogni cosa in ogni istante senza mai distrarsi. La Sua vigilanza e costante e onnicomprensiva, abbracciando ogni dettaglio dell'esistenza." },
+            { trans: "Al-Mujib", arab: "الْمُجِيبُ", meaning: "Colui che Risponde", desc: "Colui che risponde alle preghiere e alle suppliche dei Suoi servi. La Sua risposta e sempre presente, anche quando giunge in forme che l'essere umano non si aspetta." },
+            { trans: "Al-Wasi'", arab: "الْوَاسِعُ", meaning: "L'Immenso in Vastita", desc: "Colui la cui capacita e conoscenza abbracciano ogni cosa senza limiti. La Sua vastita comprende e supera ogni dimensione concepibile dello spazio e del tempo." },
+            { trans: "Al-Hakim", arab: "الْحَكِيمُ", meaning: "Il Saggio", desc: "Colui che agisce con saggezza perfetta in ogni cosa. Ogni Suo decreto contiene una sapienza profonda, anche quando la mente umana non riesce a comprenderla." },
+            { trans: "Al-Wadud", arab: "الْوَدُودُ", meaning: "L'Amorevole", desc: "Colui il cui amore per le Sue creature e puro, incondizionato e inesauribile. Il Suo amore e la forza che muove l'universo e sostiene ogni legame di affetto tra gli esseri." },
+            { trans: "Al-Majid", arab: "الْمَجِيدُ", meaning: "Il Glorioso", desc: "Colui la cui gloria e magnificenza sono senza paragone. La Sua nobilta e generosita si manifestano in ogni aspetto della creazione con splendore travolgente." },
+            { trans: "Al-Ba'ith", arab: "الْبَاعِثُ", meaning: "Colui che Risuscita", desc: "Colui che riporta alla vita dopo la morte e risveglia i cuori dalla negligenza. Il Suo potere di resurrezione e assoluto e si manifesta in ogni primavera della natura." },
+            { trans: "Ash-Shahid", arab: "اشَّهِيدُ", meaning: "Il Testimone", desc: "Colui che e testimone di ogni cosa che accade nell'universo. La Sua testimonianza e la piu veritiera e nulla puo essere nascosto o alterato davanti a Lui." },
+            { trans: "Al-Haqq", arab: "الْحَقُّ", meaning: "La Verita Assoluta", desc: "Colui che e la Verita stessa nella sua essenza piu pura. La Sua esistenza e la realta fondamentale su cui si fonda ogni altra verita e ogni altra esistenza." },
+            { trans: "Al-Wakil", arab: "الْوَكِيلُ", meaning: "Il Garante Fiduciario", desc: "Colui al quale ci si puo affidare completamente per la gestione dei propri affari. La Sua tutela e la piu sicura e chi si affida a Lui non sara mai deluso." },
+            { trans: "Al-Qawiyy", arab: "الْقَوِيُّ", meaning: "Il Forte", desc: "Colui la cui forza e illimitata e non conosce debolezza o stanchezza. La Sua potenza sostiene l'intero universo senza il minimo sforzo o diminuzione." },
+            { trans: "Al-Matin", arab: "الْمَتِينُ", meaning: "Il Saldo", desc: "Colui la cui fermezza e solidita sono incrollabili. Il Suo potere e inesauribile e la Sua determinazione e irremovibile, senza mai vacillare o indebolirsi." },
+            { trans: "Al-Waliyy", arab: "الْوَلِيُّ", meaning: "Il Protettore Amico", desc: "Colui che e l'amico e il protettore piu vicino ai Suoi servi. La Sua amicizia e una luce che guida nelle tenebre e un sostegno che non viene mai meno." },
+            { trans: "Al-Hamid", arab: "الْحَمِيدُ", meaning: "Il Lodato", desc: "Colui che e degno di ogni lode e ringraziamento. Ogni forma di perfezione e bellezza nell'universo e motivo per lodare Lui, la fonte di ogni bene." },
+            { trans: "Al-Muhsi", arab: "الْمُحْصِي", meaning: "Colui che Enumera", desc: "Colui che conosce il numero esatto di ogni cosa nell'universo. Ogni goccia di pioggia, ogni foglia caduta, ogni battito di cuore sono contati nella Sua conoscenza infinita." },
+            { trans: "Al-Mubdi'", arab: "الْمُبْدِئُ", meaning: "L'Originatore", desc: "Colui che da inizio alla creazione dal nulla assoluto, senza modello precedente. La Sua capacita creativa e senza precedenti e ogni inizio porta la Sua impronta unica." },
+            { trans: "Al-Mu'id", arab: "الْمُعِيدُ", meaning: "Colui che Restaura", desc: "Colui che riporta la creazione all'esistenza dopo il suo annientamento. Il Suo potere di restaurazione e una promessa di rinnovamento eterno per tutto cio che e stato." },
+            { trans: "Al-Muhyi", arab: "الْمُحْيِي", meaning: "Il Datore di Vita", desc: "Colui che da la vita a cio che era privo di essa. La vita in ogni sua forma, dal primo respiro del neonato al germogliare del seme, e un dono della Sua potenza creatrice." },
+            { trans: "Al-Mumit", arab: "الْمُمِيتُ", meaning: "Colui che Da la Morte", desc: "Colui che decreta la fine della vita terrena per ogni creatura. La morte non e distruzione ma un passaggio verso un'altra dimensione dell'esistenza decretata da Lui." },
+            { trans: "Al-Hayy", arab: "الْحَيُّ", meaning: "Il Vivente", desc: "Colui la cui vita e eterna, senza inizio ne fine. La Sua vita e la fonte di ogni altra vita e non dipende da nulla, mentre tutto dipende da Lui per esistere." },
+            { trans: "Al-Qayyum", arab: "الْقَيُّومُ", meaning: "L'Autosufficiente", desc: "Colui che sussiste di per Se e sostiene l'intera creazione. Senza il Suo sostegno costante, l'universo cesserebbe di esistere in un istante. Egli non ha bisogno di nulla." },
+            { trans: "Al-Wajid", arab: "الْوَاجِدُ", meaning: "Colui che Trova", desc: "Colui che possiede tutto e non manca di nulla. Ogni cosa cercata e gia presente nella Sua conoscenza e potere, e nulla puo sottrarsi alla Sua percezione." },
+            { trans: "Al-Majid", arab: "الْمَاجِدُ", meaning: "Il Nobile Glorioso", desc: "Colui la cui nobilta e gloria sono estreme e la cui generosita e illimitata. La Sua magnificenza si manifesta attraverso atti di infinita benevolenza e splendore." },
+            { trans: "Al-Wahid", arab: "الْوَاحِدُ", meaning: "L'Unico", desc: "Colui che e unico nella Sua essenza, nei Suoi attributi e nelle Sue azioni. Non vi e nulla che Gli sia simile e la Sua unicita e il fondamento di ogni verita." },
+            { trans: "Al-Ahad", arab: "الأحَدُ", meaning: "L'Uno Indivisibile", desc: "Colui che e assolutamente Uno, senza parti, senza composizione e senza molteplicita. La Sua unita e la verita piu profonda e fondamentale dell'intera esistenza." },
+            { trans: "As-Samad", arab: "الصَّمَدُ", meaning: "L'Eterno Rifugio", desc: "Colui al quale tutte le creature si rivolgono nelle loro necessita. Egli e il rifugio ultimo, autosufficiente e completo, da cui tutto dipende e che non dipende da nulla." },
+            { trans: "Al-Qadir", arab: "الْقَادِرُ", meaning: "L'Onnipotente", desc: "Colui che ha potere assoluto su ogni cosa. La Sua capacita di agire e illimitata e quando decide una cosa, dice 'Sii' e quella cosa diviene istantaneamente." },
+            { trans: "Al-Muqtadir", arab: "الْمُقْتَدِرُ", meaning: "Il Prevalente in Potere", desc: "Colui il cui potere e supremo e si manifesta con piena efficacia. Nulla puo impedire la realizzazione della Sua volonta e ogni cosa e sotto il Suo controllo totale." },
+            { trans: "Al-Muqaddim", arab: "الْمُقَدِّمُ", meaning: "Colui che Anticipa", desc: "Colui che porta avanti chi vuole e accelera cio che desidera. La Sua saggezza determina l'ordine delle cose e il tempo in cui ogni evento si manifesta." },
+            { trans: "Al-Mu'akhkhir", arab: "الْمُؤَخِّرُ", meaning: "Colui che Posticipa", desc: "Colui che ritarda e pospone secondo la Sua saggezza infinita. Il Suo ritardo non e dimenticanza ma pianificazione divina, e ogni indugio nasconde un proposito perfetto." },
+            { trans: "Al-Awwal", arab: "الأوَّلُ", meaning: "Il Primo", desc: "Colui che esiste prima di ogni cosa, senza inizio. La Sua anteriorita e assoluta e non vi fu mai un momento in cui Egli non esistesse. Tutto ha origine da Lui." },
+            { trans: "Al-Akhir", arab: "الآخِرُ", meaning: "L'Ultimo", desc: "Colui che rimarra dopo la scomparsa di ogni cosa creata. La Sua permanenza e eterna e quando tutto cessera, solo Lui rimarra nella Sua gloria infinita e immutabile." },
+            { trans: "Az-Zahir", arab: "الظَّاهِرُ", meaning: "Il Manifesto", desc: "Colui la cui esistenza e evidente attraverso i segni della Sua creazione. Ogni meraviglia dell'universo e una testimonianza della Sua presenza manifesta e innegabile." },
+            { trans: "Al-Batin", arab: "الْبَاطِنُ", meaning: "Il Nascosto", desc: "Colui la cui essenza e nascosta alla percezione delle creature. Nessun senso o intelletto puo afferrare la Sua vera natura, che rimane un mistero insondabile." },
+            { trans: "Al-Wali", arab: "الْوَالِي", meaning: "Il Governante", desc: "Colui che governa l'intero universo con autorita assoluta. La Sua gestione del creato e perfetta, senza errore o trascuratezza, abbracciando ogni dettaglio dell'esistenza." },
+            { trans: "Al-Muta'ali", arab: "الْمُتَعَالِي", meaning: "L'Eccelso Trascendente", desc: "Colui che e sublimemente elevato al di sopra di ogni attributo delle creature. La Sua trascendenza supera ogni concetto e ogni tentativo di definizione umana." },
+            { trans: "Al-Barr", arab: "الْبَرُّ", meaning: "Il Benefico", desc: "Colui la cui bonta e dolcezza pervadono ogni aspetto dell'esistenza. La Sua benevolenza si estende a tutte le creature, meritevoli o meno, con generosita sconfinata." },
+            { trans: "At-Tawwab", arab: "التَّوَّابُ", meaning: "Colui che Accetta il Pentimento", desc: "Colui che accoglie continuamente il pentimento sincero dei Suoi servi. La Sua porta e sempre aperta per chi ritorna con cuore contrito, e la Sua gioia nel perdonare e immensa." },
+            { trans: "Al-Muntaqim", arab: "الْمُنتَقِمُ", meaning: "Il Vendicatore Giusto", desc: "Colui che retribuisce con giustizia chi persiste nell'oppressione e nel male. La Sua retribuzione non e vendetta cieca ma ristabilimento dell'ordine e della giustizia divina." },
+            { trans: "Al-'Afuww", arab: "الْعَفُوُّ", meaning: "Il Perdonatore Totale", desc: "Colui che cancella completamente i peccati come se non fossero mai esistiti. Il Suo perdono non lascia traccia e restituisce al servo la purezza originale del cuore." },
+            { trans: "Ar-Ra'uf", arab: "الرَّؤُوفُ", meaning: "Il Compassionevole Tenero", desc: "Colui la cui tenerezza e compassione sono estremamente delicate e profonde. La Sua dolcezza verso le creature supera la tenerezza di una madre verso il suo neonato." },
+            { trans: "Malik-ul-Mulk", arab: "مَالِكُ الْمُلْكِ", meaning: "Il Signore del Regno", desc: "Colui che possiede il dominio assoluto su ogni reame dell'esistenza. Il Suo regno e senza confini e ogni sovranita terrena e un prestito temporaneo dalla Sua autorita." },
+            { trans: "Dhul-Jalali wal-Ikram", arab: "ذُو الْجَلاَلِ وَالْإِكْرَامِ", meaning: "Signore di Maesta e Generosita", desc: "Colui che riunisce in Se la maesta piu sublime e la generosita piu nobile. Il Suo volto e degno di venerazione eterna e la Sua generosita non ha paragone nell'esistenza." },
+            { trans: "Al-Muqsit", arab: "الْمُقْسِطُ", meaning: "L'Equo", desc: "Colui che stabilisce la giustizia con perfetto equilibrio. La Sua equita non conosce favoritismi e ogni creatura riceve esattamente cio che le spetta con precisione divina." },
+            { trans: "Al-Jami'", arab: "الْجَامِعُ", meaning: "Colui che Riunisce", desc: "Colui che riunira tutte le creature nel Giorno del Giudizio e che unifica gli opposti con armonia. La Sua capacita di riunire abbraccia ogni dimensione dell'esistenza." },
+            { trans: "Al-Ghaniyy", arab: "الْغَنِيُّ", meaning: "Il Ricco di Se", desc: "Colui che e totalmente autosufficiente e non ha bisogno di nulla e di nessuno. La Sua ricchezza e intrinseca e immutabile, mentre tutto il creato ha bisogno di Lui." },
+            { trans: "Al-Mughni", arab: "الْمُغْنِي", meaning: "L'Arricchitore", desc: "Colui che arricchisce chi vuole tra le Sue creature. La Sua capacita di donare abbondanza, sia materiale che spirituale, e illimitata e si manifesta con generosita divina." },
+            { trans: "Al-Mani'", arab: "الْمَانِعُ", meaning: "Il Difensore che Impedisce", desc: "Colui che impedisce cio che potrebbe nuocere alle Sue creature. La Sua protezione e uno scudo invisibile che blocca il male prima che possa raggiungere i Suoi servi." },
+            { trans: "Ad-Darr", arab: "الضَّارُّ", meaning: "Colui che Puo Causare Afflizione", desc: "Colui che permette la prova e la difficolta come mezzo di purificazione e crescita. Le afflizioni che decreta contengono saggezza nascosta e sono strumenti di elevazione spirituale." },
+            { trans: "An-Nafi'", arab: "النَّافِعُ", meaning: "Il Benefattore", desc: "Colui che crea il beneficio e il vantaggio per le Sue creature. Ogni bene che raggiunge una creatura proviene dalla Sua volonta benefica e dalla Sua grazia illimitata." },
+            { trans: "An-Nur", arab: "النُّورُ", meaning: "La Luce", desc: "Colui che e la Luce dei cieli e della terra. La Sua luce illumina ogni oscurita, guida ogni anima smarrita e rivela la verita nascosta dietro i veli dell'apparenza." },
+            { trans: "Al-Hadi", arab: "الْهَادِي", meaning: "La Guida", desc: "Colui che guida le creature sulla retta via con sapienza e misericordia. La Sua guida e la bussola dell'anima, che conduce verso la verita attraverso ogni nebbia di confusione." },
+            { trans: "Al-Badi'", arab: "الْبَدِيعُ", meaning: "L'Originatore Incomparabile", desc: "Colui che crea con originalita assoluta, senza modello precedente. Ogni Sua creazione e un capolavoro unico che non ha eguali ne precedenti nella storia dell'esistenza." },
+            { trans: "Al-Baqi", arab: "الْبَاقِي", meaning: "L'Eterno", desc: "Colui la cui esistenza e permanente e non conosce fine. Mentre tutto nel creato e transitorio e destinato a perire, Egli solo rimane eternamente nella Sua perfezione." },
+            { trans: "Al-Warith", arab: "الْوَارِثُ", meaning: "L'Erede Supremo", desc: "Colui che eredita tutto dopo la scomparsa delle creature. Quando ogni cosa tornera al nulla, solo Lui rimarra come il legittimo possessore di tutto cio che fu." },
+            { trans: "Ar-Rashid", arab: "الرَّشِيدُ", meaning: "La Guida Retta", desc: "Colui che guida con perfetta rettitudine e conduce ogni cosa verso la sua giusta destinazione. La Sua direzione e infallibile e porta sempre al bene ultimo e definitivo." },
+            { trans: "As-Sabur", arab: "الصَّبُورُ", meaning: "Il Paziente", desc: "Colui la cui pazienza e infinita e non Si affretta nel punire. La Sua longanimita da tempo al peccatore di pentirsi e al negligente di risvegliarsi, con clemenza senza fine." }
+        ];
+
+        function initNomiDiAllah99() {
+            var titleEl = document.getElementById('allah-title');
+            if (!titleEl) return;
+            var now = new Date();
+            var start = new Date(now.getFullYear(), 0, 0);
+            var diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+            var dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+            var baseIdx = (dayOfYear * 3) % 99;
+            var indices = [0, 1, 2].map(function(i) { return (baseIdx + i) % 99; });
+            var n1 = ALLAH_NAMES_99[indices[0]];
+            document.getElementById('allah-index').textContent = 'Nome 1/3 (' + (indices[0] + 1) + '/99)';
+            document.getElementById('allah-bg-text').textContent = n1.arab;
+            titleEl.textContent = n1.trans;
+            document.getElementById('allah-translation').textContent = n1.meaning;
+            document.getElementById('allah-desc').textContent = n1.desc;
+            for (var i = 1; i <= 2; i++) {
+                var n = ALLAH_NAMES_99[indices[i]];
+                var slot = i + 1;
+                document.getElementById('allah-index-' + slot).textContent = 'Nome ' + slot + '/3 (' + (indices[i] + 1) + '/99)';
+                document.getElementById('allah-title-' + slot).textContent = n.trans;
+                document.getElementById('allah-translation-' + slot).textContent = n.meaning;
+                document.getElementById('allah-desc-' + slot).textContent = n.desc;
+            }
+        }
+
+        initNomiDiAllah99();
 
         // Render ordine del giorno (popolato dalla routine cloud)
     </script>

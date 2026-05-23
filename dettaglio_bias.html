@@ -123,10 +123,10 @@
             <div class="flex items-center gap-4 w-auto min-w-max">
                 <div>
                     <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Bias</h1>
-                    <div class="flex gap-2.5 mt-1">
+                    <div class="flex flex-col gap-1 mt-1"><div class="flex gap-2">
                         <a href="index.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i> Dashboard</a>
                         <a href="tabella_trades.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Tabella Trades</a>
-                        <a href="#" onclick="goToOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Oggi</a>
+                        <a href="#" onclick="goToOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Oggi</a></div><div class="flex gap-2"><a href="#" onclick="goToSessioniOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="layers" class="w-3.5 h-3.5"></i> Sessioni</a><a href="#" onclick="goToBiasOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="brain" class="w-3.5 h-3.5"></i> Bias</a><a href="#" onclick="goToIpotesiOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="target" class="w-3.5 h-3.5"></i> Ipotesi</a></div>
                     </div>
                 </div>
             </div>
@@ -161,9 +161,7 @@
                 <div class="hidden xl:flex items-center gap-6 bg-gradient-to-b from-[#13161c] to-[#0a0c10] border border-tp-border/40 px-6 py-3 rounded-2xl shadow-inner h-16 mr-4">
                     <div class="flex flex-col items-center gap-1 w-10"><i id="mindset-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i></div>
                     <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
-                    <div class="flex flex-col items-center gap-1 w-10"><i id="market-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i></div>
-                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
-                    <div class="flex flex-col items-center gap-1 w-10"><i id="volatility-icon-wrapper" data-lucide="dollar-sign" class="w-7 h-7 text-tp-accent drop-shadow-[0_0_12px_rgba(32,201,151,0.8)] transition-all duration-300 transform"></i></div>
+                    <div id="volatility-coins" class="flex items-center gap-3"></div>
                 </div>
                 <div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem] shadow-[0_0_15px_rgba(32,201,151,0.05)]">
                     <div class="flex flex-col">
@@ -229,6 +227,11 @@
                             <div class="flex gap-2 items-stretch">
                                 <input id="agg-ora" type="time" class="bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[110px] flex-shrink-0"/>
                                 <textarea id="agg-testo" rows="2" class="flex-1 bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Es: London ha rispettato 4720, prima reazione long visibile, bias confermato" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'"></textarea>
+                                <div class="flex flex-col justify-center gap-1">
+                                    <button type="button" onclick="toggleNewMindset('positive')" id="nm-positive" style="padding:2px;background:none;border:none;cursor:pointer;color:rgba(128,128,128,0.35)" title="positivo"><i data-lucide="smile" style="width:14px;height:14px"></i></button>
+                                    <button type="button" onclick="toggleNewMindset('neutral')"  id="nm-neutral"  style="padding:2px;background:none;border:none;cursor:pointer;color:rgba(128,128,128,0.35)" title="neutro"><i data-lucide="meh"   style="width:14px;height:14px"></i></button>
+                                    <button type="button" onclick="toggleNewMindset('negative')" id="nm-negative" style="padding:2px;background:none;border:none;cursor:pointer;color:rgba(128,128,128,0.35)" title="negativo"><i data-lucide="frown" style="width:14px;height:14px"></i></button>
+                                </div>
                                 <button type="button" onclick="addAggiornamento()" id="agg-btn" class="px-4 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 hover:bg-tp-accent/20 uppercase transition-all flex items-center gap-2">
                                     <i data-lucide="plus" class="w-4 h-4"></i> Aggiungi
                                 </button>
@@ -575,6 +578,18 @@
             return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         }
 
+        const moodColor = { positive:'#20c997', neutral:'#eab308', negative:'#f43f5e' };
+        const moodIcon  = { positive:'smile',   neutral:'meh',     negative:'frown' };
+        let newCommentoMindset = null;
+
+        function toggleNewMindset(type) {
+            newCommentoMindset = newCommentoMindset === type ? null : type;
+            ['positive','neutral','negative'].forEach(m => {
+                const btn = document.getElementById('nm-' + m);
+                if (btn) btn.style.color = newCommentoMindset === m ? moodColor[m] : 'rgba(128,128,128,0.35)';
+            });
+        }
+
         function renderAggiornamenti() {
             const list = document.getElementById('aggiornamenti-list');
             if (!list) return;
@@ -582,15 +597,19 @@
                 list.innerHTML = `<p class="text-xs text-tp-muted/60 italic">Nessun commento ancora.</p>`;
                 return;
             }
-            list.innerHTML = commentiGiornata.map((a, i) => `
-                <div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 flex items-start gap-3">
+            list.innerHTML = commentiGiornata.map((a, i) => {
+                const moodBadge = a.mindset
+                    ? `<i data-lucide="${moodIcon[a.mindset]}" style="width:13px;height:13px;color:${moodColor[a.mindset]};flex-shrink:0;margin-top:2px"></i>`
+                    : '';
+                return `<div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 flex items-start gap-3">
                     <span class="text-xs font-bold text-tp-accent tracking-wide whitespace-nowrap mt-0.5">${escapeAggHtml(a.ora)}</span>
                     <p class="flex-1 text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escapeAggHtml(a.testo)}</p>
-                    <button type="button" onclick="removeAggiornamento(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors flex-shrink-0" title="Rimuovi">
+                    ${moodBadge}
+                    <button type="button" onclick="removeAggiornamento(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors flex-shrink-0 mt-0.5" title="Rimuovi">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
             if (window.lucide) lucide.createIcons();
         }
 
@@ -601,9 +620,16 @@
             const ora = (oraEl.value || '').trim();
             const testo = (testoEl.value || '').trim();
             if (!ora || !testo) { alert('Compila orario e testo prima di aggiungere'); return; }
-            commentiGiornata.push({ ora, testo });
+            const mindset = newCommentoMindset;
+            commentiGiornata.push({ ora, testo, mindset: mindset || null });
             commentiGiornata.sort((a,b) => (a.ora || '').localeCompare(b.ora || ''));
             testoEl.value = '';
+            newCommentoMindset = null;
+            ['positive','neutral','negative'].forEach(m => { const b = document.getElementById('nm-'+m); if(b) b.style.color='rgba(128,128,128,0.35)'; });
+            if (mindset) {
+                const { error: smErr } = await db.from('monitora_smile').insert({ mindset, sorgente: 'bias_commento' });
+                if (smErr) console.error('monitora_smile insert:', smErr);
+            }
             renderAggiornamenti();
             const { error } = await db.from('bias').update({ commenti_giornata: commentiGiornata }).eq('id', biasId);
             if (error) {

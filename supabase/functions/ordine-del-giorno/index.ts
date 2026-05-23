@@ -1,4 +1,4 @@
-// Ordine del giorno — Edge Function
+﻿// Ordine del giorno — Edge Function
 // Schedule: pg_cron 30 6 * * 1-5 UTC = 07:30 Casablanca (UTC+1, no DST, lun-ven)
 // Blocchi:
 // 1) Macro eventi oggi (allert)
@@ -184,7 +184,7 @@ serve(async (req) => {
       "Sistema i monitor in modalita analisi: Telegram + Claude Desktop / TradingView + Bull Clock / MT4 panoramica mercato",
       "Apri nuova giornata dalla dashboard",
       "Compila le cronache di ieri",
-      "Crea i reperti bias",
+      "Crea i bias bias",
       "Metti gli screen e ricontrolla Asia",
       "Crea le tue ipotesi su AsiaSweep",
       "Non tradare, segui il sistema",

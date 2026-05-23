@@ -1,4 +1,4 @@
-        <!-- ==============================================
+﻿        <!-- ==============================================
              HEADER UNIVERSALE
              ============================================== -->
         <header class="flex justify-between items-center px-8 py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
@@ -7,10 +7,10 @@
             <div class="flex items-center gap-4 w-auto min-w-max">
                 <div>
                     <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">{TITLE}</h1>
-                    <div class="flex gap-2.5 mt-1">
+                    <div class="flex flex-col gap-1 mt-1"><div class="flex gap-2">
                         <a href="index.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i> Dashboard</a>
                         <a href="tabella_trades.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Tabella Trades</a>
-                        <a href="#" onclick="goToOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Oggi</a>
+                        <a href="#" onclick="goToOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Oggi</a></div><div class="flex gap-2"><a href="#" onclick="goToSessioniOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="layers" class="w-3.5 h-3.5"></i> Sessioni</a><a href="#" onclick="goToBiasOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="brain" class="w-3.5 h-3.5"></i> Bias</a><a href="#" onclick="goToIpotesiOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="target" class="w-3.5 h-3.5"></i> Ipotesi</a></div>
                     </div>
                 </div>
             </div>
@@ -59,14 +59,7 @@
                     <div class="flex flex-col items-center gap-1 group relative w-10">
                         <i id="mindset-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i>
                     </div>
-                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
-                    <div class="flex flex-col items-center gap-1 group relative w-10">
-                        <i id="market-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i>
-                    </div>
-                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
-                    <div class="flex flex-col items-center gap-1 group relative w-10">
-                        <i id="volatility-icon-wrapper" data-lucide="dollar-sign" class="w-7 h-7 text-tp-accent drop-shadow-[0_0_12px_rgba(32,201,151,0.8)] transition-all duration-300 transform"></i>
-                    </div>
+                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div><div id="volatility-coins" class="flex items-center gap-3"></div>
                 </div>
                 <!-- Win Rate Invasivo e Tecnologico -->
                 <div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem] shadow-[0_0_15px_rgba(32,201,151,0.05)]">
