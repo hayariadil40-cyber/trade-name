@@ -60,6 +60,13 @@
         .stato-badge-chiuso { background: rgba(132,141,151,0.15); border: 1px solid rgba(132,141,151,0.4); color: #848d97; }
         .bias-readonly input, .bias-readonly select, .bias-readonly textarea { pointer-events: none; opacity: 0.65; }
         .bias-readonly button:not(.cat-tab):not(#back-btn):not([data-allow-readonly]) { pointer-events: none; opacity: 0.4; }
+        .h4-sq { width:100%;height:38px;border-radius:6px;font-size:11px;font-weight:800;border:1px solid rgba(128,128,128,0.25);color:rgba(128,128,128,0.22);background:transparent;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;justify-content:center; }
+        .h4-sq:hover { opacity:0.7; }
+        .h4-sq.h4-long   { background:rgba(32,201,151,0.15); border-color:#20c997; color:#20c997; }
+        .h4-sq.h4-short  { background:rgba(244,63,94,0.15);  border-color:#f43f5e; color:#f43f5e; }
+        .h4-sq.h4-neutro { background:rgba(234,179,8,0.15);  border-color:#eab308; color:#eab308; }
+        .h4-sq.h4-live { border-style: dashed; animation: h4pulse 2s ease-in-out infinite; }
+        @keyframes h4pulse { 0%,100%{ opacity:1 } 50%{ opacity:0.55 } }
     </style>
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -437,6 +444,7 @@
                     restoreSelections('sel-ipotesi', data.categorizzatori.ipotesi || []);
                 }, 500);
             }
+            startH4LiveTimer();
         }
 
         function restoreSelections(selectId, ids) {
@@ -774,6 +782,29 @@
                             <i data-lucide="x" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
+                    <!-- Bias Strutturale H4 -->
+                    <div class="rounded-xl border border-tp-border p-3" style="background:rgba(11,14,20,0.9)">
+                        <div class="flex items-center justify-between mb-2.5">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-white/60 flex items-center gap-2"
+                                title="LONG → chiude sopra ultimo max H4 rilevante&#10;SHORT → chiude sotto ultimo min H4 rilevante&#10;NEUTRO → oscilla / 2+ chiuse senza nuovi estremi&#10;&#10;Cambio direzione SOLO su rottura del livello opposto.&#10;Una candela singola contraria NON cambia il bias.">
+                                Bias Strutturale
+                                <span style="color:#20c997;font-size:8px;letter-spacing:0.12em;background:rgba(32,201,151,0.1);border:1px solid rgba(32,201,151,0.3);padding:1px 6px;border-radius:4px;font-weight:900">H4</span>
+                            </span>
+                            <span style="font-size:9px;color:rgba(255,255,255,0.18);font-style:italic">candela 1 → 6</span>
+                        </div>
+                        <div class="grid gap-1.5" style="grid-template-columns:repeat(6,1fr)">
+                            ${['03:00','07:00','11:00','15:00','19:00','23:00'].map((time,qi) => {
+                                const val = Array.isArray(d.bias_h4) ? (d.bias_h4[qi] || null) : null;
+                                const cls = val === 'long' ? 'h4-long' : val === 'short' ? 'h4-short' : val === 'neutro' ? 'h4-neutro' : '';
+                                const innerLbl = val === 'long' ? 'L' : val === 'short' ? 'S' : val === 'neutro' ? 'N' : `<span style="font-size:8px;opacity:0.22">${qi+1}</span>`;
+                                const timeCol = val === 'long' ? '#20c997' : val === 'short' ? '#f43f5e' : val === 'neutro' ? '#eab308' : 'rgba(255,255,255,0.22)';
+                                return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                                    <span data-h4-time-slot="${qi}" style="font-size:8px;font-weight:700;color:${timeCol};letter-spacing:0.02em;transition:color 0.15s">${time}</span>
+                                    <button type="button" onclick="toggleH4Square('${activeAsset}',${qi})" class="h4-sq ${cls}" data-h4-slot="${qi}" title="H4 ${time}: ${val || 'vuoto'} — click per cambiare">${innerLbl}</button>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>
                     <!-- Lista aggiornamenti -->
                     <div id="bias-panel-agg-list" class="space-y-2">
                         ${aggs.length ? aggs.map((a,i) => {
@@ -810,6 +841,7 @@
                 </div>
             `;
             if (window.lucide) lucide.createIcons();
+            loadLiveH4Slot(activeAsset);
         }
 
         function setNewBiasAggDir(dir) {
@@ -841,6 +873,64 @@
             if (!activeAsset || !coinData[activeAsset]) return;
             coinData[activeAsset].aggiornamenti.splice(i, 1);
             renderBiasAssetPanel();
+        }
+
+        async function toggleH4Square(asset, idx) {
+            if (!coinData[asset]) return;
+            if (!Array.isArray(coinData[asset].bias_h4)) coinData[asset].bias_h4 = Array(6).fill(null);
+            const cycle = [null, 'long', 'short', 'neutro'];
+            const cur = coinData[asset].bias_h4[idx];
+            const next = cycle[(cycle.indexOf(cur) + 1) % cycle.length];
+            coinData[asset].bias_h4[idx] = next;
+            renderBiasAssetPanel();
+            if (biasId) await db.from('bias').update({ coin_data: coinData }).eq('id', biasId);
+        }
+
+        // --- LIVE H4 SLOT (candela in corso) ---
+        function getCurrentH4LiveSlot() {
+            const now = new Date();
+            const casaHour = (now.getUTCHours() + 1) % 24;
+            const totalMin = casaHour * 60 + now.getUTCMinutes();
+            const closes = [180, 420, 660, 900, 1140, 1380]; // 03:00..23:00 Casablanca in minuti
+            for (let i = 0; i < closes.length; i++) {
+                if (totalMin < closes[i]) return i;
+            }
+            return 0; // dopo le 23:00 → prossima chiusura è 03:00 (slot 0)
+        }
+
+        async function loadLiveH4Slot(asset) {
+            if (!asset) return;
+            const { data } = await db
+                .from('watchlist')
+                .select('prezzo, h4_high, h4_low')
+                .eq('simbolo', asset)
+                .eq('active', true)
+                .maybeSingle();
+            if (!data || !data.prezzo || !data.h4_high || !data.h4_low) return;
+            const price = parseFloat(data.prezzo);
+            const h4h   = parseFloat(data.h4_high);
+            const h4l   = parseFloat(data.h4_low);
+            if (!price || !h4h || !h4l) return;
+            const slot   = getCurrentH4LiveSlot();
+            const btn    = document.querySelector('[data-h4-slot="' + slot + '"]');
+            const timeLbl = document.querySelector('[data-h4-time-slot="' + slot + '"]');
+            if (!btn) return;
+            const liveVal   = price > h4h ? 'long' : price < h4l ? 'short' : 'neutro';
+            const liveClass = liveVal === 'long' ? 'h4-long' : liveVal === 'short' ? 'h4-short' : 'h4-neutro';
+            const liveCol   = liveVal === 'long' ? '#20c997' : liveVal === 'short' ? '#f43f5e' : '#eab308';
+            btn.className   = 'h4-sq h4-live ' + liveClass;
+            btn.innerHTML   = liveVal === 'long' ? 'L' : liveVal === 'short' ? 'S' : 'N';
+            if (timeLbl) {
+                timeLbl.style.color      = liveCol;
+                timeLbl.style.fontWeight = '900';
+                timeLbl.style.opacity    = '1';
+            }
+        }
+
+        let h4LiveTimer = null;
+        function startH4LiveTimer() {
+            if (h4LiveTimer) clearInterval(h4LiveTimer);
+            h4LiveTimer = setInterval(() => { if (activeAsset) loadLiveH4Slot(activeAsset); }, 5 * 60 * 1000);
         }
 
         // --- SCREENSHOT ASSET ---
