@@ -380,7 +380,7 @@
                     const today = new Date().toISOString().split('T')[0];
                     const { data, error } = await db
                         .from('bias')
-                        .insert({ data: today, asset: '' })
+                        .insert({ data: today })
                         .select()
                         .single();
                     if (error) { alert('Errore creazione: ' + error.message); return; }
@@ -793,7 +793,7 @@
                             <span style="font-size:9px;color:rgba(255,255,255,0.18);font-style:italic">candela 1 → 6</span>
                         </div>
                         <div class="grid gap-1.5" style="grid-template-columns:repeat(6,1fr)">
-                            ${['03:00','07:00','11:00','15:00','19:00','23:00'].map((time,qi) => {
+                            ${['23:00','03:00','07:00','11:00','15:00','19:00'].map((time,qi) => {
                                 const val = Array.isArray(d.bias_h4) ? (d.bias_h4[qi] || null) : null;
                                 const cls = val === 'long' ? 'h4-long' : val === 'short' ? 'h4-short' : val === 'neutro' ? 'h4-neutro' : '';
                                 const innerLbl = val === 'long' ? 'L' : val === 'short' ? 'S' : val === 'neutro' ? 'N' : `<span style="font-size:8px;opacity:0.22">${qi+1}</span>`;
