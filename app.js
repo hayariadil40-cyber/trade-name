@@ -35,6 +35,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Lucide icons
     if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    // Auto-refresh se la tab era in background da più di 5 minuti
+    let _tdLastVisible = Date.now();
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') {
+            if (Date.now() - _tdLastVisible > 5 * 60 * 1000) location.reload();
+        } else {
+            _tdLastVisible = Date.now();
+        }
+    });
 });
 
 // ==========================================

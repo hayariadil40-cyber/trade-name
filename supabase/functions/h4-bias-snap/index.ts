@@ -48,21 +48,17 @@ function getJustClosedSlot(): number {
 
 function calcBias(
   h4Close: number,
-  prev: { h4_high: number; h4_low: number; is_inside: boolean; bias: string } | null
+  h4High: number,
+  h4Low: number,
+  prev: { is_inside: boolean; bias: string } | null
 ): { bias: string; is_inside: boolean } {
-  if (!prev) return { bias: "neutro", is_inside: false };
+  // Breakout: confronto close vs range della candela appena chiusa (self-contained)
+  if (h4Close > h4High) return { bias: "long",  is_inside: false };
+  if (h4Close < h4Low)  return { bias: "short", is_inside: false };
 
-  if (h4Close > prev.h4_high) return { bias: "long",  is_inside: false };
-  if (h4Close < prev.h4_low)  return { bias: "short", is_inside: false };
-
-  // Candela inside range
-  if (prev.is_inside) {
-    // 2 consecutive inside → neutro definitivo
-    return { bias: "neutro", is_inside: true };
-  } else {
-    // 1 sola inside: mantieni bias precedente (singola contraria non cambia)
-    return { bias: prev.bias, is_inside: true };
-  }
+  // Inside range: usa prevSnap solo per la regola "2 consecutive inside"
+  if (prev?.is_inside) return { bias: "neutro", is_inside: true };
+  return { bias: prev?.bias ?? "neutro", is_inside: true };
 }
 
 serve(async (req) => {
@@ -123,9 +119,7 @@ serve(async (req) => {
         .limit(1)
         .maybeSingle();
 
-      const { bias, is_inside } = calcBias(price, prevSnap ? {
-        h4_high:   parseFloat(prevSnap.h4_high),
-        h4_low:    parseFloat(prevSnap.h4_low),
+      const { bias, is_inside } = calcBias(price, h4High, h4Low, prevSnap ? {
         is_inside: prevSnap.is_inside,
         bias:      prevSnap.bias,
       } : null);

@@ -192,7 +192,31 @@
         }
 
         function goToToday() { currentDateStr = casaTodayStr(); loadSessions(); }
-        function goToOggi(e) { if (e) e.preventDefault(); goToToday(); }
+
+        async function goToOggi(e) {
+            if (e) e.preventDefault();
+            const today = casaTodayStr();
+            const { data } = await db.from('giornate').select('id').eq('data', today).maybeSingle();
+            if (data?.id) window.location.href = 'dettaglio_giornata.html?id=' + data.id;
+        }
+
+        function goToSessioniOggi(e) {
+            if (e) e.preventDefault();
+            goToToday();
+        }
+
+        async function goToBiasOggi(e) {
+            if (e) e.preventDefault();
+            const today = casaTodayStr();
+            const { data } = await db.from('bias').select('id').eq('data', today).maybeSingle();
+            if (data?.id) window.location.href = 'dettaglio_bias.html?id=' + data.id;
+            else window.location.href = 'dettaglio_bias.html';
+        }
+
+        function goToIpotesiOggi(e) {
+            if (e) e.preventDefault();
+            window.location.href = 'ipotesi.html?date=' + casaTodayStr();
+        }
 
         function updateDateDisplay() {
             const d = new Date(currentDateStr + 'T00:00:00Z');

@@ -735,7 +735,7 @@
                 return;
             }
             opts.forEach(v => {
-                const isOn = ipotesi.sessione === v;
+                const isOn = (ipotesi.sessione || '').toLowerCase() === v.toLowerCase();
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = isOn ? 'chip-btn on' : 'chip-btn off';
@@ -1359,6 +1359,18 @@
         async function saveIpotesi() {
             if (ipotesi && ipotesi.stato === 'osservata') {
                 alert('Ipotesi osservata: bloccata, non modificabile.');
+                return;
+            }
+            if (!ipotesi.asset) {
+                alert('Asset obbligatorio — seleziona un asset prima di salvare.');
+                return;
+            }
+            if (!ipotesi.sessione) {
+                alert('Sessione obbligatoria — seleziona London, NewYork o Asia prima di salvare.');
+                return;
+            }
+            if (!Array.isArray(ipotesi.dove_entro_flagged) || !ipotesi.dove_entro_flagged.length) {
+                alert('Ingresso obbligatorio — spunta almeno un punto "Dove entro" prima di salvare.');
                 return;
             }
             await saveCommentoPost();
