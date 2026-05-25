@@ -726,12 +726,19 @@
             panelEl.classList.remove('hidden');
             tabsEl.innerHTML = keys.map(a => {
                 const isActive = a === activeAsset;
-                const hasAgg = Array.isArray(coinData[a]?.aggiornamenti) && coinData[a].aggiornamenti.length > 0;
+                const aggs = Array.isArray(coinData[a]?.aggiornamenti) ? coinData[a].aggiornamenti : [];
+                const lastDir = aggs.length ? aggs[aggs.length - 1]?.direzione : null;
                 const cls = isActive
                     ? 'border-tp-accent bg-tp-accent/10 text-white'
-                    : hasAgg
-                        ? 'border-tp-warning bg-tp-warning/10 text-tp-warning hover:bg-tp-warning/20'
-                        : 'border-tp-loss/50 bg-tp-loss/5 text-tp-loss/70 hover:border-tp-loss hover:text-tp-loss';
+                    : lastDir === 'long'
+                        ? 'border-[#20c997] bg-[rgba(32,201,151,0.12)] text-[#20c997] hover:bg-[rgba(32,201,151,0.2)]'
+                        : lastDir === 'short'
+                            ? 'border-[#f43f5e] bg-[rgba(244,63,94,0.12)] text-[#f43f5e] hover:bg-[rgba(244,63,94,0.2)]'
+                            : lastDir === 'neutro'
+                                ? 'border-[#eab308] bg-[rgba(234,179,8,0.12)] text-[#eab308] hover:bg-[rgba(234,179,8,0.2)]'
+                                : aggs.length
+                                    ? 'border-tp-warning/50 bg-tp-warning/5 text-tp-warning/70 hover:border-tp-warning hover:text-tp-warning'
+                                    : 'border-tp-border text-tp-muted hover:border-tp-accent/50';
                 return `<button type="button" onclick="switchBiasAsset('${a}')"
                     class="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${cls}">
                     ${a}

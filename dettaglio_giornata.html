@@ -74,6 +74,13 @@
         .agg-dir-btn.agg-long  { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
         .agg-dir-btn.agg-short { background: rgba(244,63,94,0.15);  border-color: #f43f5e; color: #f43f5e; }
         .agg-dir-btn.agg-neutro{ background: rgba(234,179,8,0.15);  border-color: #eab308; color: #eab308; }
+        .h4-sq { width:100%;height:38px;border-radius:6px;font-size:11px;font-weight:800;border:1px solid rgba(128,128,128,0.25);color:rgba(128,128,128,0.22);background:transparent;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;justify-content:center; }
+        .h4-sq:hover { opacity:0.7; }
+        .h4-sq.h4-long   { background:rgba(32,201,151,0.15); border-color:#20c997; color:#20c997; }
+        .h4-sq.h4-short  { background:rgba(244,63,94,0.15);  border-color:#f43f5e; color:#f43f5e; }
+        .h4-sq.h4-neutro { background:rgba(234,179,8,0.15);  border-color:#eab308; color:#eab308; }
+        .h4-sq.h4-live { border-style: dashed; animation: h4pulse 2s ease-in-out infinite; }
+        @keyframes h4pulse { 0%,100%{ opacity:1 } 50%{ opacity:0.55 } }
 
         /* Hub tabs (Corano / ODG / Dati Giornata) */
         .dash-tab.active { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
@@ -1419,6 +1426,7 @@
             if (!gjActiveAsset || !gjCoinData[gjActiveAsset]) gjActiveAsset = 'XAUUSD';
             renderGjAssetTabs();
             if (gjActiveAsset) renderGjAssetPanel();
+            startGjH4LiveTimer();
 
             const btnLink = document.getElementById('btn-nuovo-bias');
             if (btnLink) {
@@ -1601,8 +1609,21 @@
             if (msgEl)  msgEl.classList.add('hidden');
             if (panelEl) panelEl.classList.remove('hidden');
             if (tabsEl) tabsEl.innerHTML = keys.map(a => {
-                const active = a === gjActiveAsset;
-                return `<button type="button" onclick="gjSwitchAsset('${a}')" class="px-3 py-1 rounded-lg text-xs font-bold border transition-all ${active ? 'border-tp-accent bg-tp-accent/10 text-white' : 'border-tp-border text-tp-muted hover:border-tp-accent/50'}">${a}</button>`;
+                const isActive = a === gjActiveAsset;
+                const aggs = Array.isArray(gjCoinData[a]?.aggiornamenti) ? gjCoinData[a].aggiornamenti : [];
+                const lastDir = aggs.length ? aggs[aggs.length - 1]?.direzione : null;
+                const cls = isActive
+                    ? 'border-tp-accent bg-tp-accent/10 text-white'
+                    : lastDir === 'long'
+                        ? 'border-[#20c997] bg-[rgba(32,201,151,0.12)] text-[#20c997] hover:bg-[rgba(32,201,151,0.2)]'
+                        : lastDir === 'short'
+                            ? 'border-[#f43f5e] bg-[rgba(244,63,94,0.12)] text-[#f43f5e] hover:bg-[rgba(244,63,94,0.2)]'
+                            : lastDir === 'neutro'
+                                ? 'border-[#eab308] bg-[rgba(234,179,8,0.12)] text-[#eab308] hover:bg-[rgba(234,179,8,0.2)]'
+                                : aggs.length
+                                    ? 'border-tp-warning/50 bg-tp-warning/5 text-tp-warning/70 hover:border-tp-warning hover:text-tp-warning'
+                                    : 'border-tp-border text-tp-muted hover:border-tp-accent/50';
+                return `<button type="button" onclick="gjSwitchAsset('${a}')" class="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${cls}">${a}</button>`;
             }).join('');
             if (window.lucide) lucide.createIcons();
         }
@@ -1629,6 +1650,15 @@
                     </div>
                 </div>`).join('') : '<p class="text-xs text-tp-muted/60 italic">Nessun aggiornamento ancora.</p>';
 
+            const _h4Slots = gjCoinData[gjActiveAsset]?.bias_h4 || Array(6).fill(null);
+            const h4Html = `<div class="mt-1"><label class="text-[9px] font-bold uppercase tracking-widest text-tp-muted/50 mb-1.5 block">Bias Strutturale H4</label><div class="grid grid-cols-6 gap-1">${
+                ['23:00','03:00','07:00','11:00','15:00','19:00'].map((time, qi) => {
+                    const b = _h4Slots[qi];
+                    const cls = b === 'long' ? 'h4-long' : b === 'short' ? 'h4-short' : b === 'neutro' ? 'h4-neutro' : '';
+                    return `<button type="button" class="h4-sq ${cls}" data-h4-slot="${qi}" data-h4-time-slot="${time}" onclick="gjToggleH4Square('${gjActiveAsset}',${qi})">${time}</button>`;
+                }).join('')
+            }</div></div>`;
+
             panel.innerHTML = `
                 <div class="bg-[#0a0c10] border border-tp-border rounded-xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
@@ -1637,6 +1667,7 @@
                             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
+                    ${h4Html}
                     <div id="gj-panel-agg-list" class="space-y-2">${aggRows}</div>
                     <div class="flex gap-2 items-stretch">
                         <div class="flex flex-col gap-1 shrink-0">
@@ -1654,6 +1685,7 @@
                     </div>
                 </div>`;
             if (window.lucide) lucide.createIcons();
+            gjLoadLiveH4Slot(gjActiveAsset);
         }
 
         function gjSetNewDir(dir) {
@@ -1690,6 +1722,57 @@
             gjCoinData[gjActiveAsset].aggiornamenti.splice(i, 1);
             renderGjAssetPanel();
             gjSaveCoinData();
+        }
+
+        function getCurrentH4LiveSlot() {
+            const H4_CLOSE_MINS = [180, 420, 660, 900, 1140, 1380];
+            const parts = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Africa/Casablanca', hour: 'numeric', minute: 'numeric', hour12: false
+            }).formatToParts(new Date());
+            const h = parseInt(parts.find(p => p.type === 'hour')?.value ?? '0');
+            const m = parseInt(parts.find(p => p.type === 'minute')?.value ?? '0');
+            const totalMin = h * 60 + m;
+            for (let i = 0; i < H4_CLOSE_MINS.length; i++) {
+                const curr = H4_CLOSE_MINS[i];
+                const next = H4_CLOSE_MINS[(i + 1) % 6];
+                const end  = next > curr ? next : next + 1440;
+                const t    = totalMin >= curr ? totalMin : totalMin + 1440;
+                if (t >= curr && t < end) return i;
+            }
+            return 0;
+        }
+
+        async function gjToggleH4Square(asset, idx) {
+            if (!gjCoinData[asset]) return;
+            if (!Array.isArray(gjCoinData[asset].bias_h4)) gjCoinData[asset].bias_h4 = Array(6).fill(null);
+            const cur = gjCoinData[asset].bias_h4[idx];
+            gjCoinData[asset].bias_h4[idx] = cur === null ? 'long' : cur === 'long' ? 'short' : cur === 'short' ? 'neutro' : null;
+            renderGjAssetPanel();
+            gjSaveCoinData();
+        }
+
+        async function gjLoadLiveH4Slot(asset) {
+            if (!asset || !gjCoinData[asset]) return;
+            const liveSlot = getCurrentH4LiveSlot();
+            document.querySelectorAll('[data-h4-slot]').forEach(btn => btn.classList.remove('h4-live'));
+            const liveBtn = document.querySelector(`[data-h4-slot="${liveSlot}"]`);
+            if (!liveBtn) return;
+            liveBtn.classList.add('h4-live');
+            const { data: w } = await db.from('watchlist').select('prezzo, h4_high, h4_low').eq('simbolo', asset).eq('active', true).maybeSingle();
+            if (!w?.prezzo || !w?.h4_high || !w?.h4_low) return;
+            const price  = parseFloat(w.prezzo);
+            const h4High = parseFloat(w.h4_high);
+            const h4Low  = parseFloat(w.h4_low);
+            if (!price || !h4High || !h4Low) return;
+            if (price > h4High)     { liveBtn.classList.remove('h4-short','h4-neutro'); liveBtn.classList.add('h4-long');  }
+            else if (price < h4Low) { liveBtn.classList.remove('h4-long', 'h4-neutro'); liveBtn.classList.add('h4-short'); }
+            else                    { liveBtn.classList.remove('h4-long', 'h4-short');  liveBtn.classList.add('h4-neutro');}
+        }
+
+        let gjH4LiveTimer = null;
+        function startGjH4LiveTimer() {
+            if (gjH4LiveTimer) clearInterval(gjH4LiveTimer);
+            gjH4LiveTimer = setInterval(() => { if (gjActiveAsset) gjLoadLiveH4Slot(gjActiveAsset); }, 5 * 60 * 1000);
         }
 
         // --- BIAS QUICK CLOSE ---
