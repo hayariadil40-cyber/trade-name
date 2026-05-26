@@ -209,14 +209,14 @@
         }
 
         async function loadIpotesi() {
-            const { data, error } = await db.from('ipotesi_trading').select('id,stato,created_at,strategia_id,asset,sessione,check_list_flagged,dove_entro_flagged,dove_esco_sl_flagged,dove_esco_tp_flagged,trade_id').order('created_at', { ascending: false });
+            const { data, error } = await db.from('ipotesi_trading').select('id,stato,created_at,strategia_id,asset,sessione,check_list_flagged,dove_entro_flagged,dove_esco_sl_flagged,dove_esco_tp_flagged').order('created_at', { ascending: false });
             if (error) { console.error(error); return; }
             ipotesiAll = data || [];
-            const tradeIds = ipotesiAll.map(ip => ip.trade_id).filter(Boolean);
-            if (tradeIds.length) {
-                const { data: trades } = await db.from('trades').select('id,asset,direzione,pnl,esito').in('id', tradeIds);
-                tradesMap = {};
-                (trades || []).forEach(t => { tradesMap[t.id] = t; });
+            const ipotesiIds = ipotesiAll.map(ip => ip.id).filter(Boolean);
+            tradesMap = {};
+            if (ipotesiIds.length) {
+                const { data: trades } = await db.from('trades').select('id,ipotesi_id,asset,direzione,pnl,esito').in('ipotesi_id', ipotesiIds);
+                (trades || []).forEach(t => { if (t.ipotesi_id) tradesMap[t.ipotesi_id] = t; });
             }
             render();
         }
@@ -303,20 +303,16 @@
                     da_osservare:'bg-tp-warning', osservata:'bg-cyan-400'
                 })[ip.stato] || 'bg-tp-border';
                 let tradeBadge = '';
-                if (ip.trade_id) {
-                    const t = tradesMap[ip.trade_id];
-                    if (t) {
-                        const dir = t.direzione === 'long' ? '↑' : t.direzione === 'short' ? '↓' : '—';
-                        const pnlNum = t.pnl != null ? parseFloat(t.pnl) : null;
-                        const pnlStr = pnlNum != null ? (pnlNum >= 0 ? '+' : '') + pnlNum.toFixed(2) : '—';
-                        const esito = t.esito || 'aperto';
-                        const colors = esito === 'win'  ? 'bg-tp-accent/10 text-tp-accent border-tp-accent/40'
-                                     : esito === 'loss' ? 'bg-tp-loss/10 text-tp-loss border-tp-loss/40'
-                                     :                   'bg-tp-muted/10 text-tp-muted border-tp-muted/40';
-                        tradeBadge = `<a href="dettaglio_trade.html?id=${ip.trade_id}" onclick="event.stopPropagation()" class="text-[9px] font-bold font-mono ${colors} border px-2 py-0.5 rounded flex items-center gap-1 shrink-0 hover:opacity-80">${dir} ${pnlStr} <span class="opacity-60 uppercase">${esito}</span></a>`;
-                    } else {
-                        tradeBadge = `<span class="text-[9px] font-bold uppercase tracking-widest text-tp-accent bg-tp-accent/10 border border-tp-accent/40 px-2 py-0.5 rounded shrink-0">trade</span>`;
-                    }
+                const t = tradesMap[ip.id];
+                if (t) {
+                    const dir = t.direzione === 'long' ? '↑' : t.direzione === 'short' ? '↓' : '—';
+                    const pnlNum = t.pnl != null ? parseFloat(t.pnl) : null;
+                    const pnlStr = pnlNum != null ? (pnlNum >= 0 ? '+' : '') + pnlNum.toFixed(2) : '—';
+                    const esito = t.esito || 'aperto';
+                    const colors = esito === 'win'  ? 'bg-tp-accent/10 text-tp-accent border-tp-accent/40'
+                                 : esito === 'loss' ? 'bg-tp-loss/10 text-tp-loss border-tp-loss/40'
+                                 :                   'bg-tp-muted/10 text-tp-muted border-tp-muted/40';
+                    tradeBadge = `<a href="dettaglio_trade.html?id=${t.id}" onclick="event.stopPropagation()" class="text-[9px] font-bold font-mono ${colors} border px-2 py-0.5 rounded flex items-center gap-1 shrink-0 hover:opacity-80">${dir} ${pnlStr} <span class="opacity-60 uppercase">${esito}</span></a>`;
                 }
 
                 return `
