@@ -1130,24 +1130,31 @@
             lucide.createIcons();
         }
 
-        window.handleIpotesiScreenshot = function(file, slot) {
+        window.handleIpotesiScreenshot = async function(file, slot) {
             if (!file) return;
             slot = slot || activeScreenshotTab || 'prima';
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                if (slot === 'prima') ipotesi.screenshot = e.target.result;
-                else ipotesi.screenshot_post = e.target.result;
-                renderScreenshot();
-                const updateData = { updated_at: new Date().toISOString() };
-                if (slot === 'prima') updateData.screenshot = e.target.result;
-                else updateData.screenshot_post = e.target.result;
-                await db.from('ipotesi_trading').update(updateData).eq('id', ipotesiId);
-            };
-            reader.readAsDataURL(file);
+            const ext = (file.name.split('.').pop() || 'png').toLowerCase();
+            const path = `ipotesi/${ipotesiId}/${slot}.${ext}`;
+            const { error: upErr } = await db.storage.from('trade-screenshots').upload(path, file, { contentType: file.type, upsert: true });
+            if (upErr) { alert('Errore upload: ' + upErr.message); return; }
+            const { data: urlData } = db.storage.from('trade-screenshots').getPublicUrl(path);
+            const url = urlData.publicUrl;
+            if (slot === 'prima') ipotesi.screenshot = url;
+            else ipotesi.screenshot_post = url;
+            renderScreenshot();
+            const updateData = { updated_at: new Date().toISOString() };
+            if (slot === 'prima') updateData.screenshot = url;
+            else updateData.screenshot_post = url;
+            await db.from('ipotesi_trading').update(updateData).eq('id', ipotesiId);
         };
 
         window.removeIpotesiScreenshot = async function(slot) {
             slot = slot || activeScreenshotTab || 'prima';
+            const currentUrl = slot === 'prima' ? ipotesi.screenshot : ipotesi.screenshot_post;
+            if (currentUrl && currentUrl.startsWith('http')) {
+                const match = currentUrl.match(/\/trade-screenshots\/(.+)/);
+                if (match) await db.storage.from('trade-screenshots').remove([match[1]]);
+            }
             if (slot === 'prima') ipotesi.screenshot = null;
             else ipotesi.screenshot_post = null;
             renderScreenshot();
