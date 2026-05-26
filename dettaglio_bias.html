@@ -860,14 +860,33 @@
             });
         }
 
-        function setBiasAggDir(i, dir) {
+        function _biasToast(msg, ok) {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;color:#fff;pointer-events:none;transition:opacity .4s;background:${ok ? '#20c997' : '#f43f5e'}`;
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 2000);
+        }
+
+        async function saveCoinDataQuick() {
+            if (!biasId) return;
+            try {
+                const snapshot = JSON.parse(JSON.stringify(coinData));
+                const { error } = await db.from('bias').update({ coin_data: snapshot }).eq('id', biasId);
+                if (error) { console.error('saveCoinDataQuick:', error); _biasToast('Errore: ' + error.message, false); }
+                else _biasToast('Salvato', true);
+            } catch(e) { console.error('saveCoinDataQuick:', e); _biasToast('Errore: ' + e.message, false); }
+        }
+
+        async function setBiasAggDir(i, dir) {
             if (!activeAsset || !coinData[activeAsset]) return;
             const aggs = coinData[activeAsset].aggiornamenti;
             aggs[i].direzione = aggs[i].direzione === dir ? null : dir;
             renderBiasAssetPanel();
+            saveCoinDataQuick();
         }
 
-        function addBiasAgg() {
+        async function addBiasAgg() {
             if (!activeAsset || !coinData[activeAsset]) return;
             const ora   = (document.getElementById('bias-agg-ora').value   || '').trim();
             const testo = (document.getElementById('bias-agg-testo').value || '').trim();
@@ -878,12 +897,14 @@
             document.getElementById('bias-agg-testo').value = '';
             newBiasAggDir = null;
             renderBiasAssetPanel();
+            saveCoinDataQuick();
         }
 
-        function removeBiasAgg(i) {
+        async function removeBiasAgg(i) {
             if (!activeAsset || !coinData[activeAsset]) return;
             coinData[activeAsset].aggiornamenti.splice(i, 1);
             renderBiasAssetPanel();
+            saveCoinDataQuick();
         }
 
         async function toggleH4Square(asset, idx) {
@@ -959,23 +980,16 @@
             });
             const fnData = await fnRes.json();
             if (!fnRes.ok || !fnData.publicUrl) { console.error('[uploadBiasScreenshot]', fnData); return; }
-            const { data: fresh } = await db.from('bias').select('coin_data').eq('id', biasId).single();
-            const cd = fresh?.coin_data || {};
-            if (!cd[asset]) cd[asset] = {};
-            cd[asset].screenshot = fnData.publicUrl;
             if (!coinData[asset]) coinData[asset] = {};
             coinData[asset].screenshot = fnData.publicUrl;
-            await db.from('bias').update({ coin_data: cd }).eq('id', biasId);
+            await db.from('bias').update({ coin_data: JSON.parse(JSON.stringify(coinData)) }).eq('id', biasId);
             renderBiasAssetPanel();
         }
 
         async function deleteBiasScreenshot(asset) {
             if (!coinData[asset]) return;
             coinData[asset].screenshot = null;
-            const { data: fresh } = await db.from('bias').select('coin_data').eq('id', biasId).single();
-            const cd = fresh?.coin_data || {};
-            if (cd[asset]) delete cd[asset].screenshot;
-            await db.from('bias').update({ coin_data: cd }).eq('id', biasId);
+            await db.from('bias').update({ coin_data: JSON.parse(JSON.stringify(coinData)) }).eq('id', biasId);
             renderBiasAssetPanel();
         }
 
