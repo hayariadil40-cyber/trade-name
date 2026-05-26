@@ -208,7 +208,7 @@
         }
 
         async function loadIpotesi() {
-            const { data, error } = await db.from('ipotesi_trading').select('*').order('created_at', { ascending: false });
+            const { data, error } = await db.from('ipotesi_trading').select('id,stato,created_at,strategia_id,asset,sessione,check_list_flagged,dove_entro_flagged,dove_esco_sl_flagged,dove_esco_tp_flagged,trade_id').order('created_at', { ascending: false });
             if (error) { console.error(error); return; }
             ipotesiAll = data || [];
             render();
