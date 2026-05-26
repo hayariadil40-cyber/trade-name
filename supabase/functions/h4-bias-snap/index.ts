@@ -137,15 +137,17 @@ serve(async (req) => {
         is_inside,
       });
 
-      if (biasRecord) {
-        if (!coinData[simbolo]) coinData[simbolo] = { aggiornamenti: [] };
-        if (!Array.isArray(coinData[simbolo].bias_h4)) coinData[simbolo].bias_h4 = Array(6).fill(null);
-        coinData[simbolo].bias_h4[slotIdx] = bias;
-      }
+      // Aggiorna coinData sempre, sia per update che per insert
+      if (!coinData[simbolo]) coinData[simbolo] = { aggiornamenti: [] };
+      if (!Array.isArray(coinData[simbolo].bias_h4)) coinData[simbolo].bias_h4 = Array(6).fill(null);
+      coinData[simbolo].bias_h4[slotIdx] = bias;
     }
 
     if (biasRecord) {
       await db.from("bias").update({ coin_data: coinData }).eq("id", biasRecord.id);
+    } else {
+      // Crea il record bias del giorno se non esiste ancora (es. snap 03:10 e 07:10 quando utente dorme)
+      await db.from("bias").insert({ data: todayDate, stato: "aperto", coin_data: coinData });
     }
 
     return new Response(

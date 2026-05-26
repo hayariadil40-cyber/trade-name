@@ -1555,6 +1555,14 @@
             // Merge profondo per ogni asset
             for (const asset of Object.keys(gjCoinData)) {
                 merged[asset] = { ...(cur?.coin_data?.[asset] || {}), ...gjCoinData[asset] };
+                // Merge slot-by-slot di bias_h4: null in gjCoinData non sovrascrive valori salvati dall'edge function
+                const curH4 = cur?.coin_data?.[asset]?.bias_h4;
+                const newH4 = gjCoinData[asset]?.bias_h4;
+                if (Array.isArray(curH4) || Array.isArray(newH4)) {
+                    const base = Array.isArray(curH4) ? curH4 : Array(6).fill(null);
+                    const over = Array.isArray(newH4) ? newH4 : Array(6).fill(null);
+                    merged[asset].bias_h4 = over.map((v, i) => v !== null ? v : base[i]);
+                }
             }
             const { error } = await db.from('bias').update({ coin_data: merged }).eq('id', _biasGiornataId);
             if (error) { alert('Errore salvataggio: ' + error.message); }
@@ -1673,9 +1681,9 @@
                         <div class="flex flex-col gap-1 shrink-0">
                             <input id="gj-agg-ora" type="time" value="${nowH}:${nowM}" class="bg-tp-panel border border-tp-border rounded-lg px-2 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[90px]"/>
                             <div class="flex gap-1">
-                                <button type="button" onclick="gjSetNewDir('long')"   class="agg-dir-btn flex-1 ${gjNewDir==='long'  ?'agg-long':''}">L</button>
-                                <button type="button" onclick="gjSetNewDir('short')"  class="agg-dir-btn flex-1 ${gjNewDir==='short' ?'agg-short':''}">S</button>
-                                <button type="button" onclick="gjSetNewDir('neutro')" class="agg-dir-btn flex-1 ${gjNewDir==='neutro'?'agg-neutro':''}">N</button>
+                                <button type="button" id="gj-dir-long"   onclick="gjSetNewDir('long')"   class="agg-dir-btn flex-1 ${gjNewDir==='long'  ?'agg-long':''}">L</button>
+                                <button type="button" id="gj-dir-short"  onclick="gjSetNewDir('short')"  class="agg-dir-btn flex-1 ${gjNewDir==='short' ?'agg-short':''}">S</button>
+                                <button type="button" id="gj-dir-neutro" onclick="gjSetNewDir('neutro')" class="agg-dir-btn flex-1 ${gjNewDir==='neutro'?'agg-neutro':''}">N</button>
                             </div>
                         </div>
                         <textarea id="gj-agg-testo" rows="2" class="flex-1 bg-tp-panel border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Es: 4H ha rotto struttura, daily 4720 tenuto..."></textarea>
@@ -1690,7 +1698,11 @@
 
         function gjSetNewDir(dir) {
             gjNewDir = gjNewDir === dir ? null : dir;
-            renderGjAssetPanel();
+            const clsMap = { long: 'agg-long', short: 'agg-short', neutro: 'agg-neutro' };
+            ['long','short','neutro'].forEach(d => {
+                const btn = document.getElementById('gj-dir-' + d);
+                if (btn) btn.className = 'agg-dir-btn flex-1' + (gjNewDir === d ? ' ' + clsMap[d] : '');
+            });
         }
 
         function gjSetAggDir(i, dir) {
@@ -1725,19 +1737,20 @@
         }
 
         function getCurrentH4LiveSlot() {
-            const H4_CLOSE_MINS = [180, 420, 660, 900, 1140, 1380];
+            // Aperture H4 in minuti Casablanca: 23:00→1380, 03:00→180, 07:00→420 ...
+            const H4_OPENS = [1380, 180, 420, 660, 900, 1140];
             const parts = new Intl.DateTimeFormat('en-US', {
                 timeZone: 'Africa/Casablanca', hour: 'numeric', minute: 'numeric', hour12: false
             }).formatToParts(new Date());
             const h = parseInt(parts.find(p => p.type === 'hour')?.value ?? '0');
             const m = parseInt(parts.find(p => p.type === 'minute')?.value ?? '0');
             const totalMin = h * 60 + m;
-            for (let i = 0; i < H4_CLOSE_MINS.length; i++) {
-                const curr = H4_CLOSE_MINS[i];
-                const next = H4_CLOSE_MINS[(i + 1) % 6];
-                const end  = next > curr ? next : next + 1440;
-                const t    = totalMin >= curr ? totalMin : totalMin + 1440;
-                if (t >= curr && t < end) return i;
+            for (let i = 0; i < H4_OPENS.length; i++) {
+                const open  = H4_OPENS[i];
+                const close = H4_OPENS[(i + 1) % 6]; // apertura slot successivo = chiusura corrente
+                const end   = close > open ? close : close + 1440;
+                const t     = totalMin >= open ? totalMin : totalMin + 1440;
+                if (t >= open && t < end) return i;
             }
             return 0;
         }
