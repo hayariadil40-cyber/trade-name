@@ -313,21 +313,26 @@ async function updateHeaderSmile() {
                 var wlRows = wlResult.data || [];
                 var coinAbbr = { XAUUSD:'XAU', US30:'US30', GER30:'GER', NAS100:'NAS', BTCUSD:'BTC', EURUSD:'EUR', GBPUSD:'GBP', USDJPY:'JPY', USDCHF:'CHF', AUDUSD:'AUD' };
                 var volColorMap = { high:'#20c997', medium:'#eab308', low:'#f43f5e' };
-                // Tachimetro SVG: pivot (14,14), raggio 11, arco da sinistra a destra passando per il top
-                // Lancetta: low=sinistra (3,14), medium=centro alto (14,3), high=destra (25,14)
-                var volNeedleMap = { high:{x:25,y:14}, medium:{x:14,y:3}, low:{x:3,y:14} };
+                // Tachimetro SVG semicircolare — pivot (14,14), raggio 11
+                // shaft = punto fine asta (prima della punta), arrow = triangolo freccia
+                var volNeedleMap = {
+                    high:   { sx:21,  sy:14,   arrow:'25,14 21,11.8 21,16.2' },
+                    medium: { sx:14,  sy:6.5,  arrow:'14,2.5 11.8,7 16.2,7'  },
+                    low:    { sx:7,   sy:14,   arrow:'3,14 7,11.8 7,16.2'    }
+                };
                 var html = '';
                 wlRows.forEach(function(r) {
                     var abbr = coinAbbr[r.simbolo] || r.simbolo.slice(0, 3);
                     var color = volColorMap[r.volatilita_auto] || '#848d97';
-                    var nd = volNeedleMap[r.volatilita_auto] || {x:14,y:3};
-                    html += '<div class="flex flex-col items-center gap-0.5" title="' + r.simbolo + ' — ' + (r.volatilita_auto || 'n.d.') + '">' +
-                        '<svg viewBox="0 0 28 15" width="22" height="12" style="overflow:visible">' +
-                        '<path d="M3,14 A11,11 0 0,1 25,14" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.8" stroke-linecap="round"/>' +
-                        '<line x1="14" y1="14" x2="' + nd.x + '" y2="' + nd.y + '" stroke="' + color + '" stroke-width="1.6" stroke-linecap="round" style="filter:drop-shadow(0 0 3px ' + color + ')"/>' +
-                        '<circle cx="14" cy="14" r="1.8" fill="' + color + '" style="filter:drop-shadow(0 0 3px ' + color + ')"/>' +
+                    var nd = volNeedleMap[r.volatilita_auto] || volNeedleMap.medium;
+                    html += '<div class="flex flex-col items-center" style="gap:5px" title="' + r.simbolo + ' — ' + (r.volatilita_auto || 'n.d.') + '">' +
+                        '<svg viewBox="0 0 28 15" width="30" height="16" style="overflow:visible;display:block">' +
+                        '<path d="M3,14 A11,11 0 0,1 25,14" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2" stroke-linecap="round"/>' +
+                        '<line x1="14" y1="14" x2="' + nd.sx + '" y2="' + nd.sy + '" stroke="' + color + '" stroke-width="1.6" stroke-linecap="round"/>' +
+                        '<polygon points="' + nd.arrow + '" fill="' + color + '" style="filter:drop-shadow(0 0 4px ' + color + ')"/>' +
+                        '<circle cx="14" cy="14" r="2" fill="' + color + '"/>' +
                         '</svg>' +
-                        '<span style="font-size:8px;line-height:1;color:' + color + ';font-weight:600;letter-spacing:0.02em">' + abbr + '</span>' +
+                        '<span style="font-size:8px;line-height:1;color:' + color + ';font-weight:600;letter-spacing:0.03em">' + abbr + '</span>' +
                         '</div>';
                 });
                 coinsDiv.innerHTML = html;
