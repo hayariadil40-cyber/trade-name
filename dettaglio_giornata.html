@@ -1509,7 +1509,7 @@
                 const { error } = await db.from('bias').update({ commenti_giornata: updated }).eq('id', _biasGiornataId);
                 if (error) { alert('Errore: ' + error.message); return; }
             } else {
-                const { data: newB, error } = await db.from('bias').insert({ commenti_giornata: updated, data: giornataDate, stato: 'aperto' }).select('id').single();
+                const { data: newB, error } = await db.from('bias').insert({ commenti_giornata: updated, data: giornataDate, stato: 'aperto', categorizzatori: { cronache: [], strategie: [], trades: [], ipotesi: [] } }).select('id').single();
                 if (error) { alert('Errore: ' + error.message); return; }
                 _biasGiornataId = newB.id;
             }
@@ -1553,7 +1553,7 @@
             try {
                 if (!_biasGiornataId) {
                     // Crea il bias se non esiste
-                    const { data: newB, error } = await db.from('bias').insert({ coin_data: snapshot, data: giornataDate, stato: 'aperto' }).select('id').single();
+                    const { data: newB, error } = await db.from('bias').insert({ coin_data: snapshot, data: giornataDate, stato: 'aperto', categorizzatori: { cronache: [], strategie: [], trades: [], ipotesi: [] } }).select('id').single();
                     if (error) { console.error('gjSaveCoinData INSERT:', error); _gjToast('Errore creazione bias: ' + error.message, false); return; }
                     _biasGiornataId = newB.id;
                     const btnLink = document.getElementById('btn-nuovo-bias');
