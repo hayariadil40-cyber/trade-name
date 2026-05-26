@@ -1376,10 +1376,6 @@
                 alert('Sessione obbligatoria — seleziona London, NewYork o Asia prima di salvare.');
                 return;
             }
-            if (!Array.isArray(ipotesi.dove_entro_flagged) || !ipotesi.dove_entro_flagged.length) {
-                alert('Ingresso obbligatorio — spunta almeno un punto "Dove entro" prima di salvare.');
-                return;
-            }
             await saveCommentoPost();
             const btn = document.getElementById('save-btn');
             btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvando...';
