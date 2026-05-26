@@ -853,7 +853,11 @@
 
         function setNewBiasAggDir(dir) {
             newBiasAggDir = newBiasAggDir === dir ? null : dir;
-            renderBiasAssetPanel();
+            const clsMap = { long: 'agg-long', short: 'agg-short', neutro: 'agg-neutro' };
+            ['long','short','neutro'].forEach(d => {
+                const btn = document.getElementById('bnagg-' + d);
+                if (btn) btn.className = 'agg-dir-btn flex-1' + (newBiasAggDir === d ? ' ' + clsMap[d] : '');
+            });
         }
 
         function setBiasAggDir(i, dir) {
