@@ -312,15 +312,21 @@ async function updateHeaderSmile() {
                 var wlResult = await db.from('watchlist').select('simbolo, volatilita_auto').eq('active', true).order('simbolo');
                 var wlRows = wlResult.data || [];
                 var coinAbbr = { XAUUSD:'XAU', US30:'US30', GER30:'GER', NAS100:'NAS', BTCUSD:'BTC', EURUSD:'EUR', GBPUSD:'GBP', USDJPY:'JPY', USDCHF:'CHF', AUDUSD:'AUD' };
-                var volIconMap = { high:'trending-up', medium:'minus', low:'trending-down' };
                 var volColorMap = { high:'#20c997', medium:'#eab308', low:'#f43f5e' };
+                // Tachimetro SVG: pivot (14,14), raggio 11, arco da sinistra a destra passando per il top
+                // Lancetta: low=sinistra (3,14), medium=centro alto (14,3), high=destra (25,14)
+                var volNeedleMap = { high:{x:25,y:14}, medium:{x:14,y:3}, low:{x:3,y:14} };
                 var html = '';
                 wlRows.forEach(function(r) {
                     var abbr = coinAbbr[r.simbolo] || r.simbolo.slice(0, 3);
-                    var icon = volIconMap[r.volatilita_auto] || 'minus';
                     var color = volColorMap[r.volatilita_auto] || '#848d97';
+                    var nd = volNeedleMap[r.volatilita_auto] || {x:14,y:3};
                     html += '<div class="flex flex-col items-center gap-0.5" title="' + r.simbolo + ' — ' + (r.volatilita_auto || 'n.d.') + '">' +
-                        '<i data-lucide="' + icon + '" style="width:11px;height:11px;color:' + color + ';filter:drop-shadow(0 0 5px ' + color + '80)"></i>' +
+                        '<svg viewBox="0 0 28 15" width="22" height="12" style="overflow:visible">' +
+                        '<path d="M3,14 A11,11 0 0,1 25,14" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.8" stroke-linecap="round"/>' +
+                        '<line x1="14" y1="14" x2="' + nd.x + '" y2="' + nd.y + '" stroke="' + color + '" stroke-width="1.6" stroke-linecap="round" style="filter:drop-shadow(0 0 3px ' + color + ')"/>' +
+                        '<circle cx="14" cy="14" r="1.8" fill="' + color + '" style="filter:drop-shadow(0 0 3px ' + color + ')"/>' +
+                        '</svg>' +
                         '<span style="font-size:8px;line-height:1;color:' + color + ';font-weight:600;letter-spacing:0.02em">' + abbr + '</span>' +
                         '</div>';
                 });
