@@ -1539,33 +1539,50 @@
         let gjActiveAsset = null;
         let gjNewDir = null;
 
+        function _gjToast(msg, ok) {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;color:#fff;pointer-events:none;transition:opacity .4s;background:${ok ? '#20c997' : '#f43f5e'}`;
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 2000);
+        }
+
         async function gjSaveCoinData() {
-            if (!_biasGiornataId) {
-                // Crea il bias se non esiste
-                const { data: newB, error } = await db.from('bias').insert({ coin_data: gjCoinData, data: giornataDate, stato: 'aperto' }).select('id').single();
-                if (error) { alert('Errore creazione bias: ' + error.message); return; }
-                _biasGiornataId = newB.id;
-                const btnLink = document.getElementById('btn-nuovo-bias');
-                if (btnLink) { btnLink.href = `dettaglio_bias.html?id=${_biasGiornataId}&from=giornata&gid=${giornataId}`; btnLink.classList.remove('hidden'); }
-                return;
-            }
-            // Merge coin_data per non sovrascrivere screenshot o altri campi
-            const { data: cur } = await db.from('bias').select('coin_data').eq('id', _biasGiornataId).single();
-            const merged = { ...(cur?.coin_data || {}), ...gjCoinData };
-            // Merge profondo per ogni asset
-            for (const asset of Object.keys(gjCoinData)) {
-                merged[asset] = { ...(cur?.coin_data?.[asset] || {}), ...gjCoinData[asset] };
-                // Merge slot-by-slot di bias_h4: null in gjCoinData non sovrascrive valori salvati dall'edge function
-                const curH4 = cur?.coin_data?.[asset]?.bias_h4;
-                const newH4 = gjCoinData[asset]?.bias_h4;
-                if (Array.isArray(curH4) || Array.isArray(newH4)) {
-                    const base = Array.isArray(curH4) ? curH4 : Array(6).fill(null);
-                    const over = Array.isArray(newH4) ? newH4 : Array(6).fill(null);
-                    merged[asset].bias_h4 = over.map((v, i) => v !== null ? v : base[i]);
+            // Snapshot immediato per evitare mutazioni durante l'await
+            const snapshot = JSON.parse(JSON.stringify(gjCoinData));
+            try {
+                if (!_biasGiornataId) {
+                    // Crea il bias se non esiste
+                    const { data: newB, error } = await db.from('bias').insert({ coin_data: snapshot, data: giornataDate, stato: 'aperto' }).select('id').single();
+                    if (error) { console.error('gjSaveCoinData INSERT:', error); _gjToast('Errore creazione bias: ' + error.message, false); return; }
+                    _biasGiornataId = newB.id;
+                    const btnLink = document.getElementById('btn-nuovo-bias');
+                    if (btnLink) { btnLink.href = `dettaglio_bias.html?id=${_biasGiornataId}&from=giornata&gid=${giornataId}`; btnLink.classList.remove('hidden'); }
+                    _gjToast('Bias creato', true);
+                    return;
                 }
+                // Legge lo stato corrente per merge bias_h4 (protegge da sovrascrittura edge function)
+                const { data: cur, error: selErr } = await db.from('bias').select('coin_data').eq('id', _biasGiornataId).maybeSingle();
+                if (selErr) console.warn('gjSaveCoinData SELECT warn:', selErr);
+                const dbCoin = cur?.coin_data || {};
+                const merged = { ...dbCoin, ...snapshot };
+                for (const asset of Object.keys(snapshot)) {
+                    merged[asset] = { ...(dbCoin[asset] || {}), ...snapshot[asset] };
+                    const curH4 = dbCoin[asset]?.bias_h4;
+                    const newH4 = snapshot[asset]?.bias_h4;
+                    if (Array.isArray(curH4) || Array.isArray(newH4)) {
+                        const base = Array.isArray(curH4) ? curH4 : Array(6).fill(null);
+                        const over = Array.isArray(newH4) ? newH4 : Array(6).fill(null);
+                        merged[asset].bias_h4 = over.map((v, i) => (v !== null && v !== undefined) ? v : base[i]);
+                    }
+                }
+                const { error } = await db.from('bias').update({ coin_data: merged }).eq('id', _biasGiornataId);
+                if (error) { console.error('gjSaveCoinData UPDATE:', error); _gjToast('Errore salvataggio: ' + error.message, false); return; }
+                _gjToast('Salvato', true);
+            } catch (e) {
+                console.error('gjSaveCoinData exception:', e);
+                _gjToast('Errore inatteso: ' + e.message, false);
             }
-            const { error } = await db.from('bias').update({ coin_data: merged }).eq('id', _biasGiornataId);
-            if (error) { alert('Errore salvataggio: ' + error.message); }
         }
 
         function gjOpenMenu() {
