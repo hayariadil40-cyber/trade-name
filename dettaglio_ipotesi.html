@@ -637,7 +637,7 @@
             document.getElementById('ipotesi-id-short').textContent = ipotesiId.substring(0, 8);
 
             const created = new Date(ipotesi.created_at);
-            const dateStr = created.toLocaleString('it-IT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+            const dateStr = created.toLocaleString('it-IT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' });
             document.getElementById('ipotesi-meta').textContent = `Creata ${dateStr}`;
 
             // Stato badge

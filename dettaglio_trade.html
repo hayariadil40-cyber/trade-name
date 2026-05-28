@@ -271,7 +271,7 @@
             document.getElementById('tr-asset').value = t.asset || '';
             if (t.direzione) setDir(t.direzione);
             document.getElementById('tr-sorgente').value = t.sorgente || 'mt4';
-            document.getElementById('tr-data').value = t.data ? t.data.substring(0,16) : '';
+            document.getElementById('tr-data').value = t.data ? new Date(t.data).toLocaleString('sv-SE', { timeZone: 'Africa/Casablanca' }).replace(' ', 'T').substring(0, 16) : '';
             document.getElementById('tr-durata').value = t.durata_minuti || '';
             document.getElementById('tr-entry').value = t.entry_price || '';
             document.getElementById('tr-exit').value = t.exit_price || '';
@@ -473,7 +473,7 @@
                 asset: document.getElementById('tr-asset').value,
                 direzione: currentDir,
                 sorgente: document.getElementById('tr-sorgente').value,
-                data: document.getElementById('tr-data').value || new Date().toISOString(),
+                data: (() => { const v = document.getElementById('tr-data').value; return v ? new Date(v + ':00+01:00').toISOString() : new Date().toISOString(); })(),
                 durata_minuti: parseInt(document.getElementById('tr-durata').value) || null,
                 entry_price: parseFloat(document.getElementById('tr-entry').value) || null,
                 exit_price: parseFloat(document.getElementById('tr-exit').value) || null,

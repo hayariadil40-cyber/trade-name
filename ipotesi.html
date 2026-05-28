@@ -297,7 +297,7 @@
                     (ip.dove_entro_flagged || []).length +
                     (ip.dove_esco_sl_flagged || []).length +
                     (ip.dove_esco_tp_flagged || []).length;
-                const dateStr = new Date(ip.created_at).toLocaleString('it-IT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                const dateStr = new Date(ip.created_at).toLocaleString('it-IT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' });
                 const barColor = ({
                     ipotesi:'bg-tp-muted', ingresso:'bg-tp-accent', non_eseguito:'bg-tp-loss',
                     da_osservare:'bg-tp-warning', osservata:'bg-cyan-400'

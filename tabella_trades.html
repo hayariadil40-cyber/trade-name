@@ -316,7 +316,7 @@
                 const pnlSign = (t.pnl||0) >= 0 ? '+' : '';
                 const stato = t.stato || 'nuovo';
                 const statoBadge = stato === 'completato' ? '<span class="text-[9px] px-2 py-0.5 rounded bg-tp-accent/10 text-tp-accent border border-tp-accent/20 font-bold uppercase">Completato</span>' : '<span class="text-[9px] px-2 py-0.5 rounded bg-tp-warning/10 text-tp-warning border border-tp-warning/20 font-bold uppercase">Da lavorare</span>';
-                const dateStr = t.data ? new Date(t.data).toLocaleDateString('it-IT', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '--';
+                const dateStr = t.data ? new Date(t.data).toLocaleDateString('it-IT', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit', timeZone:'Africa/Casablanca' }) : '--';
 
                 return `<div onclick="window.location.href='dettaglio_trade.html?id=${t.id}'" class="group grid grid-cols-2 gap-y-2 lg:flex lg:items-center p-3 lg:p-4 pl-5 lg:pl-4 bg-tp-panel border border-tp-border ${hoverColor} rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
                     <div class="w-1 absolute left-0 top-0 bottom-0 ${barColor}"></div>

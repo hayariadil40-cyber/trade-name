@@ -29,8 +29,12 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Converti timestamp UTC in stringa ora Casablanca (UTC+1 fisso, no DST)
+    const toCasa = (iso: string | null | undefined): string | null =>
+      iso ? new Date(iso).toLocaleString('sv-SE', { timeZone: 'Africa/Casablanca' }).replace(' ', 'T').substring(0, 16) : null;
+
     let dbContext = "";
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toLocaleString('sv-SE', { timeZone: 'Africa/Casablanca' }).split(' ')[0];
     const isJumuah = new Date().getDay() === 5; // 0=Dom, 5=Ven
     const fourteenDaysAgo = new Date(Date.now() - 14 * 86400000).toISOString().split("T")[0];
     const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().split("T")[0];
@@ -49,7 +53,12 @@ serve(async (req) => {
 
     const { data: trades } = await tradesQuery;
     if (trades && trades.length) {
-      dbContext += "\n## TRADES (" + assistantMode.toUpperCase() + "):\n" + JSON.stringify(trades);
+      // Converti trades.data da UTC a ora Casablanca (UTC+1) per allinearla con allert.ora_evento
+      const tradesCtx = trades.map((t: any) => ({
+        ...t,
+        data: t.data ? new Date(t.data).toLocaleString('sv-SE', { timeZone: 'Africa/Casablanca' }).replace(' ', 'T').substring(0, 16) : t.data,
+      }));
+      dbContext += "\n## TRADES (" + assistantMode.toUpperCase() + ") [ora in fuso Casablanca]:\n" + JSON.stringify(tradesCtx);
       const completed = trades.filter((t: any) => t.esito === "win" || t.esito === "loss");
       const wins = completed.filter((t: any) => t.esito === "win").length;
       const totalPnl = trades.reduce((sum: number, t: any) => sum + (parseFloat(t.pnl) || 0), 0);
@@ -82,7 +91,10 @@ serve(async (req) => {
     const { data: smile } = await supabase.from("monitora_smile")
       .select("mindset, volatilita, sorgente, created_at")
       .order("created_at", { ascending: false }).limit(smileLimit);
-    if (smile && smile.length) dbContext += "\n\n## MONITORASMILE:\n" + JSON.stringify(smile);
+    if (smile && smile.length) {
+      const smileCtx = smile.map((s: any) => ({ ...s, created_at: toCasa(s.created_at) }));
+      dbContext += "\n\n## MONITORASMILE:\n" + JSON.stringify(smileCtx);
+    }
 
     {
       let sessioniQuery = supabase.from("sessioni").select("nome, data, mood, coin_data");
@@ -148,7 +160,10 @@ serve(async (req) => {
         .select("id, asset, direzione, sessione, stato, note, strategia_id, created_at")
         .gte("created_at", twoDaysAgo + "T00:00:00")
         .order("created_at", { ascending: false }).limit(20);
-      if (ipotesiR && ipotesiR.length) dbContext += "\n\n## IPOTESI (ultimi 2gg):\n" + JSON.stringify(ipotesiR);
+      if (ipotesiR && ipotesiR.length) {
+        const ipotesiRCtx = ipotesiR.map((ip: any) => ({ ...ip, created_at: toCasa(ip.created_at) }));
+        dbContext += "\n\n## IPOTESI (ultimi 2gg):\n" + JSON.stringify(ipotesiRCtx);
+      }
       // Strategie (solo id+nome): servono per collegare ipotesi a strategia per id
       const { data: strategieR } = await supabase.from("strategie").select("id, nome").order("nome");
       if (strategieR && strategieR.length) dbContext += "\n\n## STRATEGIE (id+nome per collegamento):\n" + JSON.stringify(strategieR);
@@ -173,7 +188,11 @@ serve(async (req) => {
         });
         const ipotesiRich = ipotesi.map((ip: any) => ({
           ...ip,
-          trades_collegati: tradesByIpotesi[ip.id] || []
+          created_at: toCasa(ip.created_at),
+          trades_collegati: (tradesByIpotesi[ip.id] || []).map((t: any) => ({
+            ...t,
+            data: toCasa(t.data),
+          })),
         }));
         dbContext += "\n\n## IPOTESI DI TRADING (con osservazioni template + per-trade e commento_post per trade):\n" + JSON.stringify(ipotesiRich);
       }

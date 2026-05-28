@@ -509,7 +509,7 @@
             list.innerHTML=items.map(s=>{
                 const mi=s.mindset==='positive'?'smile':s.mindset==='negative'?'frown':'meh';
                 const mc=s.mindset==='positive'?'text-tp-accent':s.mindset==='negative'?'text-tp-loss':'text-tp-warning';
-                const d=new Date(s.created_at).toLocaleString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+                const d=new Date(s.created_at).toLocaleString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Africa/Casablanca'});
                 return `<div class="flex items-center p-3 lg:p-4 pl-5 bg-tp-panel border border-tp-border rounded-lg shadow-sm relative overflow-hidden gap-3"><div class="w-1 absolute left-0 top-0 bottom-0 bg-tp-accent"></div><i data-lucide="${mi}" class="w-6 h-6 ${mc}"></i><span class="font-bold text-sm ${mc} capitalize flex-1">${s.mindset||'--'}</span><span class="text-[11px] text-tp-muted">${s.sorgente||'manuale'}</span><span class="text-[11px] text-tp-muted">${d}</span></div>`;
             }).join('');
             lucide.createIcons();
@@ -531,7 +531,7 @@
                 const sc=document.getElementById(px+'-cronache'),ss=document.getElementById(px+'-strategie'),st2=document.getElementById(px+'-trades'),si=document.getElementById(px+'-ipotesi');
                 (cr||[]).forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.data} - ${c.titolo}`;sc.appendChild(o)});
                 (st||[]).forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.nome;ss.appendChild(o)});
-                (tr||[]).forEach(t=>{const o=document.createElement('option');o.value=t.id;const d=new Date(t.data).toLocaleDateString('it-IT',{day:'2-digit',month:'short'});o.textContent=`${t.asset} ${t.direzione} - ${d}`;st2.appendChild(o)});
+                (tr||[]).forEach(t=>{const o=document.createElement('option');o.value=t.id;const d=new Date(t.data).toLocaleDateString('it-IT',{day:'2-digit',month:'short',timeZone:'Africa/Casablanca'});o.textContent=`${t.asset} ${t.direzione} - ${d}`;st2.appendChild(o)});
                 if (si) (ip||[]).forEach(i=>{const o=document.createElement('option');o.value=i.id;const d=i.created_at?new Date(i.created_at).toLocaleString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Africa/Casablanca'}):'';const stato=(i.stato||'ipotesi').replace('_',' ');o.textContent=`${i.asset||'?'} ${i.sessione||''} - ${d} [${stato}]`;si.appendChild(o)});
             });
         }
