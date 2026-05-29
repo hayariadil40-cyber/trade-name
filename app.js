@@ -266,7 +266,7 @@ async function updateHeaderWinRate() {
 async function updateHeaderSmile() {
     if (typeof db === 'undefined' || !db) return;
     try {
-        var result = await db.from('monitora_smile').select('mindset, volatilita, created_at').order('created_at', { ascending: false }).limit(10);
+        var result = await db.from('monitora_smile').select('mindset, volatilita, created_at').neq('sorgente', 'volatilita_log').order('created_at', { ascending: false }).limit(10);
         var records = result.data;
         if (!records || !records.length) return;
 

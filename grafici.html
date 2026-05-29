@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -15,6 +15,11 @@
     <style>
         ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#252932;border-radius:4px}
         .coin-tab.active{background:#252932;color:#f8fafc;border-color:#20c997}
+        #chart-canvas{display:block;cursor:crosshair}
+        #chart-tip{position:absolute;pointer-events:none;background:#1c222b;border:1px solid #252932;border-radius:6px;padding:7px 10px;font-size:11px;color:#aeb8c4;display:none;z-index:5;white-space:nowrap}
+        #chart-tip b{color:#f8fafc}
+        .layer-toggle input[type=checkbox]{accent-color:#20c997;width:14px;height:14px;cursor:pointer}
+        .layer-swatch{width:12px;height:12px;border-radius:2px;display:inline-block;flex-shrink:0}
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
@@ -50,6 +55,7 @@
             <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span></a>
 
             <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span></a>
+
             <a href="ipotesi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Ipotesi</span></a>
 
             <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
@@ -75,10 +81,10 @@
 
         <!-- Contenuto -->
         <div class="flex-1 overflow-y-auto p-3 lg:p-6">
-            <div class="max-w-[1800px] mx-auto flex flex-col h-full">
+            <div class="max-w-[1800px] mx-auto flex flex-col gap-3">
 
-                <!-- Coin Tabs + Screenshot Button -->
-                <div class="flex items-center justify-between mb-4">
+                <!-- Coin Tabs -->
+                <div class="flex items-center justify-between">
                     <div class="flex bg-tp-panel border border-tp-border rounded-lg p-1 gap-1" id="coin-tabs">
                         <button onclick="switchCoin('XAUUSD')" class="coin-tab active text-xs font-bold px-4 py-2 rounded border border-transparent transition-colors">XAUUSD</button>
                         <button onclick="switchCoin('US30')" class="coin-tab text-xs font-bold px-4 py-2 rounded border border-transparent text-tp-muted hover:text-white transition-colors">US30</button>
@@ -86,408 +92,1527 @@
                         <button onclick="switchCoin('NAS100')" class="coin-tab text-xs font-bold px-4 py-2 rounded border border-transparent text-tp-muted hover:text-white transition-colors">NAS100</button>
                         <button onclick="switchCoin('BTCUSD')" class="coin-tab text-xs font-bold px-4 py-2 rounded border border-transparent text-tp-muted hover:text-white transition-colors">BTCUSD</button>
                     </div>
-                    <button onclick="takeScreenshot()" class="flex items-center gap-2 bg-tp-accent hover:bg-tp-accent/80 text-[#0a0c10] font-bold text-sm px-5 py-2.5 rounded-lg transition-colors shadow-lg shadow-tp-accent/20">
-                        <i data-lucide="camera" class="w-4 h-4"></i> Screenshot
-                    </button>
+                    <div class="flex items-center gap-3">
+                        <input type="date" id="date-picker"
+                            onchange="switchDate(this.value)"
+                            class="bg-tp-panel border border-tp-border rounded-lg px-3 py-1.5 text-xs text-tp-text focus:outline-none focus:border-tp-accent/50 cursor-pointer">
+                        <span id="chart-date-label" class="text-xs text-tp-muted font-mono hidden lg:block"></span>
+                    </div>
                 </div>
 
-                <!-- TradingView Chart Container -->
-                <div id="tv-chart-container" class="flex-1 min-h-[500px] bg-tp-panel border border-tp-border rounded-xl overflow-hidden relative">
-                    <div id="tv-loading" class="absolute inset-0 flex items-center justify-center bg-tp-panel z-10">
-                        <div class="flex items-center gap-3 text-tp-muted"><i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i> Caricamento grafico...</div>
+                <!-- Layer Panel -->
+                <div class="flex flex-wrap items-center gap-x-5 gap-y-2 bg-tp-panel border border-tp-border rounded-lg px-4 py-2.5">
+                    <span class="text-[9px] font-bold uppercase tracking-widest text-tp-muted mr-1">Layer</span>
+
+                    <label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none" title="Barre H/L M15 — sempre visibile">
+                        <span class="layer-swatch" style="background:rgba(170,180,195,.5)"></span>
+                        <span class="text-[11px] text-tp-muted font-medium">Candele</span>
+                        <input type="checkbox" id="layer-candles" checked disabled class="opacity-40">
+                    </label>
+
+                    <label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none">
+                        <span class="layer-swatch" style="background:#26a69a"></span>
+                        <span class="text-[11px] text-tp-muted font-medium">OHLC</span>
+                        <input type="checkbox" id="layer-ohlc" checked>
+                    </label>
+
+                    <label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none">
+                        <span class="layer-swatch" style="background:rgba(255,255,255,.4)"></span>
+                        <span class="text-[11px] text-tp-muted font-medium">Prezzo live</span>
+                        <input type="checkbox" id="layer-prezzo" checked>
+                    </label>
+
+                    <div class="w-px h-4 bg-tp-border"></div>
+
+                    <label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none">
+                        <span class="layer-swatch" style="background:rgba(201,162,39,.25);border:1px solid rgba(201,162,39,.7)"></span>
+                        <span class="text-[11px] text-tp-muted font-medium">Asia</span>
+                        <input type="checkbox" id="layer-asia" checked>
+                    </label>
+
+                    <label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none">
+                        <span class="layer-swatch" style="background:rgba(32,201,151,.25);border:1px solid rgba(32,201,151,.7)"></span>
+                        <span class="text-[11px] text-tp-muted font-medium">London</span>
+                        <input type="checkbox" id="layer-london" checked>
+                    </label>
+
+                    <label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none">
+                        <span class="layer-swatch" style="background:rgba(155,140,255,.25);border:1px solid rgba(155,140,255,.7)"></span>
+                        <span class="text-[11px] text-tp-muted font-medium">NY</span>
+                        <input type="checkbox" id="layer-ny" checked>
+                    </label>
+
+                    <div class="w-px h-4 bg-tp-border"></div>
+
+                    <label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none">
+                        <span class="layer-swatch" style="background:#e0a73a"></span>
+                        <span class="text-[11px] text-tp-muted font-medium">News</span>
+                        <input type="checkbox" id="layer-news">
+                        <span id="badge-news" class="text-[9px] font-bold text-tp-muted hidden"></span>
+                    </label>
+
+                    <label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none">
+                        <span class="layer-swatch" style="background:rgba(38,166,154,.5);border:1px solid rgba(38,166,154,.8)"></span>
+                        <span class="text-[11px] text-tp-muted font-medium">FVG</span>
+                        <input type="checkbox" id="layer-fvg">
+                        <span id="badge-fvg" class="text-[9px] font-bold text-tp-muted hidden"></span>
+                    </label>
+
+                    <label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none">
+                        <span class="layer-swatch" style="background:#9b8cff;border-radius:50%"></span>
+                        <span class="text-[11px] text-tp-muted font-medium">Ipotesi</span>
+                        <input type="checkbox" id="layer-ipotesi">
+                        <span id="badge-ipotesi" class="text-[9px] font-bold text-tp-muted hidden"></span>
+                    </label>
+
+                    <label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none">
+                        <span class="layer-swatch" style="background:#26a69a"></span>
+                        <span class="text-[11px] text-tp-muted font-medium">Trade</span>
+                        <input type="checkbox" id="layer-trade">
+                        <span id="badge-trade" class="text-[9px] font-bold text-tp-muted hidden"></span>
+                    </label>
+
+                    <label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none">
+                        <span class="layer-swatch" style="background:#f59e0b"></span>
+                        <span class="text-[11px] text-tp-muted font-medium">Soglie %</span>
+                        <input type="checkbox" id="layer-soglie">
+                    </label>
+
+                    <label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none">
+                        <span class="layer-swatch" style="background:#a78bfa"></span>
+                        <span class="text-[11px] text-tp-muted font-medium">Smile</span>
+                        <input type="checkbox" id="layer-smile">
+                    </label>
+
+                    <div class="w-px h-4 bg-tp-border"></div>
+
+                    <label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none">
+                        <span class="layer-swatch" style="background:#20c997;border-radius:2px"></span>
+                        <span class="text-[11px] text-tp-muted font-medium">Bias H4</span>
+                        <input type="checkbox" id="layer-biasstr" checked>
+                    </label>
+
+                    <label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none">
+                        <span class="layer-swatch" style="background:#20c997;border-radius:50%"></span>
+                        <span class="text-[11px] text-tp-muted font-medium">Bias Op.</span>
+                        <input type="checkbox" id="layer-biasop" checked>
+                    </label>
+
+                    <label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none">
+                        <span class="layer-swatch" style="background:#20c997;border-radius:50%"></span>
+                        <span class="text-[11px] text-tp-muted font-medium">Forza USD</span>
+                        <input type="checkbox" id="layer-usd" checked>
+                    </label>
+                </div>
+
+                <!-- FVG Panel (compare quando layer FVG è attivo e ci sono dati) -->
+                <div id="fvg-panel" class="hidden bg-tp-panel border border-tp-border rounded-lg px-3 py-2.5 flex flex-col gap-1.5">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[9px] font-bold uppercase tracking-widest text-tp-muted">FVG attive</span>
+                        <span id="fvg-count" class="text-[9px] text-tp-muted/40"></span>
+                        <span class="text-[8px] text-tp-muted/30 ml-1">· deseleziona per nascondere · V = riempita</span>
                     </div>
-                    <div id="tradingview_widget" class="w-full h-full"></div>
+                    <div id="fvg-list" class="flex flex-wrap gap-x-4 gap-y-1"></div>
+                </div>
+
+                <!-- Canvas Chart -->
+                <div class="bg-tp-panel border border-tp-border rounded-xl overflow-hidden relative" style="position:relative">
+                    <canvas id="chart-canvas" style="width:100%;height:600px"></canvas>
+                    <div id="chart-tip"></div>
+                </div>
+
+                <!-- Cards row: Ipotesi · Commenti Giornata · Aggiornamenti Bias -->
+                <div class="flex gap-3 items-start">
+
+                    <!-- Ipotesi (1/3) -->
+                    <div class="flex-1 min-w-0 flex flex-col gap-2">
+                        <div class="flex items-center gap-2 px-1">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">Ipotesi</span>
+                            <span class="text-[9px] text-tp-muted/50">· solo visualizzazione</span>
+                        </div>
+                        <div id="ipotesi-cards-list" class="flex flex-col gap-2">
+                            <p class="text-[11px] text-tp-muted/40 px-1">Attiva il layer Ipotesi</p>
+                        </div>
+                    </div>
+
+                    <!-- Commenti Giornata (1/3) -->
+                    <div class="flex-1 min-w-0 flex flex-col gap-2">
+                        <div class="flex items-center gap-2 px-1">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">Commenti Giornata</span>
+                        </div>
+                        <div id="bias-commenti-list" class="flex flex-col gap-2">
+                            <p class="text-[11px] text-tp-muted/40 px-1">Caricamento…</p>
+                        </div>
+                    </div>
+
+                    <!-- Aggiornamenti Bias (1/3) -->
+                    <div class="flex-1 min-w-0 flex flex-col gap-2">
+                        <div class="flex items-center gap-2 px-1">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">Aggiornamenti Bias</span>
+                        </div>
+                        <div id="bias-agg-list" class="flex flex-col gap-2">
+                            <p class="text-[11px] text-tp-muted/40 px-1">Caricamento…</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Events Table (si popola con i layer attivi) -->
+                <div id="events-section" class="hidden">
+                    <table class="w-full border-collapse text-xs">
+                        <thead>
+                            <tr class="text-tp-muted border-b border-tp-border">
+                                <th class="text-left py-2 px-3 font-semibold uppercase tracking-wider text-[10px]">UTC</th>
+                                <th class="text-left py-2 px-3 font-semibold uppercase tracking-wider text-[10px]">Casa</th>
+                                <th class="text-left py-2 px-3 font-semibold uppercase tracking-wider text-[10px]">Tipo</th>
+                                <th class="text-left py-2 px-3 font-semibold uppercase tracking-wider text-[10px]">Dettaglio</th>
+                            </tr>
+                        </thead>
+                        <tbody id="events-tbody"></tbody>
+                    </table>
                 </div>
 
             </div>
         </div>
     </main>
 
-    <!-- Modal Screenshot: Step 1 - Scegli Destinazione -->
-    <div id="modal-screen-dest" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeScreenModal()"></div>
-        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-md mx-4 relative z-10 shadow-2xl overflow-hidden flex flex-col">
-            <div class="px-6 py-4 border-b border-tp-border bg-tp-panel relative">
-                <div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-accent"></div>
-                <h2 class="text-lg font-bold flex items-center gap-2"><i data-lucide="camera" class="w-5 h-5 text-tp-accent"></i> Salva Screenshot</h2>
-                <p class="text-xs text-tp-muted mt-1" id="screen-coin-label">XAUUSD</p>
-            </div>
-            <div class="px-4 pt-4 pb-2">
-                <label class="text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-2 block">Screenshot</label>
-                <div id="screen-paste-zone" class="w-full min-h-[80px] bg-tp-bg border-2 border-dashed border-tp-border rounded-lg flex items-center justify-center cursor-pointer hover:border-tp-accent/50 transition-colors relative" onclick="document.getElementById('screen-paste-zone').focus()" tabindex="0">
-                    <div id="screen-paste-placeholder" class="flex flex-col items-center gap-1 py-4">
-                        <i data-lucide="clipboard-paste" class="w-6 h-6 text-tp-muted"></i>
-                        <span class="text-xs text-tp-muted">Clicca qui e premi <kbd class="bg-tp-border px-1.5 py-0.5 rounded text-[10px] font-bold">Ctrl+V</kbd> per incollare immagine</span>
-                        <span class="text-[9px] text-tp-muted/50">Copia immagine dalla scheda TradingView</span>
-                    </div>
-                    <img id="screen-preview" class="hidden max-h-[150px] rounded" />
-                </div>
-                <div class="flex items-center gap-2 mt-2">
-                    <div class="flex-1 h-px bg-tp-border"></div>
-                    <span class="text-[9px] text-tp-muted font-bold">OPPURE</span>
-                    <div class="flex-1 h-px bg-tp-border"></div>
-                </div>
-                <input id="screen-url-input" type="text" placeholder="Incolla URL immagine dalla barra indirizzi..." class="w-full bg-tp-bg border border-tp-border rounded-lg px-3 py-2 text-xs text-white placeholder-tp-muted/50 focus:outline-none focus:border-tp-accent/50 mt-2" oninput="onUrlInput(this.value)">
-            </div>
-            <div class="p-4 space-y-2" id="dest-buttons">
-                <button onclick="selectDest('cronaca')" class="w-full flex items-center gap-3 px-4 py-3 bg-tp-panel border border-tp-border rounded-lg hover:border-tp-accent/50 transition-colors text-left">
-                    <i data-lucide="book-open" class="w-5 h-5 text-tp-accent"></i>
-                    <div><span class="text-sm font-bold text-white">Cronaca</span><p class="text-[10px] text-tp-muted">Screenshot per coin nella cronaca del giorno</p></div>
-                </button>
-                <button onclick="selectDest('trade')" class="w-full flex items-center gap-3 px-4 py-3 bg-tp-panel border border-tp-border rounded-lg hover:border-tp-accent/50 transition-colors text-left">
-                    <i data-lucide="crosshair" class="w-5 h-5 text-tp-accent"></i>
-                    <div><span class="text-sm font-bold text-white">Trade</span><p class="text-[10px] text-tp-muted">Screenshot setup/entry del trade</p></div>
-                </button>
-                <button onclick="selectDest('sessione')" class="w-full flex items-center gap-3 px-4 py-3 bg-tp-panel border border-tp-border rounded-lg hover:border-tp-accent/50 transition-colors text-left">
-                    <i data-lucide="sun" class="w-5 h-5 text-tp-accent"></i>
-                    <div><span class="text-sm font-bold text-white">Sessione</span><p class="text-[10px] text-tp-muted">Screenshot della sessione (Asia/Londra/NY)</p></div>
-                </button>
-                <button onclick="selectDest('bias')" class="w-full flex items-center gap-3 px-4 py-3 bg-tp-panel border border-tp-border rounded-lg hover:border-tp-accent/50 transition-colors text-left">
-                    <i data-lucide="brain" class="w-5 h-5 text-tp-accent"></i>
-                    <div><span class="text-sm font-bold text-white">Bias</span><p class="text-[10px] text-tp-muted">Screenshot del bias</p></div>
-                </button>
-                <button onclick="selectDest('strategia')" class="w-full flex items-center gap-3 px-4 py-3 bg-tp-panel border border-tp-border rounded-lg hover:border-tp-accent/50 transition-colors text-left">
-                    <i data-lucide="target" class="w-5 h-5 text-tp-accent"></i>
-                    <div><span class="text-sm font-bold text-white">Strategia</span><p class="text-[10px] text-tp-muted">Aggiungi alla galleria della strategia</p></div>
-                </button>
-                <button onclick="selectDest('allert')" class="w-full flex items-center gap-3 px-4 py-3 bg-tp-panel border border-tp-border rounded-lg hover:border-tp-accent/50 transition-colors text-left">
-                    <i data-lucide="bell" class="w-5 h-5 text-tp-accent"></i>
-                    <div><span class="text-sm font-bold text-white">Allert</span><p class="text-[10px] text-tp-muted">Screenshot per un evento/allert</p></div>
-                </button>
-            </div>
-            <div class="flex justify-end px-6 py-3 border-t border-tp-border bg-tp-panel">
-                <button onclick="closeScreenModal()" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white border border-tp-border rounded-lg">Annulla</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Screenshot: Step 2 - Scegli Record -->
-    <div id="modal-screen-record" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeRecordModal()"></div>
-        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-md mx-4 relative z-10 shadow-2xl overflow-hidden flex flex-col">
-            <div class="px-6 py-4 border-b border-tp-border bg-tp-panel relative">
-                <div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-accent"></div>
-                <h2 class="text-lg font-bold flex items-center gap-2" id="record-modal-title">Scegli record</h2>
-                <p class="text-xs text-tp-muted mt-1" id="record-modal-sub"></p>
-            </div>
-            <div class="p-4 max-h-[400px] overflow-y-auto space-y-2" id="record-list">
-                <div class="flex items-center justify-center h-20 text-tp-muted text-sm">
-                    <i data-lucide="loader-2" class="w-5 h-5 animate-spin mr-2"></i> Caricamento...
-                </div>
-            </div>
-            <div class="flex justify-between px-6 py-3 border-t border-tp-border bg-tp-panel">
-                <button onclick="closeRecordModal(); document.getElementById('modal-screen-dest').classList.add('open');" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white border border-tp-border rounded-lg flex items-center gap-1"><i data-lucide="arrow-left" class="w-3 h-3"></i> Indietro</button>
-                <button onclick="closeRecordModal()" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white border border-tp-border rounded-lg">Annulla</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Conferma -->
-    <div id="modal-confirm" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeConfirm()"></div>
-        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-sm mx-4 relative z-10 shadow-2xl overflow-hidden flex flex-col">
-            <div class="px-6 py-4 border-b border-tp-border bg-tp-panel relative">
-                <div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-accent"></div>
-                <h2 id="confirm-title" class="text-lg font-bold">Salvato</h2>
-            </div>
-            <div class="p-6">
-                <p id="confirm-msg" class="text-sm text-tp-muted"></p>
-            </div>
-            <div class="flex justify-end px-6 py-4 border-t border-tp-border bg-tp-panel">
-                <button onclick="closeConfirm()" class="bg-tp-accent hover:bg-tp-accent/80 text-[#0a0c10] px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors">OK</button>
-            </div>
-        </div>
-    </div>
-
     <script src="app.js"></script>
     <script>
         // ==========================================
-        // GRAFICI - TradingView + Screenshot
+        // GRAFICI LIVE
         // ==========================================
 
         const COINS = ['XAUUSD','US30','GER30','NAS100','BTCUSD'];
-        const TV_SYMBOLS = {
-            'XAUUSD': 'OANDA:XAUUSD',
-            'US30': 'BLACKBULL:US30',
-            'GER30': 'PEPPERSTONE:GER40',
-            'NAS100': 'PEPPERSTONE:NAS100',
-            'BTCUSD': 'BITSTAMP:BTCUSD'
-        };
-
         let currentCoin = 'XAUUSD';
-        let tvWidget = null;
-        let screenshotUrl = '';
-        let selectedDest = '';
+        // oggi in Casablanca (UTC+1)
+        var _todayCasa = new Date(Date.now() + 3600000);
+        var currentDate = _todayCasa.toISOString().split('T')[0];
 
-        // --- TradingView Widget ---
-        function loadChart(symbol) {
-            const container = document.getElementById('tradingview_widget');
-            container.innerHTML = '';
-            document.getElementById('tv-loading').style.display = 'flex';
+        let candles = [];   // {t, tMs, p, h, l, o, c, faded}
+        let usdData = [];   // {tMs, v}
+        let newsData = [];  // {tMs, t, titolo, valuta, impatto}
+        let biasH4      = [];  // array 6 slot ["long"|"short"|"neutro"|null]
+        let liveH4Val   = null; // valore live slot corrente da watchlist
+        let biasOp        = [];  // aggiornamenti bias operativi {tMs, t, direzione, testo}
+        let biasOpMarkers = [];  // posizioni marker per hover {x, y, r, testo, lbl, col}
+        let smileData     = [];  // {tMs, t, mindset, sorgente}
+        let smileMarkers  = [];  // per hover {x, y, r, mindset, sorgente, t}
+        let ipotesiData    = [];  // {tMs, t, id, code, direzione, strategia, note, commento_post}
+        let ipotesiMarkers = [];  // {x, y, r, strategia, direzione, code}
+        let biasCommenti   = [];  // top-level bias.commenti_giornata [{ora, testo, mindset, tags}]
+        let fvgData        = [];  // {id, ora, tMs, createdDate, descrizione, gap_lo, gap_hi, dir}
+        let volData        = [];  // {tMs, volatilita} — log da monitora_smile ogni 15min
+        let compressData   = [];  // {tMs, t, descrizione} — EMA60 touch da allert_prezzo
+        let compressMarkers = [];
+        let soglieData     = [];  // {tMs, t, prezzo, descrizione}
+        let soglieMarkers  = [];  // {x, y, r, descrizione, col}
+        let tradeData      = [];  // {tMs, t, id, direzione, entry, sl, tp, exit, esito, stato}
+        let tradeMarkers   = [];  // {x, y, r, trade}
+        let hoveredTrade   = null;
+        let asiaBox   = null;
+        let londonBox = null;
+        let nyBox     = null;
+        let geom = null;
+        let slotW = 0;
 
-            var tvSymbol = TV_SYMBOLS[symbol] || symbol;
-            var iframe = document.createElement('iframe');
-            iframe.src = 'https://s.tradingview.com/widgetembed/?hideideas=1&overrides=&enabled_features=&disabled_features=&locale=it#' + JSON.stringify({
-                symbol: tvSymbol,
-                frameElementId: 'tradingview_widget',
-                interval: '15',
-                hide_side_toolbar: '0',
-                allow_symbol_change: '1',
-                save_image: '1',
-                details: '1',
-                hotlist: '0',
-                calendar: '0',
-                studies: ['Volume@tv-basicstudies'],
-                theme: 'dark',
-                style: '1',
-                timezone: 'Europe/Rome',
-                withdateranges: '1',
-                show_popup_button: '0',
-                studies_overrides: '{}',
-                utm_source: '',
-                utm_medium: '',
-                utm_campaign: ''
-            });
-            iframe.style.width = '100%';
-            iframe.style.height = '100%';
-            iframe.style.border = 'none';
-            iframe.allowFullscreen = true;
-            iframe.allow = 'autoplay; encrypted-media';
+        const cv = document.getElementById('chart-canvas');
+        const tip = document.getElementById('chart-tip');
 
-            iframe.onload = function() {
-                document.getElementById('tv-loading').style.display = 'none';
-            };
-
-            container.appendChild(iframe);
+        // ---- coordinate system (Casa times come riferimento X) ----
+        // Usa currentDate come ancora — i tempi Casa vengono mappati
+        // "come se fossero UTC" sul canvas per consistenza con i dati
+        function T(s) {
+            return new Date(currentDate + 'T' + s + ':00Z').getTime();
         }
 
+        // ---- switch coin/data ----
         function switchCoin(coin) {
             currentCoin = coin;
             document.querySelectorAll('.coin-tab').forEach(function(btn) {
                 btn.classList.remove('active');
                 if (btn.textContent.trim() === coin) btn.classList.add('active');
             });
-            loadChart(coin);
+            loadData();
         }
 
-        // --- Screenshot ---
-        async function takeScreenshot() {
-            document.getElementById('screen-coin-label').textContent = currentCoin;
-            document.getElementById('screen-url-input').value = '';
-            // Reset preview
-            document.getElementById('screen-preview').classList.add('hidden');
-            document.getElementById('screen-preview').src = '';
-            document.getElementById('screen-paste-placeholder').classList.remove('hidden');
-            document.getElementById('modal-screen-dest').classList.add('open');
-            lucide.createIcons();
-            setTimeout(function() { document.getElementById('screen-paste-zone').focus(); }, 300);
+        function switchDate(d) {
+            currentDate = d;
+            loadData();
         }
 
-        // --- URL input manuale ---
-        function onUrlInput(val) {
-            if (val.trim()) {
-                var preview = document.getElementById('screen-preview');
-                preview.src = val.trim();
-                preview.classList.remove('hidden');
-                document.getElementById('screen-paste-placeholder').classList.add('hidden');
+        // ---- layer toggle listeners ----
+        ['ohlc','prezzo','asia','london','ny','news','fvg','ipotesi','trade','soglie','smile','usd','biasstr','biasop'].forEach(function(id) {
+            document.getElementById('layer-' + id).addEventListener('change', function() {
+                drawChart();
+                if (id === 'ipotesi') renderIpotesiCards();
+                if (id === 'fvg') {
+                    var panel = document.getElementById('fvg-panel');
+                    if (panel) panel.classList.toggle('hidden', !layerOn('fvg') || fvgData.length === 0);
+                }
+            });
+        });
+
+        function layerOn(id) { return document.getElementById('layer-' + id).checked; }
+
+        // ==========================================
+        // LOAD DATA — carica tutti i layer in parallelo
+        // ==========================================
+        async function loadData() {
+            candles = [];
+            usdData = [];
+            newsData = [];
+            biasH4 = [];
+            biasOp = [];
+            smileData = [];
+            ipotesiData = [];
+            biasCommenti = [];
+            fvgData = [];
+            soglieData = [];
+            volData = [];
+            compressData = [];
+            tradeData = [];
+            hoveredTrade = null;
+            liveH4Val = null;
+            asiaBox = null; londonBox = null; nyBox = null;
+            drawChart();
+            await Promise.all([loadCandles(), loadUsd(), loadNews(), loadBiasH4(), loadLiveH4(), loadSmile(), loadIpotesi(), loadFvg(), loadSoglie(), loadTrades(), loadVolatilita(), loadCompress()]);
+            buildAsiaBox(); buildLondonBox(); buildNyBox();
+            drawChart();
+            renderIpotesiCards();
+            renderBiasViewers();
+        }
+
+        function buildSessionBox(startSlot, endSlot) {
+            var s = candles.filter(function(c) {
+                return c.tMs >= T(startSlot) && c.tMs < T(endSlot);
+            });
+            if (s.length === 0) return null;
+            var lo = Math.min.apply(null, s.map(function(c) { return c.l; }));
+            var hi = Math.max.apply(null, s.map(function(c) { return c.h; }));
+            var withOC = s.filter(function(c) { return c.o !== null && c.c !== null; });
+            var avg = withOC.length > 0
+                ? withOC.reduce(function(sum, c) { return sum + (c.o + c.c) / 2; }, 0) / withOC.length
+                : (lo + hi) / 2;
+            return { low: lo, high: hi, avg: avg, range: (hi - lo).toFixed(1), start: T(startSlot), end: T(endSlot) };
+        }
+
+        function buildAsiaBox()   { asiaBox   = buildSessionBox('01:00', '06:00'); }
+        function buildLondonBox() { londonBox = buildSessionBox('08:00', '12:30'); }
+        function buildNyBox()     { nyBox     = buildSessionBox('14:30', '17:00'); }
+
+        // ==========================================
+        // LOAD CANDELE DA watchlist_snapshots
+        // ==========================================
+        async function loadCandles() {
+            candles = [];
+            drawChart();
+
+            // snapshot e un array JSONB con tutti gli asset per ogni slot 15m
+            // captured_at e UTC — filtriamo la giornata Casa (+1h)
+            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+
+            const { data, error } = await db
+                .from('watchlist_snapshots')
+                .select('captured_at, snapshot')
+                .gte('captured_at', utcStart)
+                .lte('captured_at', utcEnd)
+                .order('captured_at');
+
+            if (error) { console.error('watchlist_snapshots:', error); return; }
+
+            candles = (data || []).map(function(r) {
+                var entry = (r.snapshot || []).find(function(e) { return e.simbolo === currentCoin; });
+                if (!entry) return null;
+
+                var utcMs  = new Date(r.captured_at).getTime();
+                // L'EA salva l'OHLC della candela precedente (shift=1 MT4),
+                // quindi captured_at e 30min avanti rispetto all'apertura reale.
+                // +30min invece di +60min: annulla il delay EA e converte in Casa.
+                var casaMs = utcMs + 1800000;
+                var d  = new Date(casaMs);
+                var hh = String(d.getUTCHours()).padStart(2,'0');
+                var mm = String(d.getUTCMinutes()).padStart(2,'0');
+                var t  = hh + ':' + mm;
+                var p  = parseFloat(entry.prezzo);
+                var h  = entry.high_15m  ? parseFloat(entry.high_15m)  : p;
+                var l  = entry.low_15m   ? parseFloat(entry.low_15m)   : p;
+                var o  = entry.open_15m  ? parseFloat(entry.open_15m)  : null;
+                var c  = entry.close_15m ? parseFloat(entry.close_15m) : null;
+
+                return { t: t, tMs: T(t), p: p, h: h, l: l, o: o, c: c, faded: o === null };
+            }).filter(Boolean);
+        }
+
+        // ==========================================
+        // SLOT H4 CORRENTE — logica identica a dettaglio_bias.html
+        // ==========================================
+        function getCurrentH4LiveSlot() {
+            var now = new Date();
+            var casaHour = (now.getUTCHours() + 1) % 24;
+            var totalMin = casaHour * 60 + now.getUTCMinutes();
+            var closes = [180, 420, 660, 900, 1140, 1380]; // 03,07,11,15,19,23 in minuti
+            for (var i = 0; i < closes.length; i++) {
+                if (totalMin < closes[i]) return i;
+            }
+            return 0; // dopo le 23:00 → prossima chiusura è 03:00 (slot 0)
+        }
+
+        // ==========================================
+        // LOAD LIVE H4 (watchlist: prezzo vs h4_high/h4_low)
+        // ==========================================
+        async function loadLiveH4() {
+            liveH4Val = null;
+            const { data, error } = await db
+                .from('watchlist')
+                .select('prezzo, h4_high, h4_low')
+                .eq('simbolo', currentCoin)
+                .eq('active', true)
+                .maybeSingle();
+            if (error || !data || !data.prezzo || !data.h4_high || !data.h4_low) return;
+            var price = parseFloat(data.prezzo);
+            var h4h   = parseFloat(data.h4_high);
+            var h4l   = parseFloat(data.h4_low);
+            if (!price || !h4h || !h4l) return;
+            liveH4Val = price > h4h ? 'long' : price < h4l ? 'short' : 'neutro';
+        }
+
+        // ==========================================
+        // LOAD FORZA USD
+        // ==========================================
+        async function loadUsd() {
+            usdData = [];
+            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const { data, error } = await db
+                .from('forza_usd')
+                .select('created_at, usd_strength')
+                .gte('created_at', utcStart)
+                .lte('created_at', utcEnd)
+                .order('created_at');
+            if (error) { console.error('forza_usd:', error); return; }
+            usdData = (data || []).map(function(r) {
+                var casaMs = new Date(r.created_at).getTime() + 3600000;
+                var d = new Date(casaMs);
+                var hh = String(d.getUTCHours()).padStart(2,'0');
+                var mm = String(d.getUTCMinutes()).padStart(2,'0');
+                return { tMs: T(hh + ':' + mm), v: parseFloat(r.usd_strength) };
+            }).filter(function(d) { return !isNaN(d.v); });
+        }
+
+        // ==========================================
+        // LOAD NEWS (allert — ora_evento è già ora Casa)
+        // ==========================================
+        async function loadNews() {
+            newsData = [];
+            const { data, error } = await db
+                .from('allert')
+                .select('ora_evento, titolo, valuta, impatto')
+                .eq('data_evento', currentDate)
+                .order('ora_evento');
+            if (error) { console.error('allert:', error); return; }
+            newsData = (data || []).map(function(r) {
+                var t = r.ora_evento.substring(0, 5); // "HH:MM"
+                return { tMs: T(t), t: t, titolo: r.titolo || '', valuta: r.valuta || '', impatto: r.impatto || 'medio' };
+            });
+            var el = document.getElementById('badge-news');
+            if (newsData.length > 0) { el.textContent = newsData.length; el.classList.remove('hidden'); }
+            else el.classList.add('hidden');
+        }
+
+        // ==========================================
+        // LOAD BIAS H4 (bias.coin_data[asset].bias_h4)
+        // ==========================================
+        async function loadBiasH4() {
+            biasH4 = [];
+            const { data, error } = await db
+                .from('bias')
+                .select('coin_data, commenti_giornata')
+                .eq('data', currentDate)
+                .maybeSingle();
+            if (error || !data) return;
+            biasCommenti = data.commenti_giornata || [];
+            var asset = data.coin_data && data.coin_data[currentCoin];
+            if (!asset) return;
+            biasH4 = asset.bias_h4 || [];
+            biasOp = (asset.aggiornamenti || []).map(function(a) {
+                return { tMs: T(a.ora), t: a.ora, direzione: a.direzione || 'neutro', testo: a.testo || '' };
+            }).filter(function(a) { return !isNaN(a.tMs); });
+        }
+
+        // ==========================================
+        // LOAD SMILE (monitora_smile)
+        // ==========================================
+        async function loadSmile() {
+            smileData = [];
+            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const { data, error } = await db
+                .from('monitora_smile')
+                .select('created_at, mindset, sorgente')
+                .gte('created_at', utcStart)
+                .lte('created_at', utcEnd)
+                .order('created_at');
+            if (error) { console.error('monitora_smile:', error); return; }
+            smileData = (data || []).map(function(r) {
+                var casaMs = new Date(r.created_at).getTime() + 3600000;
+                var d = new Date(casaMs);
+                var hh = String(d.getUTCHours()).padStart(2,'0');
+                var mm = String(d.getUTCMinutes()).padStart(2,'0');
+                return { tMs: T(hh + ':' + mm), t: hh + ':' + mm, mindset: r.mindset || '', sorgente: r.sorgente || '' };
+            });
+        }
+
+        function renderBiasViewers() {
+            // --- commenti giornata ---
+            var cList = document.getElementById('bias-commenti-list');
+            if (cList) {
+                if (biasCommenti.length === 0) {
+                    cList.innerHTML = '<p class="text-[11px] text-tp-muted/40 px-1">Nessun commento</p>';
+                } else {
+                    cList.innerHTML = biasCommenti.map(function(c) {
+                        var mCol = c.mindset === 'positive' ? '#20c997' : c.mindset === 'negative' ? '#f43f5e' : '#8b5cf6';
+                        var mIcon = c.mindset === 'positive' ? '◉' : c.mindset === 'negative' ? '◎' : '○';
+                        var tags = (c.tags || []).map(function(tg) {
+                            return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#20c99720] text-[#20c997] border border-[#20c99740]">' + tg + '</span>';
+                        }).join('');
+                        return '<div class="bg-tp-panel border border-tp-border rounded-lg px-3 py-2.5 flex flex-col gap-1.5">'
+                            + '<div class="flex items-center gap-2">'
+                            +   '<span class="text-[10px] font-mono text-tp-muted">' + (c.ora || '') + '</span>'
+                            +   (c.mindset ? '<span class="text-[10px] font-bold" style="color:' + mCol + '">' + mIcon + '</span>' : '')
+                            + '</div>'
+                            + '<p class="text-[11px] text-tp-text/80 leading-relaxed">' + (c.testo || '') + '</p>'
+                            + (tags ? '<div class="flex flex-wrap gap-1">' + tags + '</div>' : '')
+                            + '</div>';
+                    }).join('');
+                }
+            }
+            // --- aggiornamenti bias (biasOp) ---
+            var aList = document.getElementById('bias-agg-list');
+            if (aList) {
+                if (biasOp.length === 0) {
+                    aList.innerHTML = '<p class="text-[11px] text-tp-muted/40 px-1">Nessun aggiornamento</p>';
+                } else {
+                    aList.innerHTML = biasOp.map(function(a) {
+                        var col = a.direzione === 'long' ? '#20c997' : a.direzione === 'short' ? '#f43f5e' : '#eab308';
+                        var lbl = a.direzione === 'long' ? '↑ L' : a.direzione === 'short' ? '↓ S' : '— N';
+                        return '<div class="bg-tp-panel border border-tp-border rounded-lg px-3 py-2.5 flex flex-col gap-1.5">'
+                            + '<div class="flex items-center gap-2">'
+                            +   '<span class="text-[10px] font-mono text-tp-muted">' + a.t + '</span>'
+                            +   '<span class="text-[10px] font-bold" style="color:' + col + '">' + lbl + '</span>'
+                            + '</div>'
+                            + (a.testo ? '<p class="text-[11px] text-tp-text/80 leading-relaxed">' + a.testo + '</p>' : '')
+                            + '</div>';
+                    }).join('');
+                }
             }
         }
 
-        // --- Paste immagine ---
-        document.addEventListener('paste', async function(e) {
-            var modal = document.getElementById('modal-screen-dest');
-            if (!modal.classList.contains('open')) return;
+        // ==========================================
+        // LOAD IPOTESI (ipotesi_trading JOIN strategie)
+        // ==========================================
+        async function loadIpotesi() {
+            ipotesiData = [];
+            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const { data, error } = await db
+                .from('ipotesi_trading')
+                .select('id, created_at, direzione, note, commento_post, stato, strategia_id, strategie(nome)')
+                .eq('asset', currentCoin)
+                .gte('created_at', utcStart)
+                .lte('created_at', utcEnd)
+                .order('created_at');
+            if (error) { console.error('ipotesi_trading:', error); return; }
+            ipotesiData = (data || []).map(function(r) {
+                var casaMs = new Date(r.created_at).getTime() + 3600000;
+                var d = new Date(casaMs);
+                var hh = String(d.getUTCHours()).padStart(2,'0');
+                var mm = String(d.getUTCMinutes()).padStart(2,'0');
+                return {
+                    tMs: T(hh + ':' + mm),
+                    t: hh + ':' + mm,
+                    id: r.id,
+                    code: '#' + r.id.substring(0, 6),
+                    direzione: (r.direzione || '').toLowerCase(),
+                    stato: r.stato || '',
+                    strategia: (r.strategie && r.strategie.nome) ? r.strategie.nome : '—',
+                    note: r.note || '',
+                    commento_post: r.commento_post || ''
+                };
+            });
+            renderIpotesiCards();
+        }
 
-            var items = e.clipboardData?.items;
-            if (!items) return;
+        function renderIpotesiCards() {
+            var list = document.getElementById('ipotesi-cards-list');
+            if (!list) return;
+            if (!layerOn('ipotesi') || ipotesiData.length === 0) {
+                list.innerHTML = '<p class="text-[11px] text-tp-muted/40 px-1">' + (layerOn('ipotesi') ? 'Nessuna ipotesi' : 'Attiva il layer Ipotesi') + '</p>';
+                return;
+            }
+            list.innerHTML = ipotesiData.map(function(ip) {
+                var dirCol = ip.direzione === 'long' ? '#20c997' : ip.direzione === 'short' ? '#f43f5e' : '#848d97';
+                var dirLabel = ip.direzione === 'long' ? '↑ LONG' : ip.direzione === 'short' ? '↓ SHORT' : ip.direzione.toUpperCase() || '—';
+                var barCol = ip.direzione === 'long' ? 'bg-[#20c997]' : ip.direzione === 'short' ? 'bg-[#f43f5e]' : 'bg-tp-border';
+                return '<div class="flex items-stretch bg-tp-panel border border-tp-border rounded-lg overflow-hidden">'
+                    + '<div class="w-1 ' + barCol + ' shrink-0"></div>'
+                    + '<div class="flex-1 px-4 py-3 flex flex-col gap-2">'
+                    +   '<div class="flex items-center gap-3 flex-wrap">'
+                    +     '<span class="text-[9px] font-bold font-mono text-tp-muted/60">' + ip.code + '</span>'
+                    +     '<span class="text-[10px] font-bold" style="color:' + dirCol + '">' + dirLabel + '</span>'
+                    +     '<span class="text-[10px] text-tp-muted">' + ip.t + ' Casa</span>'
+                    +     '<span class="text-[10px] text-tp-muted/70 italic">' + ip.strategia + '</span>'
+                    +     '<span class="ml-auto text-[9px] uppercase tracking-widest text-tp-muted/50 font-mono">' + ip.stato + '</span>'
+                    +   '</div>'
+                    + (ip.note ? '<div class="bg-[#eab30815] border border-[#eab30840] rounded px-3 py-2 text-[11px] text-[#e5c96e] leading-relaxed">'
+                    +   '<span class="text-[9px] font-bold uppercase tracking-widest text-[#eab308]/60 block mb-1">Setup · Note</span>'
+                    +   ip.note
+                    + '</div>' : '')
+                    + (ip.commento_post ? '<div class="bg-tp-bg/50 rounded px-3 py-2 text-[11px] text-tp-muted leading-relaxed">'
+                    +   '<span class="text-[9px] font-bold uppercase tracking-widest text-tp-muted/50 block mb-1">Commento post</span>'
+                    +   ip.commento_post
+                    + '</div>' : '')
+                    + '</div>'
+                    + '</div>';
+            }).join('');
+        }
 
-            for (var i = 0; i < items.length; i++) {
-                if (items[i].type.indexOf('image') !== -1) {
-                    e.preventDefault();
-                    var blob = items[i].getAsFile();
+        // ==========================================
+        // FVG — load, panel, toggle, fill
+        // ==========================================
+        async function loadFvg() {
+            fvgData = [];
+            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const { data, error } = await db
+                .from('allert_prezzo')
+                .select('id, ora, descrizione, stato, created_at')
+                .eq('coin', currentCoin)
+                .ilike('descrizione', '%FVG%')
+                .eq('stato', 'nuovo')
+                .gte('created_at', utcStart)
+                .lte('created_at', utcEnd)
+                .order('created_at', { ascending: true });
+            if (error) { console.error('allert_prezzo fvg:', error); return; }
+            fvgData = (data || []).map(function(r) {
+                var dir = r.descrizione.toLowerCase().includes('long') ? 'long' : 'short';
+                var m = r.descrizione.match(/gap\s+([\d.]+)-([\d.]+)/i);
+                if (!m) return null;
+                var casaMs = new Date(r.created_at).getTime() + 3600000;
+                var createdDate = new Date(casaMs).toISOString().split('T')[0];
+                return {
+                    id: r.id,
+                    ora: r.ora || '00:00',
+                    tMs: T(r.ora || '00:00'),
+                    createdDate: createdDate,
+                    descrizione: r.descrizione,
+                    gap_lo: parseFloat(m[1]),
+                    gap_hi: parseFloat(m[2]),
+                    dir: dir
+                };
+            }).filter(Boolean);
+            renderFvgPanel();
+            // aggiorna badge
+            var badge = document.getElementById('badge-fvg');
+            if (badge) {
+                badge.textContent = fvgData.length || '';
+                badge.classList.toggle('hidden', fvgData.length === 0);
+            }
+        }
 
-                    // Mostra anteprima
-                    var reader = new FileReader();
-                    reader.onload = function(ev) {
-                        var preview = document.getElementById('screen-preview');
-                        preview.src = ev.target.result;
-                        preview.classList.remove('hidden');
-                        document.getElementById('screen-paste-placeholder').classList.add('hidden');
-                    };
-                    reader.readAsDataURL(blob);
+        function isFvgChecked(id) {
+            var v = localStorage.getItem('fvg_' + id);
+            return v === null ? true : v === '1';
+        }
 
-                    // Upload su Supabase Storage
-                    var fileName = 'screenshots/' + currentCoin + '_' + Date.now() + '.png';
-                    var { data, error } = await db.storage.from('trade-screenshots').upload(fileName, blob, {
-                        contentType: 'image/png',
-                        upsert: true
-                    });
+        window.toggleFvgItem = function(id) {
+            var cb = document.getElementById('fvg-cb-' + id);
+            if (cb) localStorage.setItem('fvg_' + id, cb.checked ? '1' : '0');
+            drawChart();
+        };
 
-                    if (error) {
-                        // Fallback: salva come base64 data URL
-                        var r2 = new FileReader();
-                        r2.onload = function(ev2) {
-                            document.getElementById('screen-url-input').value = ev2.target.result;
-                        };
-                        r2.readAsDataURL(blob);
+        function _removeFvg(id) {
+            localStorage.removeItem('fvg_' + id);
+            fvgData = fvgData.filter(function(f) { return f.id !== id; });
+            renderFvgPanel();
+            var badge = document.getElementById('badge-fvg');
+            if (badge) { badge.textContent = fvgData.length || ''; badge.classList.toggle('hidden', fvgData.length === 0); }
+            drawChart();
+        }
+
+        window.markFvgFilled = async function(id) {
+            await db.from('allert_prezzo').update({ stato: 'completato' }).eq('id', id);
+            _removeFvg(id);
+        };
+
+        window.markFvgIgnorata = async function(id) {
+            await db.from('allert_prezzo').update({ stato: 'ignorato' }).eq('id', id);
+            _removeFvg(id);
+        };
+
+        function renderFvgPanel() {
+            var panel = document.getElementById('fvg-panel');
+            var list  = document.getElementById('fvg-list');
+            if (!panel || !list) return;
+            if (fvgData.length === 0) { panel.classList.add('hidden'); return; }
+            panel.classList.remove('hidden');
+            list.innerHTML = fvgData.map(function(f) {
+                var col     = f.dir === 'long' ? '#20c997' : '#f43f5e';
+                var checked = isFvgChecked(f.id);
+                var desc    = (f.descrizione.split('|')[0] || '').trim();
+                var gapStr  = f.gap_lo.toFixed(1) + ' – ' + f.gap_hi.toFixed(1);
+                var dayLbl  = f.createdDate !== currentDate ? '<span class="text-[8px] text-tp-muted/40 font-mono shrink-0">' + f.createdDate + '</span>' : '';
+                return '<div class="flex items-center gap-2 py-0.5">'
+                    + '<input type="checkbox" id="fvg-cb-' + f.id + '" ' + (checked ? 'checked' : '') + ' onchange="toggleFvgItem(\'' + f.id + '\')" class="w-3 h-3 cursor-pointer shrink-0" style="accent-color:' + col + '">'
+                    + '<span class="text-[10px] font-medium flex-1 truncate" style="color:' + col + '">' + desc + '</span>'
+                    + '<span class="text-[9px] font-mono text-tp-muted/60 shrink-0">' + gapStr + '</span>'
+                    + '<span class="text-[9px] text-tp-muted/50 font-mono shrink-0">' + f.ora + '</span>'
+                    + dayLbl
+                    + '<button onclick="markFvgFilled(\'' + f.id + '\')" title="Completata" class="text-[9px] font-bold px-1.5 py-0.5 rounded border border-tp-border/60 text-tp-muted/60 hover:border-[#20c997] hover:text-[#20c997] transition-colors shrink-0">V</button>'
+                    + '<button onclick="markFvgIgnorata(\'' + f.id + '\')" title="Ignorata" class="text-[9px] font-bold px-1.5 py-0.5 rounded border border-tp-border/60 text-tp-muted/60 hover:border-[#f43f5e] hover:text-[#f43f5e] transition-colors shrink-0">X</button>'
+                    + '</div>';
+            }).join('');
+        }
+
+        // ==========================================
+        // LOAD SOGLIE % (allert_prezzo Superato X%)
+        // ==========================================
+        async function loadSoglie() {
+            soglieData = [];
+            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const { data, error } = await db
+                .from('allert_prezzo')
+                .select('ora, prezzo, descrizione')
+                .eq('coin', currentCoin)
+                .ilike('descrizione', '%Superato%')
+                .gte('created_at', utcStart)
+                .lte('created_at', utcEnd)
+                .order('ora');
+            if (error) { console.error('allert_prezzo soglie:', error); return; }
+            soglieData = (data || []).map(function(r) {
+                var t = (r.ora || '').substring(0, 5);
+                return { tMs: T(t), t: t, prezzo: parseFloat(r.prezzo), descrizione: r.descrizione || '' };
+            }).filter(function(s) { return !isNaN(s.prezzo); });
+        }
+
+        // ==========================================
+        // LOAD TRADES
+        // ==========================================
+        async function loadTrades() {
+            tradeData = [];
+            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const { data, error } = await db
+                .from('trades')
+                .select('id, data, direzione, entry_price, stop_loss, take_profit, exit_price, esito, stato')
+                .eq('asset', currentCoin)
+                .gte('data', utcStart)
+                .lte('data', utcEnd)
+                .order('data');
+            if (error) { console.error('trades:', error); return; }
+            tradeData = (data || []).map(function(r) {
+                var casaMs = new Date(r.data).getTime() + 3600000;
+                var d = new Date(casaMs);
+                var hh = String(d.getUTCHours()).padStart(2,'0');
+                var mm = String(d.getUTCMinutes()).padStart(2,'0');
+                return {
+                    tMs: T(hh + ':' + mm),
+                    t: hh + ':' + mm,
+                    id: r.id,
+                    direzione: (r.direzione || '').toLowerCase(),
+                    entry: r.entry_price ? parseFloat(r.entry_price) : null,
+                    sl:    r.stop_loss   ? parseFloat(r.stop_loss)   : null,
+                    tp:    r.take_profit ? parseFloat(r.take_profit) : null,
+                    exit:  r.exit_price  ? parseFloat(r.exit_price)  : null,
+                    esito: r.esito || '',
+                    stato: r.stato || ''
+                };
+            }).filter(function(t) { return !isNaN(t.tMs); });
+        }
+
+        // ==========================================
+        // LOAD VOLATILITA (monitora_smile log 15min)
+        // ==========================================
+        async function loadVolatilita() {
+            volData = [];
+            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const { data, error } = await db
+                .from('monitora_smile')
+                .select('created_at, volatilita')
+                .eq('coin', currentCoin)
+                .eq('sorgente', 'volatilita_log')
+                .gte('created_at', utcStart)
+                .lte('created_at', utcEnd)
+                .order('created_at');
+            if (error) { console.error('vol:', error); return; }
+            volData = (data || []).map(function(r) {
+                var casaMs = new Date(r.created_at).getTime() + 3600000;
+                var d = new Date(casaMs);
+                var hh = String(d.getUTCHours()).padStart(2,'0');
+                var mm = String(d.getUTCMinutes()).padStart(2,'0');
+                return { tMs: T(hh + ':' + mm), volatilita: r.volatilita || 'medium' };
+            });
+        }
+
+        // ==========================================
+        // LOAD COMPRESSIONI (EMA60 touch)
+        // ==========================================
+        async function loadCompress() {
+            compressData = [];
+            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const { data, error } = await db
+                .from('allert_prezzo')
+                .select('ora, descrizione')
+                .eq('coin', currentCoin)
+                .or('descrizione.ilike.%EMA%,descrizione.ilike.%Compressione%')
+                .gte('created_at', utcStart)
+                .lte('created_at', utcEnd)
+                .order('ora');
+            if (error) { console.error('compress:', error); return; }
+            compressData = (data || []).map(function(r) {
+                var t = (r.ora || '').substring(0, 5);
+                var isComp = r.descrizione.toLowerCase().includes('compressione');
+                return { tMs: T(t), t: t, descrizione: r.descrizione || '', isComp: isComp };
+            });
+        }
+
+        // ==========================================
+        // CANVAS RENDERER
+        // ==========================================
+        function drawChart() {
+            const dpr = window.devicePixelRatio || 1;
+            const W = cv.clientWidth;
+            const H = cv.clientHeight;
+            cv.width  = W * dpr;
+            cv.height = H * dpr;
+            const ctx = cv.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, W, H);
+
+            // --- coordinate system ---
+            const padL = 58, padR = 10, padT = 128, padB = 28;
+            const SUB_H = 80, SEP = 8;
+            const BSTR_H = 14, BSTR_SEP = 6; // striscia Bias H4
+            const x0 = padL, x1 = W - padR, y0 = padT, y1 = H - padB - SUB_H - SEP;
+            const t0   = T('00:00');
+            const tEnd = T('18:00');
+            slotW = (x1 - x0) / ((tEnd - t0) / (15 * 60000));
+
+            function pxX(t) { return x0 + (t - t0) / (tEnd - t0) * (x1 - x0); }
+
+            // Y dinamico — dai dati caricati
+            let lo = 1e9, hi = 0;
+            candles.forEach(function(c) { lo = Math.min(lo, c.l); hi = Math.max(hi, c.h); });
+            if (candles.length === 0) { lo = 1000; hi = 1100; } // fallback vuoto
+            const pd = (hi - lo) * 0.05;
+            const yMin = lo - pd, yMax = hi + pd;
+            function pxY(p) { return y1 - (p - yMin) / (yMax - yMin) * (y1 - y0); }
+
+            geom = { pxX: pxX, pxY: pxY, x0: x0, x1: x1, y0: y0, y1: y1, t0: t0, tEnd: tEnd, yMin: yMin, yMax: yMax };
+
+            // --- data label ---
+            const label = new Date(currentDate + 'T12:00:00Z').toLocaleDateString('it-IT', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+            document.getElementById('chart-date-label').textContent = label + ' · ' + currentCoin + ' M15';
+
+            // --- stato vuoto ---
+            if (candles.length === 0) {
+                ctx.fillStyle = '#848d97';
+                ctx.font = '12px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Nessun dato — ' + currentCoin + ' ' + currentDate, W / 2, H / 2);
+                return;
+            }
+
+            // --- grid Y ---
+            ctx.font = '10px Inter, sans-serif';
+            ctx.textBaseline = 'middle';
+            const stepY = Math.ceil((yMax - yMin) / 8 / 5) * 5 || 10;
+            for (var p = Math.ceil(yMin / stepY) * stepY; p <= yMax; p += stepY) {
+                const y = pxY(p);
+                ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke();
+                ctx.fillStyle = '#7d8896'; ctx.textAlign = 'right';
+                ctx.fillText(p.toFixed(0), x0 - 6, y);
+            }
+
+            // --- grid X ogni 2h ---
+            ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+            for (var h = 0; h <= 18; h += 2) {
+                const ts = T(String(h).padStart(2,'0') + ':00');
+                const x  = pxX(ts);
+                ctx.strokeStyle = 'rgba(255,255,255,.04)'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(x, y0); ctx.lineTo(x, y1); ctx.stroke();
+                ctx.fillStyle = '#7d8896';
+                ctx.fillText(String(h).padStart(2,'0') + ':00', x, y1 + 5);
+            }
+
+            // --- Bias H4 strip (bordo superiore canvas) ---
+            var bsY0 = 4;
+            var bsY1 = bsY0 + BSTR_H;
+            var bsMid = (bsY0 + bsY1) / 2;
+            ctx.fillStyle = '#454e5a'; ctx.font = '600 8px Inter, sans-serif';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+            ctx.fillText('Bias H4', x0 - 6, bsMid);
+            ctx.strokeStyle = 'rgba(255,255,255,.06)'; ctx.lineWidth = 1; ctx.setLineDash([]);
+            ctx.beginPath(); ctx.moveTo(x0, bsY1 + 3); ctx.lineTo(x1, bsY1 + 3); ctx.stroke();
+
+            // slot corrente = H4 che contiene l'ora Casa attuale (solo se stiamo guardando oggi)
+            var _todayStr = new Date(Date.now() + 3600000).toISOString().split('T')[0];
+            var currentSlot = (currentDate === _todayStr) ? getCurrentH4LiveSlot() : -1;
+
+            if (layerOn('biasstr')) {
+                // broker UTC+2 → H4 cambiano a 03/07/11/15/19/23 ora Casa (UTC+1)
+                var H4_STARTS = ['00:00','03:00','07:00','11:00','15:00','19:00'];
+                var H4_ENDS   = ['03:00','07:00','11:00','15:00','19:00','23:00'];
+
+                // disegna tutti gli slot: slot corrente usa liveH4Val da watchlist
+                var slotsToRender = [0,1,2,3,4,5];
+                slotsToRender.forEach(function(i) {
+                    var val = (i === currentSlot && liveH4Val !== null)
+                        ? liveH4Val
+                        : (biasH4[i] || null);
+                    var sMs = T(H4_STARTS[i]);
+                    var eMs = T(H4_ENDS[i]);
+                    if (eMs < t0 || sMs > tEnd) return;
+                    var rxL = pxX(Math.max(sMs, t0)), rxR = pxX(Math.min(eMs, tEnd));
+                    var isCur = (i === currentSlot);
+
+                    if (!val || val === 'neutro') {
+                        ctx.fillStyle = 'rgba(234,179,8,.15)';
+                        ctx.fillRect(rxL, bsY0, rxR - rxL, bsY1 - bsY0);
+                        ctx.strokeStyle = isCur ? 'rgba(234,179,8,.7)' : 'rgba(234,179,8,.45)';
+                        ctx.lineWidth = 1;
+                        ctx.setLineDash(isCur ? [3,3] : []);
+                        ctx.strokeRect(rxL, bsY0, rxR - rxL, bsY1 - bsY0);
+                        ctx.setLineDash([]);
+                        ctx.fillStyle = isCur ? 'rgba(234,179,8,.6)' : '#eab308';
+                        ctx.font = '600 8px Inter, sans-serif';
+                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.fillText('N', (rxL + rxR) / 2, bsMid);
                     } else {
-                        // URL pubblico dallo storage
-                        var { data: urlData } = db.storage.from('trade-screenshots').getPublicUrl(fileName);
-                        document.getElementById('screen-url-input').value = urlData.publicUrl;
+                        var col = val === 'long' ? '#20c997' : '#f43f5e';
+                        ctx.fillStyle = val === 'long'
+                            ? ('rgba(32,201,151,' + (isCur ? '.13' : '.20') + ')')
+                            : ('rgba(244,63,94,' + (isCur ? '.13' : '.20') + ')');
+                        ctx.fillRect(rxL, bsY0, rxR - rxL, bsY1 - bsY0);
+                        ctx.strokeStyle = col; ctx.lineWidth = 1;
+                        ctx.setLineDash(isCur ? [3,3] : []);
+                        ctx.strokeRect(rxL, bsY0, rxR - rxL, bsY1 - bsY0);
+                        ctx.setLineDash([]);
+                        ctx.fillStyle = col; ctx.font = '600 8px Inter, sans-serif';
+                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.fillText(val.toUpperCase(), (rxL + rxR) / 2, bsMid);
                     }
+                });
+            }
+
+            // --- Bias Operativi strip (sotto H4) ---
+            var bopY0 = bsY1 + 4;
+            var bopY1 = bopY0 + 14;
+            var bopMid = (bopY0 + bopY1) / 2;
+            ctx.fillStyle = '#454e5a'; ctx.font = '600 8px Inter, sans-serif';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+            ctx.fillText('Bias Op.', x0 - 6, bopMid);
+            // rettangolo di sfondo full-width
+            ctx.fillStyle = 'rgba(255,255,255,.02)';
+            ctx.fillRect(x0, bopY0, x1 - x0, bopY1 - bopY0);
+            ctx.strokeStyle = 'rgba(255,255,255,.06)'; ctx.lineWidth = 1; ctx.setLineDash([]);
+            ctx.strokeRect(x0, bopY0, x1 - x0, bopY1 - bopY0);
+            // separatore inferiore
+            ctx.beginPath(); ctx.moveTo(x0, bopY1 + 3); ctx.lineTo(x1, bopY1 + 3); ctx.stroke();
+
+            biasOpMarkers = [];
+            if (layerOn('biasop')) {
+                biasOp.forEach(function(a) {
+                    if (a.tMs < t0 || a.tMs > tEnd) return;
+                    var mx = pxX(a.tMs);
+                    var col = a.direzione === 'long' ? '#20c997' : a.direzione === 'short' ? '#f43f5e' : '#eab308';
+                    var lbl = a.direzione === 'long' ? 'L' : a.direzione === 'short' ? 'S' : 'N';
+                    var cr = 5;
+                    ctx.beginPath(); ctx.arc(mx, bopMid, cr, 0, Math.PI * 2);
+                    ctx.fillStyle = a.direzione === 'long' ? 'rgba(32,201,151,.2)' : a.direzione === 'short' ? 'rgba(244,63,94,.2)' : 'rgba(234,179,8,.2)';
+                    ctx.fill();
+                    ctx.strokeStyle = col; ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.fillStyle = col; ctx.font = '700 7px Inter, sans-serif';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText(lbl, mx, bopMid);
+                    biasOpMarkers.push({ x: mx, y: bopMid, r: cr + 3, testo: a.testo, t: a.t, lbl: lbl, col: col });
+                });
+            }
+
+            // --- Ipotesi strip (sotto Bias Op.) ---
+            var ipY0 = bopY1 + 4;
+            var ipY1 = ipY0 + 14;
+            var ipMid = (ipY0 + ipY1) / 2;
+            ctx.fillStyle = '#454e5a'; ctx.font = '600 8px Inter, sans-serif';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+            ctx.fillText('Ipotesi', x0 - 6, ipMid);
+            ctx.fillStyle = 'rgba(255,255,255,.02)';
+            ctx.fillRect(x0, ipY0, x1 - x0, ipY1 - ipY0);
+            ctx.strokeStyle = 'rgba(255,255,255,.06)'; ctx.lineWidth = 1; ctx.setLineDash([]);
+            ctx.strokeRect(x0, ipY0, x1 - x0, ipY1 - ipY0);
+            ctx.beginPath(); ctx.moveTo(x0, ipY1 + 3); ctx.lineTo(x1, ipY1 + 3); ctx.stroke();
+
+            ipotesiMarkers = [];
+            if (layerOn('ipotesi')) {
+                ipotesiData.forEach(function(ip) {
+                    if (ip.tMs < t0 || ip.tMs > tEnd) return;
+                    var ix = pxX(ip.tMs);
+                    var col = ip.direzione === 'long' ? '#20c997' : ip.direzione === 'short' ? '#f43f5e' : '#848d97';
+                    var lbl = ip.direzione === 'long' ? 'L' : ip.direzione === 'short' ? 'S' : 'N';
+                    var cr = 5;
+                    ctx.beginPath(); ctx.arc(ix, ipMid, cr, 0, Math.PI * 2);
+                    ctx.fillStyle = ip.direzione === 'long' ? 'rgba(32,201,151,.2)' : ip.direzione === 'short' ? 'rgba(244,63,94,.2)' : 'rgba(132,141,151,.2)';
+                    ctx.fill();
+                    ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.setLineDash([]);
+                    ctx.stroke();
+                    ctx.fillStyle = col; ctx.font = '700 7px Inter, sans-serif';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText(lbl, ix, ipMid);
+                    ipotesiMarkers.push({ x: ix, y: ipMid, r: cr + 3, strategia: ip.strategia, direzione: ip.direzione, code: ip.code, col: col });
+                });
+            }
+
+            // --- Trade strip (sotto Ipotesi) ---
+            var trY0 = ipY1 + 4;
+            var trY1 = trY0 + 14;
+            var trMid = (trY0 + trY1) / 2;
+            ctx.fillStyle = '#454e5a'; ctx.font = '600 8px Inter, sans-serif';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+            ctx.fillText('Trade', x0 - 6, trMid);
+            ctx.fillStyle = 'rgba(255,255,255,.02)';
+            ctx.fillRect(x0, trY0, x1 - x0, trY1 - trY0);
+            ctx.strokeStyle = 'rgba(255,255,255,.06)'; ctx.lineWidth = 1; ctx.setLineDash([]);
+            ctx.strokeRect(x0, trY0, x1 - x0, trY1 - trY0);
+            ctx.beginPath(); ctx.moveTo(x0, trY1 + 3); ctx.lineTo(x1, trY1 + 3); ctx.stroke();
+
+            tradeMarkers = [];
+            if (layerOn('trade')) {
+                tradeData.forEach(function(tr) {
+                    if (tr.tMs < t0 || tr.tMs > tEnd) return;
+                    var tx = pxX(tr.tMs);
+                    var col = tr.esito === 'win' ? '#20c997' : tr.esito === 'loss' ? '#f43f5e' : tr.direzione === 'long' ? '#20c997' : tr.direzione === 'short' ? '#f43f5e' : '#848d97';
+                    var lbl = tr.direzione === 'long' ? 'L' : tr.direzione === 'short' ? 'S' : '—';
+                    var cr = 5;
+                    ctx.beginPath(); ctx.arc(tx, trMid, cr, 0, Math.PI * 2);
+                    ctx.fillStyle = tr.direzione === 'long' ? 'rgba(32,201,151,.2)' : tr.direzione === 'short' ? 'rgba(244,63,94,.2)' : 'rgba(132,141,151,.2)';
+                    ctx.fill();
+                    ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.setLineDash([]);
+                    ctx.stroke();
+                    ctx.fillStyle = col; ctx.font = '700 7px Inter, sans-serif';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText(lbl, tx, trMid);
+                    tradeMarkers.push({ x: tx, y: trMid, r: cr + 3, trade: tr, col: col });
+                });
+            }
+
+            // --- Trade hover: entry / SL / TP ---
+            if (hoveredTrade && layerOn('trade')) {
+                var ht = hoveredTrade;
+                var htX = pxX(ht.tMs);
+                function drawLevel(price, color, dash, labelText) {
+                    if (!price) return;
+                    var ly = pxY(price);
+                    ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+                    ctx.setLineDash(dash);
+                    ctx.beginPath(); ctx.moveTo(htX, ly); ctx.lineTo(x1, ly); ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = color; ctx.font = '600 9px Inter, sans-serif';
+                    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+                    ctx.fillText(labelText + ' ' + price.toFixed(2), x1 - 3, ly - 5);
+                }
+                drawLevel(ht.entry, 'rgba(255,255,255,.8)',  [],     'Entry');
+                drawLevel(ht.sl,    'rgba(244,63,94,.9)',    [4,3],  'SL');
+                drawLevel(ht.tp,    'rgba(32,201,151,.9)',   [4,3],  'TP');
+                if (ht.exit && ht.exit !== ht.entry) {
+                    drawLevel(ht.exit, 'rgba(234,179,8,.8)', [2,4], 'Exit');
+                }
+                // linea verticale entry time
+                ctx.strokeStyle = 'rgba(255,255,255,.2)'; ctx.lineWidth = 1; ctx.setLineDash([3,4]);
+                ctx.beginPath(); ctx.moveTo(htX, y0); ctx.lineTo(htX, y1); ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            // --- Session Boxes (Asia / London / NY) ---
+            function drawSessionBox(box, layerId, rgb) {
+                if (!layerOn(layerId) || !box) return;
+                var axL = pxX(box.start), axR = pxX(box.end);
+                ctx.fillStyle = 'rgba(' + rgb + ',.07)';
+                ctx.fillRect(axL, pxY(box.high), axR - axL, pxY(box.low) - pxY(box.high));
+                [
+                    { p: box.high, label: 'H ' + box.high.toFixed(1), dash: [6,4], alpha: .65 },
+                    { p: box.low,  label: 'L ' + box.low.toFixed(1),  dash: [6,4], alpha: .65 },
+                    { p: box.avg,  label: 'avg ' + box.avg.toFixed(1), dash: [2,5], alpha: .4 }
+                ].forEach(function(ln) {
+                    var y = pxY(ln.p);
+                    ctx.strokeStyle = 'rgba(' + rgb + ',' + ln.alpha + ')';
+                    ctx.setLineDash(ln.dash); ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.moveTo(axL, y); ctx.lineTo(x1, y); ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = 'rgb(' + rgb + ')'; ctx.font = '9px Inter, sans-serif';
+                    ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+                    ctx.fillText(ln.label, axL + 3, y - 1);
+                });
+                ctx.fillStyle = 'rgb(' + rgb + ')'; ctx.font = '600 9px Inter, sans-serif';
+                ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+                ctx.fillText(box.range + ' pt', axR - 3, pxY(box.high) + 3);
+            }
+
+            drawSessionBox(asiaBox,   'asia',   '201,162,39');
+            drawSessionBox(londonBox, 'london', '32,201,151');
+            drawSessionBox(nyBox,     'ny',     '155,140,255');
+
+            // --- FVG: zone orizzontali ---
+            if (layerOn('fvg')) {
+                fvgData.forEach(function(f) {
+                    if (!isFvgChecked(f.id)) return;
+                    var fy0 = pxY(f.gap_hi);
+                    var fy1 = pxY(f.gap_lo);
+                    var xFvg = (f.createdDate === currentDate) ? Math.max(pxX(f.tMs), x0) : x0;
+                    var col  = f.dir === 'long' ? '32,201,151' : '244,63,94';
+                    ctx.fillStyle = 'rgba(' + col + ',.08)';
+                    ctx.fillRect(xFvg, fy0, x1 - xFvg, fy1 - fy0);
+                    ctx.setLineDash([2, 3]); ctx.lineWidth = 1;
+                    ctx.strokeStyle = 'rgba(' + col + ',.5)';
+                    ctx.beginPath(); ctx.moveTo(xFvg, fy0); ctx.lineTo(x1, fy0); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(xFvg, fy1); ctx.lineTo(x1, fy1); ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = 'rgba(' + col + ',.65)';
+                    ctx.font = '9px Inter, sans-serif';
+                    ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+                    ctx.fillText('FVG ' + f.dir + ' ' + f.gap_lo.toFixed(1) + '–' + f.gap_hi.toFixed(1), xFvg + 3, fy0 - 1);
+                });
+            }
+
+            // --- News: righe verticali gialle ---
+            if (layerOn('news')) {
+                newsData.forEach(function(n) {
+                    if (n.tMs < t0 || n.tMs > tEnd) return;
+                    var xN = pxX(n.tMs);
+                    var isAlto = n.impatto === 'alto';
+                    var col = isAlto ? '#eab308' : 'rgba(234,179,8,.5)';
+                    ctx.strokeStyle = col;
+                    ctx.lineWidth = isAlto ? 1.5 : 1;
+                    ctx.setLineDash([3, 5]);
+                    ctx.beginPath(); ctx.moveTo(xN, y0); ctx.lineTo(xN, y1); ctx.stroke();
+                    ctx.setLineDash([]);
+                    // etichetta ruotata in alto
+                    var label = n.valuta + ' · ' + (n.titolo.length > 18 ? n.titolo.substring(0, 18) + '…' : n.titolo);
+                    ctx.save();
+                    ctx.translate(xN - 3, y0 + 2);
+                    ctx.rotate(-Math.PI / 2);
+                    ctx.fillStyle = col;
+                    ctx.font = (isAlto ? '600 ' : '') + '8px Inter, sans-serif';
+                    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                    ctx.fillText(label, 0, 0);
+                    ctx.restore();
+                });
+            }
+
+            // --- candele: passata 1 — wick H/L (sempre visibili) ---
+            const bw = Math.max(slotW * 0.6, 2.5);
+            candles.forEach(function(c) {
+                const cx = pxX(c.tMs) + slotW / 2;
+                ctx.strokeStyle = 'rgba(170,180,195,.45)'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(cx, pxY(c.h)); ctx.lineTo(cx, pxY(c.l)); ctx.stroke();
+                // tick orizzontale sul prezzo se no OHLC
+                if (c.faded) {
+                    ctx.beginPath(); ctx.moveTo(cx - bw / 2, pxY(c.p)); ctx.lineTo(cx + bw / 2, pxY(c.p)); ctx.stroke();
+                }
+            });
+
+            // --- candele: passata 2 — corpo OHLC (layer separato) ---
+            if (layerOn('ohlc')) {
+                candles.forEach(function(c) {
+                    if (c.faded) return; // niente open/close per questa candela
+                    const cx  = pxX(c.tMs) + slotW / 2;
+                    const up  = c.c >= c.o;
+                    const col = up ? '#26a69a' : '#ef5350';
+                    // wick colorato
+                    ctx.strokeStyle = col; ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.moveTo(cx, pxY(c.h)); ctx.lineTo(cx, pxY(c.l)); ctx.stroke();
+                    // corpo
+                    const yo = pxY(c.o), yc = pxY(c.c);
+                    ctx.fillStyle = col;
+                    ctx.fillRect(cx - bw / 2, Math.min(yo, yc), bw, Math.max(Math.abs(yc - yo), 1));
+                });
+            }
+
+            // --- Soglie %: pallini al prezzo esatto ---
+            soglieMarkers = [];
+            if (layerOn('soglie')) {
+                soglieData.forEach(function(s) {
+                    if (s.tMs < t0 || s.tMs > tEnd) return;
+                    var sx = pxX(s.tMs);
+                    var sy = pxY(s.prezzo);
+                    var isPos = s.descrizione.includes('+');
+                    var col = isPos ? '#20c997' : '#f43f5e';
+                    var fillA = isPos ? 'rgba(32,201,151,.25)' : 'rgba(244,63,94,.25)';
+                    ctx.beginPath(); ctx.arc(sx, sy, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = fillA; ctx.fill();
+                    ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.setLineDash([]);
+                    ctx.stroke();
+                    soglieMarkers.push({ x: sx, y: sy, r: 8, descrizione: s.descrizione, col: col });
+                });
+            }
+
+            // --- Smile layer ---
+            smileMarkers = [];
+            if (layerOn('smile') && smileData.length > 0 && candles.length > 0) {
+                function drawFace(cx, cy, r, type) {
+                    var col = type === 'positive' ? '#20c997' : type === 'negative' ? '#f43f5e' : '#8b5cf6';
+                    ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.setLineDash([]);
+                    // cerchio esterno
+                    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+                    // occhi
+                    ctx.fillStyle = col;
+                    ctx.beginPath(); ctx.arc(cx - r * 0.32, cy - r * 0.25, r * 0.12, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(cx + r * 0.32, cy - r * 0.25, r * 0.12, 0, Math.PI * 2); ctx.fill();
+                    // bocca
+                    ctx.beginPath();
+                    if (type === 'positive') {
+                        ctx.arc(cx, cy + r * 0.05, r * 0.42, 0.3, Math.PI - 0.3);
+                    } else if (type === 'negative') {
+                        ctx.arc(cx, cy + r * 0.6, r * 0.42, Math.PI + 0.3, -0.3);
+                    } else {
+                        ctx.moveTo(cx - r * 0.38, cy + r * 0.3);
+                        ctx.lineTo(cx + r * 0.38, cy + r * 0.3);
+                    }
+                    ctx.stroke();
+                    return col;
+                }
+
+                var fr = 9;
+                // raggruppa per candela più vicina
+                var groups = {};
+                smileData.forEach(function(s) {
+                    if (s.tMs < t0 || s.tMs > tEnd) return;
+                    var nearest = null, nd = 1e9;
+                    candles.forEach(function(c) { var d = Math.abs(c.tMs - s.tMs); if (d < nd) { nd = d; nearest = c; } });
+                    if (!nearest) return;
+                    var key = nearest.tMs;
+                    if (!groups[key]) groups[key] = { nearest: nearest, items: [] };
+                    groups[key].items.push(s);
+                });
+                Object.keys(groups).forEach(function(key) {
+                    var g = groups[key];
+                    var ex = pxX(g.nearest.tMs);
+                    var baseY = pxY(g.nearest.l) + fr + 8;
+                    g.items.forEach(function(s, idx) {
+                        var ey = baseY + idx * (fr * 2 + 4);
+                        drawFace(ex, ey, fr, s.mindset);
+                        smileMarkers.push({ x: ex, y: ey, r: fr + 3, mindset: s.mindset, sorgente: s.sorgente, t: s.t });
+                    });
+                });
+            }
+
+            // --- linea prezzo live (ultimo snapshot) ---
+            if (layerOn('prezzo') && candles.length > 0) {
+                var lastP = candles[candles.length - 1].p;
+                var yLive = pxY(lastP);
+                ctx.strokeStyle = 'rgba(255,255,255,.55)';
+                ctx.setLineDash([4, 4]); ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(x0, yLive); ctx.lineTo(x1, yLive); ctx.stroke();
+                ctx.setLineDash([]);
+                // etichetta a sinistra con il prezzo
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '600 10px Inter, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(lastP.toFixed(2), x0 - 6, yLive);
+            }
+
+            // --- linea verticale "ora" (unico oggetto legato al now) ---
+            var now = new Date();
+            var casaNow = new Date(now.getTime() + 3600000);
+            var nowHH = String(casaNow.getUTCHours()).padStart(2,'0');
+            var nowMM = String(casaNow.getUTCMinutes()).padStart(2,'0');
+            var nowMs = T(nowHH + ':' + nowMM);
+            if (nowMs >= t0 && nowMs <= tEnd) {
+                var xNow = pxX(nowMs);
+                ctx.strokeStyle = 'rgba(255,255,255,.25)'; ctx.lineWidth = 1; ctx.setLineDash([3,4]);
+                ctx.beginPath(); ctx.moveTo(xNow, y0); ctx.lineTo(xNow, y1); ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#848d97'; ctx.font = '9px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+                ctx.fillText(nowHH + ':' + nowMM, xNow, y0 - 2);
+            }
+
+            // --- Sub-panel: Forza USD (top) + Volatilita (bottom) ---
+            var subY0  = y1 + SEP;
+            var subY1  = subY0 + 44;          // USD panel bottom (44px)
+            var subMid = (subY0 + subY1) / 2;
+            var volPY0 = subY1 + 6;           // vol panel start
+            var volPY1 = H - padB;            // vol panel end
+            var volPMid = (volPY0 + volPY1) / 2;
+
+            // separatore
+            ctx.strokeStyle = 'rgba(255,255,255,.08)'; ctx.lineWidth = 1; ctx.setLineDash([]);
+            ctx.beginPath(); ctx.moveTo(x0, subY0 - 2); ctx.lineTo(x1, subY0 - 2); ctx.stroke();
+
+            if (layerOn('usd')) {
+                // zero line
+                ctx.strokeStyle = 'rgba(255,255,255,.12)'; ctx.setLineDash([2, 4]); ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(x0, subMid); ctx.lineTo(x1, subMid); ctx.stroke();
+                ctx.setLineDash([]);
+
+                var pts = usdData.filter(function(d) { return d.tMs >= t0 && d.tMs <= tEnd; });
+                if (pts.length > 1) {
+                    var vals = pts.map(function(d) { return d.v; });
+                    var vAbsMax = Math.max.apply(null, vals.map(Math.abs)) || 0.001;
+                    var halfH = (subY1 - subY0) / 2 * 0.82;
+                    function sY(v) { return subMid - (v / vAbsMax) * halfH; }
+
+                    // area riempita (colore basato sull'ultimo valore)
+                    var lastVal = pts[pts.length - 1].v;
+                    var fillCol = lastVal >= 0 ? 'rgba(32,201,151,.13)' : 'rgba(244,63,94,.13)';
+                    ctx.beginPath();
+                    ctx.moveTo(pxX(pts[0].tMs), subMid);
+                    pts.forEach(function(d) { ctx.lineTo(pxX(d.tMs), sY(d.v)); });
+                    ctx.lineTo(pxX(pts[pts.length - 1].tMs), subMid);
+                    ctx.closePath();
+                    ctx.fillStyle = fillCol;
+                    ctx.fill();
+
+                    // linea — segmento per segmento, verde/rosso per segno
+                    ctx.lineWidth = 1.5;
+                    for (var i = 0; i < pts.length - 1; i++) {
+                        var segCol = pts[i].v >= 0 ? '#20c997' : '#f43f5e';
+                        ctx.strokeStyle = segCol; ctx.setLineDash([]);
+                        ctx.beginPath();
+                        ctx.moveTo(pxX(pts[i].tMs),     sY(pts[i].v));
+                        ctx.lineTo(pxX(pts[i+1].tMs),   sY(pts[i+1].v));
+                        ctx.stroke();
+                    }
+
+                    // etichetta valore attuale — asse Y sinistro come i prezzi
+                    var dispCol = lastVal >= 0 ? '#20c997' : '#f43f5e';
+                    var dispStr = (lastVal > 0 ? '+' : '') + (lastVal * 100).toFixed(3) + '%';
+                    ctx.fillStyle = dispCol; ctx.font = '9px Inter, sans-serif';
+                    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+                    ctx.fillText(dispStr, x0 - 6, sY(lastVal));
+
+                } else if (usdData.length === 0) {
+                    ctx.fillStyle = '#454e5a'; ctx.font = '9px Inter, sans-serif';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText('nessun dato forza USD', (x0 + x1) / 2, subMid);
+                }
+            }
+
+            // --- Sub-panel: Volatilita (linea stepped) ---
+            ctx.strokeStyle = 'rgba(255,255,255,.06)'; ctx.lineWidth = 1; ctx.setLineDash([2,4]);
+            ctx.beginPath(); ctx.moveTo(x0, volPY0 - 2); ctx.lineTo(x1, volPY0 - 2); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#454e5a'; ctx.font = '600 8px Inter, sans-serif';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+            ctx.fillText('Vol.', x0 - 6, volPMid);
+
+            var VOL_NUM  = { high: 1, medium: 0.5, low: 0 };
+            var VOL_RGB  = { high: '32,201,151', medium: '234,179,8', low: '244,63,94' };
+            function volY(v) {
+                var n = VOL_NUM[v] !== undefined ? VOL_NUM[v] : 0.5;
+                var pad = (volPY1 - volPY0) * 0.15;
+                return volPY1 - pad - n * (volPY1 - volPY0 - pad * 2);
+            }
+
+            var vpts = volData.filter(function(d) { return d.tMs >= t0 && d.tMs <= tEnd; });
+            if (vpts.length > 0) {
+                for (var vi = 0; vi < vpts.length; vi++) {
+                    var vp    = vpts[vi];
+                    var vpN   = vpts[vi + 1];
+                    var vxL   = pxX(vp.tMs);
+                    var vxR   = vpN ? pxX(vpN.tMs) : x1;
+                    var vyV   = volY(vp.volatilita);
+                    var rgb   = VOL_RGB[vp.volatilita] || VOL_RGB.medium;
+                    // area fill sotto la linea
+                    ctx.fillStyle = 'rgba(' + rgb + ',.08)';
+                    ctx.fillRect(vxL, vyV, vxR - vxL, volPY1 - vyV);
+                    // linea orizzontale del segmento
+                    ctx.strokeStyle = 'rgba(' + rgb + ',.85)';
+                    ctx.lineWidth = 1.5; ctx.setLineDash([]);
+                    ctx.beginPath(); ctx.moveTo(vxL, vyV); ctx.lineTo(vxR, vyV); ctx.stroke();
+                    // linea verticale di transizione al prossimo
+                    if (vpN) {
+                        var vyN = volY(vpN.volatilita);
+                        ctx.strokeStyle = 'rgba(' + rgb + ',.4)';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath(); ctx.moveTo(vxR, vyV); ctx.lineTo(vxR, vyN); ctx.stroke();
+                    }
+                }
+                // label valore attuale
+                var last = vpts[vpts.length - 1];
+                var lrgb = VOL_RGB[last.volatilita] || VOL_RGB.medium;
+                ctx.fillStyle = 'rgba(' + lrgb + ',.8)';
+                ctx.font = '600 9px Inter, sans-serif';
+                ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+                ctx.fillText(last.volatilita, x0 - 6, volY(last.volatilita));
+            }
+
+            // --- EMA touch + Compressioni: pallini nel pannello vol ---
+            compressMarkers = [];
+            compressData.forEach(function(c) {
+                if (c.tMs < t0 || c.tMs > tEnd) return;
+                var cx = pxX(c.tMs);
+                if (c.isComp) {
+                    // Compressione — arancione, più grande, linea verticale sul chart
+                    ctx.beginPath(); ctx.arc(cx, volPMid, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(251,146,60,.25)'; ctx.fill();
+                    ctx.strokeStyle = '#fb923c'; ctx.lineWidth = 1.5; ctx.setLineDash([]);
+                    ctx.stroke();
+                    // linea verticale leggera sul grafico principale
+                    ctx.strokeStyle = 'rgba(251,146,60,.2)'; ctx.lineWidth = 1; ctx.setLineDash([2,4]);
+                    ctx.beginPath(); ctx.moveTo(cx, y0); ctx.lineTo(cx, y1); ctx.stroke();
+                    ctx.setLineDash([]);
+                } else {
+                    // EMA touch — bianco piccolo
+                    ctx.beginPath(); ctx.arc(cx, volPMid, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255,255,255,.12)'; ctx.fill();
+                    ctx.strokeStyle = 'rgba(255,255,255,.6)'; ctx.lineWidth = 1; ctx.setLineDash([]);
+                    ctx.stroke();
+                }
+                compressMarkers.push({ x: cx, y: volPMid, r: c.isComp ? 8 : 6, descrizione: c.descrizione, t: c.t, isComp: c.isComp });
+            });
+        }
+
+        // ==========================================
+        // TOOLTIP HOVER
+        // ==========================================
+        cv.addEventListener('mousemove', function(e) {
+            if (!geom) return;
+            const r  = cv.getBoundingClientRect();
+            const mx = e.clientX - r.left;
+            const my = e.clientY - r.top;
+
+            // --- check bias op markers ---
+            for (var bi = 0; bi < biasOpMarkers.length; bi++) {
+                var bm = biasOpMarkers[bi];
+                var dx = mx - bm.x, dy = my - bm.y;
+                if (Math.sqrt(dx*dx + dy*dy) <= bm.r) {
+                    tip.innerHTML = '<b style="color:' + bm.col + '">' + bm.lbl + ' ' + bm.t + '</b><br><span style="max-width:220px;display:inline-block;white-space:normal">' + bm.testo + '</span>';
+                    tip.style.display = 'block';
+                    tip.style.left = Math.min(mx + 14, r.width - 240) + 'px';
+                    tip.style.top  = (my + 12) + 'px';
                     return;
                 }
             }
-        });
 
-        // --- Modale Destinazione ---
-        function closeScreenModal() {
-            document.getElementById('modal-screen-dest').classList.remove('open');
-        }
-
-        function closeRecordModal() {
-            document.getElementById('modal-screen-record').classList.remove('open');
-        }
-
-        function closeConfirm() {
-            document.getElementById('modal-confirm').classList.remove('open');
-        }
-
-        async function selectDest(dest) {
-            // Valida immagine
-            var urlInput = document.getElementById('screen-url-input').value.trim();
-            if (!urlInput) {
-                document.getElementById('screen-paste-zone').style.borderColor = '#f43f5e';
-                document.getElementById('screen-paste-zone').focus();
+            // --- check trade markers ---
+            var foundTrade = null;
+            for (var ti = 0; ti < tradeMarkers.length; ti++) {
+                var tm = tradeMarkers[ti];
+                var tdx = mx - tm.x, tdy = my - tm.y;
+                if (Math.sqrt(tdx*tdx + tdy*tdy) <= tm.r) { foundTrade = tm.trade; break; }
+            }
+            if (foundTrade !== hoveredTrade) {
+                hoveredTrade = foundTrade;
+                drawChart();
+                if (!foundTrade) { tip.style.display = 'none'; return; }
+            }
+            if (foundTrade) {
+                var tc = foundTrade;
+                var dirLbl = tc.direzione === 'long' ? '↑ LONG' : tc.direzione === 'short' ? '↓ SHORT' : tc.direzione;
+                tip.innerHTML = '<b style="color:' + (tc.direzione === 'long' ? '#20c997' : '#f43f5e') + '">' + dirLbl + '</b> · ' + tc.t
+                    + (tc.entry ? '<br>Entry <b>' + tc.entry.toFixed(2) + '</b>' : '')
+                    + (tc.sl    ? '  SL <b style="color:#f43f5e">' + tc.sl.toFixed(2) + '</b>' : '')
+                    + (tc.tp    ? '  TP <b style="color:#20c997">' + tc.tp.toFixed(2) + '</b>' : '')
+                    + (tc.esito ? '<br><span style="color:#848d97">' + tc.esito + '</span>' : '');
+                tip.style.display = 'block';
+                tip.style.left = Math.min(mx + 14, r.width - 240) + 'px';
+                tip.style.top  = (my + 12) + 'px';
                 return;
             }
-            document.getElementById('screen-paste-zone').style.borderColor = '';
-            screenshotUrl = urlInput;
-            selectedDest = dest;
-            closeScreenModal();
 
-            var title = '', sub = '', records = [];
-            var today = new Date().toISOString().split('T')[0];
-
-            if (dest === 'cronaca') {
-                title = 'Scegli Cronaca';
-                sub = 'Lo screenshot verra salvato per ' + currentCoin;
-                var { data } = await db.from('cronache').select('id, data, titolo, stato').order('data', { ascending: false }).limit(5);
-                records = (data || []).map(function(r) {
-                    return { id: r.id, label: r.data + (r.titolo ? ' - ' + r.titolo : ''), sub: r.stato, extra: { coin: currentCoin } };
-                });
-            } else if (dest === 'trade') {
-                title = 'Scegli Trade';
-                sub = 'Trade aperti o recenti';
-                var { data } = await db.from('trades').select('id, asset, direzione, data, stato').order('data', { ascending: false }).limit(5);
-                records = (data || []).map(function(r) {
-                    return { id: r.id, label: (r.asset || '?') + ' ' + (r.direzione || '') + ' - ' + (r.data || ''), sub: r.stato };
-                });
-            } else if (dest === 'sessione') {
-                title = 'Scegli Sessione';
-                sub = 'Sessioni di oggi o recenti';
-                var { data } = await db.from('sessioni').select('id, nome, data, stato').order('data', { ascending: false }).limit(5);
-                records = (data || []).map(function(r) {
-                    return { id: r.id, label: (r.nome || '?') + ' - ' + (r.data || ''), sub: r.stato };
-                });
-            } else if (dest === 'bias') {
-                title = 'Scegli Bias';
-                sub = 'Bias recenti';
-                var { data } = await db.from('bias').select('id, data, asset, stato').order('data', { ascending: false }).limit(5);
-                records = (data || []).map(function(r) {
-                    return { id: r.id, label: (r.asset || '?') + ' - ' + (r.data || ''), sub: r.stato };
-                });
-            } else if (dest === 'strategia') {
-                title = 'Scegli Strategia';
-                sub = 'Lo screenshot verra aggiunto alla galleria';
-                var { data } = await db.from('strategie').select('id, nome, stato').order('created_at', { ascending: false }).limit(5);
-                records = (data || []).map(function(r) {
-                    return { id: r.id, label: r.nome || '?', sub: r.stato };
-                });
-            } else if (dest === 'allert') {
-                title = 'Scegli Allert';
-                sub = 'Allert recenti';
-                var { data } = await db.from('allert').select('id, titolo, data, tipo').order('data', { ascending: false }).limit(5);
-                records = (data || []).map(function(r) {
-                    return { id: r.id, label: (r.titolo || '?') + ' - ' + (r.data || ''), sub: r.tipo || '' };
-                });
+            // --- check ipotesi markers ---
+            for (var ii = 0; ii < ipotesiMarkers.length; ii++) {
+                var im = ipotesiMarkers[ii];
+                var idx = mx - im.x, idy = my - im.y;
+                if (Math.sqrt(idx*idx + idy*idy) <= im.r) {
+                    tip.innerHTML = '<b style="color:' + im.col + '">' + im.code + '</b> · ' + im.strategia;
+                    tip.style.display = 'block';
+                    tip.style.left = Math.min(mx + 14, r.width - 260) + 'px';
+                    tip.style.top  = (my + 12) + 'px';
+                    return;
+                }
             }
 
-            // Render lista record
-            var list = document.getElementById('record-list');
-            document.getElementById('record-modal-title').textContent = title;
-            document.getElementById('record-modal-sub').textContent = sub;
+            // --- check smile markers ---
+            for (var si = 0; si < smileMarkers.length; si++) {
+                var sm = smileMarkers[si];
+                var sdx = mx - sm.x, sdy = my - sm.y;
+                if (Math.sqrt(sdx*sdx + sdy*sdy) <= sm.r) {
+                    tip.innerHTML = '<b>' + sm.mindset + '</b> · ' + sm.sorgente;
+                    tip.style.display = 'block';
+                    tip.style.left = Math.min(mx + 14, r.width - 200) + 'px';
+                    tip.style.top  = (my + 12) + 'px';
+                    return;
+                }
+            }
 
-            if (!records.length) {
-                list.innerHTML = '<p class="text-sm text-tp-muted text-center py-6">Nessun record trovato</p>';
+            // --- check compress markers ---
+            for (var ci = 0; ci < compressMarkers.length; ci++) {
+                var cm = compressMarkers[ci];
+                var cdx = mx - cm.x, cdy = my - cm.y;
+                if (Math.sqrt(cdx*cdx + cdy*cdy) <= cm.r) {
+                    tip.innerHTML = '<b>' + cm.t + '</b> · ' + cm.descrizione;
+                    tip.style.display = 'block';
+                    tip.style.left = Math.min(mx + 14, r.width - 240) + 'px';
+                    tip.style.top  = (my + 12) + 'px';
+                    return;
+                }
+            }
+
+            // --- check soglie markers ---
+            for (var gi = 0; gi < soglieMarkers.length; gi++) {
+                var gm = soglieMarkers[gi];
+                var gdx = mx - gm.x, gdy = my - gm.y;
+                if (Math.sqrt(gdx*gdx + gdy*gdy) <= gm.r) {
+                    tip.innerHTML = '<b style="color:' + gm.col + '">' + gm.descrizione + '</b>';
+                    tip.style.display = 'block';
+                    tip.style.left = Math.min(mx + 14, r.width - 240) + 'px';
+                    tip.style.top  = (my + 12) + 'px';
+                    return;
+                }
+            }
+
+            // --- check candles ---
+            if (candles.length === 0) { tip.style.display = 'none'; return; }
+            var best = null, bd = 1e9;
+            candles.forEach(function(c) {
+                const cx = geom.pxX(c.tMs) + slotW / 2;
+                const d  = Math.abs(cx - mx);
+                if (d < bd) { bd = d; best = c; }
+            });
+            if (best && bd < slotW) {
+                var html = best.faded
+                    ? '<b>' + best.t + ' Casa</b><br>prezzo ' + best.p.toFixed(2) + '<br>H ' + best.h.toFixed(2) + ' L ' + best.l.toFixed(2) + '<br><span style="color:#7d8896">no OHLC</span>'
+                    : '<b>' + best.t + ' Casa</b><br>O ' + best.o.toFixed(2) + ' H ' + best.h.toFixed(2) + '<br>L ' + best.l.toFixed(2) + ' C ' + best.c.toFixed(2);
+                tip.innerHTML = html;
+                tip.style.display = 'block';
+                tip.style.left = Math.min(mx + 14, r.width - 200) + 'px';
+                tip.style.top  = (my + 12) + 'px';
             } else {
-                list.innerHTML = records.map(function(r) {
-                    var statusColor = r.sub === 'completato' ? 'text-tp-accent' : r.sub === 'in_corso' ? 'text-tp-warning' : 'text-tp-muted';
-                    return '<button onclick="saveScreenshot(\'' + r.id + '\', ' + JSON.stringify(r.extra || {}).replace(/'/g, "\\'") + ')" class="w-full flex items-center justify-between px-4 py-3 bg-tp-panel border border-tp-border rounded-lg hover:border-tp-accent/50 transition-colors text-left">' +
-                        '<div><span class="text-sm font-bold text-white">' + r.label + '</span></div>' +
-                        '<span class="text-[10px] font-bold uppercase ' + statusColor + '">' + (r.sub || '') + '</span>' +
-                        '</button>';
-                }).join('');
+                tip.style.display = 'none';
             }
+        });
+        cv.addEventListener('mouseleave', function() {
+            tip.style.display = 'none';
+            if (hoveredTrade) { hoveredTrade = null; drawChart(); }
+        });
 
-            document.getElementById('modal-screen-record').classList.add('open');
-            lucide.createIcons();
-        }
-
-        // --- Salvataggio Screenshot ---
-        async function saveScreenshot(recordId, extra) {
-            extra = extra || {};
-            var error = null;
-            var imgUrl = screenshotUrl;
-
-            if (selectedDest === 'cronaca') {
-                // Aggiorna coin_data[coin].screenshot nella cronaca
-                var { data: cronaca } = await db.from('cronache').select('coin_data').eq('id', recordId).single();
-                var coinData = cronaca?.coin_data || {};
-                var coin = extra.coin || currentCoin;
-                if (!coinData[coin]) coinData[coin] = {};
-                coinData[coin].screenshot = imgUrl;
-                var res = await db.from('cronache').update({ coin_data: coinData }).eq('id', recordId);
-                error = res.error;
-            } else if (selectedDest === 'trade') {
-                var res = await db.from('trades').update({ screenshot_url: imgUrl }).eq('id', recordId);
-                error = res.error;
-            } else if (selectedDest === 'sessione') {
-                var res = await db.from('sessioni').update({ screenshot: imgUrl }).eq('id', recordId);
-                error = res.error;
-            } else if (selectedDest === 'bias') {
-                var res = await db.from('bias').update({ screenshot: imgUrl }).eq('id', recordId);
-                error = res.error;
-            } else if (selectedDest === 'strategia') {
-                // Aggiungi alla galleria screenshots[]
-                var { data: strat } = await db.from('strategie').select('screenshots').eq('id', recordId).single();
-                var screens = strat?.screenshots || [];
-                screens.push(imgUrl);
-                var res = await db.from('strategie').update({ screenshots: screens }).eq('id', recordId);
-                error = res.error;
-            } else if (selectedDest === 'allert') {
-                var res = await db.from('allert').update({ screenshot: imgUrl }).eq('id', recordId);
-                error = res.error;
-            }
-
-            closeRecordModal();
-
-            if (error) {
-                document.getElementById('confirm-title').textContent = 'Errore';
-                document.getElementById('confirm-msg').textContent = 'Errore nel salvataggio: ' + error.message;
-            } else {
-                document.getElementById('confirm-title').textContent = 'Screenshot Salvato';
-                document.getElementById('confirm-msg').textContent = 'Screenshot di ' + currentCoin + ' salvato in ' + selectedDest + ' con successo.';
-            }
-            document.getElementById('modal-confirm').classList.add('open');
-            lucide.createIcons();
-        }
-
-        // --- Init ---
+        // ==========================================
+        // INIT
+        // ==========================================
         document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
-            loadChart(currentCoin);
+            document.getElementById('date-picker').value = currentDate;
+            loadData();
         });
+
+        window.addEventListener('resize', drawChart);
     </script>
 </body>
 </html>

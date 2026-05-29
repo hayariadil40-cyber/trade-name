@@ -231,15 +231,27 @@
                                 <span class="text-[10px] font-normal text-tp-muted/70 normal-case tracking-normal" id="aggiornamenti-sublabel">(monitoring sviluppo durante la giornata)</span>
                             </label>
                             <div id="aggiornamenti-list" class="space-y-2 mb-4"></div>
-                            <div class="flex gap-2 items-stretch">
-                                <input id="agg-ora" type="time" class="bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[110px] flex-shrink-0"/>
-                                <textarea id="agg-testo" rows="2" class="flex-1 bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Es: London ha rispettato 4720, prima reazione long visibile, bias confermato" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'"></textarea>
-                                <div class="flex flex-col justify-center gap-1">
+                            <div class="flex gap-2 items-start">
+                                <input id="agg-ora" type="time" class="bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[110px] flex-shrink-0 mt-0.5"/>
+                                <div class="flex-1 flex flex-col gap-1.5">
+                                    <textarea id="agg-testo" rows="2" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Es: London ha rispettato 4720, prima reazione long visibile, bias confermato" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'"></textarea>
+                                    <!-- Area tag -->
+                                    <div class="bg-[#0a0c10] border border-tp-border/50 rounded-lg px-2.5 py-2">
+                                        <div id="agg-tags-container" class="flex flex-wrap gap-1.5 mb-2 min-h-[18px]"></div>
+                                        <div class="flex gap-1.5">
+                                            <input id="agg-tag-input" type="text" placeholder="Aggiungi tag…"
+                                                onkeydown="if(event.key==='Enter'){event.preventDefault();addAggTag()}"
+                                                class="flex-1 bg-tp-panel border border-tp-border rounded px-2.5 py-1 text-xs text-tp-text/80 outline-none focus:border-tp-accent transition-colors">
+                                            <button type="button" onclick="addAggTag()" class="px-3 py-1 bg-tp-panel border border-tp-border rounded text-xs font-bold text-tp-muted hover:text-tp-accent hover:border-tp-accent transition-colors">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col justify-center gap-1 mt-0.5">
                                     <button type="button" onclick="toggleNewMindset('positive')" id="nm-positive" style="padding:2px;background:none;border:none;cursor:pointer;color:rgba(128,128,128,0.35)" title="positivo"><i data-lucide="smile" style="width:14px;height:14px"></i></button>
                                     <button type="button" onclick="toggleNewMindset('neutral')"  id="nm-neutral"  style="padding:2px;background:none;border:none;cursor:pointer;color:rgba(128,128,128,0.35)" title="neutro"><i data-lucide="meh"   style="width:14px;height:14px"></i></button>
                                     <button type="button" onclick="toggleNewMindset('negative')" id="nm-negative" style="padding:2px;background:none;border:none;cursor:pointer;color:rgba(128,128,128,0.35)" title="negativo"><i data-lucide="frown" style="width:14px;height:14px"></i></button>
                                 </div>
-                                <button type="button" onclick="addAggiornamento()" id="agg-btn" class="px-4 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 hover:bg-tp-accent/20 uppercase transition-all flex items-center gap-2">
+                                <button type="button" onclick="addAggiornamento()" id="agg-btn" class="px-4 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 hover:bg-tp-accent/20 uppercase transition-all flex items-center gap-2 mt-0.5">
                                     <i data-lucide="plus" class="w-4 h-4"></i> Aggiungi
                                 </button>
                             </div>
@@ -609,9 +621,15 @@
                 const moodBadge = a.mindset
                     ? `<i data-lucide="${moodIcon[a.mindset]}" style="width:13px;height:13px;color:${moodColor[a.mindset]};flex-shrink:0;margin-top:2px"></i>`
                     : '';
+                const tagsHtml = (a.tags && a.tags.length)
+                    ? `<div class="flex flex-wrap gap-1 mt-1.5">${a.tags.map(t => `<span class="inline-flex items-center px-2 py-0.5 rounded bg-tp-accent/10 border border-tp-accent/25 text-[10px] text-tp-accent font-medium">${escapeAggHtml(t)}</span>`).join('')}</div>`
+                    : '';
                 return `<div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 flex items-start gap-3">
                     <span class="text-xs font-bold text-tp-accent tracking-wide whitespace-nowrap mt-0.5">${escapeAggHtml(a.ora)}</span>
-                    <p class="flex-1 text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escapeAggHtml(a.testo)}</p>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escapeAggHtml(a.testo)}</p>
+                        ${tagsHtml}
+                    </div>
                     ${moodBadge}
                     <button type="button" onclick="removeAggiornamento(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors flex-shrink-0 mt-0.5" title="Rimuovi">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -629,10 +647,12 @@
             const testo = (testoEl.value || '').trim();
             if (!ora || !testo) { alert('Compila orario e testo prima di aggiungere'); return; }
             const mindset = newCommentoMindset;
-            commentiGiornata.push({ ora, testo, mindset: mindset || null });
+            commentiGiornata.push({ ora, testo, mindset: mindset || null, tags: [...newBiasAggTags] });
             commentiGiornata.sort((a,b) => (a.ora || '').localeCompare(b.ora || ''));
             testoEl.value = '';
             newCommentoMindset = null;
+            newBiasAggTags = [];
+            renderAggTagsInput();
             ['positive','neutral','negative'].forEach(m => { const b = document.getElementById('nm-'+m); if(b) b.style.color='rgba(128,128,128,0.35)'; });
             if (mindset) {
                 const { error: smErr } = await db.from('monitora_smile').insert({ mindset, sorgente: 'bias_commento' });
@@ -664,7 +684,8 @@
         const BIAS_ASSETS = ['XAUUSD','EURUSD','GBPUSD','US30','NAS100','GER30','GER40','USDJPY','BTCUSD','DXY'];
         let coinData = {};        // { XAUUSD: {aggiornamenti:[{ora,testo,direzione}]} }
         let activeAsset = null;   // tab attivo
-        let newBiasAggDir = null; // direzione L/S/N in corso per nuovo aggiornamento
+        let newBiasAggDir  = null; // direzione L/S/N in corso per nuovo aggiornamento
+        let newBiasAggTags = [];  // tag in corso per nuovo aggiornamento
 
         function buildBiasAssetMenu() {
             const menu = document.getElementById('bias-asset-menu');
@@ -815,10 +836,15 @@
                     <!-- Lista aggiornamenti -->
                     <div id="bias-panel-agg-list" class="space-y-2">
                         ${aggs.length ? aggs.map((a,i) => {
-                            const dc = a.direzione === 'long' ? 'agg-long' : a.direzione === 'short' ? 'agg-short' : a.direzione === 'neutro' ? 'agg-neutro' : '';
+                            const tagsHtml = (a.tags && a.tags.length)
+                                ? `<div class="flex flex-wrap gap-1 mt-1.5">${a.tags.map(t => `<span class="inline-flex items-center px-2 py-0.5 rounded bg-tp-accent/10 border border-tp-accent/25 text-[10px] text-tp-accent font-medium">${escapeAggHtml(t)}</span>`).join('')}</div>`
+                                : '';
                             return `<div class="bg-tp-panel border border-tp-border rounded-lg p-2.5 flex items-start gap-2">
                                 <span class="text-xs font-bold text-tp-accent whitespace-nowrap mt-0.5">${escapeAggHtml(a.ora)}</span>
-                                <p class="flex-1 text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escapeAggHtml(a.testo)}</p>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escapeAggHtml(a.testo)}</p>
+                                    ${tagsHtml}
+                                </div>
                                 <div class="flex items-center gap-1 shrink-0">
                                     <button type="button" onclick="setBiasAggDir(${i},'long')"   class="agg-dir-btn ${a.direzione==='long'  ?'agg-long':''}">L</button>
                                     <button type="button" onclick="setBiasAggDir(${i},'short')"  class="agg-dir-btn ${a.direzione==='short' ?'agg-short':''}">S</button>
@@ -831,7 +857,7 @@
                         }).join('') : '<p class="text-xs text-tp-muted/60 italic">Nessun aggiornamento ancora.</p>'}
                     </div>
                     <!-- Input nuovo aggiornamento -->
-                    <div class="flex gap-2 items-stretch">
+                    <div class="flex gap-2 items-start">
                         <div class="flex flex-col gap-1 shrink-0">
                             <input id="bias-agg-ora" type="time" value="${nowH}:${nowM}" class="bg-tp-panel border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[100px]"/>
                             <div class="flex gap-1">
@@ -858,6 +884,31 @@
                 const btn = document.getElementById('bnagg-' + d);
                 if (btn) btn.className = 'agg-dir-btn flex-1' + (newBiasAggDir === d ? ' ' + clsMap[d] : '');
             });
+        }
+
+        function renderAggTagsInput() {
+            var c = document.getElementById('agg-tags-container');
+            if (!c) return;
+            c.innerHTML = newBiasAggTags.map(function(t, i) {
+                return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-tp-accent/10 border border-tp-accent/30 text-[10px] text-tp-accent font-medium">'
+                    + t
+                    + '<button type="button" onclick="removeAggTag(' + i + ')" class="opacity-60 hover:opacity-100 leading-none ml-0.5">×</button>'
+                    + '</span>';
+            }).join('');
+        }
+
+        function addAggTag() {
+            var input = document.getElementById('agg-tag-input');
+            var val = (input ? input.value : '').trim();
+            if (!val) return;
+            if (!newBiasAggTags.includes(val)) newBiasAggTags.push(val);
+            input.value = '';
+            renderAggTagsInput();
+        }
+
+        function removeAggTag(i) {
+            newBiasAggTags.splice(i, 1);
+            renderAggTagsInput();
         }
 
         function _biasToast(msg, ok) {

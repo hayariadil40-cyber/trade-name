@@ -498,7 +498,7 @@
 
         // === MONITORASMILE ===
         async function loadSmile(){
-            const{data}=await db.from('monitora_smile').select('*').order('created_at',{ascending:false});
+            const{data}=await db.from('monitora_smile').select('*').neq('sorgente','volatilita_log').order('created_at',{ascending:false});
             renderSmile(data||[]);
         }
 
