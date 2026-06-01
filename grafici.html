@@ -215,10 +215,21 @@
                     <div id="fvg-list" class="flex flex-wrap gap-x-4 gap-y-1"></div>
                 </div>
 
+                <!-- Weekend badge -->
+                <div id="weekend-badge" style="display:none" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#eab30815] border border-[#eab30840] text-[#e5c96e] text-xs font-semibold">
+                    <i data-lucide="moon" class="w-3.5 h-3.5"></i>
+                    <span></span>
+                </div>
+
                 <!-- Canvas Chart -->
                 <div class="bg-tp-panel border border-tp-border rounded-xl overflow-hidden relative" style="position:relative">
-                    <canvas id="chart-canvas" style="width:100%;height:600px"></canvas>
+                    <canvas id="chart-canvas" style="width:100%;aspect-ratio:16/9;display:block"></canvas>
                     <div id="chart-tip"></div>
+                    <button id="capture-btn" onclick="captureScreenshot()" title="Cattura e salva in Cronache"
+                        class="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-[#0a0c10]/80 border border-tp-border text-tp-muted hover:border-tp-accent hover:text-tp-accent transition-colors backdrop-blur-sm z-10">
+                        <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                        <span id="capture-label">Screenshot → Cronache</span>
+                    </button>
                 </div>
 
                 <!-- Cards row: Ipotesi · Commenti Giornata · Aggiornamenti Bias -->
@@ -272,6 +283,37 @@
                     </table>
                 </div>
 
+                <!-- Analisi Intraday -->
+                <div class="flex gap-3 mt-2">
+
+                    <!-- Sbilanciamenti FVG -->
+                    <div class="flex-1 bg-tp-panel border border-tp-border rounded-xl p-4 flex flex-col gap-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">Sbilanciamenti — Rally Direzionali</span>
+                                <span id="sbil-coin-badge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-tp-border text-tp-muted"></span>
+                                <span id="sbil-count-badge" class="text-[9px] font-bold text-tp-muted/40 hidden"></span>
+                            </div>
+                            <button id="save-sbil-btn" onclick="saveSbilanciamentiToCronache()" class="text-[10px] font-bold px-3 py-1.5 rounded-lg bg-tp-accent/10 border border-tp-accent/30 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors hidden">
+                                Salva in Cronache
+                            </button>
+                        </div>
+                        <div id="sbil-detected-panel" class="flex flex-col gap-0.5 min-h-[40px]">
+                            <p class="text-[11px] text-tp-muted/40">Carica un giorno feriale per rilevare i FVG</p>
+                        </div>
+                    </div>
+
+                    <!-- Picchi Volume (placeholder) -->
+                    <div class="flex-1 bg-tp-panel border border-tp-border rounded-xl p-4 flex flex-col gap-3 opacity-40">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">Picchi Volume</span>
+                            <span class="text-[9px] text-tp-muted/50 italic">· in arrivo</span>
+                        </div>
+                        <p class="text-[11px] text-tp-muted/40">Richiede dati di volume — non ancora disponibili nei snapshot M15.</p>
+                    </div>
+
+                </div>
+
             </div>
         </div>
     </main>
@@ -308,6 +350,7 @@
         let soglieMarkers  = [];  // {x, y, r, descrizione, col}
         let tradeData      = [];  // {tMs, t, id, direzione, entry, sl, tp, exit, esito, stato}
         let tradeMarkers   = [];  // {x, y, r, trade}
+        let sbilanciamentiDetected = [];  // {t, tMs, dir, lo, hi, size}
         let hoveredTrade   = null;
         let asiaBox   = null;
         let londonBox = null;
@@ -335,8 +378,35 @@
             loadData();
         }
 
+        function getLastFriday(dateStr) {
+            var d = new Date(dateStr + 'T12:00:00Z');
+            var dow = d.getUTCDay(); // 0=sun, 6=sat
+            if (dow === 0) d.setUTCDate(d.getUTCDate() - 2);
+            else if (dow === 6) d.setUTCDate(d.getUTCDate() - 1);
+            return d.toISOString().split('T')[0];
+        }
+
+        function isWeekend(dateStr) {
+            var dow = new Date(dateStr + 'T12:00:00Z').getUTCDay();
+            return dow === 0 || dow === 6;
+        }
+
+        function updateWeekendBadge(original) {
+            var badge = document.getElementById('weekend-badge');
+            if (!badge) return;
+            if (isWeekend(original)) {
+                badge.querySelector('span').textContent = 'Weekend — visualizzo venerdì ' + currentDate;
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
         function switchDate(d) {
-            currentDate = d;
+            var adjusted = getLastFriday(d);
+            currentDate = adjusted;
+            document.getElementById('date-picker').value = currentDate;
+            updateWeekendBadge(d);
             loadData();
         }
 
@@ -380,6 +450,7 @@
             drawChart();
             renderIpotesiCards();
             renderBiasViewers();
+            renderSbilanciamentiPanel();
         }
 
         function buildSessionBox(startSlot, endSlot) {
@@ -550,6 +621,8 @@
             const { data, error } = await db
                 .from('monitora_smile')
                 .select('created_at, mindset, sorgente')
+                .neq('sorgente', 'volatilita_log')
+                .not('mindset', 'is', null)
                 .gte('created_at', utcStart)
                 .lte('created_at', utcEnd)
                 .order('created_at');
@@ -880,6 +953,159 @@
         }
 
         // ==========================================
+        // SBILANCIAMENTI — forti rally direzionali M15
+        // Un rally = 3+ candele consecutive stesso senso dove il movimento
+        // cumulativo supera 1.5× il body medio della sessione
+        // ==========================================
+        function detectSbilanciamenti(candleList) {
+            var valid = candleList.filter(function(c) { return !c.faded && c.o !== null && c.c !== null; });
+            if (valid.length < 4) return [];
+
+            var avgBody = valid.reduce(function(s, c) { return s + Math.abs(c.c - c.o); }, 0) / valid.length;
+            var threshold = avgBody * 1.5;
+
+            var results = [];
+            var i = 0;
+            while (i < valid.length - 2) {
+                var dir = valid[i].c > valid[i].o ? 'bull' : 'bear';
+                var j = i;
+                var cumMove = 0;
+                var lo = Infinity, hi = -Infinity;
+                while (j < valid.length) {
+                    var c = valid[j];
+                    if ((c.c > c.o ? 'bull' : 'bear') !== dir) break;
+                    cumMove += Math.abs(c.c - c.o);
+                    lo = Math.min(lo, c.l);
+                    hi = Math.max(hi, c.h);
+                    j++;
+                }
+                if (j - i >= 3 && cumMove >= threshold) {
+                    results.push({
+                        t:       valid[i].t,
+                        tEnd:    valid[j - 1].t,
+                        tMs:     valid[i].tMs,
+                        dir:     dir,
+                        candele: j - i,
+                        move:    cumMove.toFixed(2),
+                        lo:      lo,
+                        hi:      hi
+                    });
+                    i = j;
+                } else {
+                    i++;
+                }
+            }
+            return results;
+        }
+
+        function renderSbilanciamentiPanel() {
+            sbilanciamentiDetected = detectSbilanciamenti(candles);
+            var panel   = document.getElementById('sbil-detected-panel');
+            var badge   = document.getElementById('sbil-coin-badge');
+            var count   = document.getElementById('sbil-count-badge');
+            var saveBtn = document.getElementById('save-sbil-btn');
+            if (!panel) return;
+            if (badge) badge.textContent = currentCoin + ' · ' + currentDate;
+            if (sbilanciamentiDetected.length === 0) {
+                panel.innerHTML = '<p class="text-[11px] text-tp-muted/40">Nessun rally rilevato — ' + currentCoin + ' ' + currentDate + '</p>';
+                if (count) count.classList.add('hidden');
+                if (saveBtn) saveBtn.classList.add('hidden');
+                return;
+            }
+            if (count) { count.textContent = sbilanciamentiDetected.length + ' trovati'; count.classList.remove('hidden'); }
+            if (saveBtn) saveBtn.classList.remove('hidden');
+            panel.innerHTML = sbilanciamentiDetected.map(function(f) {
+                var col = f.dir === 'bull' ? '#20c997' : '#f43f5e';
+                var lbl = f.dir === 'bull' ? '↑ Bull' : '↓ Bear';
+                var dec = f.lo > 100 ? 0 : 2;
+                return '<div class="flex items-center gap-3 py-2 border-b border-tp-border/20 last:border-0">'
+                    + '<span class="text-xs font-mono text-tp-muted shrink-0">' + f.t + ' – ' + f.tEnd + '</span>'
+                    + '<span class="text-xs font-bold w-16 shrink-0" style="color:' + col + '">' + lbl + '</span>'
+                    + '<span class="text-xs text-tp-muted/60 shrink-0">' + f.candele + ' candele</span>'
+                    + '<span class="text-xs text-tp-muted/50 font-mono shrink-0">' + f.move + ' pt</span>'
+                    + '<span class="text-xs font-mono font-bold ml-auto shrink-0" style="color:' + col + '">L ' + f.lo.toFixed(dec) + '  H ' + f.hi.toFixed(dec) + '</span>'
+                    + '</div>';
+            }).join('');
+        }
+
+        async function saveSbilanciamentiToCronache() {
+            if (sbilanciamentiDetected.length === 0) return;
+            var btn = document.getElementById('save-sbil-btn');
+            btn.textContent = 'Salvataggio…';
+            btn.disabled = true;
+            var times = sbilanciamentiDetected.map(function(f) {
+                var dec = f.lo > 100 ? 0 : 2;
+                var arr = f.dir === 'bull' ? '↑' : '↓';
+                return f.t + ' – ' + f.tEnd + ' ' + arr + ' ' + f.candele + 'c ' + f.move + 'pt L' + f.lo.toFixed(dec) + ' H' + f.hi.toFixed(dec);
+            });
+            var { data: cronaca, error: errQ } = await db
+                .from('cronache').select('id, coin_data').eq('data', currentDate).maybeSingle();
+            if (errQ || !cronaca) {
+                alert('Nessuna cronaca trovata per ' + currentDate + '. Creane una prima da cronache.html.');
+                btn.textContent = 'Salva in Cronache'; btn.disabled = false; return;
+            }
+            var cd = cronaca.coin_data || {};
+            if (!cd[currentCoin]) cd[currentCoin] = {};
+            cd[currentCoin].sbilanciamenti = times;
+            var { error } = await db.from('cronache').update({ coin_data: cd }).eq('id', cronaca.id);
+            if (error) { alert('Errore: ' + error.message); btn.textContent = 'Salva in Cronache'; btn.disabled = false; return; }
+            btn.textContent = '✓ Salvato';
+            setTimeout(function() { btn.textContent = 'Salva in Cronache'; btn.disabled = false; }, 2000);
+        }
+
+        // ==========================================
+        // SCREENSHOT CANVAS → CRONACHE
+        // ==========================================
+        async function captureScreenshot() {
+            var btn   = document.getElementById('capture-btn');
+            var label = document.getElementById('capture-label');
+            label.textContent = 'Caricamento…';
+            btn.disabled = true;
+
+            // 1. trova cronaca del giorno
+            var { data: cronaca, error: errQ } = await db
+                .from('cronache').select('id, coin_data').eq('data', currentDate).maybeSingle();
+            if (errQ || !cronaca) {
+                alert('Nessuna cronaca per ' + currentDate + '. Creala prima da cronache.html.');
+                label.textContent = 'Screenshot → Cronache'; btn.disabled = false; return;
+            }
+
+            // 2. esporta canvas come PNG blob
+            var canvas = document.getElementById('chart-canvas');
+            var blob = await new Promise(function(res) { canvas.toBlob(res, 'image/png'); });
+
+            // 3. upload via edge function storage-upload
+            var { data: { session } } = await db.auth.getSession();
+            var path = 'cronache/' + cronaca.id + '/' + currentCoin + '_' + currentDate + '.png';
+            var form = new FormData();
+            form.append('file', blob, path.split('/').pop());
+            form.append('path', path);
+            var res = await fetch(SUPABASE_URL + '/functions/v1/storage-upload', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + session.access_token },
+                body: form
+            });
+            var json = await res.json();
+            if (!res.ok || json.error) {
+                alert('Errore upload: ' + (json.error || res.statusText));
+                label.textContent = 'Screenshot → Cronache'; btn.disabled = false; return;
+            }
+
+            // 4. salva URL in cronache.coin_data[currentCoin].screenshot
+            var cd = cronaca.coin_data || {};
+            if (!cd[currentCoin]) cd[currentCoin] = {};
+            cd[currentCoin].screenshot = json.url;
+            var { error } = await db.from('cronache').update({ coin_data: cd }).eq('id', cronaca.id);
+            if (error) {
+                alert('Errore salvataggio: ' + error.message);
+                label.textContent = 'Screenshot → Cronache'; btn.disabled = false; return;
+            }
+
+            label.textContent = '✓ Salvato!';
+            setTimeout(function() { label.textContent = 'Screenshot → Cronache'; btn.disabled = false; }, 2500);
+        }
+
+        // ==========================================
         // CANVAS RENDERER
         // ==========================================
         function drawChart() {
@@ -907,7 +1133,8 @@
             let lo = 1e9, hi = 0;
             candles.forEach(function(c) { lo = Math.min(lo, c.l); hi = Math.max(hi, c.h); });
             if (candles.length === 0) { lo = 1000; hi = 1100; } // fallback vuoto
-            const pd = (hi - lo) * 0.05;
+            var avgRange = candles.length ? candles.reduce(function(s,c){ return s+(c.h-c.l); },0)/candles.length : 0;
+            const pd = Math.max((hi - lo) * 0.003, avgRange * 1.0);
             const yMin = lo - pd, yMax = hi + pd;
             function pxY(p) { return y1 - (p - yMin) / (yMax - yMin) * (y1 - y0); }
 
@@ -1608,7 +1835,10 @@
         // ==========================================
         document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
+            var rawDate = currentDate;
+            currentDate = getLastFriday(rawDate);
             document.getElementById('date-picker').value = currentDate;
+            updateWeekendBadge(rawDate);
             loadData();
         });
 
