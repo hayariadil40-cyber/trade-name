@@ -791,6 +791,7 @@
                 return;
             }
             await loadGiornata();
+            checkFajrAuto();
             loadCoranoWidget('corano-widget');
             await Promise.all([
                 loadAllertOggi(),
@@ -954,6 +955,40 @@
                 no.classList.add('bg-tp-loss', 'text-white', 'border-tp-loss');
                 no.classList.remove('text-tp-muted', 'border-tp-border');
             }
+        }
+
+        async function checkFajrAuto() {
+            if (!giornataId || !giornataDate) return;
+            if (fajrState !== null) return;
+
+            // Solo per la giornata di oggi
+            const casaToday = new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Casablanca' });
+            if (giornataDate !== casaToday) return;
+
+            // Ora corrente in Casablanca
+            const parts = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Africa/Casablanca', hour: '2-digit', minute: '2-digit', hour12: false
+            }).formatToParts(new Date());
+            const h = parseInt(parts.find(p => p.type === 'hour').value);
+            const m = parseInt(parts.find(p => p.type === 'minute').value);
+            if (h * 60 + m < 6 * 60 + 40) return; // prima delle 06:40
+
+            // Auto-flag: fajr non eseguito
+            fajrState = false;
+            renderFajr();
+            await db.from('giornate').update({ fajr: false }).eq('id', giornataId);
+            _gjToast('Fajr segnato come non eseguito', false);
+
+            // Rodrigo manda la ramanzina (fire-and-forget)
+            fetch(SUPABASE_URL + '/functions/v1/fajr-reminder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+                },
+                body: JSON.stringify({ date: casaToday })
+            }).catch(() => {});
         }
 
         // ============================================
