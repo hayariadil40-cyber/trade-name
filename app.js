@@ -52,9 +52,9 @@ document.addEventListener('DOMContentLoaded', function() {
 // ==========================================
 function updateClock() {
     const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const hours = String(now.getUTCHours()).padStart(2, '0');
+    const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+    const seconds = String(now.getUTCSeconds()).padStart(2, '0');
 
     const clockEl = document.getElementById('digital-clock');
     if (clockEl) clockEl.textContent = hours + ':' + minutes + ':' + seconds;
@@ -78,8 +78,8 @@ function updateClock() {
     checkBlink('tf-15m', (m % 15 === 14) && s >= 50);
     checkBlink('tf-30m', (m % 30 === 29) && s >= 50);
     checkBlink('tf-1h', (m === 59) && s >= 50);
-    // Broker 4H chiude 01/05/09/13/17/21 broker = 23/03/07/11/15/19 Casa (broker-2h): blink nell'ora precedente
-    checkBlink('tf-4h', ((now.getHours() % 4 === 2) && m === 59 && s >= 50));
+    // H4 UTC chiude 02/06/10/14/18/22 UTC — blink all'ora precedente (01/05/09/13/17/21 UTC)
+    checkBlink('tf-4h', ((now.getUTCHours() % 4 === 1) && m === 59 && s >= 50));
 }
 
 // ==========================================
@@ -129,7 +129,7 @@ function updateTimeline() {
 
     // Calcola posizione attuale nella giornata
     var now = new Date();
-    var totalMinutes = now.getHours() * 60 + now.getMinutes();
+    var totalMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
 
     // Primo blocco start e ultimo blocco end
     var dayStart = timeToMinutes(blocks[0].start);
@@ -793,7 +793,7 @@ window.selectVol = function(btn, type) {
 // 10. CANDELA 4H REMINDER
 // ==========================================
 (function() {
-    var CLOSE_HOURS_CASA = [3, 7, 11, 15, 19];
+    var CLOSE_HOURS_CASA = [2, 6, 10, 14, 18, 22]; // chiusure H4 in UTC
     var STORAGE_KEY = 'td_candle4h_shown';
 
     function getShown() {
