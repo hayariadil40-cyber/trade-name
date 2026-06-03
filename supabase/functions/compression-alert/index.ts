@@ -39,11 +39,6 @@ Deno.serve(async () => {
 
     const linee: string[] = [];
 
-    // ora Casa (UTC+1) per allert_prezzo.ora
-    const casaDate = new Date(now.getTime() + 3600000);
-    const casaHH   = String(casaDate.getUTCHours()).padStart(2, "0");
-    const casaMM   = String(casaDate.getUTCMinutes()).padStart(2, "0");
-    const casaOra  = `${casaHH}:${casaMM}`;
 
     for (const row of compressi) {
       const h = Number(row.high_15m) || 0;
@@ -65,7 +60,6 @@ Deno.serve(async () => {
         .from("allert_prezzo")
         .insert({
           coin: row.simbolo,
-          ora: casaOra,
           prezzo: String(h > 0 ? ((h + l) / 2).toFixed(2) : "0"),
           descrizione: `Compressione M15 | range ${range} pip`,
           stato: "nuovo",

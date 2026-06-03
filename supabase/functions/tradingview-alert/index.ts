@@ -88,7 +88,6 @@ serve(async (req) => {
     const descrizione = String(
       payload.descrizione ?? payload.message ?? payload.alert_message ?? payload.condition ?? payload.note ?? ""
     ).trim().substring(0, 500);
-    const ora = String(payload.ora ?? hhmmUtc());
 
     if (!coin && !prezzo) {
       return new Response(JSON.stringify({ error: "missing coin and prezzo (need at least one)", received: payload }), {
@@ -104,7 +103,6 @@ serve(async (req) => {
     const { data, error } = await supabase.from("allert_prezzo").insert({
       coin: coin || "?",
       prezzo: prezzo || "?",
-      ora,
       descrizione: descrizione || "Alert TradingView",
       stato: "nuovo",
     }).select("id, coin, prezzo, created_at").single();

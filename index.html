@@ -924,10 +924,10 @@
             }));
 
             // Allert prezzo (solo manuali da TV: gli EA MT4 vivono nel box Allert EA, non sono task)
-            const { data: allertPrezzo } = await db.from('allert_prezzo').select('id, coin, prezzo, ora, descrizione, created_at').eq('stato', 'nuovo');
+            const { data: allertPrezzo } = await db.from('allert_prezzo').select('id, coin, prezzo, descrizione, created_at').eq('stato', 'nuovo');
             const allertPrezzoManuali = (allertPrezzo || []).filter(ap => !isEaAllert(ap));
             allertPrezzoManuali.forEach(ap => {
-                const oraStr = ap.ora ? ap.ora.substring(0,5) : (ap.created_at ? new Date(ap.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : '');
+                const oraStr = ap.created_at ? new Date(ap.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : '';
                 tickets.push({
                     type: 'allert_prezzo', label: 'Allert Da Validare', title: (ap.coin || '') + ' @ ' + (ap.prezzo || ''),
                     desc: (ap.descrizione || 'Alert prezzo triggerato') + (oraStr ? ' - ' + oraStr : ''), id: ap.id,
@@ -1196,7 +1196,7 @@
             }
 
             container.innerHTML = items.map(a => {
-                const time = a.ora ? a.ora.substring(0,5) : (a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--');
+                const time = a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--';
                 const desc = a.descrizione || '';
                 return `
                 <div data-allert-id="${a.id}"

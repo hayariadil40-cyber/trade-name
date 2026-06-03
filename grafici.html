@@ -79,26 +79,31 @@
             <div class="flex items-center gap-4 w-auto shrink-0 justify-end"><div class="hidden xl:flex items-center gap-6 bg-gradient-to-b from-[#13161c] to-[#0a0c10] border border-tp-border/40 px-6 py-3 rounded-2xl shadow-inner h-16 mr-4"><div class="flex flex-col items-center gap-1 w-10"><i id="mindset-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent drop-shadow-md"></i></div><div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div><div id="volatility-coins" class="flex items-center gap-3"></div></div><div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem]"><div class="flex flex-col"><span class="text-[9px] text-tp-accent font-bold uppercase tracking-widest opacity-80">Win Rate</span><span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-tp-accent to-white leading-none mt-0.5">67%</span></div><div class="relative w-10 h-10 flex items-center justify-center"><svg class="w-[120%] h-[120%] transform -rotate-90 overflow-visible absolute" viewBox="0 0 36 36"><path class="text-tp-border" d="M18 2.0845a15.9155 15.9155 0 010 31.831a15.9155 15.9155 0 010-31.831" fill="none" stroke="currentColor" stroke-width="3"/><path class="text-tp-accent" stroke-dasharray="67,100" d="M18 2.0845a15.9155 15.9155 0 010 31.831a15.9155 15.9155 0 010-31.831" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg></div></div></div>
         </header>
 
+        <!-- Date nav + Coin tabs -->
+        <div class="flex items-center gap-3 px-4 lg:px-6 py-2.5 border-b border-tp-border bg-tp-panel flex-shrink-0 flex-wrap">
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+                <button onclick="changeDate(-1)" class="w-7 h-7 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-white hover:border-tp-muted flex items-center justify-center transition-colors">
+                    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                </button>
+                <span id="date-display" class="text-white font-bold text-xs w-52 text-center select-none">—</span>
+                <button onclick="changeDate(1)" class="w-7 h-7 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-white hover:border-tp-muted flex items-center justify-center transition-colors">
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="goToToday()" class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-tp-accent hover:border-tp-accent/40 transition-colors">Oggi</button>
+            </div>
+            <div class="w-px h-5 bg-tp-border flex-shrink-0"></div>
+            <div class="flex gap-1.5 flex-wrap" id="coin-tabs">
+                <button onclick="switchCoin('XAUUSD')" data-coin="XAUUSD" class="coin-tab active text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors">XAUUSD</button>
+                <button onclick="switchCoin('US30')" data-coin="US30" class="coin-tab text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors">US30</button>
+                <button onclick="switchCoin('GER30')" data-coin="GER30" class="coin-tab text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors">GER30</button>
+                <button onclick="switchCoin('NAS100')" data-coin="NAS100" class="coin-tab text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors">NAS100</button>
+                <button onclick="switchCoin('BTCUSD')" data-coin="BTCUSD" class="coin-tab text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors">BTCUSD</button>
+            </div>
+        </div>
+
         <!-- Contenuto -->
         <div class="flex-1 overflow-y-auto p-3 lg:p-6">
             <div class="max-w-[1800px] mx-auto flex flex-col gap-3">
-
-                <!-- Coin Tabs -->
-                <div class="flex items-center justify-between">
-                    <div class="flex bg-tp-panel border border-tp-border rounded-lg p-1 gap-1" id="coin-tabs">
-                        <button onclick="switchCoin('XAUUSD')" class="coin-tab active text-xs font-bold px-4 py-2 rounded border border-transparent transition-colors">XAUUSD</button>
-                        <button onclick="switchCoin('US30')" class="coin-tab text-xs font-bold px-4 py-2 rounded border border-transparent text-tp-muted hover:text-white transition-colors">US30</button>
-                        <button onclick="switchCoin('GER30')" class="coin-tab text-xs font-bold px-4 py-2 rounded border border-transparent text-tp-muted hover:text-white transition-colors">GER30</button>
-                        <button onclick="switchCoin('NAS100')" class="coin-tab text-xs font-bold px-4 py-2 rounded border border-transparent text-tp-muted hover:text-white transition-colors">NAS100</button>
-                        <button onclick="switchCoin('BTCUSD')" class="coin-tab text-xs font-bold px-4 py-2 rounded border border-transparent text-tp-muted hover:text-white transition-colors">BTCUSD</button>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <input type="date" id="date-picker"
-                            onchange="switchDate(this.value)"
-                            class="bg-tp-panel border border-tp-border rounded-lg px-3 py-1.5 text-xs text-tp-text focus:outline-none focus:border-tp-accent/50 cursor-pointer">
-                        <span id="chart-date-label" class="text-xs text-tp-muted font-mono hidden lg:block"></span>
-                    </div>
-                </div>
 
                 <!-- Layer Panel -->
                 <div class="flex flex-wrap items-center gap-x-5 gap-y-2 bg-tp-panel border border-tp-border rounded-lg px-4 py-2.5">
@@ -386,8 +391,7 @@
         function switchCoin(coin) {
             currentCoin = coin;
             document.querySelectorAll('.coin-tab').forEach(function(btn) {
-                btn.classList.remove('active');
-                if (btn.textContent.trim() === coin) btn.classList.add('active');
+                btn.classList.toggle('active', btn.dataset.coin === coin);
             });
             loadData();
         }
@@ -416,12 +420,30 @@
             }
         }
 
+        function updateDateDisplay() {
+            var d = new Date(currentDate + 'T12:00:00Z');
+            var days = ['dom','lun','mar','mer','gio','ven','sab'];
+            var months = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+            var label = days[d.getUTCDay()] + ' ' + String(d.getUTCDate()).padStart(2,'0') + ' ' + months[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
+            document.getElementById('date-display').textContent = label;
+        }
+
         function switchDate(d) {
             var adjusted = getLastFriday(d);
             currentDate = adjusted;
-            document.getElementById('date-picker').value = currentDate;
             updateWeekendBadge(d);
+            updateDateDisplay();
             loadData();
+        }
+
+        function changeDate(delta) {
+            var d = new Date(currentDate + 'T12:00:00Z');
+            d.setUTCDate(d.getUTCDate() + delta);
+            switchDate(d.toISOString().slice(0, 10));
+        }
+
+        function goToToday() {
+            switchDate(new Date().toISOString().slice(0, 10));
         }
 
         // ---- layer toggle listeners ----
@@ -471,21 +493,12 @@
             asiaBox = null; londonBox = null; nyBox = null;
             drawChart();
             await Promise.all([loadCandles(), loadUsd(), loadNews(), loadBiasH4(), loadLiveH4(), loadSmile(), loadIpotesi(), loadFvg(), loadSoglie(), loadTrades(), loadVolatilita(), loadCompress()]);
-            // Live prev: ultima candela chiusa direttamente da watchlist (sempre aggiornata)
-            if (liveM15Prev && currentDate === new Date().toISOString().slice(0, 10)) {
-                var _nowP = new Date();
-                var _m15P = Math.floor(_nowP.getUTCMinutes() / 15) * 15;
-                var _prevMs = Date.UTC(_nowP.getUTCFullYear(), _nowP.getUTCMonth(), _nowP.getUTCDate(), _nowP.getUTCHours(), _m15P, 0) - 900000;
-                var _pd = new Date(_prevMs);
-                var _pt = String(_pd.getUTCHours()).padStart(2,'0') + ':' + String(_pd.getUTCMinutes()).padStart(2,'0');
-                candles = candles.filter(function(c) { return c.t !== _pt; });
-                candles.push({ t: _pt, tMs: T(_pt), p: liveM15Prev.p, h: liveM15Prev.h, l: liveM15Prev.l, o: liveM15Prev.o, c: liveM15Prev.c, faded: false });
-            }
-            // Live current: candela in formazione direttamente da watchlist
+            // Candela in formazione: solo liveM15 (current slot).
+            // liveM15Prev rimosso: candles_15m + trigger sono autoritativi per i bar chiusi.
             if (liveM15 && currentDate === new Date().toISOString().slice(0, 10)) {
-                var _nowC = new Date();
-                var _m15C = Math.floor(_nowC.getUTCMinutes() / 15) * 15;
-                var _ct = String(_nowC.getUTCHours()).padStart(2,'0') + ':' + String(_m15C).padStart(2,'0');
+                var _liveNow = new Date();
+                var _liveM15 = Math.floor(_liveNow.getUTCMinutes() / 15) * 15;
+                var _ct = String(_liveNow.getUTCHours()).padStart(2,'0') + ':' + String(_liveM15).padStart(2,'0');
                 candles = candles.filter(function(c) { return c.t !== _ct; });
                 candles.push({ t: _ct, tMs: T(_ct), p: liveM15.p, h: liveM15.h, l: liveM15.l, o: liveM15.o, c: liveM15.c, faded: true });
             }
@@ -516,64 +529,38 @@
         function buildNyBox()     { nyBox     = buildSessionBox('13:30', '16:00'); }
 
         // ==========================================
-        // LOAD CANDELE DA watchlist_snapshots
+        // LOAD CANDELE DA candles_15m
         // ==========================================
         async function loadCandles() {
             candles = [];
             drawChart();
 
-            // snapshot e un array JSONB con tutti gli asset per ogni slot 15m
-            // filtriamo la giornata in UTC
             const utcStart = new Date(currentDate + 'T00:00:00Z').toISOString();
             const utcEnd   = new Date(currentDate + 'T23:59:59Z').toISOString();
 
             const { data, error } = await db
-                .from('watchlist_snapshots')
-                .select('captured_at, snapshot')
-                .gte('captured_at', utcStart)
-                .lte('captured_at', utcEnd)
-                .order('captured_at');
+                .from('candles_15m')
+                .select('ts, open, high, low, close')
+                .eq('coin', currentCoin)
+                .gte('ts', utcStart)
+                .lte('ts', utcEnd)
+                .order('ts');
 
-            if (error) { console.error('watchlist_snapshots:', error); return; }
+            if (error) { console.error('candles_15m:', error); return; }
 
-            var slotMap = {};
-            (data || []).forEach(function(r) {
-                var entry = (r.snapshot || []).find(function(e) { return e.simbolo === currentCoin; });
-                if (!entry) return;
-
-                var capDate = new Date(r.captured_at);
-                var slotMin = Math.floor(capDate.getUTCMinutes() / 15) * 15;
-                var slotMs  = Date.UTC(capDate.getUTCFullYear(), capDate.getUTCMonth(), capDate.getUTCDate(), capDate.getUTCHours(), slotMin, 0);
-
-                var p = parseFloat(entry.prezzo);
-
-                // Candela completata (*_prev) → slot precedente
-                if (entry.open_15m_prev != null && entry.high_15m_prev != null) {
-                    var prevMs = slotMs - 900000;
-                    var pd = new Date(prevMs);
-                    var pt = String(pd.getUTCHours()).padStart(2,'0') + ':' + String(pd.getUTCMinutes()).padStart(2,'0');
-                    slotMap[pt] = { t: pt, tMs: T(pt), p: p,
-                        h: parseFloat(entry.high_15m_prev),
-                        l: parseFloat(entry.low_15m_prev),
-                        o: parseFloat(entry.open_15m_prev),
-                        c: parseFloat(entry.close_15m_prev),
-                        faded: false };
-                }
-
-                // Candela corrente/fallback (*) → slot corrente
-                if (entry.open_15m != null && entry.high_15m != null) {
-                    var ct = String(new Date(slotMs).getUTCHours()).padStart(2,'0') + ':' + String(slotMin).padStart(2,'0');
-                    // Se *_prev non disponibile (snapshot vecchi), usa * come completata al suo slot
-                    var hasPrev = (entry.open_15m_prev != null && entry.high_15m_prev != null);
-                    slotMap[ct] = { t: ct, tMs: T(ct), p: p,
-                        h: parseFloat(entry.high_15m) || p,
-                        l: parseFloat(entry.low_15m)  || p,
-                        o: parseFloat(entry.open_15m) || null,
-                        c: parseFloat(entry.close_15m) || p,
-                        faded: hasPrev };
-                }
+            candles = (data || []).map(function(r) {
+                var d = new Date(r.ts);
+                var t = String(d.getUTCHours()).padStart(2,'0') + ':' + String(d.getUTCMinutes()).padStart(2,'0');
+                return {
+                    t: t, tMs: T(t),
+                    p: parseFloat(r.close),
+                    o: parseFloat(r.open),
+                    h: parseFloat(r.high),
+                    l: parseFloat(r.low),
+                    c: parseFloat(r.close),
+                    faded: false
+                };
             });
-            candles = Object.values(slotMap).sort(function(a, b) { return a.tMs - b.tMs; });
         }
 
         // ==========================================
@@ -834,7 +821,7 @@
             const utcEnd   = new Date(currentDate + 'T23:59:59Z').toISOString();
             const { data, error } = await db
                 .from('allert_prezzo')
-                .select('id, ora, descrizione, stato, created_at')
+                .select('id, descrizione, stato, created_at')
                 .eq('coin', currentCoin)
                 .ilike('descrizione', '%FVG%')
                 .eq('stato', 'nuovo')
@@ -846,13 +833,15 @@
                 var dir = r.descrizione.toLowerCase().includes('long') ? 'long' : 'short';
                 var m = r.descrizione.match(/gap\s+([\d.]+)-([\d.]+)/i);
                 if (!m) return null;
-                var casaMs = new Date(r.created_at).getTime();
-                var createdDate = new Date(casaMs).toISOString().split('T')[0];
+                var cd = new Date(r.created_at);
+                var hh = String(cd.getUTCHours()).padStart(2,'0');
+                var mm = String(cd.getUTCMinutes()).padStart(2,'0');
+                var t = hh + ':' + mm;
                 return {
                     id: r.id,
-                    ora: r.ora || '00:00',
-                    tMs: T(r.ora || '00:00'),
-                    createdDate: createdDate,
+                    ora: t,
+                    tMs: T(t),
+                    createdDate: r.created_at.split('T')[0],
                     descrizione: r.descrizione,
                     gap_lo: parseFloat(m[1]),
                     gap_hi: parseFloat(m[2]),
@@ -931,15 +920,16 @@
             const utcEnd   = new Date(currentDate + 'T23:59:59Z').toISOString();
             const { data, error } = await db
                 .from('allert_prezzo')
-                .select('ora, prezzo, descrizione')
+                .select('created_at, prezzo, descrizione')
                 .eq('coin', currentCoin)
                 .ilike('descrizione', '%Superato%')
                 .gte('created_at', utcStart)
                 .lte('created_at', utcEnd)
-                .order('ora');
+                .order('created_at');
             if (error) { console.error('allert_prezzo soglie:', error); return; }
             soglieData = (data || []).map(function(r) {
-                var t = (r.ora || '').substring(0, 5);
+                var cd = new Date(r.created_at);
+                var t = String(cd.getUTCHours()).padStart(2,'0') + ':' + String(cd.getUTCMinutes()).padStart(2,'0');
                 return { tMs: T(t), t: t, prezzo: parseFloat(r.prezzo), descrizione: r.descrizione || '' };
             }).filter(function(s) { return !isNaN(s.prezzo); });
         }
@@ -1013,15 +1003,16 @@
             const utcEnd   = new Date(currentDate + 'T23:59:59Z').toISOString();
             const { data, error } = await db
                 .from('allert_prezzo')
-                .select('ora, descrizione')
+                .select('created_at, descrizione')
                 .eq('coin', currentCoin)
                 .or('descrizione.ilike.%EMA%,descrizione.ilike.%Compressione%')
                 .gte('created_at', utcStart)
                 .lte('created_at', utcEnd)
-                .order('ora');
+                .order('created_at');
             if (error) { console.error('compress:', error); return; }
             compressData = (data || []).map(function(r) {
-                var t = (r.ora || '').substring(0, 5);
+                var cd = new Date(r.created_at);
+                var t = String(cd.getUTCHours()).padStart(2,'0') + ':' + String(cd.getUTCMinutes()).padStart(2,'0');
                 var isComp = r.descrizione.toLowerCase().includes('compressione');
                 return { tMs: T(t), t: t, descrizione: r.descrizione || '', isComp: isComp };
             });
@@ -1218,7 +1209,7 @@
 
             // --- data label ---
             const label = new Date(currentDate + 'T12:00:00Z').toLocaleDateString('it-IT', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-            document.getElementById('chart-date-label').textContent = label + ' · ' + currentCoin + ' M15';
+            var _lbl = document.getElementById('chart-date-label'); if (_lbl) _lbl.textContent = label + ' · ' + currentCoin + ' M15';
 
             // --- stato vuoto ---
             if (candles.length === 0) {
@@ -1913,12 +1904,16 @@
             lucide.createIcons();
             var rawDate = currentDate;
             currentDate = getLastFriday(rawDate);
-            document.getElementById('date-picker').value = currentDate;
             updateWeekendBadge(rawDate);
+            updateDateDisplay();
             loadData();
         });
 
         window.addEventListener('resize', drawChart);
+
+        setInterval(function() {
+            if (currentDate === new Date().toISOString().slice(0, 10)) loadData();
+        }, 5 * 60 * 1000);
     </script>
 </body>
 </html>

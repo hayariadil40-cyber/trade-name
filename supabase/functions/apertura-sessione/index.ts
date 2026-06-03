@@ -158,7 +158,7 @@ Regole:
     // ===== 3. Allert prezzo NON lavorati (stato=nuovo) — lista cruda manuali, persistita in apertura_brief =====
     const { data: allertRaw } = await supabase
       .from("allert_prezzo")
-      .select("coin, prezzo, ora, descrizione, created_at")
+      .select("coin, prezzo, descrizione, created_at")
       .eq("stato", "nuovo")
       .order("created_at", { ascending: false })
       .limit(20);
@@ -169,7 +169,7 @@ Regole:
     for (const a of allertNuovi) {
       const c = a.coin || "?";
       if (!byCoin[c]) byCoin[c] = [];
-      byCoin[c].push({ prezzo: a.prezzo || "", ora: a.ora || new Date(a.created_at).toISOString().slice(11, 16), descrizione: a.descrizione || "" });
+      byCoin[c].push({ prezzo: a.prezzo || "", ora: new Date(a.created_at).toISOString().slice(11, 16), descrizione: a.descrizione || "" });
     }
     const allertBlock = { count: allertNuovi.length, by_coin: byCoin };
 
@@ -179,7 +179,7 @@ Regole:
     if (sessione === "ny") {
       const { data: eaRaw } = await supabase
         .from("allert_prezzo")
-        .select("coin, prezzo, ora, descrizione, created_at")
+        .select("coin, prezzo, descrizione, created_at")
         .gte("created_at", startOfDayIso)
         .order("created_at", { ascending: true })
         .limit(500);
@@ -188,7 +188,7 @@ Regole:
       if (eaToday.length > 0) {
         // Compatto in righe testuali per il prompt
         const eaLines = eaToday.map((a) => {
-          const ora = a.ora || new Date(a.created_at).toISOString().slice(11, 16);
+          const ora = new Date(a.created_at).toISOString().slice(11, 16);
           return `${ora} ${a.coin || "?"} @ ${a.prezzo || "?"} | ${a.descrizione || ""}`;
         }).join("\n");
 

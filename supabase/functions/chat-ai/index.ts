@@ -317,15 +317,17 @@ serve(async (req) => {
       // 3. FVG attive
       const { data: fvgRaw } = await supabase
         .from("allert_prezzo")
-        .select("coin, ora, descrizione")
+        .select("coin, created_at, descrizione")
         .ilike("descrizione", "%FVG%")
         .eq("stato", "nuovo")
-        .order("ora", { ascending: true });
+        .order("created_at", { ascending: true });
       if (fvgRaw?.length) {
         const fvgCtx = fvgRaw.map((f: any) => {
           const m = f.descrizione.match(/gap\s+([\d.]+)-([\d.]+)/i);
+          const cd = new Date(f.created_at);
+          const ora = String(cd.getUTCHours()).padStart(2, "0") + ":" + String(cd.getUTCMinutes()).padStart(2, "0");
           return {
-            coin: f.coin, ora: f.ora,
+            coin: f.coin, ora,
             dir: f.descrizione.toLowerCase().includes("long") ? "long" : "short",
             lo: m ? parseFloat(m[1]) : null,
             hi: m ? parseFloat(m[2]) : null,
@@ -499,7 +501,7 @@ NON puoi: chiudere trade, eliminare record. Su bias con stato='chiuso' puoi corr
 - Mai parolacce, mai linguaggio volgare o colloquiale pesante. Inammissibile.
 - Mai inventare dati: se un dato manca, dichiaralo invece di ipotizzare.
 - Non dare segnali operativi di mercato.
-- TIMEZONE allert_prezzo: il campo "ora" e' gia' in fuso Casablanca (UTC+1) — usa SEMPRE "ora" per ragionare sull'orario di un allert prezzo. Il campo "created_at" e' in UTC (-1h rispetto a Casablanca): ignoralo o aggiungici +1h se lo usi.`;
+- TIMEZONE allert_prezzo: il campo "ora" e' stato rimosso. L'orario e' derivato da "created_at" (UTC) +1h per ottenere l'orario Casablanca.`;
 
     const PROMPT_RODRIGO = `Ti chiami Rodrigo. Sei l'assistente operativo giornaliero del Trade Desk.
 

@@ -1212,7 +1212,7 @@
 
             const prezzoManuali = (prezzoData || []).filter(function(ap) { return !isEaAllert(ap); });
             var allItems = (data || []).concat(prezzoManuali.map(function(ap) {
-                return { id: ap.id, titolo: (ap.coin || '') + ' @ ' + (ap.prezzo || '') + (ap.descrizione ? ' — ' + ap.descrizione : ''), ora_evento: ap.ora || '', stato: ap.stato, _type: 'prezzo' };
+                return { id: ap.id, titolo: (ap.coin || '') + ' @ ' + (ap.prezzo || '') + (ap.descrizione ? ' — ' + ap.descrizione : ''), ora_evento: ap.created_at ? new Date(ap.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : '', stato: ap.stato, _type: 'prezzo' };
             }));
 
             if (!allItems.length) {
@@ -1285,7 +1285,7 @@
             }
 
             container.innerHTML = items.map(a => {
-                const ora = a.ora ? a.ora.substring(0, 5) : (a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--');
+                const ora = a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--';
                 const desc = a.descrizione || '';
                 return `<div data-allert-id="${a.id}" class="bg-[#0a0c10] border border-tp-border hover:border-[#eab308]/40 rounded-lg p-2.5 transition-all group relative overflow-hidden">
                     <div class="absolute inset-y-0 left-0 w-1 bg-[#eab308]/60"></div>
@@ -2213,8 +2213,8 @@
                 const nowHHMM = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
                 const { data: allerts } = await db.from('allert').select('id, titolo, data_evento, ora_evento').eq('stato', 'nuovo').lte('data_evento', today);
                 ((allerts || []).filter(a => { if (!a.data_evento) return false; if (a.data_evento < today) return true; const ora = (a.ora_evento || '').substring(0,5); return !ora || ora <= nowHHMM; })).forEach(a => tickets.push({ type: 'allert', label: 'Notizia Da Validare', title: a.titolo || 'Notizia', desc: "L'orario e scattato. Inserire dati per archiviare.", id: a.id, link: 'allert.html?openNews=' + a.id, color: 'purple', table: 'allert' }));
-                const { data: allertPrezzo } = await db.from('allert_prezzo').select('id, coin, prezzo, ora, descrizione, created_at').eq('stato', 'nuovo');
-                ((allertPrezzo || []).filter(ap => !isEaAllert(ap))).forEach(ap => { const oraStr = ap.ora ? ap.ora.substring(0,5) : (ap.created_at ? new Date(ap.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : ''); tickets.push({ type: 'allert_prezzo', label: 'Allert Da Validare', title: (ap.coin || '') + ' @ ' + (ap.prezzo || ''), desc: (ap.descrizione || 'Alert prezzo triggerato') + (oraStr ? ' - ' + oraStr : ''), id: ap.id, link: 'allert.html?openAllert=' + ap.id, color: 'tp-warning', table: 'allert_prezzo' }); });
+                const { data: allertPrezzo } = await db.from('allert_prezzo').select('id, coin, prezzo, descrizione, created_at').eq('stato', 'nuovo');
+                ((allertPrezzo || []).filter(ap => !isEaAllert(ap))).forEach(ap => { const oraStr = ap.created_at ? new Date(ap.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : ''; tickets.push({ type: 'allert_prezzo', label: 'Allert Da Validare', title: (ap.coin || '') + ' @ ' + (ap.prezzo || ''), desc: (ap.descrizione || 'Alert prezzo triggerato') + (oraStr ? ' - ' + oraStr : ''), id: ap.id, link: 'allert.html?openAllert=' + ap.id, color: 'tp-warning', table: 'allert_prezzo' }); });
                 try {
                     const { data: cronache } = await db.from('cronache').select('id, titolo').eq('stato', 'nuovo');
                     if (cronache) cronache.forEach(c => tickets.push({ type: 'cronaca', label: 'Cronaca Da Compilare', title: c.titolo || 'Cronaca', desc: 'Cronaca da compilare con dettagli e analisi.', id: c.id, link: 'dettaglio_cronaca.html?id=' + c.id, color: 'teal', table: 'cronache' }));
