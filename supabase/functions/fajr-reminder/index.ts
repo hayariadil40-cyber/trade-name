@@ -1,5 +1,5 @@
 // fajr-reminder - Edge Function
-// Chiamata dal frontend (dettaglio_giornata.html) quando fajr è null dopo le 06:40 Casablanca.
+// Chiamata dal frontend (dettaglio_giornata.html) quando fajr è null dopo le 05:40 UTC.
 // Genera una ramanzina via Claude Haiku e la manda su Telegram.
 // Il flag fajr=false viene già salvato dal frontend prima di chiamare questa function.
 
@@ -12,18 +12,16 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-function nowCasablanca(): string {
-  return new Intl.DateTimeFormat("it-IT", {
-    timeZone: "Africa/Casablanca",
-    weekday: "long",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(new Date());
+function nowUtc(): string {
+  const now = new Date();
+  const giorni = ["domenica", "lunedi", "martedi", "mercoledi", "giovedi", "venerdi", "sabato"];
+  const hh = String(now.getUTCHours()).padStart(2, "0");
+  const mm = String(now.getUTCMinutes()).padStart(2, "0");
+  return `${giorni[now.getUTCDay()]} ${hh}:${mm}`;
 }
 
 async function generateRamanzina(apiKey: string): Promise<string> {
-  const ora = nowCasablanca();
+  const ora = nowUtc();
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -37,7 +35,7 @@ async function generateRamanzina(apiKey: string): Promise<string> {
       system: `Sei Rodrigo, assistente operativo di un trader. Tono: diretto, asciutto, senza fronzoli. Puoi essere duro ma mai volgare. Zero frasi motivazionali da palestra. Scrivi in italiano.`,
       messages: [{
         role: "user",
-        content: `Sono le ${ora} a Casablanca. Il trader non ha fatto il Fajr — l'ho segnato automaticamente come "non eseguito". Scrivi una ramanzina breve (max 5 righe) che faccia pesare il gesto. Niente "sei forte", niente "domani puoi farcela". Solo il peso reale di quello che ha saltato. Firma come — Rodrigo`,
+        content: `Sono le ${ora} UTC. Il trader non ha fatto il Fajr — l'ho segnato automaticamente come "non eseguito". Scrivi una ramanzina breve (max 5 righe) che faccia pesare il gesto. Niente "sei forte", niente "domani puoi farcela". Solo il peso reale di quello che ha saltato. Firma come — Rodrigo`,
       }],
     }),
   });

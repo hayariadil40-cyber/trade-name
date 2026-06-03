@@ -24,13 +24,12 @@ function Write-RoutineLog {
     Add-Content -Path (Get-RoutineLogPath) -Value $line -Encoding UTF8
 }
 
-# ===== Date helpers (Casablanca) =====
+# ===== Date helpers (UTC) =====
 function Get-CasablancaDate {
-    $tz = [System.TimeZoneInfo]::FindSystemTimeZoneById('Morocco Standard Time')
-    return [System.TimeZoneInfo]::ConvertTimeFromUtc([DateTime]::UtcNow, $tz)
+    return [DateTime]::UtcNow
 }
 function Get-TodayCasaIso {
-    return (Get-CasablancaDate).ToString('yyyy-MM-dd')
+    return [DateTime]::UtcNow.ToString('yyyy-MM-dd')
 }
 
 # ===== Telegram =====

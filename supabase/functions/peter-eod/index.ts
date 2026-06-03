@@ -1,5 +1,5 @@
 // Peter EOD — Edge Function
-// pg_cron: `15 16 * * 1-5` UTC = 17:15 Casablanca
+// pg_cron: `15 16 * * 1-5` UTC
 // Digest disciplinare fine giornata: catena bias→ipotesi→trade, checklist, metriche, confronto baseline.
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
@@ -11,32 +11,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-function todayCasablanca(): string {
-  const fmt = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Africa/Casablanca",
-    year: "numeric", month: "2-digit", day: "2-digit",
-  });
-  const parts = fmt.formatToParts(new Date());
-  const get = (t: string) => parts.find((p) => p.type === t)?.value || "00";
-  return `${get("year")}-${get("month")}-${get("day")}`;
-}
 
-// Midnight Casablanca = UTC-1 (Africa/Casablanca è UTC+1)
-function startOfDayCasablanca(today: string): string {
-  const [y, m, d] = today.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d, -1, 0, 0)).toISOString();
-}
-
-function endOfDayCasablanca(today: string): string {
-  const [y, m, d] = today.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d, 22, 59, 59, 999)).toISOString();
-}
-
-function hhmmCasablanca(iso: string): string {
-  return new Intl.DateTimeFormat("it-IT", {
-    timeZone: "Africa/Casablanca", hour: "2-digit", minute: "2-digit", hour12: false,
-  }).format(new Date(iso));
-}
 
 async function callClaude(system: string, user: string, apiKey: string, maxTokens = 1800): Promise<string> {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -71,7 +46,7 @@ const SYSTEM_PROMPT = `Sei Peter. Analista comportamentale del trading dell'uten
 
 Ragioni esclusivamente sui dati ricevuti. Se segnali un pattern, dichiara sempre la dimensione del campione (es. "n=4, campione debole" / "n=18, segnale robusto"). Non presumere mai correlazioni senza evidenza numerica.
 
-CONTESTO: EOD, 17:15 Casablanca. Ricevi in JSON tutti i dati della giornata operativa appena chiusa.
+CONTESTO: EOD, 16:15 UTC. Ricevi in JSON tutti i dati della giornata operativa appena chiusa.
 
 ---
 
@@ -145,9 +120,9 @@ serve(async (req) => {
     const ANTHROPIC_API_KEYS = Deno.env.get("ANTHROPIC_API_KEYS")!;
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    const today = todayCasablanca();
-    const startToday = startOfDayCasablanca(today);
-    const endToday = endOfDayCasablanca(today);
+    const today = new Date().toISOString().slice(0, 10);
+    const startToday = `${today}T00:00:00Z`;
+    const endToday = `${today}T23:59:59.999Z`;
     const start30 = new Date(Date.now() - 30 * 86400000).toISOString();
 
     // ── 1. Trade di oggi ──────────────────────────────────────────────────────
@@ -265,7 +240,7 @@ serve(async (req) => {
       trade_oggi: trades.map((t: any) => ({
         asset: t.asset,
         direzione: t.direzione,
-        ora: hhmmCasablanca(t.data),
+        ora: new Date(t.data).toISOString().slice(11, 16),
         esito: t.esito,
         pnl: t.pnl,
         rr_reale: t.rr_reale,

@@ -1,5 +1,5 @@
 // Letture Mattina - Edge Function
-// Schedule: pg_cron `50 5 * * *` UTC = 06:50 Casablanca (UTC+1, no DST)
+// Schedule: pg_cron `50 5 * * *` UTC
 // Flusso:
 // 1) Anthropic API (claude-sonnet-4-6 + tool web_search) -> rassegna stampa 24h
 // 2) Filtra/sintetizza, tagga per tema, restituisce JSON
@@ -16,15 +16,6 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-function todayCasablanca(): string {
-  const fmt = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Africa/Casablanca",
-    year: "numeric", month: "2-digit", day: "2-digit",
-  });
-  const parts = fmt.formatToParts(new Date());
-  const get = (t: string) => parts.find((p) => p.type === t)?.value || "00";
-  return `${get("year")}-${get("month")}-${get("day")}`;
-}
 
 const SYSTEM_PROMPT = `Sei un assistente che prepara la rassegna stampa mattutina per un trader (focus: forex, macro, indici USA/EU, oro, crypto quando muove i mercati).
 
@@ -174,8 +165,8 @@ serve(async (req) => {
     }
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const today = todayCasablanca();
-    const userPrompt = `Data di oggi: ${today} (Casablanca / UTC+1). Prepara la rassegna mattutina.`;
+    const today = new Date().toISOString().slice(0, 10);
+    const userPrompt = `Data di oggi: ${today} (UTC). Prepara la rassegna mattutina.`;
 
     // Background task: il fetch web_search puo durare 1-3 min e supera il
     // gateway timeout (~90s). Eseguiamo fire-and-forget e ritorniamo subito.

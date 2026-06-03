@@ -418,7 +418,7 @@
 
             biasDataField = data.data || '';
             const createdAt = data.created_at ? new Date(data.created_at) : new Date();
-            const dateLabel = createdAt.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Africa/Casablanca' });
+            const dateLabel = createdAt.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
             document.getElementById('bias-title').textContent = `Bias — ${dateLabel}`;
             document.getElementById('bias-id-display').textContent = `ID: ${data.id.substring(0, 8)}`;
             // coin_data per asset tabs
@@ -567,7 +567,7 @@
             (trades || []).forEach(t => {
                 const opt = document.createElement('option');
                 opt.value = t.id;
-                const d = new Date(t.data).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', timeZone: 'Africa/Casablanca' });
+                const d = new Date(t.data).toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
                 opt.textContent = `${t.asset} ${t.direzione} - ${d}`;
                 selTrades.appendChild(opt);
             });
@@ -580,7 +580,7 @@
             (ipotesi || []).forEach(i => {
                 const opt = document.createElement('option');
                 opt.value = i.id;
-                const dt = new Date(i.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', timeZone: 'Africa/Casablanca' });
+                const dt = new Date(i.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
                 const stratName = i.strategia_id ? (stratNames[i.strategia_id] || '?') : 'no strategia';
                 const stato = (i.stato || 'ipotesi').replace('_', ' ');
                 opt.textContent = `${dt} · ${stratName} · ${i.asset || '—'} · [${stato}]`;

@@ -203,6 +203,15 @@
                         <span class="text-[11px] text-tp-muted font-medium">Forza USD</span>
                         <input type="checkbox" id="layer-usd" checked>
                     </label>
+
+                    <div class="w-px h-4 bg-tp-border"></div>
+
+                    <span class="text-[9px] font-bold uppercase tracking-widest text-tp-muted">Scala Y</span>
+                    <div class="flex gap-1">
+                        <button id="yzoom-0" onclick="setYZoom(0)" class="text-[10px] font-bold px-2 py-0.5 rounded border border-tp-border text-tp-muted hover:text-white transition-colors" style="color:#20c997;border-color:#20c997">Auto</button>
+                        <button id="yzoom-1" onclick="setYZoom(1)" class="text-[10px] font-bold px-2 py-0.5 rounded border border-tp-border text-tp-muted hover:text-white transition-colors">Med</button>
+                        <button id="yzoom-2" onclick="setYZoom(2)" class="text-[10px] font-bold px-2 py-0.5 rounded border border-tp-border text-tp-muted hover:text-white transition-colors">Stretto</button>
+                    </div>
                 </div>
 
                 <!-- FVG Panel (compare quando layer FVG è attivo e ci sono dati) -->
@@ -274,7 +283,7 @@
                         <thead>
                             <tr class="text-tp-muted border-b border-tp-border">
                                 <th class="text-left py-2 px-3 font-semibold uppercase tracking-wider text-[10px]">UTC</th>
-                                <th class="text-left py-2 px-3 font-semibold uppercase tracking-wider text-[10px]">Casa</th>
+                                <th class="text-left py-2 px-3 font-semibold uppercase tracking-wider text-[10px]">Ora</th>
                                 <th class="text-left py-2 px-3 font-semibold uppercase tracking-wider text-[10px]">Tipo</th>
                                 <th class="text-left py-2 px-3 font-semibold uppercase tracking-wider text-[10px]">Dettaglio</th>
                             </tr>
@@ -326,15 +335,16 @@
 
         const COINS = ['XAUUSD','US30','GER30','NAS100','BTCUSD'];
         let currentCoin = 'XAUUSD';
-        // oggi in Casablanca (UTC+1)
-        var _todayCasa = new Date(Date.now() + 3600000);
-        var currentDate = _todayCasa.toISOString().split('T')[0];
+        var currentDate = new Date().toISOString().slice(0, 10);
 
+        let yZoom = 0;      // 0=auto 1=med 2=stretto
         let candles = [];   // {t, tMs, p, h, l, o, c, faded}
         let usdData = [];   // {tMs, v}
         let newsData = [];  // {tMs, t, titolo, valuta, impatto}
         let biasH4      = [];  // array 6 slot ["long"|"short"|"neutro"|null]
         let liveH4Val   = null; // valore live slot corrente da watchlist
+        let liveM15     = null; // candela in formazione da watchlist {p,h,l,o,c}
+        let liveM15Prev = null; // ultima candela chiusa da watchlist {p,h,l,o,c}
         let biasOp        = [];  // aggiornamenti bias operativi {tMs, t, direzione, testo}
         let biasOpMarkers = [];  // posizioni marker per hover {x, y, r, testo, lbl, col}
         let smileData     = [];  // {tMs, t, mindset, sorgente}
@@ -361,11 +371,15 @@
         const cv = document.getElementById('chart-canvas');
         const tip = document.getElementById('chart-tip');
 
-        // ---- coordinate system (Casa times come riferimento X) ----
-        // Usa currentDate come ancora — i tempi Casa vengono mappati
-        // "come se fossero UTC" sul canvas per consistenza con i dati
+        // ---- coordinate system (UTC times) ----
+        // Usa currentDate come ancora — i tempi UTC vengono mappati sul canvas
         function T(s) {
             return new Date(currentDate + 'T' + s + ':00Z').getTime();
+        }
+        function addM15(t) {
+            var p = t.split(':'), h = parseInt(p[0]), m = parseInt(p[1]) + 15;
+            if (m >= 60) { m -= 60; h += 1; }
+            return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
         }
 
         // ---- switch coin/data ----
@@ -424,6 +438,17 @@
 
         function layerOn(id) { return document.getElementById('layer-' + id).checked; }
 
+        function setYZoom(n) {
+            yZoom = n;
+            [0, 1, 2].forEach(function(i) {
+                var btn = document.getElementById('yzoom-' + i);
+                if (!btn) return;
+                btn.style.color       = i === n ? '#20c997' : '';
+                btn.style.borderColor = i === n ? '#20c997' : '';
+            });
+            drawChart();
+        }
+
         // ==========================================
         // LOAD DATA — carica tutti i layer in parallelo
         // ==========================================
@@ -446,6 +471,25 @@
             asiaBox = null; londonBox = null; nyBox = null;
             drawChart();
             await Promise.all([loadCandles(), loadUsd(), loadNews(), loadBiasH4(), loadLiveH4(), loadSmile(), loadIpotesi(), loadFvg(), loadSoglie(), loadTrades(), loadVolatilita(), loadCompress()]);
+            // Live prev: ultima candela chiusa direttamente da watchlist (sempre aggiornata)
+            if (liveM15Prev && currentDate === new Date().toISOString().slice(0, 10)) {
+                var _nowP = new Date();
+                var _m15P = Math.floor(_nowP.getUTCMinutes() / 15) * 15;
+                var _prevMs = Date.UTC(_nowP.getUTCFullYear(), _nowP.getUTCMonth(), _nowP.getUTCDate(), _nowP.getUTCHours(), _m15P, 0) - 900000;
+                var _pd = new Date(_prevMs);
+                var _pt = String(_pd.getUTCHours()).padStart(2,'0') + ':' + String(_pd.getUTCMinutes()).padStart(2,'0');
+                candles = candles.filter(function(c) { return c.t !== _pt; });
+                candles.push({ t: _pt, tMs: T(_pt), p: liveM15Prev.p, h: liveM15Prev.h, l: liveM15Prev.l, o: liveM15Prev.o, c: liveM15Prev.c, faded: false });
+            }
+            // Live current: candela in formazione direttamente da watchlist
+            if (liveM15 && currentDate === new Date().toISOString().slice(0, 10)) {
+                var _nowC = new Date();
+                var _m15C = Math.floor(_nowC.getUTCMinutes() / 15) * 15;
+                var _ct = String(_nowC.getUTCHours()).padStart(2,'0') + ':' + String(_m15C).padStart(2,'0');
+                candles = candles.filter(function(c) { return c.t !== _ct; });
+                candles.push({ t: _ct, tMs: T(_ct), p: liveM15.p, h: liveM15.h, l: liveM15.l, o: liveM15.o, c: liveM15.c, faded: true });
+            }
+            candles.sort(function(a, b) { return a.tMs - b.tMs; });
             buildAsiaBox(); buildLondonBox(); buildNyBox();
             drawChart();
             renderIpotesiCards();
@@ -467,9 +511,9 @@
             return { low: lo, high: hi, avg: avg, range: (hi - lo).toFixed(1), start: T(startSlot), end: T(endSlot) };
         }
 
-        function buildAsiaBox()   { asiaBox   = buildSessionBox('01:00', '06:00'); }
-        function buildLondonBox() { londonBox = buildSessionBox('08:00', '12:30'); }
-        function buildNyBox()     { nyBox     = buildSessionBox('14:30', '17:00'); }
+        function buildAsiaBox()   { asiaBox   = buildSessionBox('00:00', '05:00'); }
+        function buildLondonBox() { londonBox = buildSessionBox('07:00', '12:00'); }
+        function buildNyBox()     { nyBox     = buildSessionBox('13:30', '16:00'); }
 
         // ==========================================
         // LOAD CANDELE DA watchlist_snapshots
@@ -479,9 +523,9 @@
             drawChart();
 
             // snapshot e un array JSONB con tutti gli asset per ogni slot 15m
-            // captured_at e UTC — filtriamo la giornata Casa (+1h)
-            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
-            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            // filtriamo la giornata in UTC
+            const utcStart = new Date(currentDate + 'T00:00:00Z').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59Z').toISOString();
 
             const { data, error } = await db
                 .from('watchlist_snapshots')
@@ -492,27 +536,44 @@
 
             if (error) { console.error('watchlist_snapshots:', error); return; }
 
-            candles = (data || []).map(function(r) {
+            var slotMap = {};
+            (data || []).forEach(function(r) {
                 var entry = (r.snapshot || []).find(function(e) { return e.simbolo === currentCoin; });
-                if (!entry) return null;
+                if (!entry) return;
 
-                var utcMs  = new Date(r.captured_at).getTime();
-                // L'EA salva l'OHLC della candela precedente (shift=1 MT4),
-                // quindi captured_at e 30min avanti rispetto all'apertura reale.
-                // +30min invece di +60min: annulla il delay EA e converte in Casa.
-                var casaMs = utcMs + 1800000;
-                var d  = new Date(casaMs);
-                var hh = String(d.getUTCHours()).padStart(2,'0');
-                var mm = String(d.getUTCMinutes()).padStart(2,'0');
-                var t  = hh + ':' + mm;
-                var p  = parseFloat(entry.prezzo);
-                var h  = entry.high_15m  ? parseFloat(entry.high_15m)  : p;
-                var l  = entry.low_15m   ? parseFloat(entry.low_15m)   : p;
-                var o  = entry.open_15m  ? parseFloat(entry.open_15m)  : null;
-                var c  = entry.close_15m ? parseFloat(entry.close_15m) : null;
+                var capDate = new Date(r.captured_at);
+                var slotMin = Math.floor(capDate.getUTCMinutes() / 15) * 15;
+                var slotMs  = Date.UTC(capDate.getUTCFullYear(), capDate.getUTCMonth(), capDate.getUTCDate(), capDate.getUTCHours(), slotMin, 0);
 
-                return { t: t, tMs: T(t), p: p, h: h, l: l, o: o, c: c, faded: o === null };
-            }).filter(Boolean);
+                var p = parseFloat(entry.prezzo);
+
+                // Candela completata (*_prev) → slot precedente
+                if (entry.open_15m_prev != null && entry.high_15m_prev != null) {
+                    var prevMs = slotMs - 900000;
+                    var pd = new Date(prevMs);
+                    var pt = String(pd.getUTCHours()).padStart(2,'0') + ':' + String(pd.getUTCMinutes()).padStart(2,'0');
+                    slotMap[pt] = { t: pt, tMs: T(pt), p: p,
+                        h: parseFloat(entry.high_15m_prev),
+                        l: parseFloat(entry.low_15m_prev),
+                        o: parseFloat(entry.open_15m_prev),
+                        c: parseFloat(entry.close_15m_prev),
+                        faded: false };
+                }
+
+                // Candela corrente/fallback (*) → slot corrente
+                if (entry.open_15m != null && entry.high_15m != null) {
+                    var ct = String(new Date(slotMs).getUTCHours()).padStart(2,'0') + ':' + String(slotMin).padStart(2,'0');
+                    // Se *_prev non disponibile (snapshot vecchi), usa * come completata al suo slot
+                    var hasPrev = (entry.open_15m_prev != null && entry.high_15m_prev != null);
+                    slotMap[ct] = { t: ct, tMs: T(ct), p: p,
+                        h: parseFloat(entry.high_15m) || p,
+                        l: parseFloat(entry.low_15m)  || p,
+                        o: parseFloat(entry.open_15m) || null,
+                        c: parseFloat(entry.close_15m) || p,
+                        faded: hasPrev };
+                }
+            });
+            candles = Object.values(slotMap).sort(function(a, b) { return a.tMs - b.tMs; });
         }
 
         // ==========================================
@@ -520,9 +581,8 @@
         // ==========================================
         function getCurrentH4LiveSlot() {
             var now = new Date();
-            var casaHour = (now.getUTCHours() + 1) % 24;
-            var totalMin = casaHour * 60 + now.getUTCMinutes();
-            var closes = [180, 420, 660, 900, 1140, 1380]; // 03,07,11,15,19,23 in minuti
+            var totalMin = now.getUTCHours() * 60 + now.getUTCMinutes();
+            var closes = [120, 360, 600, 840, 1080, 1320]; // 02,06,10,14,18,22 UTC in minuti
             for (var i = 0; i < closes.length; i++) {
                 if (totalMin < closes[i]) return i;
             }
@@ -534,18 +594,33 @@
         // ==========================================
         async function loadLiveH4() {
             liveH4Val = null;
+            liveM15 = null;
+            liveM15Prev = null;
             const { data, error } = await db
                 .from('watchlist')
-                .select('prezzo, h4_high, h4_low')
+                .select('prezzo, h4_high, h4_low, open_15m, high_15m, low_15m, close_15m, open_15m_prev, high_15m_prev, low_15m_prev, close_15m_prev')
                 .eq('simbolo', currentCoin)
                 .eq('active', true)
                 .maybeSingle();
-            if (error || !data || !data.prezzo || !data.h4_high || !data.h4_low) return;
+            if (error || !data || !data.prezzo) return;
             var price = parseFloat(data.prezzo);
             var h4h   = parseFloat(data.h4_high);
             var h4l   = parseFloat(data.h4_low);
-            if (!price || !h4h || !h4l) return;
-            liveH4Val = price > h4h ? 'long' : price < h4l ? 'short' : 'neutro';
+            if (price && h4h && h4l) liveH4Val = price > h4h ? 'long' : price < h4l ? 'short' : 'neutro';
+            if (data.open_15m) liveM15 = {
+                p: price,
+                h: parseFloat(data.high_15m) || price,
+                l: parseFloat(data.low_15m)  || price,
+                o: parseFloat(data.open_15m) || price,
+                c: price
+            };
+            if (data.open_15m_prev) liveM15Prev = {
+                p: price,
+                h: parseFloat(data.high_15m_prev),
+                l: parseFloat(data.low_15m_prev),
+                o: parseFloat(data.open_15m_prev),
+                c: parseFloat(data.close_15m_prev)
+            };
         }
 
         // ==========================================
@@ -553,8 +628,8 @@
         // ==========================================
         async function loadUsd() {
             usdData = [];
-            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
-            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const utcStart = new Date(currentDate + 'T00:00:00Z').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59Z').toISOString();
             const { data, error } = await db
                 .from('forza_usd')
                 .select('created_at, usd_strength')
@@ -563,7 +638,7 @@
                 .order('created_at');
             if (error) { console.error('forza_usd:', error); return; }
             usdData = (data || []).map(function(r) {
-                var casaMs = new Date(r.created_at).getTime() + 3600000;
+                var casaMs = new Date(r.created_at).getTime();
                 var d = new Date(casaMs);
                 var hh = String(d.getUTCHours()).padStart(2,'0');
                 var mm = String(d.getUTCMinutes()).padStart(2,'0');
@@ -572,7 +647,7 @@
         }
 
         // ==========================================
-        // LOAD NEWS (allert — ora_evento è già ora Casa)
+        // LOAD NEWS (allert — ora_evento in UTC)
         // ==========================================
         async function loadNews() {
             newsData = [];
@@ -616,8 +691,8 @@
         // ==========================================
         async function loadSmile() {
             smileData = [];
-            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
-            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const utcStart = new Date(currentDate + 'T00:00:00Z').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59Z').toISOString();
             const { data, error } = await db
                 .from('monitora_smile')
                 .select('created_at, mindset, sorgente')
@@ -628,7 +703,7 @@
                 .order('created_at');
             if (error) { console.error('monitora_smile:', error); return; }
             smileData = (data || []).map(function(r) {
-                var casaMs = new Date(r.created_at).getTime() + 3600000;
+                var casaMs = new Date(r.created_at).getTime();
                 var d = new Date(casaMs);
                 var hh = String(d.getUTCHours()).padStart(2,'0');
                 var mm = String(d.getUTCMinutes()).padStart(2,'0');
@@ -686,8 +761,8 @@
         // ==========================================
         async function loadIpotesi() {
             ipotesiData = [];
-            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
-            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const utcStart = new Date(currentDate + 'T00:00:00Z').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59Z').toISOString();
             const { data, error } = await db
                 .from('ipotesi_trading')
                 .select('id, created_at, direzione, note, commento_post, stato, strategia_id, strategie(nome)')
@@ -697,7 +772,7 @@
                 .order('created_at');
             if (error) { console.error('ipotesi_trading:', error); return; }
             ipotesiData = (data || []).map(function(r) {
-                var casaMs = new Date(r.created_at).getTime() + 3600000;
+                var casaMs = new Date(r.created_at).getTime();
                 var d = new Date(casaMs);
                 var hh = String(d.getUTCHours()).padStart(2,'0');
                 var mm = String(d.getUTCMinutes()).padStart(2,'0');
@@ -733,7 +808,7 @@
                     +   '<div class="flex items-center gap-3 flex-wrap">'
                     +     '<span class="text-[9px] font-bold font-mono text-tp-muted/60">' + ip.code + '</span>'
                     +     '<span class="text-[10px] font-bold" style="color:' + dirCol + '">' + dirLabel + '</span>'
-                    +     '<span class="text-[10px] text-tp-muted">' + ip.t + ' Casa</span>'
+                    +     '<span class="text-[10px] text-tp-muted">' + ip.t + ' UTC</span>'
                     +     '<span class="text-[10px] text-tp-muted/70 italic">' + ip.strategia + '</span>'
                     +     '<span class="ml-auto text-[9px] uppercase tracking-widest text-tp-muted/50 font-mono">' + ip.stato + '</span>'
                     +   '</div>'
@@ -755,8 +830,8 @@
         // ==========================================
         async function loadFvg() {
             fvgData = [];
-            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
-            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const utcStart = new Date(currentDate + 'T00:00:00Z').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59Z').toISOString();
             const { data, error } = await db
                 .from('allert_prezzo')
                 .select('id, ora, descrizione, stato, created_at')
@@ -771,7 +846,7 @@
                 var dir = r.descrizione.toLowerCase().includes('long') ? 'long' : 'short';
                 var m = r.descrizione.match(/gap\s+([\d.]+)-([\d.]+)/i);
                 if (!m) return null;
-                var casaMs = new Date(r.created_at).getTime() + 3600000;
+                var casaMs = new Date(r.created_at).getTime();
                 var createdDate = new Date(casaMs).toISOString().split('T')[0];
                 return {
                     id: r.id,
@@ -852,8 +927,8 @@
         // ==========================================
         async function loadSoglie() {
             soglieData = [];
-            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
-            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const utcStart = new Date(currentDate + 'T00:00:00Z').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59Z').toISOString();
             const { data, error } = await db
                 .from('allert_prezzo')
                 .select('ora, prezzo, descrizione')
@@ -874,8 +949,8 @@
         // ==========================================
         async function loadTrades() {
             tradeData = [];
-            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
-            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const utcStart = new Date(currentDate + 'T00:00:00Z').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59Z').toISOString();
             const { data, error } = await db
                 .from('trades')
                 .select('id, data, direzione, entry_price, stop_loss, take_profit, exit_price, esito, stato')
@@ -885,7 +960,7 @@
                 .order('data');
             if (error) { console.error('trades:', error); return; }
             tradeData = (data || []).map(function(r) {
-                var casaMs = new Date(r.data).getTime() + 3600000;
+                var casaMs = new Date(r.data).getTime();
                 var d = new Date(casaMs);
                 var hh = String(d.getUTCHours()).padStart(2,'0');
                 var mm = String(d.getUTCMinutes()).padStart(2,'0');
@@ -909,8 +984,8 @@
         // ==========================================
         async function loadVolatilita() {
             volData = [];
-            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
-            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const utcStart = new Date(currentDate + 'T00:00:00Z').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59Z').toISOString();
             const { data, error } = await db
                 .from('monitora_smile')
                 .select('created_at, volatilita')
@@ -921,7 +996,7 @@
                 .order('created_at');
             if (error) { console.error('vol:', error); return; }
             volData = (data || []).map(function(r) {
-                var casaMs = new Date(r.created_at).getTime() + 3600000;
+                var casaMs = new Date(r.created_at).getTime();
                 var d = new Date(casaMs);
                 var hh = String(d.getUTCHours()).padStart(2,'0');
                 var mm = String(d.getUTCMinutes()).padStart(2,'0');
@@ -934,8 +1009,8 @@
         // ==========================================
         async function loadCompress() {
             compressData = [];
-            const utcStart = new Date(currentDate + 'T00:00:00+01:00').toISOString();
-            const utcEnd   = new Date(currentDate + 'T23:59:59+01:00').toISOString();
+            const utcStart = new Date(currentDate + 'T00:00:00Z').toISOString();
+            const utcEnd   = new Date(currentDate + 'T23:59:59Z').toISOString();
             const { data, error } = await db
                 .from('allert_prezzo')
                 .select('ora, descrizione')
@@ -1134,7 +1209,8 @@
             candles.forEach(function(c) { lo = Math.min(lo, c.l); hi = Math.max(hi, c.h); });
             if (candles.length === 0) { lo = 1000; hi = 1100; } // fallback vuoto
             var avgRange = candles.length ? candles.reduce(function(s,c){ return s+(c.h-c.l); },0)/candles.length : 0;
-            const pd = Math.max((hi - lo) * 0.003, avgRange * 1.0);
+            var _pdMult = [1.0, 0.25, 0.05][yZoom] || 1.0;
+            const pd = Math.max((hi - lo) * 0.003, avgRange * _pdMult);
             const yMin = lo - pd, yMax = hi + pd;
             function pxY(p) { return y1 - (p - yMin) / (yMax - yMin) * (y1 - y0); }
 
@@ -1187,14 +1263,14 @@
             ctx.strokeStyle = 'rgba(255,255,255,.06)'; ctx.lineWidth = 1; ctx.setLineDash([]);
             ctx.beginPath(); ctx.moveTo(x0, bsY1 + 3); ctx.lineTo(x1, bsY1 + 3); ctx.stroke();
 
-            // slot corrente = H4 che contiene l'ora Casa attuale (solo se stiamo guardando oggi)
-            var _todayStr = new Date(Date.now() + 3600000).toISOString().split('T')[0];
+            // slot corrente = H4 che contiene l'ora UTC attuale (solo se stiamo guardando oggi)
+            var _todayStr = new Date().toISOString().slice(0, 10);
             var currentSlot = (currentDate === _todayStr) ? getCurrentH4LiveSlot() : -1;
 
             if (layerOn('biasstr')) {
-                // broker UTC+2 → H4 cambiano a 03/07/11/15/19/23 ora Casa (UTC+1)
-                var H4_STARTS = ['00:00','03:00','07:00','11:00','15:00','19:00'];
-                var H4_ENDS   = ['03:00','07:00','11:00','15:00','19:00','23:00'];
+                // H4 closes 02,06,10,14,18,22 UTC
+                var H4_STARTS = ['00:00','02:00','06:00','10:00','14:00','18:00'];
+                var H4_ENDS   = ['02:00','06:00','10:00','14:00','18:00','22:00'];
 
                 // disegna tutti gli slot: slot corrente usa liveH4Val da watchlist
                 var slotsToRender = [0,1,2,3,4,5];
@@ -1556,9 +1632,8 @@
 
             // --- linea verticale "ora" (unico oggetto legato al now) ---
             var now = new Date();
-            var casaNow = new Date(now.getTime() + 3600000);
-            var nowHH = String(casaNow.getUTCHours()).padStart(2,'0');
-            var nowMM = String(casaNow.getUTCMinutes()).padStart(2,'0');
+            var nowHH = String(now.getUTCHours()).padStart(2,'0');
+            var nowMM = String(now.getUTCMinutes()).padStart(2,'0');
             var nowMs = T(nowHH + ':' + nowMM);
             if (nowMs >= t0 && nowMs <= tEnd) {
                 var xNow = pxX(nowMs);
@@ -1814,9 +1889,10 @@
                 if (d < bd) { bd = d; best = c; }
             });
             if (best && bd < slotW) {
+                var _closeT = addM15(best.t);
                 var html = best.faded
-                    ? '<b>' + best.t + ' Casa</b><br>prezzo ' + best.p.toFixed(2) + '<br>H ' + best.h.toFixed(2) + ' L ' + best.l.toFixed(2) + '<br><span style="color:#7d8896">no OHLC</span>'
-                    : '<b>' + best.t + ' Casa</b><br>O ' + best.o.toFixed(2) + ' H ' + best.h.toFixed(2) + '<br>L ' + best.l.toFixed(2) + ' C ' + best.c.toFixed(2);
+                    ? '<b>' + best.t + '–' + _closeT + ' UTC</b> <span style="color:#7d8896;font-size:10px">in form.</span><br>prezzo ' + best.p.toFixed(2) + '<br>H ' + best.h.toFixed(2) + ' L ' + best.l.toFixed(2)
+                    : '<b>' + best.t + '–' + _closeT + ' UTC</b><br>O ' + best.o.toFixed(2) + ' H ' + best.h.toFixed(2) + '<br>L ' + best.l.toFixed(2) + ' C ' + best.c.toFixed(2);
                 tip.innerHTML = html;
                 tip.style.display = 'block';
                 tip.style.left = Math.min(mx + 14, r.width - 200) + 'px';

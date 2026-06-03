@@ -241,9 +241,7 @@
         }
 
         function casaDateStr(date) {
-            // Africa/Casablanca = UTC+1 fisso, no DST
-            const d = new Date(new Date(date).getTime() + 60 * 60000);
-            return d.toISOString().split('T')[0];
+            return new Date(date).toISOString().slice(0, 10);
         }
 
         function matchPeriodo(ip) {
@@ -297,7 +295,7 @@
                     (ip.dove_entro_flagged || []).length +
                     (ip.dove_esco_sl_flagged || []).length +
                     (ip.dove_esco_tp_flagged || []).length;
-                const dateStr = new Date(ip.created_at).toLocaleString('it-IT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' });
+                const dateStr = new Date(ip.created_at).toLocaleString('it-IT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
                 const barColor = ({
                     ipotesi:'bg-tp-muted', ingresso:'bg-tp-accent', non_eseguito:'bg-tp-loss',
                     da_osservare:'bg-tp-warning', osservata:'bg-cyan-400'

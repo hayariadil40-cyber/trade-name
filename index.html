@@ -726,7 +726,7 @@
             const { data: rowsRaw } = await db.from('forza_usd').select('usd_strength, created_at').gte('created_at', todayStart).order('created_at', { ascending: false }).limit(300);
             const rows = rowsRaw ? rowsRaw.reverse() : [];
             if (rows && rows.length) {
-                labels = rows.map(r => new Date(r.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' }));
+                labels = rows.map(r => new Date(r.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }));
                 data = rows.map(r => parseFloat(r.usd_strength));
             } else {
                 labels = ['--'];
@@ -862,7 +862,7 @@
             }, '');
             if (latest) {
                 var d = new Date(latest);
-                document.getElementById('watchlist-updated').textContent = d.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit', timeZone: 'Africa/Casablanca' });
+                document.getElementById('watchlist-updated').textContent = d.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
             }
         } catch(e) { console.warn('Watchlist:', e); }
     }
@@ -927,7 +927,7 @@
             const { data: allertPrezzo } = await db.from('allert_prezzo').select('id, coin, prezzo, ora, descrizione, created_at').eq('stato', 'nuovo');
             const allertPrezzoManuali = (allertPrezzo || []).filter(ap => !isEaAllert(ap));
             allertPrezzoManuali.forEach(ap => {
-                const oraStr = ap.ora ? ap.ora.substring(0,5) : (ap.created_at ? new Date(ap.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Casablanca'}) : '');
+                const oraStr = ap.ora ? ap.ora.substring(0,5) : (ap.created_at ? new Date(ap.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : '');
                 tickets.push({
                     type: 'allert_prezzo', label: 'Allert Da Validare', title: (ap.coin || '') + ' @ ' + (ap.prezzo || ''),
                     desc: (ap.descrizione || 'Alert prezzo triggerato') + (oraStr ? ' - ' + oraStr : ''), id: ap.id,
@@ -1171,16 +1171,16 @@
         if (!container) return;
 
         try {
-            // Inizio giornata in Africa/Casablanca (UTC+1 fisso, no DST)
+            // Inizio giornata UTC
             const now = new Date();
-            const yyyy = now.getFullYear();
-            const mm = String(now.getMonth() + 1).padStart(2, '0');
-            const dd = String(now.getDate()).padStart(2, '0');
-            const todayStartCasa = `${yyyy}-${mm}-${dd}T00:00:00+01:00`;
+            const yyyy = now.getUTCFullYear();
+            const mm = String(now.getUTCMonth() + 1).padStart(2, '0');
+            const dd = String(now.getUTCDate()).padStart(2, '0');
+            const todayStartUtc = `${yyyy}-${mm}-${dd}T00:00:00Z`;
 
             const { data, error } = await db.from('allert_prezzo')
                 .select('*')
-                .gte('created_at', todayStartCasa)
+                .gte('created_at', todayStartUtc)
                 .not('stato', 'in', '("completato","ignorato")')
                 .order('created_at', { ascending: false });
 
@@ -1196,7 +1196,7 @@
             }
 
             container.innerHTML = items.map(a => {
-                const time = a.ora ? a.ora.substring(0,5) : (a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' }) : '--:--');
+                const time = a.ora ? a.ora.substring(0,5) : (a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--');
                 const desc = a.descrizione || '';
                 return `
                 <div data-allert-id="${a.id}"
@@ -1367,7 +1367,7 @@
             if (badge) badge.classList.remove('hidden');
             if (meta) {
                 var t = b.generato_alle ? new Date(b.generato_alle) : null;
-                meta.textContent = 'Pre-sessione' + (t ? ' · generato alle ' + t.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit', timeZone:'Africa/Casablanca'}) : '');
+                meta.textContent = 'Pre-sessione' + (t ? ' · generato alle ' + t.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'}) : '');
             }
             var usd = b.usd_strength || {};
             var usdAttuale = (usd.attuale !== undefined && usd.attuale !== null) ? Number(usd.attuale).toFixed(4) : '--';
@@ -1466,7 +1466,7 @@
                     return '<span class="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ' + c + '">' + t.replace('_', '/') + '</span>';
                 }).join('');
                 var stars = a.rilevanza ? '<span class="text-[9px] text-tp-warning shrink-0">' + '*'.repeat(a.rilevanza) + '</span>' : '';
-                var ora = a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' }) : '';
+                var ora = a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '';
                 return '<div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 hover:border-tp-accent/30 transition-all group">' +
                     '<div class="flex justify-between items-start gap-2 mb-1.5">' +
                         '<div class="flex flex-wrap items-center gap-1 flex-1 min-w-0">' + tagBadges + stars + '</div>' +

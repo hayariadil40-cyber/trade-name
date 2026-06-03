@@ -157,7 +157,7 @@ Lo schema completo iniziale è in `supabase_schema.sql` ma è **datato** — il 
 
 ## Convenzioni e regole di lavoro
 
-**Timezone**: tutto è in **Africa/Casablanca** (UTC+1, niente DST). Ore nei record DB, ore mostrate in UI, scheduling cron (calcolare in UTC: `casa_hour - 1`). Mai usare Europe/Rome o UTC nella UI.
+**Timezone**: tutto è in **UTC**. DB, UI, edge functions e pg_cron usano UTC direttamente. Le ore mostrate in UI sono UTC. Mai usare Europe/Rome o Africa/Casablanca.
 
 **Lingua**: tutto in italiano — UI, prompt assistenti, commenti dei messaggi Telegram. Mai parolacce in nessun output AI.
 

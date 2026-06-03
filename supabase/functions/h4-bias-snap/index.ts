@@ -2,7 +2,7 @@
 // Calcola L/S/N per ogni asset e scrive in bias di oggi + h4_snaps.
 //
 // pg_cron (UTC): h4-bias-0210/0610/1010/1410/1810/2210
-// = 03:10, 07:10, 11:10, 15:10, 19:10, 23:10 Casablanca
+// = 02:10, 06:10, 10:10, 14:10, 18:10, 22:10 UTC
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -13,30 +13,21 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-// Chiusure H4 in minuti da mezzanotte Casablanca
-const H4_CLOSE_MINS = [180, 420, 660, 900, 1140, 1380]; // 03,07,11,15,19,23
+// Chiusure H4 in minuti da mezzanotte UTC
+const H4_CLOSE_MINS = [120, 360, 600, 840, 1080, 1320]; // 02,06,10,14,18,22 UTC
 
-function getCasaMinutes(): number {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "Africa/Casablanca",
-    hour: "numeric",
-    minute: "numeric",
-    hour12: false,
-  }).formatToParts(new Date());
-  const h = parseInt(parts.find(p => p.type === "hour")?.value ?? "0");
-  const m = parseInt(parts.find(p => p.type === "minute")?.value ?? "0");
-  return h * 60 + m;
+function getUtcMinutes(): number {
+  const now = new Date();
+  return now.getUTCHours() * 60 + now.getUTCMinutes();
 }
 
-function getCasaDate(): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Africa/Casablanca",
-  }).format(new Date());
+function getUtcDate(): string {
+  return new Date().toISOString().slice(0, 10);
 }
 
 // Quale slot ha appena chiuso? (finestra 0-20 min dopo la chiusura)
 function getJustClosedSlot(): number {
-  const totalMin = getCasaMinutes();
+  const totalMin = getUtcMinutes();
   for (let i = 0; i < H4_CLOSE_MINS.length; i++) {
     const diff = totalMin - H4_CLOSE_MINS[i];
     if (diff >= 0 && diff <= 20) return i;
@@ -78,7 +69,7 @@ serve(async (req) => {
       );
     }
 
-    const todayDate   = getCasaDate();
+    const todayDate   = getUtcDate();
     const prevSlotIdx = (slotIdx - 1 + 6) % 6;
 
     const { data: watchlist } = await db

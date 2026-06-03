@@ -1,5 +1,5 @@
 ﻿// Ordine del giorno — Edge Function
-// Schedule: pg_cron 30 6 * * 1-5 UTC = 07:30 Casablanca (UTC+1, no DST, lun-ven)
+// Schedule: pg_cron 30 6 * * 1-5 UTC (lun-ven)
 // Blocchi:
 // 1) Macro eventi oggi (allert)
 // 2) Sessione asiatica: range + prezzo corrente + posizione (sopra/dentro/sotto) da watchlist
@@ -18,31 +18,6 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-function todayCasablanca(): string {
-  const fmt = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Africa/Casablanca",
-    year: "numeric", month: "2-digit", day: "2-digit",
-  });
-  const parts = fmt.formatToParts(new Date());
-  const get = (t: string) => parts.find((p) => p.type === t)?.value || "00";
-  return `${get("year")}-${get("month")}-${get("day")}`;
-}
-
-// 00:00 Casablanca (UTC+1) di "today" come ISO UTC.
-// Esempio: today=2026-04-25 → 2026-04-24T23:00:00.000Z
-function startOfDayCasablancaIso(today: string): string {
-  const [y, m, d] = today.split("-").map(Number);
-  // -1 ora per la differenza UTC+1 fisso
-  return new Date(Date.UTC(y, m - 1, d, -1, 0, 0)).toISOString();
-}
-
-function hhmmCasablanca(iso: string): string {
-  const fmt = new Intl.DateTimeFormat("it-IT", {
-    timeZone: "Africa/Casablanca",
-    hour: "2-digit", minute: "2-digit", hour12: false,
-  });
-  return fmt.format(new Date(iso));
-}
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -127,9 +102,9 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const today = todayCasablanca();
+    const today = new Date().toISOString().slice(0, 10);
     const nowIso = new Date().toISOString();
-    const startOfDayIso = startOfDayCasablancaIso(today);
+    const startOfDayIso = `${today}T00:00:00Z`;
 
     // ===== 1. Macro eventi oggi =====
     const { data: macroRaw } = await supabase
@@ -228,8 +203,8 @@ serve(async (req) => {
       if (delta > 0.005) trend = "in rafforzamento";
       else if (delta < -0.005) trend = "in indebolimento";
 
-      const maxOra = hhmmCasablanca(usdSeries[maxIdx].created_at);
-      const minOra = hhmmCasablanca(usdSeries[minIdx].created_at);
+      const maxOra = new Date(usdSeries[maxIdx].created_at).toISOString().slice(11, 16);
+      const minOra = new Date(usdSeries[minIdx].created_at).toISOString().slice(11, 16);
 
       let descr = `Apertura a ${apertura.toFixed(4)}, ora a ${attuale.toFixed(4)} (${trend}, delta ${delta >= 0 ? "+" : ""}${delta.toFixed(4)}).`;
       if (max !== min) {
@@ -296,7 +271,7 @@ Genera un commento generale (2-3 righe, italiano, asciutto, niente motivazione v
         const apText = allertPrezzo.map((a, i) =>
           `${i + 1}. ${a.coin || "?"} a ${a.prezzo || "?"} (${a.descrizione || "n.d."})${a.commento ? " — note: " + a.commento : ""}`
         ).join("\n");
-        const prompt = `Sei Rodrigo, assistente operativo del Trade Desk. Ecco gli allert di prezzo registrati dall'apertura della giornata corrente (00:00 Casablanca a ora):
+        const prompt = `Sei Rodrigo, assistente operativo del Trade Desk. Ecco gli allert di prezzo registrati dall'apertura della giornata corrente (00:00 UTC a ora):
 
 ${apText}
 

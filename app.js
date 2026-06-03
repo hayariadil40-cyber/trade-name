@@ -760,7 +760,7 @@ window.selectVol = function(btn, type) {
         if (typeof db === 'undefined' || !db) return;
         try {
             // Solo non-dismissed di oggi (Casablanca date) - per non mostrare alert vecchi
-            var todayCasa = new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Casablanca' });
+            var todayCasa = new Date().toISOString().slice(0, 10);
             var res = await db.from('loss_alerts')
                 .select('*')
                 .is('dismissed_at', null)
@@ -807,22 +807,13 @@ window.selectVol = function(btn, type) {
     }
 
     function isWeekday() {
-        var day = new Date().toLocaleDateString('en-US', { timeZone: 'Africa/Casablanca', weekday: 'short' });
-        return day !== 'Sat' && day !== 'Sun';
+        var d = new Date().getUTCDay(); // 0=Dom, 6=Sab
+        return d !== 0 && d !== 6;
     }
 
     function getCasaTime() {
         var now = new Date();
-        var parts = new Intl.DateTimeFormat('en-CA', {
-            timeZone: 'Africa/Casablanca',
-            year: 'numeric', month: '2-digit', day: '2-digit',
-            hour: '2-digit', minute: '2-digit', hour12: false
-        }).formatToParts(now);
-        var get = function(t) { return parseInt((parts.find(function(p) { return p.type === t; }) || {}).value || '0', 10); };
-        var date = (parts.find(function(p) { return p.type === 'year'; }) || {}).value + '-' +
-                   String(get('month')).padStart(2, '0') + '-' +
-                   String(get('day')).padStart(2, '0');
-        return { hour: get('hour'), minute: get('minute'), date: date };
+        return { hour: now.getUTCHours(), minute: now.getUTCMinutes(), date: now.toISOString().slice(0, 10) };
     }
 
     function injectStyles() {
@@ -994,13 +985,13 @@ window.selectVol = function(btn, type) {
 // ==========================================
 window.goToIpotesiOggi = function(ev) {
     if (ev && ev.preventDefault) ev.preventDefault();
-    var today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Casablanca' });
+    var today = new Date().toISOString().slice(0, 10);
     window.location.href = 'ipotesi.html?date=' + today;
 };
 
 window.goToSessioniOggi = function(ev) {
     if (ev && ev.preventDefault) ev.preventDefault();
-    var today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Casablanca' });
+    var today = new Date().toISOString().slice(0, 10);
     window.location.href = 'sessioni.html?date=' + today;
 };
 
@@ -1008,7 +999,7 @@ window.goToBiasOggi = async function(ev) {
     if (ev && ev.preventDefault) ev.preventDefault();
     if (typeof db === 'undefined' || !db) return;
     try {
-        var today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Casablanca' });
+        var today = new Date().toISOString().slice(0, 10);
         var existing = await db.from('bias').select('id').eq('data', today).order('created_at', { ascending: true }).limit(1).maybeSingle();
         if (existing.data && existing.data.id) {
             window.location.href = 'dettaglio_bias.html?id=' + existing.data.id;

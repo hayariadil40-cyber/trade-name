@@ -22,18 +22,11 @@ function makeFFId(ev: { date: string; country: string; title: string }): string 
   return `${ev.date}|${ev.country}|${ev.title}`;
 }
 
-function parseFFDateToCasa(ffDate: string): { data_evento: string; ora_evento: string } {
-  const d = new Date(ffDate);
-  const fmt = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Africa/Casablanca",
-    year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
-  });
-  const parts = fmt.formatToParts(d);
-  const get = (t: string) => parts.find((p) => p.type === t)?.value || "00";
+function parseFFDateToUtc(ffDate: string): { data_evento: string; ora_evento: string } {
+  const iso = new Date(ffDate).toISOString();
   return {
-    data_evento: `${get("year")}-${get("month")}-${get("day")}`,
-    ora_evento: `${get("hour")}:${get("minute")}:${get("second")}`,
+    data_evento: iso.slice(0, 10),
+    ora_evento: iso.slice(11, 19),
   };
 }
 
@@ -43,7 +36,7 @@ async function generateRodrigoAnalysis(ev: {
 }, apiKey: string): Promise<string> {
   const prompt = `Sei Rodrigo, analista macro per un trader scalper specializzato in XAU/USD, US30, NASDAQ, EURUSD, USDJPY (sessioni Londra/New York).
 
-Analisi sintetica dell'evento macro "${ev.title}" (${ev.country}) previsto per il ${ev.data_evento} alle ${ev.ora_evento.substring(0, 5)} (Africa/Casablanca).
+Analisi sintetica dell'evento macro "${ev.title}" (${ev.country}) previsto per il ${ev.data_evento} alle ${ev.ora_evento.substring(0, 5)} UTC.
 
 Forecast: ${ev.forecast || "n.d."}
 Precedente: ${ev.previous || "n.d."}
@@ -118,7 +111,7 @@ serve(async (req) => {
       if (!CURRENCY_FILTER.has(ev.country)) { skipped_currency++; continue; }
 
       const ffId = makeFFId(ev);
-      const { data_evento, ora_evento } = parseFFDateToCasa(ev.date);
+      const { data_evento, ora_evento } = parseFFDateToUtc(ev.date);
 
       const { data: existing } = await supabase
         .from("allert").select("id").eq("ff_id", ffId).maybeSingle();

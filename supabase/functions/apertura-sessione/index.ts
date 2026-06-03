@@ -1,7 +1,7 @@
 ﻿// Apertura Sessione - Edge Function
 // Schedule:
-//   pg_cron `0 7 * * *` UTC  = 08:00 Casablanca (Londra)   body: { sessione: "londra" }
-//   pg_cron `30 13 * * *` UTC = 14:30 Casablanca (New York) body: { sessione: "ny" }
+//   pg_cron `0 7 * * *` UTC   body: { sessione: "londra" }
+//   pg_cron `30 13 * * *` UTC  body: { sessione: "ny" }
 // Blocchi:
 //   1. bias da attenzionare (Claude)
 //   2. forza USD intraday
@@ -27,22 +27,6 @@ const SESSIONE_INFO: Record<string, { label: string; emoji: string; nomeDb: stri
   ny:     { label: "New York", emoji: "🇺🇸", nomeDb: "newyork" },
 };
 
-function todayCasablanca(): string {
-  const fmt = new Intl.DateTimeFormat("sv-SE", { timeZone: "Africa/Casablanca", year: "numeric", month: "2-digit", day: "2-digit" });
-  const parts = fmt.formatToParts(new Date());
-  const get = (t: string) => parts.find((p) => p.type === t)?.value || "00";
-  return `${get("year")}-${get("month")}-${get("day")}`;
-}
-
-function startOfDayCasablancaIso(today: string): string {
-  const [y, m, d] = today.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d, -1, 0, 0)).toISOString();
-}
-
-function hhmmCasablanca(iso: string): string {
-  const fmt = new Intl.DateTimeFormat("it-IT", { timeZone: "Africa/Casablanca", hour: "2-digit", minute: "2-digit", hour12: false });
-  return fmt.format(new Date(iso));
-}
 
 async function callClaude(prompt: string, apiKey: string, maxTokens = 500): Promise<string> {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -99,9 +83,9 @@ serve(async (req) => {
     const info = SESSIONE_INFO[sessione];
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const today = todayCasablanca();
+    const today = new Date().toISOString().slice(0, 10);
     const nowIso = new Date().toISOString();
-    const startOfDayIso = startOfDayCasablancaIso(today);
+    const startOfDayIso = `${today}T00:00:00Z`;
 
     // ===== 1. Bias (bias) - SOLO della giornata di oggi, tutti gli stati =====
     // Un bias e una lettura di mercato dell'utente per la giornata: aperto/chiuso indica
@@ -164,8 +148,8 @@ Regole:
       const delta = attuale - apertura;
       let trend = "laterale";
       if (delta > 0.005) trend = "in rafforzamento"; else if (delta < -0.005) trend = "in indebolimento";
-      const maxOra = hhmmCasablanca(usdSeries[maxIdx].created_at);
-      const minOra = hhmmCasablanca(usdSeries[minIdx].created_at);
+      const maxOra = new Date(usdSeries[maxIdx].created_at).toISOString().slice(11, 16);
+      const minOra = new Date(usdSeries[minIdx].created_at).toISOString().slice(11, 16);
       let descr = `Apertura giornata a ${apertura.toFixed(4)}, ora a ${attuale.toFixed(4)} (${trend}, delta ${delta >= 0 ? "+" : ""}${delta.toFixed(4)}).`;
       if (max !== min) descr += ` Range giornaliero finora: max ${max.toFixed(4)} alle ${maxOra}, min ${min.toFixed(4)} alle ${minOra}.`;
       usdBlock = { apertura, attuale, max, min, max_ora: maxOra, min_ora: minOra, trend_intraday: trend, descrizione: descr };
@@ -185,7 +169,7 @@ Regole:
     for (const a of allertNuovi) {
       const c = a.coin || "?";
       if (!byCoin[c]) byCoin[c] = [];
-      byCoin[c].push({ prezzo: a.prezzo || "", ora: a.ora || hhmmCasablanca(a.created_at), descrizione: a.descrizione || "" });
+      byCoin[c].push({ prezzo: a.prezzo || "", ora: a.ora || new Date(a.created_at).toISOString().slice(11, 16), descrizione: a.descrizione || "" });
     }
     const allertBlock = { count: allertNuovi.length, by_coin: byCoin };
 
@@ -204,7 +188,7 @@ Regole:
       if (eaToday.length > 0) {
         // Compatto in righe testuali per il prompt
         const eaLines = eaToday.map((a) => {
-          const ora = a.ora || hhmmCasablanca(a.created_at);
+          const ora = a.ora || new Date(a.created_at).toISOString().slice(11, 16);
           return `${ora} ${a.coin || "?"} @ ${a.prezzo || "?"} | ${a.descrizione || ""}`;
         }).join("\n");
 

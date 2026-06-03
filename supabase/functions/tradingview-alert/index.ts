@@ -26,11 +26,9 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-function hhmmCasablanca(): string {
-  return new Intl.DateTimeFormat("it-IT", {
-    timeZone: "Africa/Casablanca",
-    hour: "2-digit", minute: "2-digit", hour12: false,
-  }).format(new Date());
+function hhmmUtc(): string {
+  const now = new Date();
+  return String(now.getUTCHours()).padStart(2, "0") + ":" + String(now.getUTCMinutes()).padStart(2, "0");
 }
 
 function parseBody(raw: string): Record<string, unknown> {
@@ -90,7 +88,7 @@ serve(async (req) => {
     const descrizione = String(
       payload.descrizione ?? payload.message ?? payload.alert_message ?? payload.condition ?? payload.note ?? ""
     ).trim().substring(0, 500);
-    const ora = String(payload.ora ?? hhmmCasablanca());
+    const ora = String(payload.ora ?? hhmmUtc());
 
     if (!coin && !prezzo) {
       return new Response(JSON.stringify({ error: "missing coin and prezzo (need at least one)", received: payload }), {

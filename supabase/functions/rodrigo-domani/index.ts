@@ -1,5 +1,5 @@
 ﻿// Rodrigo Domani - Edge Function
-// Schedule: pg_cron `0 20 * * *` UTC = 21:00 Casablanca
+// Schedule: pg_cron `0 20 * * *` UTC
 // Prep prossima giornata operativa: salta sabato/domenica.
 // Output: messaggio Telegram firmato Rodrigo + INSERT su routine_events e assistant_messages.
 
@@ -12,15 +12,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-function todayCasablanca(): string {
-  const fmt = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Africa/Casablanca",
-    year: "numeric", month: "2-digit", day: "2-digit",
-  });
-  const parts = fmt.formatToParts(new Date());
-  const get = (t: string) => parts.find((p) => p.type === t)?.value || "00";
-  return `${get("year")}-${get("month")}-${get("day")}`;
-}
+
 
 // Restituisce {iso, label, isFridayOggi}: prossima giornata operativa (lun-ven), saltando weekend.
 function nextOperativeDay(today: string): { iso: string; label: string; oggiIsFriday: boolean } {
@@ -83,7 +75,7 @@ serve(async (req) => {
     const ANTHROPIC_API_KEYS = Deno.env.get("ANTHROPIC_API_KEYS")!;
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const today = todayCasablanca();
+    const today = new Date().toISOString().slice(0, 10);
     const { iso: domani, label: domaniLabel, oggiIsFriday } = nextOperativeDay(today);
 
     const { data: macroDomaniRaw } = await supabase
@@ -108,14 +100,8 @@ serve(async (req) => {
       .from("giornate").select("stato, mindset, note_domani").eq("data", today).limit(1);
     const giornataOggi = giornataRows && giornataRows.length > 0 ? giornataRows[0] : null;
 
-    const startToday = (() => {
-      const [yy, mm, dd] = today.split("-").map(Number);
-      return new Date(Date.UTC(yy, mm - 1, dd, -1, 0, 0)).toISOString();
-    })();
-    const endToday = (() => {
-      const [yy, mm, dd] = today.split("-").map(Number);
-      return new Date(Date.UTC(yy, mm - 1, dd, 22, 59, 59, 999)).toISOString();
-    })();
+    const startToday = `${today}T00:00:00Z`;
+    const endToday = `${today}T23:59:59.999Z`;
     const { data: tradesNonCompRaw } = await supabase
       .from("trades").select("asset, direzione")
       .gte("data", startToday).lte("data", endToday).is("screenshot_url", null);
@@ -123,7 +109,7 @@ serve(async (req) => {
 
     const systemPrompt = `Sei RODRIGO, assistente operativo giornaliero. Scrivi in italiano, tono pratico e sveglio.
 
-CONTESTO: sono le 21:00 Casablanca. La giornata di trading di oggi e chiusa. Sto preparando l'utente per la prossima giornata operativa: ${domaniLabel} (${domani}). Se la data salta il weekend (es. venerdi sera -> lunedi), menziona esplicitamente che si tratta della prossima apertura dei mercati.
+CONTESTO: sono le 20:00 UTC. La giornata di trading di oggi e chiusa. Sto preparando l'utente per la prossima giornata operativa: ${domaniLabel} (${domani}). Se la data salta il weekend (es. venerdi sera -> lunedi), menziona esplicitamente che si tratta della prossima apertura dei mercati.
 
 OUTPUT:
 - Max 10 righe. HTML Telegram: <b>, <i>.

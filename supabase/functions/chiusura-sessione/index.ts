@@ -1,7 +1,7 @@
 ﻿// Chiusura Sessione - Edge Function
 // Schedule:
-//   pg_cron `0 10 * * *` UTC = 11:00 Casablanca (post-Londra) → { sessione: "londra" }
-//   pg_cron `30 15 * * *` UTC = 16:30 Casablanca (check NY)   → { sessione: "ny" }
+//   pg_cron `0 10 * * *` UTC  → { sessione: "londra" }
+//   pg_cron `30 15 * * *` UTC → { sessione: "ny" }
 // Blocchi:
 // - Recap trade della sessione
 // - Commento Peter disciplinare (incrocia bias, allert, trade, strategie)
@@ -20,26 +20,10 @@ const corsHeaders = {
 };
 
 const SESSIONE_INFO: Record<string, { label: string; emoji: string; oraStart: string; oraEnd: string; scope: "lifestyle" | "compilazione" }> = {
-  londra: { label: "Londra", emoji: "🇬🇧", oraStart: "07:00", oraEnd: "11:00", scope: "lifestyle" },
-  ny:     { label: "New York", emoji: "🇺🇸", oraStart: "14:30", oraEnd: "16:30", scope: "compilazione" },
+  londra: { label: "Londra", emoji: "🇬🇧", oraStart: "06:00", oraEnd: "10:00", scope: "lifestyle" },
+  ny:     { label: "New York", emoji: "🇺🇸", oraStart: "13:30", oraEnd: "15:30", scope: "compilazione" },
 };
 
-function todayCasablanca(): string {
-  const fmt = new Intl.DateTimeFormat("sv-SE", { timeZone: "Africa/Casablanca", year: "numeric", month: "2-digit", day: "2-digit" });
-  const parts = fmt.formatToParts(new Date());
-  const get = (t: string) => parts.find((p) => p.type === t)?.value || "00";
-  return `${get("year")}-${get("month")}-${get("day")}`;
-}
-
-function startOfDayCasablancaIso(today: string): string {
-  const [y, m, d] = today.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d, -1, 0, 0)).toISOString();
-}
-
-function hhmmCasablanca(iso: string): string {
-  const fmt = new Intl.DateTimeFormat("it-IT", { timeZone: "Africa/Casablanca", hour: "2-digit", minute: "2-digit", hour12: false });
-  return fmt.format(new Date(iso));
-}
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -101,8 +85,8 @@ serve(async (req) => {
     const info = SESSIONE_INFO[sessione];
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const today = todayCasablanca();
-    const startOfDayIso = startOfDayCasablancaIso(today);
+    const today = new Date().toISOString().slice(0, 10);
+    const startOfDayIso = `${today}T00:00:00Z`;
     const last30daysIso = new Date(Date.now() - 30 * 86400000).toISOString().split("T")[0];
 
     // ===== 1. Trade della sessione =====
@@ -114,7 +98,7 @@ serve(async (req) => {
     const tradesAll = tradesAllRaw || [];
 
     const tradesSessione = tradesAll.filter((t) => {
-      const ora = hhmmCasablanca(t.data);
+      const ora = new Date(t.data).toISOString().slice(11, 16);
       return ora >= info.oraStart && ora <= info.oraEnd;
     });
 
@@ -178,7 +162,7 @@ serve(async (req) => {
     if (hasMaterial) {
       try {
         const tradeLines = tradesSessione.map((t, i) => {
-          const ora = hhmmCasablanca(t.data);
+          const ora = new Date(t.data).toISOString().slice(11, 16);
           return `${i + 1}. [${ora}] ${t.asset} ${t.direzione} esito=${t.esito || "open"} pnl=${t.pnl != null ? t.pnl : "n.d."} rr_reale=${t.rr_reale || "n.d."}${t.note ? " note: " + (t.note.length > 100 ? t.note.substring(0, 100) + "..." : t.note) : ""}${t.strategia_id ? " strat_id=" + t.strategia_id.substring(0, 8) : ""} trade_id=${t.id.substring(0, 8)}`;
         }).join("\n");
 
@@ -263,7 +247,7 @@ DEADLINE IPOTESI (CRITICO, sessione attuale = ${info.label}):
 - SOLO nel debrief EOD finale (post-NY) le ipotesi senza esito esplicito (eseguita/invalidata/scaduta) vanno trattate come "lasciate aperte da chiudere".
 - Sessione corrente del debrief: ${info.label}. Se ${info.label} != "New York", non lamentarti delle ipotesi non ancora chiuse.
 
-DEBRIEF SESSIONE ${info.label.toUpperCase()} (oggi ${today}, ${info.oraStart}-${info.oraEnd} Casablanca)
+DEBRIEF SESSIONE ${info.label.toUpperCase()} (oggi ${today}, ${info.oraStart}-${info.oraEnd} UTC)
 
 TRADE DELLA SESSIONE (${tradesSessione.length}, completed=${completed.length}, winrate=${winrate}%, net PnL=${netPnl.toFixed(2)}):
 ${tradeLines}
@@ -321,7 +305,7 @@ VINCOLI HARD:
       try {
         const prompt = `Sei Rodrigo, assistente operativo del Trade Desk.
 
-L'utente ha appena chiuso la sessione di Londra (sono le 11:00 Casablanca). Ha qualche ora di pausa prima della sessione di New York alle 14:30.
+L'utente ha appena chiuso la sessione di Londra (sono le 10:00 UTC). Ha qualche ora di pausa prima della sessione di New York alle 13:30 UTC.
 
 BASSA MAREA OGGI A RABAT: ${mareaOra || "n.d."} (il campo "marea" contiene SEMPRE l'orario della bassa marea, mai dell'alta — non inventare un'alta marea).
 
@@ -381,7 +365,7 @@ Italiano. Una frase. Niente motivazione vuota, niente parolacce, niente formule 
     // ===== Telegram =====
     const tradeLinesShort = tradesSessione.length > 0
       ? tradesSessione.map((t) => {
-          const ora = hhmmCasablanca(t.data);
+          const ora = new Date(t.data).toISOString().slice(11, 16);
           const p = t.pnl != null && Number(t.pnl) >= 0 ? `+${t.pnl}` : `${t.pnl ?? "?"}`;
           return `- ${ora} ${t.asset} ${t.direzione} <b>${p}</b> (${t.esito || "open"})`;
         }).join("\n")

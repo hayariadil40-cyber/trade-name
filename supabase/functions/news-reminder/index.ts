@@ -16,19 +16,14 @@ const IMPACT_EMOJI: Record<string, string> = {
   basso: "⚪",
 };
 
-function nowInCasa(): { dateStr: string; hhmm: string; minutes: number } {
+function nowInUtc(): { dateStr: string; hhmm: string; minutes: number } {
   const now = new Date();
-  const fmt = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Africa/Casablanca",
-    year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", hour12: false,
-  });
-  const parts = fmt.formatToParts(now);
-  const get = (t: string) => parts.find((p) => p.type === t)?.value || "00";
-  const dateStr = `${get("year")}-${get("month")}-${get("day")}`;
-  const hh = parseInt(get("hour"), 10);
-  const mm = parseInt(get("minute"), 10);
-  return { dateStr, hhmm: `${get("hour")}:${get("minute")}`, minutes: hh * 60 + mm };
+  const dateStr = now.toISOString().slice(0, 10);
+  const hh = now.getUTCHours();
+  const mm = now.getUTCMinutes();
+  const hhStr = String(hh).padStart(2, "0");
+  const mmStr = String(mm).padStart(2, "0");
+  return { dateStr, hhmm: `${hhStr}:${mmStr}`, minutes: hh * 60 + mm };
 }
 
 function timeToMinutes(timeStr: string): number {
@@ -83,7 +78,7 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { dateStr, minutes: nowMin } = nowInCasa();
+    const { dateStr, minutes: nowMin } = nowInUtc();
     const minMin = nowMin + REMINDER_MIN_AHEAD;
     const maxMin = nowMin + REMINDER_MAX_AHEAD;
 

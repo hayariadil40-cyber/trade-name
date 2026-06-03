@@ -2,7 +2,7 @@
 // Invia messaggio Telegram da Rodrigo 5 minuti prima della chiusura candela 4H.
 //
 // pg_cron (UTC): `55 1,5,9,13,17 * * 1-5`
-// = 02:55, 06:55, 10:55, 14:55, 18:55 Casablanca — solo lun-ven
+// = 01:55, 05:55, 09:55, 13:55, 17:55 UTC — solo lun-ven (H4 chiude alle 02,06,10,14,18 UTC)
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 
@@ -12,16 +12,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const CLOSE_HOURS_CASA = [3, 7, 11, 15, 19];
-
-function currentCasaHour(): number {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "Africa/Casablanca",
-    hour: "numeric",
-    hour12: false,
-  }).formatToParts(new Date());
-  return parseInt(parts.find((p) => p.type === "hour")?.value || "0", 10);
-}
+const CLOSE_HOURS_UTC = [2, 6, 10, 14, 18];
 
 async function sendTelegram(text: string, botToken: string, chatId: string) {
   const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -54,11 +45,11 @@ serve(async (req) => {
       });
     }
 
-    const hourNow = currentCasaHour();
-    const nextClose = CLOSE_HOURS_CASA.find((h) => h - 1 === hourNow);
+    const hourNow = new Date().getUTCHours();
+    const nextClose = CLOSE_HOURS_UTC.find((h) => h - 1 === hourNow);
     const closeTime = nextClose !== undefined
-      ? String(nextClose).padStart(2, "0") + ":00"
-      : "??:00";
+      ? String(nextClose).padStart(2, "0") + ":00 UTC"
+      : "??:00 UTC";
 
     const message = `⏰ <b>Rodrigo</b>\nCandela 4H chiude alle <b>${closeTime}</b>. Dai un'occhiata al grafico.`;
 

@@ -1079,7 +1079,7 @@
                 const dotColor = isWin ? 'bg-tp-accent' : isLoss ? 'bg-tp-loss' : 'bg-tp-muted';
                 const textColor = isWin ? 'text-tp-accent' : isLoss ? 'text-tp-loss' : 'text-tp-muted';
                 const pnlSign = t.pnl >= 0 ? '+' : '';
-                const dateStr = new Date(t.data).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' });
+                const dateStr = new Date(t.data).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
                 return `
                     <li class="bg-tp-bg border border-tp-border rounded-lg p-3 hover:border-tp-accent/30 cursor-pointer transition-colors group" onclick="window.location.href='dettaglio_trade.html?id=${t.id}'">
@@ -1200,7 +1200,7 @@
             })[s] || 'bg-tp-border';
 
             const html = rows.map(ip => {
-                const dateStr = new Date(ip.created_at).toLocaleDateString('it-IT', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit', timeZone:'Africa/Casablanca' });
+                const dateStr = new Date(ip.created_at).toLocaleDateString('it-IT', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
                 const note = ip.note ? String(ip.note) : '';
                 const noteShort = note.length > 80 ? note.substring(0, 80) + '...' : note;
                 const tradeBadge = ip.trade_id ? '<span class="text-[9px] font-bold uppercase text-tp-accent">trade</span>' : '';

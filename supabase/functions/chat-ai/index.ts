@@ -22,19 +22,18 @@ serve(async (req) => {
     }
 
     const { message, context, history, mode } = await req.json();
-    // mode: "giornaliero" (Rodrigo) | "coach" (Peter) | "power" (Steve)
+    // mode: "giornaliero" (Rodrigo) | "coach" (Peter) | "power" (Steve) | "operativo" (partner compilazione)
     const assistantMode = mode || "giornaliero";
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Converti timestamp UTC in stringa ora Casablanca (UTC+1 fisso, no DST)
-    const toCasa = (iso: string | null | undefined): string | null =>
-      iso ? new Date(iso).toLocaleString('sv-SE', { timeZone: 'Africa/Casablanca' }).replace(' ', 'T').substring(0, 16) : null;
+    const toUtcIso = (iso: string | null | undefined): string | null =>
+      iso ? new Date(iso).toISOString().slice(0, 16) : null;
 
     let dbContext = "";
-    const today = new Date().toLocaleString('sv-SE', { timeZone: 'Africa/Casablanca' }).split(' ')[0];
+    const today = new Date().toISOString().slice(0, 10);
     const isJumuah = new Date().getDay() === 5; // 0=Dom, 5=Ven
     const fourteenDaysAgo = new Date(Date.now() - 14 * 86400000).toISOString().split("T")[0];
     const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().split("T")[0];
@@ -43,22 +42,21 @@ serve(async (req) => {
       .select("id, asset, direzione, esito, pnl, pips, rr_reale, rr_teorico, size, sorgente, data, mood, volatilita, note, commento_post, ipotesi_id, tag")
       .order("data", { ascending: false });
 
-    if (assistantMode === "giornaliero") {
-      tradesQuery = tradesQuery.gte("data", today + "T00:00:00").lte("data", today + "T23:59:59");
+    if (assistantMode === "giornaliero" || assistantMode === "operativo") {
+      tradesQuery = tradesQuery.gte("data", today + "T00:00:00Z").lte("data", today + "T23:59:59Z");
     } else if (assistantMode === "coach") {
-      tradesQuery = tradesQuery.gte("data", fourteenDaysAgo + "T00:00:00").limit(60);
+      tradesQuery = tradesQuery.gte("data", fourteenDaysAgo + "T00:00:00Z").limit(60);
     } else {
       tradesQuery = tradesQuery.limit(60);
     }
 
     const { data: trades } = await tradesQuery;
     if (trades && trades.length) {
-      // Converti trades.data da UTC a ora Casablanca (UTC+1) per allinearla con allert.ora_evento
       const tradesCtx = trades.map((t: any) => ({
         ...t,
-        data: t.data ? new Date(t.data).toLocaleString('sv-SE', { timeZone: 'Africa/Casablanca' }).replace(' ', 'T').substring(0, 16) : t.data,
+        data: t.data ? new Date(t.data).toISOString().slice(0, 16) : t.data,
       }));
-      dbContext += "\n## TRADES (" + assistantMode.toUpperCase() + ") [ora in fuso Casablanca]:\n" + JSON.stringify(tradesCtx);
+      dbContext += "\n## TRADES (" + assistantMode.toUpperCase() + ") [ora UTC]:\n" + JSON.stringify(tradesCtx);
       const completed = trades.filter((t: any) => t.esito === "win" || t.esito === "loss");
       const wins = completed.filter((t: any) => t.esito === "win").length;
       const totalPnl = trades.reduce((sum: number, t: any) => sum + (parseFloat(t.pnl) || 0), 0);
@@ -87,12 +85,12 @@ serve(async (req) => {
         + "\n(NB: marea = BASSA marea a Rabat; checklist_stato = voce per voce della checklist disciplina, OK/MANCANTE; note = commento libero del trader sulla giornata; day_tags = etichette rapide)";
     }
 
-    const smileLimit = assistantMode === "giornaliero" ? 10 : assistantMode === "coach" ? 20 : 40;
+    const smileLimit = (assistantMode === "giornaliero" || assistantMode === "operativo") ? 10 : assistantMode === "coach" ? 20 : 40;
     const { data: smile } = await supabase.from("monitora_smile")
       .select("mindset, volatilita, sorgente, created_at")
       .order("created_at", { ascending: false }).limit(smileLimit);
     if (smile && smile.length) {
-      const smileCtx = smile.map((s: any) => ({ ...s, created_at: toCasa(s.created_at) }));
+      const smileCtx = smile.map((s: any) => ({ ...s, created_at: toUtcIso(s.created_at) }));
       dbContext += "\n\n## MONITORASMILE:\n" + JSON.stringify(smileCtx);
     }
 
@@ -133,12 +131,12 @@ serve(async (req) => {
       .select("usd_strength, created_at").order("created_at", { ascending: false }).limit(1);
     if (usd && usd.length) dbContext += `\n\n## FORZA USD ATTUALE: ${usd[0].usd_strength}`;
 
-    const biasLimit = assistantMode === "giornaliero" ? 5 : assistantMode === "coach" ? 40 : 30;
+    const biasLimit = (assistantMode === "giornaliero" || assistantMode === "operativo") ? 5 : assistantMode === "coach" ? 40 : 30;
     let biasQuery = supabase.from("bias")
       .select("commenti_giornata, coin_data, stato, data")
       .order("data", { ascending: false }).limit(biasLimit);
     if (assistantMode === "coach") biasQuery = biasQuery.gte("data", thirtyDaysAgo);
-    else if (assistantMode === "giornaliero") biasQuery = biasQuery.gte("data", fourteenDaysAgo);
+    else if (assistantMode === "giornaliero" || assistantMode === "operativo") biasQuery = biasQuery.gte("data", fourteenDaysAgo);
     const { data: bias } = await biasQuery;
     if (bias && bias.length) {
       const biasLight = bias.map((b: any) => ({
@@ -153,15 +151,15 @@ serve(async (req) => {
       dbContext += "\n\n## BIAS (struttura duale: `commenti_giornata` top-level = note generali della giornata {ora, testo}; `coin_data.<ASSET>.aggiornamenti` = timeline per-asset {ora, testo, direzione?} — QUI vivono le direzioni operative. REGOLA: direzione CORRENTE di un asset = ultima `direzione` non-null in `coin_data.<ASSET>.aggiornamenti`. Sequenza long→short = flip intraday, analizzalo come evento cognitivo):\n" + JSON.stringify(biasLight);
     }
 
-    // Ipotesi per Rodrigo: ultime 48h (possono essere aperte da ieri)
-    if (assistantMode === "giornaliero") {
+    // Ipotesi per Rodrigo / Operativo: ultime 48h (possono essere aperte da ieri)
+    if (assistantMode === "giornaliero" || assistantMode === "operativo") {
       const twoDaysAgo = new Date(Date.now() - 2 * 86400000).toISOString().split("T")[0];
       const { data: ipotesiR } = await supabase.from("ipotesi_trading")
         .select("id, asset, direzione, sessione, stato, note, strategia_id, created_at")
-        .gte("created_at", twoDaysAgo + "T00:00:00")
+        .gte("created_at", twoDaysAgo + "T00:00:00Z")
         .order("created_at", { ascending: false }).limit(20);
       if (ipotesiR && ipotesiR.length) {
-        const ipotesiRCtx = ipotesiR.map((ip: any) => ({ ...ip, created_at: toCasa(ip.created_at) }));
+        const ipotesiRCtx = ipotesiR.map((ip: any) => ({ ...ip, created_at: toUtcIso(ip.created_at) }));
         dbContext += "\n\n## IPOTESI (ultimi 2gg):\n" + JSON.stringify(ipotesiRCtx);
       }
       // Strategie (solo id+nome): servono per collegare ipotesi a strategia per id
@@ -173,7 +171,7 @@ serve(async (req) => {
       const ipotesiLimit = 20;
       const { data: ipotesi } = await supabase.from("ipotesi_trading")
         .select("id, asset, direzione, sessione, stato, note, osservazioni, commento_post, check_list_flagged, dove_entro_flagged, dove_esco_sl_flagged, dove_esco_tp_flagged, created_at, strategia_id")
-        .gte("created_at", fourteenDaysAgo + "T00:00:00")
+        .gte("created_at", fourteenDaysAgo + "T00:00:00Z")
         .order("created_at", { ascending: false }).limit(ipotesiLimit);
       if (ipotesi && ipotesi.length) {
         // Arricchisci ogni ipotesi con i trade collegati (osservazioni per-trade + commento_post)
@@ -188,10 +186,10 @@ serve(async (req) => {
         });
         const ipotesiRich = ipotesi.map((ip: any) => ({
           ...ip,
-          created_at: toCasa(ip.created_at),
+          created_at: toUtcIso(ip.created_at),
           trades_collegati: (tradesByIpotesi[ip.id] || []).map((t: any) => ({
             ...t,
-            data: toCasa(t.data),
+            data: toUtcIso(t.data),
           })),
         }));
         dbContext += "\n\n## IPOTESI DI TRADING (con osservazioni template + per-trade e commento_post per trade):\n" + JSON.stringify(ipotesiRich);
@@ -251,6 +249,107 @@ serve(async (req) => {
       if (giornate && giornate.length) dbContext += "\n\n## STORICO GIORNATE:\n" + JSON.stringify(giornate);
     }
 
+    // ── OPERATIVO: dati extra (watchlist live, M15, FVG, processi attivi) ──
+    if (assistantMode === "operativo") {
+
+      // 1. Watchlist live + struttura H4
+      const { data: wl } = await supabase
+        .from("watchlist")
+        .select("simbolo, prezzo, posizione, h4_high, h4_low, open_15m, high_15m, low_15m, close_15m, volatilita_auto")
+        .eq("active", true).order("simbolo");
+      if (wl?.length) {
+        const wlCtx = wl.map((w: any) => {
+          const p = parseFloat(w.prezzo), hh = parseFloat(w.h4_high), hl = parseFloat(w.h4_low);
+          return {
+            s: w.simbolo, p: w.prezzo, pos: w.posizione,
+            h4_hi: w.h4_high, h4_lo: w.h4_low,
+            struttura: p > hh ? "RIALZISTA" : p < hl ? "BASSISTA" : "NEUTRO",
+            vol: w.volatilita_auto,
+            m15: { o: w.open_15m, h: w.high_15m, l: w.low_15m, c: w.close_15m },
+          };
+        });
+        dbContext += "\n\n## WATCHLIST LIVE (prezzo + struttura H4):\n" + JSON.stringify(wlCtx);
+      }
+
+      // 2. Candele M15 ultime 2h da watchlist_snapshots
+      const twoHoursAgo = new Date(Date.now() - 2 * 3600000).toISOString();
+      const { data: snaps } = await supabase
+        .from("watchlist_snapshots")
+        .select("captured_at, snapshot")
+        .gte("captured_at", twoHoursAgo)
+        .order("captured_at", { ascending: true });
+      if (snaps?.length) {
+        const coins = ["XAUUSD","US30","GER30","NAS100","BTCUSD","EURUSD"];
+        const slotMap: Record<string, Record<string, any>> = {};
+        for (const snap of snaps) {
+          const cd = new Date(snap.captured_at);
+          const slotMin = Math.floor(cd.getUTCMinutes() / 15) * 15;
+          const slotMs = Date.UTC(cd.getUTCFullYear(), cd.getUTCMonth(), cd.getUTCDate(), cd.getUTCHours(), slotMin, 0);
+          for (const entry of (snap.snapshot || [])) {
+            if (!coins.includes(entry.simbolo)) continue;
+            if (!slotMap[entry.simbolo]) slotMap[entry.simbolo] = {};
+            if (entry.open_15m_prev != null && entry.high_15m_prev != null) {
+              const prevMs = slotMs - 900000;
+              const pd = new Date(prevMs);
+              const pk = String(pd.getUTCHours()).padStart(2,"0") + ":" + String(Math.floor(pd.getUTCMinutes()/15)*15).padStart(2,"0");
+              slotMap[entry.simbolo][pk] = {
+                t: pk,
+                o: parseFloat(entry.open_15m_prev),
+                h: parseFloat(entry.high_15m_prev),
+                l: parseFloat(entry.low_15m_prev),
+                c: parseFloat(entry.close_15m_prev),
+              };
+            }
+          }
+        }
+        const candlesCtx: Record<string, any[]> = {};
+        for (const coin of coins) {
+          if (slotMap[coin] && Object.keys(slotMap[coin]).length) {
+            candlesCtx[coin] = Object.values(slotMap[coin])
+              .sort((a: any, b: any) => a.t.localeCompare(b.t)).slice(-8);
+          }
+        }
+        if (Object.keys(candlesCtx).length) {
+          dbContext += "\n\n## CANDELE M15 (ultime 2h per asset, UTC — o=open h=high l=low c=close):\n" + JSON.stringify(candlesCtx);
+        }
+      }
+
+      // 3. FVG attive
+      const { data: fvgRaw } = await supabase
+        .from("allert_prezzo")
+        .select("coin, ora, descrizione")
+        .ilike("descrizione", "%FVG%")
+        .eq("stato", "nuovo")
+        .order("ora", { ascending: true });
+      if (fvgRaw?.length) {
+        const fvgCtx = fvgRaw.map((f: any) => {
+          const m = f.descrizione.match(/gap\s+([\d.]+)-([\d.]+)/i);
+          return {
+            coin: f.coin, ora: f.ora,
+            dir: f.descrizione.toLowerCase().includes("long") ? "long" : "short",
+            lo: m ? parseFloat(m[1]) : null,
+            hi: m ? parseFloat(m[2]) : null,
+          };
+        });
+        dbContext += "\n\n## FVG ATTIVE:\n" + JSON.stringify(fvgCtx);
+      }
+
+      // 4. Processi attivi
+      const [{ data: tradesAperti }, { data: newsNV }, { data: ipotesiP }] = await Promise.all([
+        supabase.from("trades").select("id, asset, direzione, entry_price").eq("stato", "aperto"),
+        supabase.from("allert").select("id, titolo, valuta, ora_evento")
+          .eq("data_evento", today).is("valore_effettivo", null),
+        supabase.from("ipotesi_trading").select("id, asset, direzione, sessione, stato")
+          .in("stato", ["ipotesi", "osservare"]).gte("created_at", today + "T00:00:00Z"),
+      ]);
+      const processi: string[] = [];
+      if (tradesAperti?.length) processi.push("TRADE APERTI (" + tradesAperti.length + "): " + tradesAperti.map((t: any) => t.asset + " " + t.direzione + (t.entry_price ? " @" + t.entry_price : "")).join(", "));
+      if (newsNV?.length) processi.push("NEWS NON VALIDATE (" + newsNV.length + "): " + newsNV.map((n: any) => n.valuta + " " + n.titolo + " [" + n.ora_evento + "]").join(", "));
+      if (ipotesiP?.length) processi.push("IPOTESI PENDENTI (" + ipotesiP.length + "): " + ipotesiP.map((ip: any) => ip.asset + " " + ip.direzione + " [" + ip.stato + "]").join(", "));
+      if (!processi.length) processi.push("Nessun processo aperto.");
+      dbContext += "\n\n## PROCESSI ATTIVI:\n" + processi.join("\n");
+    }
+
     if (context) dbContext += "\n\n## CONTESTO AGGIUNTIVO:\n" + context;
 
     const MAX_CONTEXT_CHARS = 150000;
@@ -259,7 +358,7 @@ serve(async (req) => {
     }
 
     const PROFILO = `PROFILO TRADER:
-- Scalper retail con base a Casablanca (timezone Africa/Casablanca, UTC+1, no DST)
+- Scalper retail con base a Casablanca (timezone UTC)
 - Sessioni: Londra limitata, New York focus massimo, Asia occasionale
 - Orari sessioni (Casablanca): Asia fino alle 09:00, Londra 09:00-18:00, New York 14:30-23:00
 - Strumenti principali: XAUUSD, US30, NASDAQ, GER40
@@ -612,9 +711,110 @@ ${dbContext}
 
 ${DB_ACTIONS}`;
 
+    const PROMPT_OPERATIVO = `Ti chiami Rodrigo. Sei il partner operativo di compilazione del Trade Desk.
+
+${PROFILO}
+
+IL TUO RUOLO:
+- Compili i campi durante la sessione su dettatura. Quando l'utente dice qualcosa che implica una compilazione, compila subito senza chiedere conferma.
+- All'avvio segnala i processi attivi (vedi ## PROCESSI ATTIVI): cosa è rimasto aperto, cosa va validato.
+- Sei consapevole del grafico: conosci la struttura H4, le FVG attive, le ultime candele M15.
+- Risposte brevissime. Se compili: 1 riga di conferma. Se controlli: 2-3 righe max.
+- Puoi bacchettare in modo professionale. Niente motivational speech.
+
+STRUTTURA H4 (da ## WATCHLIST LIVE):
+- h4_hi / h4_lo = livelli della H4 precedente completata (non quella in formazione).
+- prezzo > h4_hi → struttura RIALZISTA
+- prezzo < h4_lo → struttura BASSISTA
+- tra i due → NEUTRO / dentro struttura
+
+SESSIONI — orari UTC:
+- Asia: 00:00–07:00
+- London: 07:00–13:30
+- New York: 13:30+
+Se l'utente non specifica la sessione, la rileva dall'ora UTC attuale nel contesto.
+
+─────────────────────────────────────
+REGOLE DI COMPILAZIONE PER ENTITÀ
+─────────────────────────────────────
+
+1. GIORNATA (giornate) — giornata di oggi già nel contesto
+   Compilabile:
+   - checklist_stato: array bool. Mappa item per nome (leggi le voci dal contesto), aggiorna solo l'indice corretto. Passa l'array INTERO.
+   - day_tags: array stringhe. Estrae tag da testo libero, appende. Passa array INTERO.
+   - note_domani: testo libero (a fine giornata).
+   - fajr: bool. "ho pregato fajr" → true, "non ho pregato fajr" → false.
+   SOLO LETTURA: data, pnl, n_trades, winrate.
+
+2. BIAS (bias) — bias di oggi: l'ultimo in ## BIAS con data=oggi
+   Compilabile:
+   - commenti_giornata: accoda {ora, testo, smile?}. Passa array INTERO con nuovo elemento appeso.
+   - coin_data[ASSET].aggiornamenti: accoda {ora, testo, direzione?}. Passa array INTERO.
+   - ora default = UTC corrente (o specificata dall'utente).
+   SOLO LETTURA: coin_data[ASSET].bias_h4 (automatizzato EA). Non toccare MAI salvo "forza bias H4" esplicito.
+   Tag commenti: ignorare, non compilare.
+
+3. SESSIONI (sessioni) — sessione corrente da orario UTC
+   Compilabile via update_coin:
+   - low, high: range sessione (stringhe numeriche).
+   - bias: "LONG" | "SHORT" | "NEUTRAL".
+   - commento: testo libero.
+   - aggiornamenti: accoda {ora, testo, direzione?}. direzione = "sopra"|"sotto"|"dentro" (posizione rispetto all'Asian Box).
+   L'asset va sempre specificato dall'utente. ora default = UTC corrente.
+   SOLO LETTURA: aiflow, apertura, chiusura.
+
+4. IPOTESI (ipotesi_trading)
+   CREATE — trigger "crea una nuova ipotesi":
+   - insert {asset, direzione, sessione, stato:"ipotesi", note, strategia_id}.
+   - strategia_id: lookup per nome in ## STRATEGIE.
+   - note: struttura libera che include tipo_mercato, frontalità, candle m15/h1/d1 (verde/rosso), note setup.
+   REVISIONE — trigger "controlla ipotesi" o descrizione esito:
+   - Legge stato. Se "ipotesi" o "osservare" → chiede: cosa è constatato?
+   - Dopo risposta: compila tags (array parole chiave da conservare) + commento_post (sintesi Claude, 2-4 righe asciutte).
+   SOLO UTENTE: entry/exit price, screenshot, spunta checklist manuale.
+
+5. TRADE (trades) — compilazione real-time
+   Dopo descrizione ingresso:
+   - commento_trade: sintesi ingresso in 1-2 righe.
+   - mood: stato emotivo dalla descrizione.
+   Categorizzatore ipotesi_id: cerca in ## IPOTESI l'ipotesi aperta con stesso asset + direzione + sessione → propone collegamento.
+   Dopo link: verifica coerenza asset ✓ direzione ✓ strategia_id ✓. Se discrepanza: segnala prima di scrivere.
+   SOLO EA: entry_price, stop_loss, take_profit, asset, direzione, data.
+
+─────────────────────────────────────
+NOTIZIE MACRO (allert)
+─────────────────────────────────────
+Quando l'utente dice il valore effettivo → aggiorna allert.valore_effettivo (usa id come match).
+Il trigger Postgres genera commento_rodrigo automaticamente in ~5-10s. Non scriverlo tu.
+Non modificare: data_evento, ora_evento, impatto, titolo, valuta, valore_atteso, valore_precedente.
+
+─────────────────────────────────────
+CONSAPEVOLEZZA GRAFICO
+─────────────────────────────────────
+- ## WATCHLIST LIVE: prezzo corrente, posizione (sopra/sotto H4), struttura H4 calcolata.
+- ## CANDELE M15: ultime 8 candele chiuse per asset (ultime ~2h). Usale per commentare price action recente.
+- ## FVG ATTIVE: zone non riempite con gap_lo/gap_hi/direzione. Rimangono attive finché stato='nuovo'.
+- ## FORZA USD: ultimo valore. Se positivo (+) → USD forte → peso su XAUUSD e indici inversamente.
+
+${isJumuah ? `VENERDI' — JUMU'AH:
+Oggi e' venerdi'. La Jumu'ah e' obbligatoria per l'uomo adulto musulmano libero (Surah Al-Jumu'ah 62:9). Nel corso della mattinata ricordagli di prepararsi e andare alla moschea presto.
+- Ghusl prima di uscire: bagno rituale completo, sunnah raccomandata prima del Jumu'ah.
+- Arrivare presto vale piu' ricompensa: Abu Hurayra riporta che la prima ora e' come offrire un cammello, la seconda un bue, la terza un montone, la quarta un pollo, la quinta un uovo. Prima si arriva, maggiore il peso.
+- Ascoltare la khutba in silenzio: parlare durante l'adhan o la khutba e' proibito.
+- Dopo l'Asr c'e' l'ora benedetta del venerdi' in cui la dua'a e' accettata: ricordagli di non perderla.
+Menzionalo in modo diretto e breve, senza essere pesante o predicatorio. Una riga basta.
+
+` : ''}${REGOLE_COMUNI}
+
+DATI DISPONIBILI:
+${dbContext}
+
+${DB_ACTIONS}`;
+
     let systemPrompt;
     if (assistantMode === "coach") systemPrompt = PROMPT_PETER;
     else if (assistantMode === "power") systemPrompt = PROMPT_STEVE;
+    else if (assistantMode === "operativo") systemPrompt = PROMPT_OPERATIVO;
     else systemPrompt = PROMPT_RODRIGO;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {

@@ -1,5 +1,5 @@
 ﻿// Rodrigo Morning - Edge Function
-// Schedule: pg_cron `35 6 * * 1-5` UTC = 07:35 Casablanca (lun-ven)
+// Schedule: pg_cron `35 6 * * 1-5` UTC (lun-ven)
 // Briefing operativo Rodrigo: stato giornata, bias, allert macro, top articoli del giorno.
 // Output: messaggio Telegram firmato Rodrigo + INSERT su routine_events e assistant_messages.
 
@@ -12,20 +12,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-function todayCasablanca(): string {
-  const fmt = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Africa/Casablanca",
-    year: "numeric", month: "2-digit", day: "2-digit",
-  });
-  const parts = fmt.formatToParts(new Date());
-  const get = (t: string) => parts.find((p) => p.type === t)?.value || "00";
-  return `${get("year")}-${get("month")}-${get("day")}`;
-}
 
-function startOfDayCasablancaIso(today: string): string {
-  const [y, m, d] = today.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d, -1, 0, 0)).toISOString();
-}
 
 async function callClaude(systemPrompt: string, userPrompt: string, apiKey: string, maxTokens = 1200): Promise<string> {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -62,7 +49,7 @@ IDENTITA:
 - Bacchetti con professionalita: "ti manca X", "hai Y aperto alle Z", "ricorda W prima delle H".
 - Zero parolacce, zero termini volgari. Tono sempre rispettoso.
 
-CONTESTO: sono le 07:35 Casablanca. La giornata di trading inizia a breve (apertura Londra alle 08:00).
+CONTESTO: sono le 06:35 UTC. La giornata di trading inizia a breve (apertura Londra alle 07:00 UTC).
 
 OBIETTIVO DEL MESSAGGIO:
 1. Saluto breve
@@ -93,8 +80,8 @@ serve(async (req) => {
     const ANTHROPIC_API_KEYS = Deno.env.get("ANTHROPIC_API_KEYS")!;
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const today = todayCasablanca();
-    const startOfDayIso = startOfDayCasablancaIso(today);
+    const today = new Date().toISOString().slice(0, 10);
+    const startOfDayIso = `${today}T00:00:00Z`;
 
     const { data: giornataRows } = await supabase
       .from("giornate")

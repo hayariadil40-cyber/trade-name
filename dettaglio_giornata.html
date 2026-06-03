@@ -962,12 +962,12 @@
             if (fajrState !== null) return;
 
             // Solo per la giornata di oggi
-            const casaToday = new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Casablanca' });
+            const casaToday = new Date().toISOString().slice(0, 10);
             if (giornataDate !== casaToday) return;
 
             // Ora corrente in Casablanca
             const parts = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'Africa/Casablanca', hour: '2-digit', minute: '2-digit', hour12: false
+                hour: '2-digit', minute: '2-digit', hour12: false
             }).formatToParts(new Date());
             const h = parseInt(parts.find(p => p.type === 'hour').value);
             const m = parseInt(parts.find(p => p.type === 'minute').value);
@@ -1285,7 +1285,7 @@
             }
 
             container.innerHTML = items.map(a => {
-                const ora = a.ora ? a.ora.substring(0, 5) : (a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' }) : '--:--');
+                const ora = a.ora ? a.ora.substring(0, 5) : (a.created_at ? new Date(a.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--');
                 const desc = a.descrizione || '';
                 return `<div data-allert-id="${a.id}" class="bg-[#0a0c10] border border-tp-border hover:border-[#eab308]/40 rounded-lg p-2.5 transition-all group relative overflow-hidden">
                     <div class="absolute inset-y-0 left-0 w-1 bg-[#eab308]/60"></div>
@@ -1493,7 +1493,7 @@
             if (!container) return;
 
             const now = new Date();
-            const nowH = String(now.toLocaleString('en-US', { hour: '2-digit', hour12: false, timeZone: 'Africa/Casablanca' })).padStart(2,'0');
+            const nowH = String(now.toLocaleString('en-US', { hour: '2-digit', hour12: false })).padStart(2,'0');
             const nowM = String(now.getMinutes()).padStart(2,'0');
             const nowTime = `${nowH}:${nowM}`;
 
@@ -1693,7 +1693,7 @@
             if (!panel || !gjActiveAsset || !gjCoinData[gjActiveAsset]) return;
             const aggs = Array.isArray(gjCoinData[gjActiveAsset].aggiornamenti) ? gjCoinData[gjActiveAsset].aggiornamenti : [];
             const now = new Date();
-            const nowH = String(now.toLocaleString('en-US', { hour: '2-digit', hour12: false, timeZone: 'Africa/Casablanca' })).padStart(2,'0');
+            const nowH = String(now.toLocaleString('en-US', { hour: '2-digit', hour12: false })).padStart(2,'0');
             const nowM = String(now.getMinutes()).padStart(2,'0');
 
             const aggRows = aggs.length ? aggs.map((a, i) => `
@@ -1792,7 +1792,7 @@
             // Aperture H4 in minuti Casablanca: 23:00→1380, 03:00→180, 07:00→420 ...
             const H4_OPENS = [1380, 180, 420, 660, 900, 1140];
             const parts = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'Africa/Casablanca', hour: 'numeric', minute: 'numeric', hour12: false
+                hour: 'numeric', minute: 'numeric', hour12: false
             }).formatToParts(new Date());
             const h = parseInt(parts.find(p => p.type === 'hour')?.value ?? '0');
             const m = parseInt(parts.find(p => p.type === 'minute')?.value ?? '0');
@@ -1927,7 +1927,7 @@
             }
 
             container.innerHTML = items.map(t => {
-                const ora = t.data ? new Date(t.data).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' }) : '--:--';
+                const ora = t.data ? new Date(t.data).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--';
                 const dir = (t.direzione || '').toUpperCase();
                 const dirColor = dir === 'LONG' ? 'text-tp-accent' : dir === 'SHORT' ? 'text-tp-loss' : 'text-tp-muted';
                 const sorgenteBadge = t.sorgente ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-tp-border/40 text-tp-muted border border-tp-border font-bold uppercase">${t.sorgente}</span>` : '';
@@ -2003,7 +2003,7 @@
             })[s] || 'text-tp-muted';
 
             container.innerHTML = items.map(ip => {
-                const ora = new Date(ip.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' });
+                const ora = new Date(ip.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
                 const dir = (ip.direzione || '').toUpperCase();
                 const dirColor = dir === 'LONG' ? 'text-tp-accent' : dir === 'SHORT' ? 'text-tp-loss' : 'text-tp-muted';
                 const stratName = ip.strategia_id ? (stratMap[ip.strategia_id] || '?') : 'no strategia';
@@ -2073,7 +2073,7 @@
                     var resultRaw = await db.from('forza_usd').select('usd_strength, created_at').gte('created_at', todayStart).order('created_at', { ascending: false }).limit(300);
                     var rows = resultRaw.data ? resultRaw.data.reverse() : [];
                     if (rows.length) {
-                        labels = rows.map(function(r) { return new Date(r.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' }); });
+                        labels = rows.map(function(r) { return new Date(r.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }); });
                         data = rows.map(function(r) { return parseFloat(r.usd_strength); });
                     }
                 } catch(e) {}
@@ -2209,12 +2209,12 @@
                 const { data: trades } = await db.from('trades').select('id, asset').eq('stato', 'nuovo');
                 if (trades) trades.forEach(t => tickets.push({ type: 'trade', label: 'Trade Da Lavorare', title: 'Trade ' + (t.asset || ''), desc: 'Trade da compilare con screenshot, strategia e mindset.', id: t.id, link: 'dettaglio_trade.html?id=' + t.id, color: 'warning', table: 'trades' }));
                 const now = new Date();
-                const today = now.toLocaleDateString('sv-SE', { timeZone: 'Africa/Casablanca' });
+                const today = now.toISOString().slice(0, 10);
                 const nowHHMM = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
                 const { data: allerts } = await db.from('allert').select('id, titolo, data_evento, ora_evento').eq('stato', 'nuovo').lte('data_evento', today);
                 ((allerts || []).filter(a => { if (!a.data_evento) return false; if (a.data_evento < today) return true; const ora = (a.ora_evento || '').substring(0,5); return !ora || ora <= nowHHMM; })).forEach(a => tickets.push({ type: 'allert', label: 'Notizia Da Validare', title: a.titolo || 'Notizia', desc: "L'orario e scattato. Inserire dati per archiviare.", id: a.id, link: 'allert.html?openNews=' + a.id, color: 'purple', table: 'allert' }));
                 const { data: allertPrezzo } = await db.from('allert_prezzo').select('id, coin, prezzo, ora, descrizione, created_at').eq('stato', 'nuovo');
-                ((allertPrezzo || []).filter(ap => !isEaAllert(ap))).forEach(ap => { const oraStr = ap.ora ? ap.ora.substring(0,5) : (ap.created_at ? new Date(ap.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Casablanca'}) : ''); tickets.push({ type: 'allert_prezzo', label: 'Allert Da Validare', title: (ap.coin || '') + ' @ ' + (ap.prezzo || ''), desc: (ap.descrizione || 'Alert prezzo triggerato') + (oraStr ? ' - ' + oraStr : ''), id: ap.id, link: 'allert.html?openAllert=' + ap.id, color: 'tp-warning', table: 'allert_prezzo' }); });
+                ((allertPrezzo || []).filter(ap => !isEaAllert(ap))).forEach(ap => { const oraStr = ap.ora ? ap.ora.substring(0,5) : (ap.created_at ? new Date(ap.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : ''); tickets.push({ type: 'allert_prezzo', label: 'Allert Da Validare', title: (ap.coin || '') + ' @ ' + (ap.prezzo || ''), desc: (ap.descrizione || 'Alert prezzo triggerato') + (oraStr ? ' - ' + oraStr : ''), id: ap.id, link: 'allert.html?openAllert=' + ap.id, color: 'tp-warning', table: 'allert_prezzo' }); });
                 try {
                     const { data: cronache } = await db.from('cronache').select('id, titolo').eq('stato', 'nuovo');
                     if (cronache) cronache.forEach(c => tickets.push({ type: 'cronaca', label: 'Cronaca Da Compilare', title: c.titolo || 'Cronaca', desc: 'Cronaca da compilare con dettagli e analisi.', id: c.id, link: 'dettaglio_cronaca.html?id=' + c.id, color: 'teal', table: 'cronache' }));
@@ -2319,7 +2319,7 @@
                 var latest = data.reduce(function(max, w) { return w.updated_at > max ? w.updated_at : max; }, '');
                 if (latest) {
                     var d = new Date(latest);
-                    document.getElementById('watchlist-updated').textContent = d.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit', timeZone:'Africa/Casablanca' });
+                    document.getElementById('watchlist-updated').textContent = d.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
                 }
             } catch(e) { console.warn('Watchlist:', e); }
         }
