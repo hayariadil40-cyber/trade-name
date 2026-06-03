@@ -821,7 +821,7 @@
                             <span style="font-size:9px;color:rgba(255,255,255,0.18);font-style:italic">candela 1 → 6</span>
                         </div>
                         <div class="grid gap-1.5" style="grid-template-columns:repeat(6,1fr)">
-                            ${['23:00','03:00','07:00','11:00','15:00','19:00'].map((time,qi) => {
+                            ${['22:00','02:00','06:00','10:00','14:00','18:00'].map((time,qi) => {
                                 const val = Array.isArray(d.bias_h4) ? (d.bias_h4[qi] || null) : null;
                                 const cls = val === 'long' ? 'h4-long' : val === 'short' ? 'h4-short' : val === 'neutro' ? 'h4-neutro' : '';
                                 const innerLbl = val === 'long' ? 'L' : val === 'short' ? 'S' : val === 'neutro' ? 'N' : `<span style="font-size:8px;opacity:0.22">${qi+1}</span>`;
@@ -972,13 +972,12 @@
         // --- LIVE H4 SLOT (candela in corso) ---
         function getCurrentH4LiveSlot() {
             const now = new Date();
-            const casaHour = (now.getUTCHours() + 1) % 24;
-            const totalMin = casaHour * 60 + now.getUTCMinutes();
-            const closes = [180, 420, 660, 900, 1140, 1380]; // 03:00..23:00 Casablanca in minuti
+            const totalMin = now.getUTCHours() * 60 + now.getUTCMinutes();
+            const closes = [120, 360, 600, 840, 1080, 1320]; // 02:00..22:00 UTC in minuti
             for (let i = 0; i < closes.length; i++) {
                 if (totalMin < closes[i]) return i;
             }
-            return 0; // dopo le 23:00 → prossima chiusura è 03:00 (slot 0)
+            return 0; // dopo le 22:00 UTC → prossima chiusura è 02:00 (slot 0)
         }
 
         async function loadLiveH4Slot(asset) {
