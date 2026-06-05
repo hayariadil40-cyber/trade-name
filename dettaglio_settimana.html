@@ -40,6 +40,11 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #252932; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #3b4252; }
+        .day-tab.active  { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
+        .day-tab:not(.active) { background: transparent; border-color: #252932; color: #848d97; }
+        .day-tab:not(.active):hover { color: #ffffff; border-color: #3b4252; }
+        .day-pane { display: none; }
+        .day-pane.active { display: block; }
     </style>
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -206,67 +211,74 @@
 
         <!-- Content: 2-column layout -->
         <div class="flex-1 overflow-y-auto p-3 lg:p-6 scroll-smooth">
-            <div class="max-w-[1600px] mx-auto">
-                <!-- Torna indietro -->
-                <a href="settimanale.html" class="flex items-center gap-2 mb-6 text-tp-muted hover:text-white transition-colors cursor-pointer w-fit">
+            <div class="max-w-[1600px] mx-auto mb-6">
+                <a href="settimanale.html" class="flex items-center gap-2 mb-3 text-tp-muted hover:text-white transition-colors cursor-pointer w-fit">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
                     <span class="text-xs font-bold uppercase tracking-widest">Torna alle Settimane</span>
                 </a>
+                <div class="flex items-center justify-between">
+                    <h1 id="week-title" class="text-2xl font-black text-white tracking-tight"></h1>
+                    <button onclick="saveWeek()" class="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-lg bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors">
+                        <i data-lucide="save" class="w-3.5 h-3.5"></i> Salva
+                    </button>
+                </div>
             </div>
             <div class="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 pb-10">
 
-                <!-- LEFT COLUMN: Flusso Operativo Giornaliero (col-span-5) -->
+                <!-- LEFT COLUMN: Flusso + Lezioni (col-span-5) -->
                 <div class="lg:col-span-5 flex flex-col gap-4">
-                    <h2 class="text-sm font-bold uppercase tracking-widest text-[#848d97] border-b border-[#252932] pb-2 mb-2 flex items-center gap-2">
+                    <h2 class="text-sm font-bold uppercase tracking-widest text-[#848d97] pb-2 mb-2 flex items-center gap-2">
                         <i data-lucide="history" class="w-4 h-4"></i> Flusso Operativo Giornaliero
                     </h2>
+                    <div class="flex flex-col">
+                        <div class="flex gap-1.5 flex-wrap" id="day-tabs"></div>
+                        <div id="day-panes" class="border border-tp-border rounded-b-xl rounded-tr-xl bg-tp-panel min-h-[160px]"></div>
+                    </div>
 
-                    <div id="days-list" class="space-y-3">
-                        <!-- Days injected by JS -->
+                    <!-- Lezioni e Pianificazione -->
+                    <h2 class="text-sm font-bold uppercase tracking-widest text-tp-accent border-b border-tp-border pb-2 mt-4 flex items-center gap-2">
+                        <i data-lucide="edit-3" class="w-4 h-4"></i> Lezioni e Pianificazione
+                    </h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-tp-panel border border-tp-border rounded-xl p-4 flex flex-col">
+                            <h3 class="text-[11px] font-bold uppercase tracking-widest text-tp-accent mb-3 flex items-center gap-2">
+                                <i data-lucide="thumbs-up" class="w-3.5 h-3.5"></i> Cosa ha funzionato
+                            </h3>
+                            <textarea id="review" class="flex-1 w-full bg-[#0a0c10] border border-transparent rounded-lg p-3 text-sm text-tp-text/90 resize-none outline-none focus:border-tp-accent/50 transition-colors" style="min-height:140px" placeholder="Pattern, setup, comportamenti che hanno funzionato..."></textarea>
+                        </div>
+                        <div class="bg-[#0a0c10] border border-tp-border rounded-xl p-4 flex flex-col">
+                            <h3 class="text-[11px] font-bold uppercase tracking-widest text-tp-warning mb-3 flex items-center gap-2">
+                                <i data-lucide="globe-2" class="w-3.5 h-3.5"></i> Settimana successiva
+                            </h3>
+                            <textarea id="next-week" class="flex-1 w-full bg-transparent border-none p-2 text-sm text-tp-text resize-none outline-none focus:ring-0" style="min-height:140px" placeholder="Sentiment, livelli macro, piano operativo..."></textarea>
+                        </div>
                     </div>
                 </div>
 
-                <!-- RIGHT COLUMN: Lezioni e Pianificazione (col-span-7) -->
-                <div class="lg:col-span-7 flex flex-col gap-6">
-                    <!-- Title + Save -->
-                    <div class="flex justify-between items-center border-b border-tp-border pb-2">
-                        <h2 class="text-sm font-bold uppercase tracking-widest text-tp-accent flex items-center gap-2">
-                            <i data-lucide="edit-3" class="w-4 h-4"></i> Lezioni e Pianificazione
-                        </h2>
-                        <div class="flex items-center gap-3">
-                            <span id="week-title" class="text-xs text-tp-muted font-bold uppercase tracking-wider"></span>
-                            <button onclick="saveWeek()" class="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-lg bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors">
-                                <i data-lucide="save" class="w-3.5 h-3.5"></i> Salva
+                <!-- RIGHT COLUMN: Diario (col-span-7) -->
+                <div class="lg:col-span-7 flex flex-col gap-4">
+                    <h2 class="text-sm font-bold uppercase tracking-widest text-[#848d97] border-b border-[#252932] pb-2 mb-2 flex items-center gap-2">
+                        <i data-lucide="book" class="w-4 h-4"></i> Diario
+                    </h2>
+                    <div id="appunti-list" class="space-y-2"></div>
+                    <div class="flex flex-col gap-2 mt-2 bg-tp-panel border border-tp-border rounded-xl p-4">
+                        <div class="flex gap-2 items-start">
+                            <input id="appunto-ora" type="datetime-local" class="bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[190px] flex-shrink-0"/>
+                            <textarea id="appunto-testo" rows="2" class="flex-1 bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Appunto, insight, osservazione..." oninput="this.style.height='';this.style.height=this.scrollHeight+'px'"></textarea>
+                            <button type="button" onclick="addAppunto()" class="px-4 py-2 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 hover:bg-tp-accent/20 uppercase transition-all flex items-center gap-2 flex-shrink-0">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Aggiorna
                             </button>
                         </div>
-                    </div>
-
-                    <!-- Stats Box -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-tp-panel border border-tp-border rounded-xl p-5 text-center">
-                            <span class="text-[10px] text-tp-muted font-bold uppercase tracking-widest">Win Rate</span>
-                            <p id="stat-winrate" class="text-3xl font-black text-white mt-1">--</p>
+                        <!-- Tag row -->
+                        <div class="flex flex-wrap gap-1.5 items-center">
+                            <span class="text-[10px] text-tp-muted font-bold uppercase tracking-wider mr-1">Tag:</span>
+                            <div id="appunto-tags-row" class="flex flex-wrap gap-1.5 items-center"></div>
+                            <div class="flex items-center gap-1 ml-1">
+                                <input id="appunto-tag-custom" type="text" placeholder="+ nuovo" maxlength="24"
+                                    class="bg-[#0a0c10] border border-tp-border/60 rounded px-2 py-0.5 text-[11px] text-tp-text/80 outline-none focus:border-tp-accent transition-colors w-[90px]"
+                                    onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomTag();}"/>
+                            </div>
                         </div>
-                        <div class="bg-tp-panel border border-tp-border rounded-xl p-5 text-center">
-                            <span class="text-[10px] text-tp-muted font-bold uppercase tracking-widest">Net Profit</span>
-                            <p id="stat-profit" class="text-3xl font-black text-tp-accent mt-1">--</p>
-                        </div>
-                    </div>
-
-                    <!-- Review textarea -->
-                    <div class="bg-tp-panel border border-tp-border rounded-xl p-5 shadow-lg flex flex-col">
-                        <h3 class="text-[11px] font-bold uppercase tracking-widest text-tp-accent mb-3 flex items-center gap-2">
-                            <i data-lucide="thumbs-up" class="w-3.5 h-3.5"></i> Cosa ha funzionato / <span class="text-tp-loss">Cosa devo smettere di fare</span>
-                        </h3>
-                        <textarea id="review" class="w-full bg-[#0a0c10] border border-transparent rounded-lg p-3 text-sm text-tp-text/90 resize-none outline-none focus:border-tp-accent/50 transition-colors" style="min-height:200px" placeholder="Scrivi le tue osservazioni sulla settimana: cosa ha funzionato bene, errori da evitare, pattern ricorrenti..."></textarea>
-                    </div>
-
-                    <!-- Next week textarea -->
-                    <div class="bg-[#0a0c10] border border-tp-border rounded-xl p-5 shadow-inner flex flex-col">
-                        <h3 class="text-[11px] font-bold uppercase tracking-widest text-tp-warning mb-3 flex items-center gap-2">
-                            <i data-lucide="globe-2" class="w-3.5 h-3.5"></i> Commenti per la settimana successiva
-                        </h3>
-                        <textarea id="next-week" class="w-full bg-transparent border-none p-2 text-sm text-tp-text resize-none outline-none focus:ring-0" style="min-height:150px" placeholder="Che sentiment percepisci per la prossima settimana? Livelli macro, eventi importanti, piano operativo..."></textarea>
                     </div>
                 </div>
 
@@ -278,6 +290,9 @@
     <script>
     let weekId = null;
     let weekData = null;
+    let appunti = [];
+    const PRESET_TAGS = ['strategia','mindset','claude','io','vantaggio','fvg','bug'];
+    let newAppuntoTags = [];
 
     const DAY_NAMES = ['Domenica', 'Lunedi', 'Martedi', 'Mercoledi', 'Giovedi', 'Venerdi', 'Sabato'];
 
@@ -292,7 +307,6 @@
         return new Date(d).toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' });
     }
 
-    // Generate all weekdays (Mon-Fri) between data_inizio and data_fine
     function getWeekDays(dataInizio, dataFine) {
         const days = [];
         const start = new Date(dataInizio + 'T00:00:00');
@@ -316,6 +330,110 @@
         return { icon: 'frown', color: 'text-tp-loss' };
     }
 
+    function switchDayTab(dateStr) {
+        document.querySelectorAll('.day-tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.day-pane').forEach(p => p.classList.remove('active'));
+        const tab = document.getElementById('day-tab-' + dateStr);
+        const pane = document.getElementById('day-pane-' + dateStr);
+        if (tab) tab.classList.add('active');
+        if (pane) pane.classList.add('active');
+    }
+
+    function escHtml(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function renderTagRow() {
+        const row = document.getElementById('appunto-tags-row');
+        if (!row) return;
+        const allTags = [...new Set([...PRESET_TAGS, ...newAppuntoTags])];
+        row.innerHTML = allTags.map(t => {
+            const active = newAppuntoTags.includes(t);
+            return `<button type="button" onclick="toggleAppuntoTag('${escHtml(t)}')"
+                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors ${active
+                    ? 'bg-tp-accent/10 border-tp-accent/30 text-tp-accent'
+                    : 'bg-tp-panel border-tp-border text-tp-muted hover:border-tp-accent/40 hover:text-white'}">${escHtml(t)}</button>`;
+        }).join('');
+    }
+
+    function toggleAppuntoTag(tag) {
+        const idx = newAppuntoTags.indexOf(tag);
+        if (idx >= 0) newAppuntoTags.splice(idx, 1);
+        else newAppuntoTags.push(tag);
+        renderTagRow();
+    }
+
+    function addCustomTag() {
+        const el = document.getElementById('appunto-tag-custom');
+        const val = (el.value || '').trim().toLowerCase();
+        if (!val) return;
+        if (!newAppuntoTags.includes(val)) newAppuntoTags.push(val);
+        el.value = '';
+        renderTagRow();
+    }
+
+    function formatAppuntoOra(raw) {
+        if (!raw) return '--';
+        // raw può essere "2026-06-05T09:30" o "HH:MM" (legacy)
+        if (raw.includes('T')) {
+            const d = new Date(raw);
+            return d.toLocaleDateString('it-IT', { day: '2-digit', month: 'short' }) + ' ' +
+                   d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', hour12: false });
+        }
+        return raw;
+    }
+
+    function renderAppunti() {
+        const list = document.getElementById('appunti-list');
+        if (!list) return;
+        if (!appunti.length) {
+            list.innerHTML = `<p class="text-xs text-tp-muted/60 italic">Nessun appunto ancora.</p>`;
+            return;
+        }
+        list.innerHTML = appunti.map((a, i) => {
+            const tagsHtml = (a.tags && a.tags.length)
+                ? `<div class="flex flex-wrap gap-1.5 mt-2">${a.tags.map(t => `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-tp-accent/10 border border-tp-accent/30 text-tp-accent text-xs font-bold">${escHtml(t)}</span>`).join('')}</div>`
+                : '';
+            return `
+            <div class="flex items-start gap-3 bg-tp-panel border border-tp-border rounded-lg px-4 py-3">
+                <span class="text-[11px] font-bold text-tp-accent/80 shrink-0 mt-0.5 font-mono whitespace-nowrap">${escHtml(formatAppuntoOra(a.ora))}</span>
+                <div class="flex-1">
+                    <p class="text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escHtml(a.testo)}</p>
+                    ${tagsHtml}
+                </div>
+                <button type="button" onclick="removeAppunto(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors flex-shrink-0 mt-0.5" title="Rimuovi">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+            </div>`;
+        }).join('');
+        lucide.createIcons();
+    }
+
+    async function addAppunto() {
+        const ora = (document.getElementById('appunto-ora').value || '').trim();
+        const testoEl = document.getElementById('appunto-testo');
+        const testo = (testoEl.value || '').trim();
+        if (!testo) return;
+        appunti.push({ ora, testo, tags: [...newAppuntoTags] });
+        appunti.sort((a, b) => (a.ora || '').localeCompare(b.ora || ''));
+        testoEl.value = '';
+        testoEl.style.height = '';
+        newAppuntoTags = [];
+        renderTagRow();
+        renderAppunti();
+        await db.from('settimane').update({ appunti }).eq('id', weekId);
+    }
+
+    async function removeAppunto(i) {
+        const removed = appunti.splice(i, 1)[0];
+        renderAppunti();
+        const { error } = await db.from('settimane').update({ appunti }).eq('id', weekId);
+        if (error) {
+            appunti.splice(i, 0, removed);
+            renderAppunti();
+        }
+    }
+
     async function loadPage() {
         const params = new URLSearchParams(window.location.search);
         weekId = params.get('id');
@@ -333,18 +451,27 @@
 
         const weekNum = getWeekNumber(week.data_inizio);
         document.getElementById('page-global-title').textContent = `Review: Settimana ${weekNum}`;
-        document.getElementById('week-title').textContent = `Week ${weekNum} | ${formatDate(week.data_inizio)} - ${formatDate(week.data_fine)}`;
+        document.getElementById('week-title').textContent = `Settimana ${weekNum}  ·  ${formatDate(week.data_inizio)} – ${formatDate(week.data_fine)}`;
         document.title = `Trade Desk - Review Settimana ${weekNum}`;
 
-        // Populate textareas
         document.getElementById('review').value = week.review || '';
         document.getElementById('next-week').value = week.note || '';
 
-        // Load giornate for this week
+        appunti = Array.isArray(week.appunti) ? week.appunti.slice() : [];
+        const now = new Date();
+        const pad = n => String(n).padStart(2,'0');
+        document.getElementById('appunto-ora').value = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        renderAppunti();
+        renderTagRow();
+
+        // Load giornate: +1 giorno prima per avere note_domani di ieri
+        const prevDayDate = new Date(week.data_inizio + 'T00:00:00');
+        prevDayDate.setDate(prevDayDate.getDate() - 1);
+        const prevDayStr = prevDayDate.toISOString().slice(0, 10);
         const { data: giornate } = await db
             .from('giornate')
             .select('*')
-            .gte('data', week.data_inizio)
+            .gte('data', prevDayStr)
             .lte('data', week.data_fine)
             .order('data', { ascending: true });
 
@@ -375,85 +502,99 @@
         const winRate = (wins + losses) > 0 ? Math.round((wins / (wins + losses)) * 100) : null;
         const netProfit = allTrades.reduce((sum, t) => sum + (parseFloat(t.pnl) || 0), 0);
 
-        // Update stats
-        document.getElementById('stat-winrate').textContent = winRate !== null ? winRate + '%' : '--';
-        const profitEl = document.getElementById('stat-profit');
-        if (totalTrades > 0) {
-            const sign = netProfit > 0 ? '+ ' : netProfit < 0 ? '- ' : '';
-            profitEl.textContent = `${sign}$${Math.abs(netProfit).toFixed(2)}`;
-            profitEl.className = `text-3xl font-black mt-1 ${netProfit > 0 ? 'text-tp-accent' : netProfit < 0 ? 'text-tp-loss' : 'text-tp-muted'}`;
-        }
-
-        // Nota: l'header winrate e gestito globalmente da app.js (updateHeaderWinRate) e deve mostrare sempre il totale.
-
-        // Render days
+        // Render days as tabs
         const weekDays = getWeekDays(week.data_inizio, week.data_fine);
-        const daysList = document.getElementById('days-list');
-        let daysHtml = '';
+        const DAY_SHORT = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+        let tabsHtml = '', panesHtml = '';
+        const firstDay = weekDays[0];
 
         for (const dateStr of weekDays) {
             const giornata = giornateMap[dateStr];
             const dayTrades = tradesMap[dateStr] || [];
             const dt = new Date(dateStr + 'T00:00:00');
             const dayName = DAY_NAMES[dt.getDay()];
+            const shortName = DAY_SHORT[dt.getDay()];
             const dayNum = dt.getDate();
+            const isActive = dateStr === firstDay;
 
             const tp = dayTrades.filter(t => t.esito === 'win').length;
             const sl = dayTrades.filter(t => t.esito === 'loss').length;
             const dayPnl = dayTrades.reduce((s, t) => s + (parseFloat(t.pnl) || 0), 0);
 
+            // dot indicator on tab
+            let dot = '';
+            if (giornata && dayTrades.length > 0) {
+                const dc = dayPnl > 0 ? 'bg-tp-accent' : dayPnl < 0 ? 'bg-tp-loss' : 'bg-tp-muted';
+                dot = `<span class="w-1.5 h-1.5 rounded-full ${dc} inline-block"></span>`;
+            }
+            tabsHtml += `<button onclick="switchDayTab('${dateStr}')" id="day-tab-${dateStr}"
+                class="day-tab ${isActive ? 'active' : ''} px-3 py-2 rounded-t-lg text-xs font-bold border border-b-0 uppercase transition-all flex items-center gap-1.5">
+                ${shortName} ${dayNum} ${dot}
+            </button>`;
+
+            // pane content
             if (giornata) {
                 const ms = mindsetIcon(giornata.mindset);
                 const pnlColor = dayPnl > 0 ? 'text-tp-accent' : dayPnl < 0 ? 'text-tp-loss' : 'text-tp-muted';
                 const pnlSign = dayPnl > 0 ? '+ ' : dayPnl < 0 ? '- ' : '';
-                const pnlText = dayTrades.length > 0 ? `${pnlSign}$${Math.abs(dayPnl).toFixed(2)}` : '$0.00';
+                const pnlText = dayTrades.length > 0 ? `${pnlSign}$${Math.abs(dayPnl).toFixed(2)}` : '--';
 
-                const hasBestDay = dayPnl > 0 && dayPnl === Math.max(...weekDays.map(d => (tradesMap[d] || []).reduce((s, t) => s + (parseFloat(t.pnl) || 0), 0)));
+                // fajr badge
+                const fajrBadge = giornata.fajr === true
+                    ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-tp-accent/10 border border-tp-accent/30 text-tp-accent text-xs font-bold"><i data-lucide="check" class="w-3 h-3"></i> Fajr</span>`
+                    : giornata.fajr === false
+                    ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-tp-loss/10 border border-tp-loss/30 text-tp-loss text-xs font-bold"><i data-lucide="x" class="w-3 h-3"></i> Fajr</span>`
+                    : `<span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-tp-panel border border-tp-border text-tp-muted text-xs font-bold">-- Fajr</span>`;
 
-                const borderClass = hasBestDay ? 'border-tp-accent/50' : 'border-tp-border';
-                const accentBar = hasBestDay ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-tp-accent"></div>' : '';
-                const paddingLeft = hasBestDay ? 'pl-2' : '';
+                // commenti ieri (note_domani del giorno precedente)
+                const prevDt2 = new Date(dateStr + 'T00:00:00');
+                prevDt2.setDate(prevDt2.getDate() - 1);
+                const prevKey = prevDt2.toISOString().slice(0, 10);
+                const commentiIeri = giornateMap[prevKey]?.note_domani || '';
+                const commentiDomani = giornata.note_domani || '';
 
-                daysHtml += `
-                <div onclick="window.location.href='dettaglio_giornata.html?id=${giornata.id}'"
-                     class="bg-tp-panel border ${borderClass} rounded-lg p-4 flex items-center justify-between shadow-sm cursor-pointer hover:border-tp-accent/30 transition-all relative overflow-hidden">
-                    ${accentBar}
-                    <div class="flex items-center gap-4 ${paddingLeft}">
-                        <div class="w-10 h-10 rounded-full bg-[#0a0c10] border border-tp-border flex items-center justify-center">
-                            <i data-lucide="${ms.icon}" class="w-6 h-6 ${ms.color}"></i>
+                panesHtml += `<div id="day-pane-${dateStr}" class="day-pane ${isActive ? 'active' : ''} p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-[#0a0c10] border border-tp-border flex items-center justify-center">
+                                <i data-lucide="${ms.icon}" class="w-5 h-5 ${ms.color}"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">${dayName} ${dayNum}</h4>
+                                <span class="text-[10px] text-tp-muted font-bold uppercase tracking-wider">${dateStr}</span>
+                            </div>
                         </div>
-                        <div>
-                            <h4 class="font-bold text-white text-sm">${dayName} ${dayNum}</h4>
-                            <span class="text-[10px] uppercase text-tp-muted font-bold tracking-widest">${dateStr}</span>
-                        </div>
+                        <a href="dettaglio_giornata.html?id=${giornata.id}" class="flex items-center gap-1.5 text-[10px] font-bold px-3 py-1.5 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-white hover:border-tp-accent/50 transition-colors">
+                            <i data-lucide="external-link" class="w-3 h-3"></i> Dettaglio
+                        </a>
                     </div>
-                    <div class="flex items-center gap-6">
-                        <div class="flex gap-2">
-                            <span class="${tp > 0 ? 'bg-tp-accent/20 text-tp-accent border-tp-accent/20' : 'bg-tp-bg text-tp-text border-tp-border'} border text-[10px] font-bold px-2 py-0.5 rounded">${tp} TP</span>
-                            <span class="${sl > 0 ? 'bg-tp-loss/10 text-tp-loss border-tp-loss/20' : 'bg-tp-bg text-tp-text border-tp-border'} border text-[10px] font-bold px-2 py-0.5 rounded">${sl} SL</span>
-                        </div>
-                        <span class="font-bold ${pnlColor} w-20 text-right">${pnlText}</span>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        ${fajrBadge}
+                        <span class="${tp > 0 ? 'bg-tp-accent/20 text-tp-accent border-tp-accent/20' : 'bg-tp-bg text-tp-text border-tp-border'} border text-[10px] font-bold px-2 py-1 rounded-lg">${tp} TP</span>
+                        <span class="${sl > 0 ? 'bg-tp-loss/10 text-tp-loss border-tp-loss/20' : 'bg-tp-bg text-tp-text border-tp-border'} border text-[10px] font-bold px-2 py-1 rounded-lg">${sl} SL</span>
+                        <span class="font-bold ${pnlColor} ml-auto text-sm">${pnlText}</span>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-tp-muted font-bold uppercase tracking-wider mb-1">Ieri per oggi</p>
+                        <p class="text-sm text-tp-text/80 leading-relaxed bg-[#0a0c10] rounded-lg px-3 py-2 min-h-[36px]">${escHtml(commentiIeri) || '<span class="text-tp-muted/40 italic">--</span>'}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-tp-muted font-bold uppercase tracking-wider mb-1">Oggi per domani</p>
+                        <p class="text-sm text-tp-text/80 leading-relaxed bg-[#0a0c10] rounded-lg px-3 py-2 min-h-[36px]">${escHtml(commentiDomani) || '<span class="text-tp-muted/40 italic">--</span>'}</p>
                     </div>
                 </div>`;
             } else {
-                // Empty placeholder day
-                daysHtml += `
-                <div class="bg-tp-panel/50 border border-tp-border/50 border-dashed rounded-lg p-4 flex items-center justify-between opacity-50">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-full bg-[#0a0c10] border border-tp-border/50 flex items-center justify-center">
-                            <i data-lucide="minus" class="w-6 h-6 text-tp-muted"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-tp-muted text-sm">${dayName} ${dayNum}</h4>
-                            <span class="text-[10px] uppercase text-tp-muted/60 font-bold tracking-widest">Nessuna giornata</span>
-                        </div>
+                panesHtml += `<div id="day-pane-${dateStr}" class="day-pane ${isActive ? 'active' : ''} p-5">
+                    <div class="flex flex-col items-center justify-center h-28 text-tp-muted/40">
+                        <i data-lucide="minus" class="w-8 h-8 mb-2"></i>
+                        <span class="text-xs font-bold uppercase tracking-wider">Nessuna giornata</span>
                     </div>
-                    <span class="text-tp-muted text-xs font-bold">--</span>
                 </div>`;
             }
         }
 
-        daysList.innerHTML = daysHtml;
+        document.getElementById('day-tabs').innerHTML = tabsHtml;
+        document.getElementById('day-panes').innerHTML = panesHtml;
         lucide.createIcons();
     }
 
