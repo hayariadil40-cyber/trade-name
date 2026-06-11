@@ -174,6 +174,82 @@
         let localChanges   = {};
         const AGG_POS = ['sopra','dentro','sotto'];
         let aggDirs        = { asia: '', london: '', newyork: '' };
+
+        const SESSION_RANGES = {
+            asia:     { start: '01:00', end: '06:00' },
+            london:   { start: '06:00', end: '14:30' },
+            newyork:  { start: '14:30', end: '22:00' },
+        };
+
+        async function drawSessionMiniChart(nome, date, coin) {
+            const cv = document.getElementById('mini-chart-' + nome);
+            if (!cv || cv.classList.contains('hidden')) return;
+            const dpr = window.devicePixelRatio || 1;
+            const W = cv.clientWidth, H = cv.clientHeight;
+            if (!W || !H) return;
+            cv.width = W * dpr; cv.height = H * dpr;
+            const ctx = cv.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, W, H);
+
+            const range = SESSION_RANGES[nome];
+            if (!range) return;
+            const startTs = `${date}T${range.start}:00Z`;
+            const endTs   = `${date}T${range.end}:00Z`;
+
+            const { data: candles } = await db.from('candles_15m')
+                .select('ts, open, high, low, close')
+                .eq('coin', coin)
+                .gte('ts', startTs)
+                .lt('ts', endTs)
+                .order('ts', { ascending: true });
+
+            if (!candles || candles.length === 0) {
+                ctx.fillStyle = '#454e5a';
+                ctx.font = `${Math.max(9, Math.round(H * 0.11))}px Inter, sans-serif`;
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('Nessun dato · ' + coin, W / 2, H / 2);
+                return;
+            }
+
+            const padL = 4, padR = 4, padT = 6, padB = 16;
+            const x0 = padL, x1 = W - padR, y0 = padT, y1 = H - padB;
+            const t0ms = new Date(startTs).getTime();
+            const t1ms = new Date(endTs).getTime();
+            function pxX(ms) { return x0 + (ms - t0ms) / (t1ms - t0ms) * (x1 - x0); }
+
+            let lo = 1e9, hi = 0;
+            candles.forEach(function(c) { lo = Math.min(lo, parseFloat(c.low)); hi = Math.max(hi, parseFloat(c.high)); });
+            const pp = Math.max((hi - lo) * 0.06, 0.0001);
+            const yMin = lo - pp, yMax = hi + pp;
+            function pxY(p) { return y1 - (p - yMin) / (yMax - yMin) * (y1 - y0); }
+
+            const slotMs = 15 * 60 * 1000;
+            const slotPx = (x1 - x0) / ((t1ms - t0ms) / slotMs);
+            const cw = Math.max(1.5, slotPx * 0.65);
+
+            candles.forEach(function(c) {
+                const tMs = new Date(c.ts).getTime();
+                const xMid = pxX(tMs + slotMs / 2);
+                const o = parseFloat(c.open), h = parseFloat(c.high),
+                      l = parseFloat(c.low), cl = parseFloat(c.close);
+                const bull = cl >= o;
+                const col  = bull ? '#20c997' : '#f43f5e';
+                ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.setLineDash([]);
+                ctx.beginPath(); ctx.moveTo(xMid, pxY(h)); ctx.lineTo(xMid, pxY(l)); ctx.stroke();
+                ctx.fillStyle = bull ? 'rgba(32,201,151,0.85)' : 'rgba(244,63,94,0.85)';
+                const bTop = pxY(Math.max(o, cl));
+                ctx.fillRect(xMid - cw / 2, bTop, cw, Math.max(1, pxY(Math.min(o, cl)) - bTop));
+            });
+
+            ctx.fillStyle = '#3a4352';
+            ctx.font = '9px Inter, sans-serif';
+            ctx.textBaseline = 'top';
+            ctx.textAlign = 'left';  ctx.fillText(range.start + ' UTC', x0, y1 + 3);
+            ctx.textAlign = 'right'; ctx.fillText(range.end   + ' UTC', x1, y1 + 3);
+        }
         let pasteTarget    = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -296,22 +372,28 @@
             grid.innerHTML = SESSION_NAMES.map(n => buildPanel(n)).join('');
             lucide.createIcons();
 
-            // Screenshot: imposta img.src dopo innerHTML per evitare base64 enormi nel template
+            // Screenshot / mini-chart: mostra wrap se c'è screenshot, altrimenti canvas auto
             SESSION_NAMES.forEach(nome => {
-                const shot  = getAssetData(nome).screenshot || '';
-                const show  = shot.startsWith('http') || (shot.startsWith('data:') && nome === 'newyork');
-                const wrap  = document.getElementById('shot-wrap-'  + nome);
-                const img   = document.getElementById('shot-img-'   + nome);
-                const empty = document.getElementById('shot-empty-' + nome);
-                const del   = document.getElementById('shot-del-'   + nome);
-                if (show && shot && wrap && img) {
+                const shot = getAssetData(nome).screenshot || '';
+                const show = shot.startsWith('http') || shot.startsWith('data:');
+                const wrap = document.getElementById('shot-wrap-'    + nome);
+                const img  = document.getElementById('shot-img-'     + nome);
+                const del  = document.getElementById('shot-del-'     + nome);
+                const mc   = document.getElementById('mini-chart-'   + nome);
+                if (show && wrap && img) {
                     img.src = shot;
                     wrap.classList.remove('hidden');
-                    if (empty) empty.classList.add('hidden');
+                    if (mc) mc.classList.add('hidden');
                     if (del) del.classList.remove('hidden');
                 } else {
+                    if (wrap) wrap.classList.add('hidden');
+                    if (mc) mc.classList.remove('hidden');
                     if (del) del.classList.add('hidden');
                 }
+            });
+            // Disegna mini-chart con RAF per garantire che il layout sia calcolato
+            requestAnimationFrame(function() {
+                SESSION_NAMES.forEach(nome => drawSessionMiniChart(nome, currentDateStr, activeAsset));
             });
 
             computeAllRanges();
@@ -370,10 +452,7 @@
                                     <span class="text-[10px] text-white font-bold uppercase tracking-wider">Cambia</span>
                                 </div>
                             </div>
-                            <div id="shot-empty-${nome}" class="rounded-lg border-2 border-dashed border-tp-border/40 flex flex-col items-center justify-center gap-1.5 hover:border-tp-accent/40 transition-colors" style="aspect-ratio:16/9">
-                                <i data-lucide="image-plus" class="w-5 h-5 text-tp-muted/30"></i>
-                                <span class="text-[9px] font-bold uppercase tracking-wider text-tp-muted/30">Screenshot</span>
-                            </div>
+                            <canvas id="mini-chart-${nome}" class="rounded-lg border border-tp-border/30 block w-full" style="aspect-ratio:16/9; background:#0d1117"></canvas>
                         </label>
                         <button onclick="deleteScreenshot('${nome}');event.stopPropagation()"
                             class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/70 text-white items-center justify-center opacity-0 group-hover/shot:opacity-100 transition-opacity hidden"
