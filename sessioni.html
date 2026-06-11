@@ -175,10 +175,10 @@
         const AGG_POS = ['sopra','dentro','sotto'];
         let aggDirs        = { asia: '', london: '', newyork: '' };
 
-        const SESSION_RANGES = {
-            asia:     { start: '01:00', end: '06:00' },
-            london:   { start: '06:00', end: '14:30' },
-            newyork:  { start: '14:30', end: '22:00' },
+        const SESSION_CONFIG = {
+            asia:    { start: '01:00', end: '06:00', ctxStart: '00:00', ctxEnd: '07:30', rgb: '201,162,39'  },
+            london:  { start: '06:00', end: '14:30', ctxStart: '04:45', ctxEnd: '16:00', rgb: '32,201,151'  },
+            newyork: { start: '14:30', end: '22:00', ctxStart: '13:00', ctxEnd: '23:45', rgb: '155,140,255' },
         };
 
         async function drawSessionMiniChart(nome, date, coin) {
@@ -194,19 +194,26 @@
             ctx.fillStyle = '#0d1117';
             ctx.fillRect(0, 0, W, H);
 
-            const range = SESSION_RANGES[nome];
-            if (!range) return;
-            const startTs = `${date}T${range.start}:00Z`;
-            const endTs   = `${date}T${range.end}:00Z`;
+            const cfg = SESSION_CONFIG[nome];
+            if (!cfg) return;
 
-            const { data: candles } = await db.from('candles_15m')
+            const loadStart = `${date}T${cfg.ctxStart}:00Z`;
+            const loadEnd   = `${date}T${cfg.ctxEnd}:00Z`;
+
+            const { data: rows } = await db.from('candles_15m')
                 .select('ts, open, high, low, close')
                 .eq('coin', coin)
-                .gte('ts', startTs)
-                .lt('ts', endTs)
+                .gte('ts', loadStart)
+                .lt('ts', loadEnd)
                 .order('ts', { ascending: true });
 
-            if (!candles || candles.length === 0) {
+            const candles = (rows || []).map(function(r) {
+                return { tMs: new Date(r.ts).getTime(),
+                    o: parseFloat(r.open), h: parseFloat(r.high),
+                    l: parseFloat(r.low),  c: parseFloat(r.close) };
+            });
+
+            if (candles.length === 0) {
                 ctx.fillStyle = '#454e5a';
                 ctx.font = `${Math.max(9, Math.round(H * 0.11))}px Inter, sans-serif`;
                 ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -214,41 +221,110 @@
                 return;
             }
 
-            const padL = 4, padR = 4, padT = 6, padB = 16;
+            const padL = 46, padR = 6, padT = 8, padB = 18;
             const x0 = padL, x1 = W - padR, y0 = padT, y1 = H - padB;
-            const t0ms = new Date(startTs).getTime();
-            const t1ms = new Date(endTs).getTime();
+
+            const t0ms = new Date(loadStart).getTime();
+            const t1ms = new Date(loadEnd).getTime();
             function pxX(ms) { return x0 + (ms - t0ms) / (t1ms - t0ms) * (x1 - x0); }
 
             let lo = 1e9, hi = 0;
-            candles.forEach(function(c) { lo = Math.min(lo, parseFloat(c.low)); hi = Math.max(hi, parseFloat(c.high)); });
+            candles.forEach(function(c) { lo = Math.min(lo, c.l); hi = Math.max(hi, c.h); });
             const pp = Math.max((hi - lo) * 0.06, 0.0001);
             const yMin = lo - pp, yMax = hi + pp;
             function pxY(p) { return y1 - (p - yMin) / (yMax - yMin) * (y1 - y0); }
 
+            // session range ms
+            const sesStartMs = new Date(`${date}T${cfg.start}:00Z`).getTime();
+            const sesEndMs   = new Date(`${date}T${cfg.end}:00Z`).getTime();
+            const sesCdl = candles.filter(function(c) { return c.tMs >= sesStartMs && c.tMs < sesEndMs; });
+            const sesLo  = sesCdl.length ? Math.min.apply(null, sesCdl.map(function(c){return c.l;})) : null;
+            const sesHi  = sesCdl.length ? Math.max.apply(null, sesCdl.map(function(c){return c.h;})) : null;
+            const sesAvg = sesCdl.length ? sesCdl.reduce(function(s,c){return s+(c.o+c.c)/2;},0)/sesCdl.length : null;
+
+            // price step for Y grid
+            const rawStep = (yMax - yMin) / 6;
+            const mag = Math.pow(10, Math.floor(Math.log10(rawStep || 1)));
+            const nn = rawStep / mag;
+            const stepY = mag * (nn < 1.5 ? 1 : nn < 3 ? 2 : nn < 7 ? 5 : 10);
+            const dec = stepY < 0.001 ? 5 : stepY < 0.01 ? 4 : stepY < 0.1 ? 3 : stepY < 1 ? 2 : stepY < 10 ? 1 : 0;
+
+            // --- Y grid + price labels ---
+            ctx.font = '9px Inter, sans-serif';
+            for (var p = Math.ceil(yMin / stepY) * stepY; p <= yMax + stepY * 0.01; p += stepY) {
+                var yg = pxY(p);
+                if (yg < y0 - 1 || yg > y1 + 1) continue;
+                ctx.strokeStyle = 'rgba(255,255,255,.04)'; ctx.lineWidth = 1; ctx.setLineDash([]);
+                ctx.beginPath(); ctx.moveTo(x0, yg); ctx.lineTo(x1, yg); ctx.stroke();
+                ctx.fillStyle = '#4a5568'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+                ctx.fillText(p.toFixed(dec), x0 - 4, yg);
+            }
+
+            // --- X grid + time labels ---
+            const durationH = (t1ms - t0ms) / 3600000;
+            const xIntervalH = durationH <= 9 ? 1 : 2;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillStyle = '#3a4352';
+            for (var hh = 0; hh <= 24; hh += xIntervalH) {
+                var xts = new Date(`${date}T${String(hh).padStart(2,'0')}:00:00Z`).getTime();
+                if (xts < t0ms || xts > t1ms) continue;
+                var xg2 = pxX(xts);
+                ctx.strokeStyle = 'rgba(255,255,255,.04)'; ctx.lineWidth = 1; ctx.setLineDash([]);
+                ctx.beginPath(); ctx.moveTo(xg2, y0); ctx.lineTo(xg2, y1); ctx.stroke();
+                ctx.fillText(String(hh).padStart(2,'0') + ':00', xg2, y1 + 3);
+            }
+
+            // --- session background + vertical delimiters ---
+            var sxL = pxX(sesStartMs), sxR = pxX(sesEndMs);
+            ctx.fillStyle = 'rgba(' + cfg.rgb + ',.06)';
+            ctx.fillRect(sxL, y0, sxR - sxL, y1 - y0);
+            ctx.strokeStyle = 'rgba(' + cfg.rgb + ',.3)'; ctx.lineWidth = 1; ctx.setLineDash([3,4]);
+            ctx.beginPath(); ctx.moveTo(sxL, y0); ctx.lineTo(sxL, y1); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(sxR, y0); ctx.lineTo(sxR, y1); ctx.stroke();
+            ctx.setLineDash([]);
+
+            // --- session H / L / avg lines (stile grafici.html drawSessionBox) ---
+            if (sesLo !== null) {
+                [
+                    { p: sesHi,  label: 'H '   + sesHi.toFixed(dec),  dash: [6,4], alpha: .7 },
+                    { p: sesLo,  label: 'L '   + sesLo.toFixed(dec),  dash: [6,4], alpha: .7 },
+                    { p: sesAvg, label: 'avg ' + sesAvg.toFixed(dec), dash: [2,5], alpha: .4 },
+                ].forEach(function(ln) {
+                    var ly = pxY(ln.p);
+                    ctx.strokeStyle = 'rgba(' + cfg.rgb + ',' + ln.alpha + ')';
+                    ctx.setLineDash(ln.dash); ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.moveTo(sxL, ly); ctx.lineTo(x1, ly); ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = 'rgb(' + cfg.rgb + ')';
+                    ctx.font = '600 9px Inter, sans-serif';
+                    ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+                    ctx.fillText(ln.label, sxL + 3, ly - 1);
+                });
+                // range label top-right del box
+                var rng = sesHi - sesLo;
+                var rngStr = (rng >= 10 ? rng.toFixed(0) : rng.toFixed(dec)) + ' pt';
+                ctx.fillStyle = 'rgb(' + cfg.rgb + ')'; ctx.font = '600 9px Inter, sans-serif';
+                ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+                ctx.fillText(rngStr, sxR - 3, y0 + 2);
+            }
+
+            // --- candele ---
             const slotMs = 15 * 60 * 1000;
             const slotPx = (x1 - x0) / ((t1ms - t0ms) / slotMs);
             const cw = Math.max(1.5, slotPx * 0.65);
 
             candles.forEach(function(c) {
-                const tMs = new Date(c.ts).getTime();
-                const xMid = pxX(tMs + slotMs / 2);
-                const o = parseFloat(c.open), h = parseFloat(c.high),
-                      l = parseFloat(c.low), cl = parseFloat(c.close);
-                const bull = cl >= o;
-                const col  = bull ? '#20c997' : '#f43f5e';
+                var xMid = pxX(c.tMs + slotMs / 2);
+                var bull = c.c >= c.o;
+                var col  = bull ? '#20c997' : '#f43f5e';
+                var inSes = c.tMs >= sesStartMs && c.tMs < sesEndMs;
+                ctx.globalAlpha = inSes ? 1.0 : 0.35;
                 ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.setLineDash([]);
-                ctx.beginPath(); ctx.moveTo(xMid, pxY(h)); ctx.lineTo(xMid, pxY(l)); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(xMid, pxY(c.h)); ctx.lineTo(xMid, pxY(c.l)); ctx.stroke();
                 ctx.fillStyle = bull ? 'rgba(32,201,151,0.85)' : 'rgba(244,63,94,0.85)';
-                const bTop = pxY(Math.max(o, cl));
-                ctx.fillRect(xMid - cw / 2, bTop, cw, Math.max(1, pxY(Math.min(o, cl)) - bTop));
+                var bTop = pxY(Math.max(c.o, c.c));
+                ctx.fillRect(xMid - cw / 2, bTop, cw, Math.max(1, pxY(Math.min(c.o, c.c)) - bTop));
             });
-
-            ctx.fillStyle = '#3a4352';
-            ctx.font = '9px Inter, sans-serif';
-            ctx.textBaseline = 'top';
-            ctx.textAlign = 'left';  ctx.fillText(range.start + ' UTC', x0, y1 + 3);
-            ctx.textAlign = 'right'; ctx.fillText(range.end   + ' UTC', x1, y1 + 3);
+            ctx.globalAlpha = 1;
         }
         let pasteTarget    = null;
 
