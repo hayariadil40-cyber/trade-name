@@ -494,21 +494,45 @@
             asiaBox = null; londonBox = null; nyBox = null;
             drawChart();
             await Promise.all([loadCandles(), loadUsd(), loadNews(), loadBiasH4(), loadLiveH4(), loadSmile(), loadIpotesi(), loadFvg(), loadSoglie(), loadTrades(), loadVolatilita(), loadCompress()]);
-            // Candela in formazione: solo liveM15 (current slot).
-            // liveM15Prev rimosso: candles_15m + trigger sono autoritativi per i bar chiusi.
-            if (liveM15 && currentDate === new Date().toISOString().slice(0, 10)) {
-                var _liveNow = new Date();
-                var _liveM15 = Math.floor(_liveNow.getUTCMinutes() / 15) * 15;
-                var _ct = String(_liveNow.getUTCHours()).padStart(2,'0') + ':' + String(_liveM15).padStart(2,'0');
-                candles = candles.filter(function(c) { return c.t !== _ct; });
-                candles.push({ t: _ct, tMs: T(_ct), p: liveM15.p, h: liveM15.h, l: liveM15.l, o: liveM15.o, c: liveM15.c, faded: true });
-            }
-            candles.sort(function(a, b) { return a.tMs - b.tMs; });
+            applyLiveOverlay();
             buildAsiaBox(); buildLondonBox(); buildNyBox();
             drawChart();
             renderIpotesiCards();
             renderBiasViewers();
             renderSbilanciamentiPanel();
+        }
+
+        // Overlay live da watchlist: candela in formazione (slot corrente) +
+        // ultima candela chiusa come tappabuchi finché candles_15m non la scrive (~2 min di lag EA).
+        // Le candele overlay hanno faded=true; quelle ufficiali (faded=false) hanno sempre precedenza.
+        function applyLiveOverlay() {
+            candles = candles.filter(function(c) { return !c.faded; });
+            if (currentDate === new Date().toISOString().slice(0, 10)) {
+                var now = new Date();
+                var slotMin = Math.floor(now.getUTCMinutes() / 15) * 15;
+                var curT = String(now.getUTCHours()).padStart(2,'0') + ':' + String(slotMin).padStart(2,'0');
+                var prevD = new Date(now.getTime());
+                prevD.setUTCMinutes(slotMin - 15, 0, 0);
+                var prevT = String(prevD.getUTCHours()).padStart(2,'0') + ':' + String(prevD.getUTCMinutes()).padStart(2,'0');
+                var prevSameDay = prevD.toISOString().slice(0, 10) === currentDate;
+                if (liveM15Prev && prevSameDay && !candles.some(function(c) { return c.t === prevT; })) {
+                    candles.push({ t: prevT, tMs: T(prevT), p: liveM15Prev.c, h: liveM15Prev.h, l: liveM15Prev.l, o: liveM15Prev.o, c: liveM15Prev.c, faded: true });
+                }
+                if (liveM15 && !candles.some(function(c) { return c.t === curT; })) {
+                    candles.push({ t: curT, tMs: T(curT), p: liveM15.p, h: liveM15.h, l: liveM15.l, o: liveM15.o, c: liveM15.c, faded: true });
+                }
+            }
+            candles.sort(function(a, b) { return a.tMs - b.tMs; });
+        }
+
+        // Refresh leggero: solo watchlist (1 riga) ogni 20s — la candela live e il
+        // tappabuchi restano freschi senza ricaricare tutti i layer.
+        async function refreshLive() {
+            if (currentDate !== new Date().toISOString().slice(0, 10)) return;
+            await loadLiveH4();
+            applyLiveOverlay();
+            buildAsiaBox(); buildLondonBox(); buildNyBox();
+            drawChart();
         }
 
         function buildSessionBox(startSlot, endSlot) {
@@ -1915,6 +1939,8 @@
         setInterval(function() {
             if (currentDate === new Date().toISOString().slice(0, 10)) loadData();
         }, 5 * 60 * 1000);
+
+        setInterval(refreshLive, 20 * 1000);
     </script>
 </body>
 </html>
