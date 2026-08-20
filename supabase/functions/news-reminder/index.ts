@@ -113,7 +113,7 @@ serve(async (req) => {
       const ora = ev.ora_evento.substring(0, 5);
       const emoji = IMPACT_EMOJI[ev.impatto] || "⚪";
       const text =
-`${emoji} <b>${ev.titolo}</b> (${ev.valuta}) tra 5 min — ore ${ora}
+`${emoji} <b>${ev.titolo}</b> (${ev.valuta}) tra 5 min — ore ${ora} UTC
 
 Forecast: <b>${ev.valore_atteso || "n.d."}</b>
 Precedente: ${ev.valore_precedente || "n.d."}

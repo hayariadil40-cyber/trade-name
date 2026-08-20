@@ -104,7 +104,7 @@
             transform: scale(1);
         }
 
-        /* Dashboard hero tabs (Corano / ODG / Processi) */
+        /* Dashboard hero tabs (ODG / Processi) */
         .dash-tab.active { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
         .dash-tab:not(.active) { background: transparent; border-color: #252932; color: #848d97; }
         .dash-tab:not(.active):hover { color: #ffffff; border-color: #3b4252; }
@@ -132,7 +132,6 @@
     <script src="supabase-config.js"></script>
     <script src="settings.js"></script>
     <script src="auth.js"></script>
-    <script src="corano.js"></script>
 </head>
 
 <body class="bg-tp-bg text-tp-text font-sans h-screen w-screen flex overflow-hidden">
@@ -209,9 +208,7 @@
 
             <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
 
-            <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Peter</span></a>
 
-            <a href="steve.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Steve</span></a>
 
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
 
@@ -340,61 +337,16 @@
                         <!-- Dati aggiornati automaticamente da n8n ogni 5 min -->
                     </div>
 
-                    <!-- Box 2: I Nomi di Allah (3 al giorno) -->
-                    <div
-                        class="bg-gradient-to-br from-[#161920] to-[#0a0c10] rounded-xl border border-[#20c997]/20 p-5 flex-1 min-h-[300px] shadow-[0_0_15px_rgba(32,201,151,0.05)] relative overflow-hidden group">
-                        <div
-                            class="absolute -right-6 -top-6 opacity-10 rotate-12 transform group-hover:rotate-6 transition-transform duration-700 pointer-events-none">
-                            <span id="allah-bg-text" class="text-[10rem] font-display text-white">&#1575;&#1604;&#1604;&#1607;</span>
-                        </div>
-                        <div class="flex items-center justify-between mb-4 border-b border-tp-border/50 pb-3 relative z-10">
-                            <h3 class="text-xs font-bold uppercase tracking-widest text-[#20c997]">I Nomi di Allah</h3>
-                            <span class="text-[9px] text-tp-muted/70 uppercase tracking-wider font-bold">Oggi · 3</span>
-                        </div>
-
-                        <!-- Nome 1 -->
-                        <div class="relative z-10 mb-5">
-                            <p id="allah-index" class="text-tp-muted text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Nome 1/3 (1/99)</p>
-                            <h2 id="allah-title" class="text-3xl md:text-4xl font-bold font-display text-white tracking-tight">Ar-Rahman</h2>
-                            <p id="allah-translation" class="text-base text-tp-accent italic font-serif opacity-90 mt-1">Il Compassionevole</p>
-                            <p id="allah-desc" class="text-xs text-tp-text/80 leading-relaxed italic border-l-2 border-tp-border pl-3 mt-3">
-                                Colui la cui misericordia abbraccia incondizionatamente ogni cosa creata nell'universo.
-                            </p>
-                        </div>
-
-                        <!-- Nome 2 -->
-                        <div class="relative z-10 mb-5 border-t border-tp-border/40 pt-4">
-                            <p id="allah-index-2" class="text-tp-muted text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Nome 2/3 (2/99)</p>
-                            <h2 id="allah-title-2" class="text-3xl md:text-4xl font-bold font-display text-white tracking-tight">Ar-Rahim</h2>
-                            <p id="allah-translation-2" class="text-base text-tp-accent italic font-serif opacity-90 mt-1">Il Misericordioso</p>
-                            <p id="allah-desc-2" class="text-xs text-tp-text/80 leading-relaxed italic border-l-2 border-tp-border pl-3 mt-3">
-                                Colui che elargisce misericordia costante e specifica ai Suoi servi devoti.
-                            </p>
-                        </div>
-
-                        <!-- Nome 3 -->
-                        <div class="relative z-10 border-t border-tp-border/40 pt-4">
-                            <p id="allah-index-3" class="text-tp-muted text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Nome 3/3 (3/99)</p>
-                            <h2 id="allah-title-3" class="text-3xl md:text-4xl font-bold font-display text-white tracking-tight">Al-Malik</h2>
-                            <p id="allah-translation-3" class="text-base text-tp-accent italic font-serif opacity-90 mt-1">Il Sovrano</p>
-                            <p id="allah-desc-3" class="text-xs text-tp-text/80 leading-relaxed italic border-l-2 border-tp-border pl-3 mt-3">
-                                L'Assoluto detentore della sovranita su ogni reame visibile e invisibile.
-                            </p>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- /// CENTER COLUMN (Col Span: 6) /// -->
                 <div class="xl:col-span-6 flex flex-col gap-6">
 
-                    <!-- Box 3: Hub a tab — Corano / Ordine del Giorno / Processi Attivi -->
+                    <!-- Box 3: Hub a tab — Ordine del Giorno / Processi Attivi -->
                     <div class="flex flex-col">
                         <!-- Tab strip -->
                         <div class="flex gap-2" id="dash-tabs">
-                            <button onclick="switchDashTab('corano')" id="dash-tab-corano" class="dash-tab active px-4 py-2 rounded-t-lg text-xs font-bold border border-b-0 uppercase transition-all flex items-center gap-2">
-                                <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Corano
-                            </button>
-                            <button onclick="switchDashTab('odg')" id="dash-tab-odg" class="dash-tab px-4 py-2 rounded-t-lg text-xs font-bold border border-b-0 uppercase transition-all flex items-center gap-2">
+                            <button onclick="switchDashTab('odg')" id="dash-tab-odg" class="dash-tab active px-4 py-2 rounded-t-lg text-xs font-bold border border-b-0 uppercase transition-all flex items-center gap-2">
                                 <i data-lucide="sunrise" class="w-3.5 h-3.5"></i> Ordine del Giorno
                             </button>
                             <button onclick="switchDashTab('processi')" id="dash-tab-processi" class="dash-tab px-4 py-2 rounded-t-lg text-xs font-bold border border-b-0 uppercase transition-all flex items-center gap-2">
@@ -407,15 +359,8 @@
                         <div class="bg-tp-panel border border-tp-border rounded-b-xl rounded-tr-xl shadow-lg min-h-[400px] relative overflow-hidden">
                             <div class="absolute inset-0 bg-gradient-to-br from-tp-accent/5 to-transparent pointer-events-none"></div>
 
-                            <!-- Pane: Corano -->
-                            <div id="dash-pane-corano" class="dash-pane active relative z-10 p-5">
-                                <div id="corano-widget">
-                                    <div class="text-xs text-tp-muted italic text-center py-4">Caricamento Corano...</div>
-                                </div>
-                            </div>
-
                             <!-- Pane: Ordine del Giorno -->
-                            <div id="dash-pane-odg" class="dash-pane relative z-10">
+                            <div id="dash-pane-odg" class="dash-pane active relative z-10">
                                 <div id="odg-hero">
                                     <div class="p-5 border-b border-tp-border/50 flex items-center justify-between">
                                         <div class="flex items-center gap-3">
@@ -573,142 +518,6 @@
     // ==========================================
     // DASHBOARD INLINE SCRIPTS
     // ==========================================
-
-    // --- 99 Nomi di Allah ---
-    const ALLAH_NAMES_99 = [
-        { trans: "Ar-Rahman", arab: "\u0627\u0644\u0631\u0651\u064E\u062D\u0652\u0645\u064E\u0646\u064F", meaning: "Il Compassionevole", desc: "Colui la cui misericordia abbraccia incondizionatamente ogni cosa creata, dal piu piccolo granello di sabbia alla piu vasta galassia. La Sua compassione precede ogni altra cosa ed e la fonte di ogni bene." },
-        { trans: "Ar-Rahim", arab: "\u0627\u0644\u0631\u0651\u064E\u062D\u0650\u064A\u0645\u064F", meaning: "Il Misericordioso", desc: "Colui che elargisce misericordia costante e specifica ai Suoi servi devoti. La Sua misericordia e un fiume inesauribile che scorre verso chi si volge a Lui con sincerita." },
-        { trans: "Al-Malik", arab: "\u0627\u0644\u0652\u0645\u064E\u0644\u0650\u0643\u064F", meaning: "Il Sovrano", desc: "L'Assoluto detentore della sovranita su ogni reame visibile e invisibile. Il Suo dominio e perfetto, senza rivali ne limiti, e tutto esiste sotto la Sua autorita." },
-        { trans: "Al-Quddus", arab: "\u0627\u0644\u0652\u0642\u064F\u062F\u0651\u064F\u0648\u0633\u064F", meaning: "Il Purissimo", desc: "Colui che e assolutamente puro e libero da ogni imperfezione, difetto o mancanza. La Sua santita trascende ogni comprensione umana ed e la fonte di ogni purificazione." },
-        { trans: "As-Salam", arab: "\u0627\u0644\u0633\u0651\u064E\u0644\u0627\u064E\u0645\u064F", meaning: "La Pace", desc: "La fonte di ogni pace e sicurezza. Colui che salva le Sue creature da ogni pericolo e imperfezione. Da Lui emana la serenita che pervade i cuori dei credenti." },
-        { trans: "Al-Mu'min", arab: "\u0627\u0644\u0652\u0645\u064F\u0624\u0652\u0645\u0650\u0646\u064F", meaning: "Il Garante della Fede", desc: "Colui che conferma la verita e dona sicurezza ai cuori. Egli e il custode della fede, che illumina le anime e protegge dalla falsita e dal dubbio." },
-        { trans: "Al-Muhaymin", arab: "\u0627\u0644\u0652\u0645\u064F\u0647\u064E\u064A\u0652\u0645\u0650\u0646\u064F", meaning: "Il Custode Vigilante", desc: "Colui che veglia su ogni cosa con attenzione assoluta. Nulla sfugge alla Sua osservazione, ed Egli protegge e preserva ogni creatura con cura infinita." },
-        { trans: "Al-Aziz", arab: "\u0627\u0644\u0652\u0639\u064E\u0632\u0650\u064A\u0632\u064F", meaning: "L'Eccelso in Potenza", desc: "Colui la cui potenza e invincibile e la cui dignita e ineguagliabile. Nessuna forza puo resistere alla Sua volonta, e la Sua gloria pervade l'intero creato." },
-        { trans: "Al-Jabbar", arab: "\u0627\u0644\u0652\u062C\u064E\u0628\u0651\u064E\u0627\u0631\u064F", meaning: "Il Riparatore Supremo", desc: "Colui che ripara cio che e spezzato e ristabilisce l'ordine. Egli risana i cuori afflitti e restaura cio che sembra irrimediabilmente perduto con la Sua potenza infinita." },
-        { trans: "Al-Mutakabbir", arab: "\u0627\u0644\u0652\u0645\u064F\u062A\u064E\u0643\u064E\u0628\u0651\u0650\u0631\u064F", meaning: "Il Supremo in Grandezza", desc: "Colui la cui grandezza trascende ogni immaginazione. Solo a Lui appartiene la vera grandezza, e ogni orgoglio nelle creature e un mero riflesso imperfetto della Sua maesta." },
-        { trans: "Al-Khaliq", arab: "\u0627\u0644\u0652\u062E\u064E\u0627\u0644\u0650\u0642\u064F", meaning: "Il Creatore", desc: "Colui che porta all'esistenza dal nulla con la Sua sola volonta. Ogni forma di vita, ogni stella e ogni atomo esistono grazie al Suo atto creativo originale." },
-        { trans: "Al-Bari'", arab: "\u0627\u0644\u0652\u0628\u064E\u0627\u0631\u0650\u0626\u064F", meaning: "Il Plasmatore dal Nulla", desc: "Colui che evolve e sviluppa le creature donando loro forma distinta e unica. Egli libera l'esistenza dal caos primordiale, plasmandola con ordine e bellezza." },
-        { trans: "Al-Musawwir", arab: "\u0627\u0644\u0652\u0645\u064F\u0635\u064E\u0648\u0651\u0650\u0631\u064F", meaning: "Il Modellatore delle Forme", desc: "Colui che da a ogni creatura la sua forma unica e irripetibile. Ogni volto, ogni foglia, ogni fiocco di neve porta l'impronta della Sua arte divina infinita." },
-        { trans: "Al-Ghaffar", arab: "\u0627\u0644\u0652\u063A\u064E\u0641\u0651\u064E\u0627\u0631\u064F", meaning: "Il Perdonatore", desc: "Colui che perdona ripetutamente e copre i peccati con il Suo velo di misericordia. La Sua capacita di perdonare non ha limiti e abbraccia ogni anima pentita." },
-        { trans: "Al-Qahhar", arab: "\u0627\u0644\u0652\u0642\u064E\u0647\u0651\u064E\u0627\u0631\u064F", meaning: "Il Dominatore Irresistibile", desc: "Colui che sottomette ogni cosa alla Sua volonta con potenza irresistibile. Nessuna forza nel creato puo opporsi al Suo decreto, e ogni tiranno e impotente davanti a Lui." },
-        { trans: "Al-Wahhab", arab: "\u0627\u0644\u0652\u0648\u064E\u0647\u0651\u064E\u0627\u0628\u064F", meaning: "Il Donatore Generoso", desc: "Colui che dona abbondantemente senza che Gli venga chiesto e senza aspettarsi ricompensa. I Suoi doni fluiscono incessantemente come pioggia benefica su tutta la creazione." },
-        { trans: "Ar-Razzaq", arab: "\u0627\u0644\u0631\u0651\u064E\u0632\u0651\u064E\u0627\u0642\u064F", meaning: "Il Provveditore", desc: "Colui che provvede il sostentamento a ogni creatura vivente, dalla formica nascosta alla balena negli abissi. Il Suo provvedere e garantito e non conosce esaurimento." },
-        { trans: "Al-Fattah", arab: "\u0627\u0644\u0652\u0641\u064E\u062A\u0651\u064E\u0627\u062D\u064F", meaning: "Colui che Apre", desc: "Colui che apre le porte della misericordia e della conoscenza. Egli rimuove gli ostacoli e dischiude i sentieri della comprensione a chi cerca con sincerita." },
-        { trans: "Al-'Alim", arab: "\u0627\u064E\u0644\u0652\u0639\u064E\u0644\u0650\u064A\u0652\u0645\u064F", meaning: "L'Onnisciente", desc: "Colui la cui conoscenza abbraccia ogni cosa, dal visibile all'invisibile, dal passato al futuro. Nulla e nascosto alla Sua sapienza, nemmeno il piu segreto pensiero." },
-        { trans: "Al-Qabid", arab: "\u0627\u0644\u0652\u0642\u064E\u0627\u0628\u0650\u0636\u064F", meaning: "Colui che Trattiene", desc: "Colui che contrae e trattiene per saggezza divina. Egli restringe il sostentamento o il cuore come prova, per poi espandere con generosita ancor piu grande." },
-        { trans: "Al-Basit", arab: "\u0627\u0644\u0652\u0628\u064E\u0627\u0633\u0650\u0637\u064F", meaning: "Colui che Espande", desc: "Colui che espande e allarga con generosita. Egli dilata i cuori con gioia e fede, e stende la Sua provvidenza su chi si rivolge a Lui con fiducia." },
-        { trans: "Al-Khafid", arab: "\u0627\u0644\u0652\u062E\u064E\u0627\u0641\u0650\u0636\u064F", meaning: "Colui che Abbassa", desc: "Colui che abbassa gli arroganti e i tiranni dalla loro posizione elevata. La Sua giustizia ristabilisce l'equilibrio e umilia chi si e innalzato ingiustamente." },
-        { trans: "Ar-Rafi'", arab: "\u0627\u0644\u0631\u0651\u064E\u0627\u0641\u0650\u0639\u064F", meaning: "Colui che Innalza", desc: "Colui che innalza i Suoi servi in rango e dignita. Egli eleva gli umili e i giusti, conferendo loro onore e stazione elevata presso di Se." },
-        { trans: "Al-Mu'izz", arab: "\u0627\u0644\u0652\u0645\u064F\u0639\u0650\u0632\u0651\u064F", meaning: "Il Datore di Onore", desc: "Colui che conferisce onore e dignita a chi vuole. L'onore vero proviene solo da Lui, e chi Egli onora non potra mai essere realmente umiliato." },
-        { trans: "Al-Mudhill", arab: "\u0627\u0644\u0652\u0645\u064F\u0630\u0650\u0644\u0651\u064F", meaning: "Colui che Umilia", desc: "Colui che toglie l'onore a chi persiste nella ribellione e nell'ingiustizia. Il Suo decreto porta umilta ai cuori induriti e giustizia dove regna l'oppressione." },
-        { trans: "As-Sami'", arab: "\u0627\u0644\u0633\u0651\u064E\u0645\u0650\u064A\u0639\u064F", meaning: "L'Audiente", desc: "Colui che ascolta ogni suono, ogni sussurro, ogni preghiera silenziosa del cuore. Il Suo udito abbraccia l'intero universo e nessuna invocazione e mai ignorata." },
-        { trans: "Al-Basir", arab: "\u0627\u0644\u0652\u0628\u064E\u0635\u0650\u064A\u0631\u064F", meaning: "Il Vedente", desc: "Colui che vede ogni cosa con chiarezza assoluta, dal movimento dell'atomo nel buio piu profondo al volo dell'uccello nelle altezze del cielo. Nulla e celato al Suo sguardo." },
-        { trans: "Al-Hakam", arab: "\u0627\u0644\u0652\u062D\u064E\u0643\u064E\u0645\u064F", meaning: "Il Giudice Supremo", desc: "Colui il cui giudizio e definitivo e perfettamente giusto. Le Sue sentenze sono irrevocabili e contengono una saggezza che trascende la comprensione umana." },
-        { trans: "Al-'Adl", arab: "\u0627\u0644\u0652\u0639\u064E\u062F\u0652\u0644\u064F", meaning: "Il Giusto", desc: "Colui che e la giustizia stessa nella sua forma piu pura. Non vi e nemmeno l'ombra di ingiustizia nelle Sue azioni, e ogni Suo decreto porta equilibrio perfetto." },
-        { trans: "Al-Latif", arab: "\u0627\u0644\u0644\u0651\u064E\u0637\u0650\u064A\u0641\u064F", meaning: "Il Sottile e Gentile", desc: "Colui la cui gentilezza e cosi sottile e raffinata da essere impercettibile. Egli opera attraverso vie misteriose e delicate, portando bene anche dove non ci si aspetta." },
-        { trans: "Al-Khabir", arab: "\u0627\u0644\u0652\u062E\u064E\u0628\u0650\u064A\u0631\u064F", meaning: "Il Consapevole di Tutto", desc: "Colui che conosce la realta interiore di ogni cosa. La Sua consapevolezza penetra nelle profondita nascoste dell'esistenza, oltre ogni apparenza superficiale." },
-        { trans: "Al-Halim", arab: "\u0627\u0644\u0652\u062D\u064E\u0644\u0650\u064A\u0645\u064F", meaning: "Il Clemente", desc: "Colui che non affretta la punizione nonostante la disobbedienza delle creature. La Sua clemenza offre sempre il tempo per il pentimento e la correzione." },
-        { trans: "Al-'Azim", arab: "\u0627\u0644\u0652\u0639\u064E\u0638\u0650\u064A\u0645\u064F", meaning: "L'Immenso", desc: "Colui la cui grandezza e magnificenza sono oltre ogni misura e comprensione. La Sua immensita abbraccia tutto cio che esiste ed e fonte di venerazione infinita." },
-        { trans: "Al-Ghafur", arab: "\u0627\u0644\u0652\u063A\u064E\u0641\u064F\u0648\u0631\u064F", meaning: "Il Perdonatore Copioso", desc: "Colui che perdona abbondantemente e ripetutamente. La Sua capacita di perdonare e come un oceano senza fondo che accoglie ogni pentimento sincero senza mai respingerlo." },
-        { trans: "Ash-Shakur", arab: "\u0627\u0644\u0634\u0651\u064E\u0643\u064F\u0648\u0631\u064F", meaning: "Il Riconoscente", desc: "Colui che apprezza e ricompensa abbondantemente anche il piu piccolo atto di bene. La Sua gratitudine verso i servi moltiplica ogni buona azione in misura incommensurabile." },
-        { trans: "Al-'Aliyy", arab: "\u0627\u0644\u0652\u0639\u064E\u0644\u0650\u064A\u0651\u064F", meaning: "L'Altissimo", desc: "Colui che e al di sopra di tutto in rango, potere e perfezione. La Sua elevatezza non ha pari e trascende ogni concetto di altezza fisica o spirituale." },
-        { trans: "Al-Kabir", arab: "\u0627\u0644\u0652\u0643\u064E\u0628\u0650\u064A\u0631\u064F", meaning: "Il Grande", desc: "Colui la cui grandezza e incommensurabile e incomparabile. Tutto nel creato, per quanto vasto e maestoso, e infinitamente piccolo rispetto alla Sua magnificenza." },
-        { trans: "Al-Hafiz", arab: "\u0627\u0644\u0652\u062D\u064E\u0641\u0650\u064A\u0638\u064F", meaning: "Il Preservatore", desc: "Colui che preserva e protegge ogni cosa dall'annientamento. La Sua custodia mantiene l'equilibrio dell'universo e salvaguarda ogni creatura dal male." },
-        { trans: "Al-Muqit", arab: "\u0627\u0644\u0652\u0645\u064F\u0642\u0650\u064A\u062A\u064F", meaning: "Il Nutritore", desc: "Colui che sostenta e nutre ogni creatura con cio di cui ha bisogno, sia materialmente che spiritualmente. Il Suo nutrimento sostiene ogni forma di vita in ogni istante." },
-        { trans: "Al-Hasib", arab: "\u0627\u0644\u0652\u062D\u064E\u0633\u0650\u064A\u0628\u064F", meaning: "Colui che Tiene il Conto", desc: "Colui che tiene conto di ogni cosa con precisione infinita. Nessun atto, parola o pensiero sfugge al Suo calcolo, e il Suo rendiconto e perfetto e completo." },
-        { trans: "Al-Jalil", arab: "\u0627\u0644\u0652\u062C\u064E\u0644\u0650\u064A\u0644\u064F", meaning: "Il Maestoso", desc: "Colui la cui maesta ispira reverenza e venerazione. La Sua grandezza e accompagnata da una bellezza che riempie i cuori di timore reverenziale e meraviglia." },
-        { trans: "Al-Karim", arab: "\u0627\u0644\u0652\u0643\u064E\u0631\u0650\u064A\u0645\u064F", meaning: "Il Generoso", desc: "Colui la cui generosita non ha limiti e non richiede contropartita. Egli dona senza misura, perdona senza condizione e onora senza che il servo lo meriti." },
-        { trans: "Ar-Raqib", arab: "\u0627\u0644\u0631\u0651\u064E\u0642\u0650\u064A\u0628\u064F", meaning: "Il Vigilante", desc: "Colui che osserva ogni cosa in ogni istante senza mai distrarsi. La Sua vigilanza e costante e onnicomprensiva, abbracciando ogni dettaglio dell'esistenza." },
-        { trans: "Al-Mujib", arab: "\u0627\u0644\u0652\u0645\u064F\u062C\u0650\u064A\u0628\u064F", meaning: "Colui che Risponde", desc: "Colui che risponde alle preghiere e alle suppliche dei Suoi servi. La Sua risposta e sempre presente, anche quando giunge in forme che l'essere umano non si aspetta." },
-        { trans: "Al-Wasi'", arab: "\u0627\u0644\u0652\u0648\u064E\u0627\u0633\u0650\u0639\u064F", meaning: "L'Immenso in Vastita", desc: "Colui la cui capacita e conoscenza abbracciano ogni cosa senza limiti. La Sua vastita comprende e supera ogni dimensione concepibile dello spazio e del tempo." },
-        { trans: "Al-Hakim", arab: "\u0627\u0644\u0652\u062D\u064E\u0643\u0650\u064A\u0645\u064F", meaning: "Il Saggio", desc: "Colui che agisce con saggezza perfetta in ogni cosa. Ogni Suo decreto contiene una sapienza profonda, anche quando la mente umana non riesce a comprenderla." },
-        { trans: "Al-Wadud", arab: "\u0627\u0644\u0652\u0648\u064E\u062F\u064F\u0648\u062F\u064F", meaning: "L'Amorevole", desc: "Colui il cui amore per le Sue creature e puro, incondizionato e inesauribile. Il Suo amore e la forza che muove l'universo e sostiene ogni legame di affetto tra gli esseri." },
-        { trans: "Al-Majid", arab: "\u0627\u0644\u0652\u0645\u064E\u062C\u0650\u064A\u062F\u064F", meaning: "Il Glorioso", desc: "Colui la cui gloria e magnificenza sono senza paragone. La Sua nobilta e generosita si manifestano in ogni aspetto della creazione con splendore travolgente." },
-        { trans: "Al-Ba'ith", arab: "\u0627\u0644\u0652\u0628\u064E\u0627\u0639\u0650\u062B\u064F", meaning: "Colui che Risuscita", desc: "Colui che riporta alla vita dopo la morte e risveglia i cuori dalla negligenza. Il Suo potere di resurrezione e assoluto e si manifesta in ogni primavera della natura." },
-        { trans: "Ash-Shahid", arab: "\u0627\u0644\u0634\u0651\u064E\u0647\u0650\u064A\u062F\u064F", meaning: "Il Testimone", desc: "Colui che e testimone di ogni cosa che accade nell'universo. La Sua testimonianza e la piu veritiera e nulla puo essere nascosto o alterato davanti a Lui." },
-        { trans: "Al-Haqq", arab: "\u0627\u0644\u0652\u062D\u064E\u0642\u0651\u064F", meaning: "La Verita Assoluta", desc: "Colui che e la Verita stessa nella sua essenza piu pura. La Sua esistenza e la realta fondamentale su cui si fonda ogni altra verita e ogni altra esistenza." },
-        { trans: "Al-Wakil", arab: "\u0627\u0644\u0652\u0648\u064E\u0643\u0650\u064A\u0644\u064F", meaning: "Il Garante Fiduciario", desc: "Colui al quale ci si puo affidare completamente per la gestione dei propri affari. La Sua tutela e la piu sicura e chi si affida a Lui non sara mai deluso." },
-        { trans: "Al-Qawiyy", arab: "\u0627\u0644\u0652\u0642\u064E\u0648\u0650\u064A\u0651\u064F", meaning: "Il Forte", desc: "Colui la cui forza e illimitata e non conosce debolezza o stanchezza. La Sua potenza sostiene l'intero universo senza il minimo sforzo o diminuzione." },
-        { trans: "Al-Matin", arab: "\u0627\u0644\u0652\u0645\u064E\u062A\u0650\u064A\u0646\u064F", meaning: "Il Saldo", desc: "Colui la cui fermezza e solidita sono incrollabili. Il Suo potere e inesauribile e la Sua determinazione e irremovibile, senza mai vacillare o indebolirsi." },
-        { trans: "Al-Waliyy", arab: "\u0627\u0644\u0652\u0648\u064E\u0644\u0650\u064A\u0651\u064F", meaning: "Il Protettore Amico", desc: "Colui che e l'amico e il protettore piu vicino ai Suoi servi. La Sua amicizia e una luce che guida nelle tenebre e un sostegno che non viene mai meno." },
-        { trans: "Al-Hamid", arab: "\u0627\u0644\u0652\u062D\u064E\u0645\u0650\u064A\u062F\u064F", meaning: "Il Lodato", desc: "Colui che e degno di ogni lode e ringraziamento. Ogni forma di perfezione e bellezza nell'universo e motivo per lodare Lui, la fonte di ogni bene." },
-        { trans: "Al-Muhsi", arab: "\u0627\u0644\u0652\u0645\u064F\u062D\u0652\u0635\u0650\u064A", meaning: "Colui che Enumera", desc: "Colui che conosce il numero esatto di ogni cosa nell'universo. Ogni goccia di pioggia, ogni foglia caduta, ogni battito di cuore sono contati nella Sua conoscenza infinita." },
-        { trans: "Al-Mubdi'", arab: "\u0627\u0644\u0652\u0645\u064F\u0628\u0652\u062F\u0650\u0626\u064F", meaning: "L'Originatore", desc: "Colui che da inizio alla creazione dal nulla assoluto, senza modello precedente. La Sua capacita creativa e senza precedenti e ogni inizio porta la Sua impronta unica." },
-        { trans: "Al-Mu'id", arab: "\u0627\u0644\u0652\u0645\u064F\u0639\u0650\u064A\u062F\u064F", meaning: "Colui che Restaura", desc: "Colui che riporta la creazione all'esistenza dopo il suo annientamento. Il Suo potere di restaurazione e una promessa di rinnovamento eterno per tutto cio che e stato." },
-        { trans: "Al-Muhyi", arab: "\u0627\u0644\u0652\u0645\u064F\u062D\u0652\u064A\u0650\u064A", meaning: "Il Datore di Vita", desc: "Colui che da la vita a cio che era privo di essa. La vita in ogni sua forma, dal primo respiro del neonato al germogliare del seme, e un dono della Sua potenza creatrice." },
-        { trans: "Al-Mumit", arab: "\u0627\u0644\u0652\u0645\u064F\u0645\u0650\u064A\u062A\u064F", meaning: "Colui che Da la Morte", desc: "Colui che decreta la fine della vita terrena per ogni creatura. La morte non e distruzione ma un passaggio verso un'altra dimensione dell'esistenza decretata da Lui." },
-        { trans: "Al-Hayy", arab: "\u0627\u0644\u0652\u062D\u064E\u064A\u0651\u064F", meaning: "Il Vivente", desc: "Colui la cui vita e eterna, senza inizio ne fine. La Sua vita e la fonte di ogni altra vita e non dipende da nulla, mentre tutto dipende da Lui per esistere." },
-        { trans: "Al-Qayyum", arab: "\u0627\u0644\u0652\u0642\u064E\u064A\u0651\u064F\u0648\u0645\u064F", meaning: "L'Autosufficiente", desc: "Colui che sussiste di per Se e sostiene l'intera creazione. Senza il Suo sostegno costante, l'universo cesserebbe di esistere in un istante. Egli non ha bisogno di nulla." },
-        { trans: "Al-Wajid", arab: "\u0627\u0644\u0652\u0648\u064E\u0627\u062C\u0650\u062F\u064F", meaning: "Colui che Trova", desc: "Colui che possiede tutto e non manca di nulla. Ogni cosa cercata e gia presente nella Sua conoscenza e potere, e nulla puo sottrarsi alla Sua percezione." },
-        { trans: "Al-Majid", arab: "\u0627\u0644\u0652\u0645\u064E\u0627\u062C\u0650\u062F\u064F", meaning: "Il Nobile Glorioso", desc: "Colui la cui nobilta e gloria sono estreme e la cui generosita e illimitata. La Sua magnificenza si manifesta attraverso atti di infinita benevolenza e splendore." },
-        { trans: "Al-Wahid", arab: "\u0627\u0644\u0652\u0648\u064E\u0627\u062D\u0650\u062F\u064F", meaning: "L'Unico", desc: "Colui che e unico nella Sua essenza, nei Suoi attributi e nelle Sue azioni. Non vi e nulla che Gli sia simile e la Sua unicita e il fondamento di ogni verita." },
-        { trans: "Al-Ahad", arab: "\u0627\u0644\u0623\u062D\u064E\u062F\u064F", meaning: "L'Uno Indivisibile", desc: "Colui che e assolutamente Uno, senza parti, senza composizione e senza molteplicita. La Sua unita e la verita piu profonda e fondamentale dell'intera esistenza." },
-        { trans: "As-Samad", arab: "\u0627\u0644\u0635\u0651\u064E\u0645\u064E\u062F\u064F", meaning: "L'Eterno Rifugio", desc: "Colui al quale tutte le creature si rivolgono nelle loro necessita. Egli e il rifugio ultimo, autosufficiente e completo, da cui tutto dipende e che non dipende da nulla." },
-        { trans: "Al-Qadir", arab: "\u0627\u0644\u0652\u0642\u064E\u0627\u062F\u0650\u0631\u064F", meaning: "L'Onnipotente", desc: "Colui che ha potere assoluto su ogni cosa. La Sua capacita di agire e illimitata e quando decide una cosa, dice 'Sii' e quella cosa diviene istantaneamente." },
-        { trans: "Al-Muqtadir", arab: "\u0627\u0644\u0652\u0645\u064F\u0642\u0652\u062A\u064E\u062F\u0650\u0631\u064F", meaning: "Il Prevalente in Potere", desc: "Colui il cui potere e supremo e si manifesta con piena efficacia. Nulla puo impedire la realizzazione della Sua volonta e ogni cosa e sotto il Suo controllo totale." },
-        { trans: "Al-Muqaddim", arab: "\u0627\u0644\u0652\u0645\u064F\u0642\u064E\u062F\u0651\u0650\u0645\u064F", meaning: "Colui che Anticipa", desc: "Colui che porta avanti chi vuole e accelera cio che desidera. La Sua saggezza determina l'ordine delle cose e il tempo in cui ogni evento si manifesta." },
-        { trans: "Al-Mu'akhkhir", arab: "\u0627\u0644\u0652\u0645\u064F\u0624\u064E\u062E\u0651\u0650\u0631\u064F", meaning: "Colui che Posticipa", desc: "Colui che ritarda e pospone secondo la Sua saggezza infinita. Il Suo ritardo non e dimenticanza ma pianificazione divina, e ogni indugio nasconde un proposito perfetto." },
-        { trans: "Al-Awwal", arab: "\u0627\u0644\u0623\u0648\u0651\u064E\u0644\u064F", meaning: "Il Primo", desc: "Colui che esiste prima di ogni cosa, senza inizio. La Sua anteriorita e assoluta e non vi fu mai un momento in cui Egli non esistesse. Tutto ha origine da Lui." },
-        { trans: "Al-Akhir", arab: "\u0627\u0644\u0622\u062E\u0650\u0631\u064F", meaning: "L'Ultimo", desc: "Colui che rimarra dopo la scomparsa di ogni cosa creata. La Sua permanenza e eterna e quando tutto cessera, solo Lui rimarra nella Sua gloria infinita e immutabile." },
-        { trans: "Az-Zahir", arab: "\u0627\u0644\u0638\u0651\u064E\u0627\u0647\u0650\u0631\u064F", meaning: "Il Manifesto", desc: "Colui la cui esistenza e evidente attraverso i segni della Sua creazione. Ogni meraviglia dell'universo e una testimonianza della Sua presenza manifesta e innegabile." },
-        { trans: "Al-Batin", arab: "\u0627\u0644\u0652\u0628\u064E\u0627\u0637\u0650\u0646\u064F", meaning: "Il Nascosto", desc: "Colui la cui essenza e nascosta alla percezione delle creature. Nessun senso o intelletto puo afferrare la Sua vera natura, che rimane un mistero insondabile." },
-        { trans: "Al-Wali", arab: "\u0627\u0644\u0652\u0648\u064E\u0627\u0644\u0650\u064A", meaning: "Il Governante", desc: "Colui che governa l'intero universo con autorita assoluta. La Sua gestione del creato e perfetta, senza errore o trascuratezza, abbracciando ogni dettaglio dell'esistenza." },
-        { trans: "Al-Muta'ali", arab: "\u0627\u0644\u0652\u0645\u064F\u062A\u064E\u0639\u064E\u0627\u0644\u0650\u064A", meaning: "L'Eccelso Trascendente", desc: "Colui che e sublimemente elevato al di sopra di ogni attributo delle creature. La Sua trascendenza supera ogni concetto e ogni tentativo di definizione umana." },
-        { trans: "Al-Barr", arab: "\u0627\u0644\u0652\u0628\u064E\u0631\u0651\u064F", meaning: "Il Benefico", desc: "Colui la cui bonta e dolcezza pervadono ogni aspetto dell'esistenza. La Sua benevolenza si estende a tutte le creature, meritevoli o meno, con generosita sconfinata." },
-        { trans: "At-Tawwab", arab: "\u0627\u0644\u062A\u0651\u064E\u0648\u0651\u064E\u0627\u0628\u064F", meaning: "Colui che Accetta il Pentimento", desc: "Colui che accoglie continuamente il pentimento sincero dei Suoi servi. La Sua porta e sempre aperta per chi ritorna con cuore contrito, e la Sua gioia nel perdonare e immensa." },
-        { trans: "Al-Muntaqim", arab: "\u0627\u0644\u0652\u0645\u064F\u0646\u062A\u064E\u0642\u0650\u0645\u064F", meaning: "Il Vendicatore Giusto", desc: "Colui che retribuisce con giustizia chi persiste nell'oppressione e nel male. La Sua retribuzione non e vendetta cieca ma ristabilimento dell'ordine e della giustizia divina." },
-        { trans: "Al-'Afuww", arab: "\u0627\u0644\u0652\u0639\u064E\u0641\u064F\u0648\u0651\u064F", meaning: "Il Perdonatore Totale", desc: "Colui che cancella completamente i peccati come se non fossero mai esistiti. Il Suo perdono non lascia traccia e restituisce al servo la purezza originale del cuore." },
-        { trans: "Ar-Ra'uf", arab: "\u0627\u0644\u0631\u0651\u064E\u0624\u064F\u0648\u0641\u064F", meaning: "Il Compassionevole Tenero", desc: "Colui la cui tenerezza e compassione sono estremamente delicate e profonde. La Sua dolcezza verso le creature supera la tenerezza di una madre verso il suo neonato." },
-        { trans: "Malik-ul-Mulk", arab: "\u0645\u064E\u0627\u0644\u0650\u0643\u064F \u0627\u0644\u0652\u0645\u064F\u0644\u0652\u0643\u0650", meaning: "Il Signore del Regno", desc: "Colui che possiede il dominio assoluto su ogni reame dell'esistenza. Il Suo regno e senza confini e ogni sovranita terrena e un prestito temporaneo dalla Sua autorita." },
-        { trans: "Dhul-Jalali wal-Ikram", arab: "\u0630\u064F\u0648 \u0627\u0644\u0652\u062C\u064E\u0644\u0627\u064E\u0644\u0650 \u0648\u064E\u0627\u0644\u0652\u0625\u0650\u0643\u0652\u0631\u064E\u0627\u0645\u0650", meaning: "Signore di Maesta e Generosita", desc: "Colui che riunisce in Se la maesta piu sublime e la generosita piu nobile. Il Suo volto e degno di venerazione eterna e la Sua generosita non ha paragone nell'esistenza." },
-        { trans: "Al-Muqsit", arab: "\u0627\u0644\u0652\u0645\u064F\u0642\u0652\u0633\u0650\u0637\u064F", meaning: "L'Equo", desc: "Colui che stabilisce la giustizia con perfetto equilibrio. La Sua equita non conosce favoritismi e ogni creatura riceve esattamente cio che le spetta con precisione divina." },
-        { trans: "Al-Jami'", arab: "\u0627\u0644\u0652\u062C\u064E\u0627\u0645\u0650\u0639\u064F", meaning: "Colui che Riunisce", desc: "Colui che riunira tutte le creature nel Giorno del Giudizio e che unifica gli opposti con armonia. La Sua capacita di riunire abbraccia ogni dimensione dell'esistenza." },
-        { trans: "Al-Ghaniyy", arab: "\u0627\u0644\u0652\u063A\u064E\u0646\u0650\u064A\u0651\u064F", meaning: "Il Ricco di Se", desc: "Colui che e totalmente autosufficiente e non ha bisogno di nulla e di nessuno. La Sua ricchezza e intrinseca e immutabile, mentre tutto il creato ha bisogno di Lui." },
-        { trans: "Al-Mughni", arab: "\u0627\u0644\u0652\u0645\u064F\u063A\u0652\u0646\u0650\u064A", meaning: "L'Arricchitore", desc: "Colui che arricchisce chi vuole tra le Sue creature. La Sua capacita di donare abbondanza, sia materiale che spirituale, e illimitata e si manifesta con generosita divina." },
-        { trans: "Al-Mani'", arab: "\u0627\u0644\u0652\u0645\u064E\u0627\u0646\u0650\u0639\u064F", meaning: "Il Difensore che Impedisce", desc: "Colui che impedisce cio che potrebbe nuocere alle Sue creature. La Sua protezione e uno scudo invisibile che blocca il male prima che possa raggiungere i Suoi servi." },
-        { trans: "Ad-Darr", arab: "\u0627\u0644\u0636\u0651\u064E\u0627\u0631\u0651\u064F", meaning: "Colui che Puo Causare Afflizione", desc: "Colui che permette la prova e la difficolta come mezzo di purificazione e crescita. Le afflizioni che decreta contengono saggezza nascosta e sono strumenti di elevazione spirituale." },
-        { trans: "An-Nafi'", arab: "\u0627\u0644\u0646\u0651\u064E\u0627\u0641\u0650\u0639\u064F", meaning: "Il Benefattore", desc: "Colui che crea il beneficio e il vantaggio per le Sue creature. Ogni bene che raggiunge una creatura proviene dalla Sua volonta benefica e dalla Sua grazia illimitata." },
-        { trans: "An-Nur", arab: "\u0627\u0644\u0646\u0651\u064F\u0648\u0631\u064F", meaning: "La Luce", desc: "Colui che e la Luce dei cieli e della terra. La Sua luce illumina ogni oscurita, guida ogni anima smarrita e rivela la verita nascosta dietro i veli dell'apparenza." },
-        { trans: "Al-Hadi", arab: "\u0627\u0644\u0652\u0647\u064E\u0627\u062F\u0650\u064A", meaning: "La Guida", desc: "Colui che guida le creature sulla retta via con sapienza e misericordia. La Sua guida e la bussola dell'anima, che conduce verso la verita attraverso ogni nebbia di confusione." },
-        { trans: "Al-Badi'", arab: "\u0627\u0644\u0652\u0628\u064E\u062F\u0650\u064A\u0639\u064F", meaning: "L'Originatore Incomparabile", desc: "Colui che crea con originalita assoluta, senza modello precedente. Ogni Sua creazione e un capolavoro unico che non ha eguali ne precedenti nella storia dell'esistenza." },
-        { trans: "Al-Baqi", arab: "\u0627\u0644\u0652\u0628\u064E\u0627\u0642\u0650\u064A", meaning: "L'Eterno", desc: "Colui la cui esistenza e permanente e non conosce fine. Mentre tutto nel creato e transitorio e destinato a perire, Egli solo rimane eternamente nella Sua perfezione." },
-        { trans: "Al-Warith", arab: "\u0627\u0644\u0652\u0648\u064E\u0627\u0631\u0650\u062B\u064F", meaning: "L'Erede Supremo", desc: "Colui che eredita tutto dopo la scomparsa delle creature. Quando ogni cosa tornera al nulla, solo Lui rimarra come il legittimo possessore di tutto cio che fu." },
-        { trans: "Ar-Rashid", arab: "\u0627\u0644\u0631\u0651\u064E\u0634\u0650\u064A\u062F\u064F", meaning: "La Guida Retta", desc: "Colui che guida con perfetta rettitudine e conduce ogni cosa verso la sua giusta destinazione. La Sua direzione e infallibile e porta sempre al bene ultimo e definitivo." },
-        { trans: "As-Sabur", arab: "\u0627\u0644\u0635\u0651\u064E\u0628\u064F\u0648\u0631\u064F", meaning: "Il Paziente", desc: "Colui la cui pazienza e infinita e non Si affretta nel punire. La Sua longanimita da tempo al peccatore di pentirsi e al negligente di risvegliarsi, con clemenza senza fine." }
-    ];
-
-    // --- Init 99 Nomi di Allah (3 al giorno) ---
-    function initNomiDiAllah99() {
-        const titleEl = document.getElementById('allah-title');
-        if (!titleEl) return;
-
-        const now = new Date();
-        const start = new Date(now.getFullYear(), 0, 0);
-        const diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
-        const oneDay = 1000 * 60 * 60 * 24;
-        const dayOfYear = Math.floor(diff / oneDay);
-        const baseIdx = (dayOfYear * 3) % 99;
-        const indices = [0, 1, 2].map(i => (baseIdx + i) % 99);
-
-        // Nome 1 (principale)
-        const n1 = ALLAH_NAMES_99[indices[0]];
-        document.getElementById('allah-index').textContent = 'Nome 1/3 (' + (indices[0] + 1) + '/99)';
-        document.getElementById('allah-bg-text').textContent = n1.arab;
-        titleEl.textContent = n1.trans;
-        document.getElementById('allah-translation').textContent = n1.meaning;
-
-        document.getElementById('allah-desc').textContent = n1.desc;
-
-        // Nomi 2 e 3 (stessa struttura del primo)
-        for (let i = 1; i <= 2; i++) {
-            const n = ALLAH_NAMES_99[indices[i]];
-            const slot = i + 1;
-            document.getElementById('allah-index-' + slot).textContent = 'Nome ' + slot + '/3 (' + (indices[i] + 1) + '/99)';
-            document.getElementById('allah-title-' + slot).textContent = n.trans;
-            document.getElementById('allah-translation-' + slot).textContent = n.meaning;
-            document.getElementById('allah-desc-' + slot).textContent = n.desc;
-        }
-    }
 
     // --- Init Paniere USD Chart ---
     async function initPaniereChart() {
@@ -1296,9 +1105,9 @@
         });
     };
 
-    // --- DASH TABS (Corano / ODG / Processi) ---
+    // --- DASH TABS (ODG / Processi) ---
     window.switchDashTab = function(name) {
-        ['corano', 'odg', 'processi'].forEach(n => {
+        ['odg', 'processi'].forEach(n => {
             const btn = document.getElementById('dash-tab-' + n);
             const pane = document.getElementById('dash-pane-' + n);
             if (!btn || !pane) return;
@@ -1310,7 +1119,6 @@
     // --- INIT ---
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
-        initNomiDiAllah99();
         initPaniereChart();
         setupCalendarFilters();
 
@@ -1321,7 +1129,6 @@
         loadArticoli();
         loadWatchlist();
         loadOdgHero();
-        loadCoranoWidget('corano-widget');
         // Refresh watchlist ogni 5 minuti (fallback se Realtime down)
         setInterval(loadWatchlist, 5 * 60 * 1000);
         // Refresh processi ogni 60s: cosi le notizie compaiono automaticamente quando scatta l'orario

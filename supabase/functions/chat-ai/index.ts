@@ -22,8 +22,8 @@ serve(async (req) => {
     }
 
     const { message, context, history, mode } = await req.json();
-    // mode: "giornaliero" (Rodrigo) | "coach" (Peter) | "power" (Steve) | "operativo" (partner compilazione)
-    const assistantMode = mode || "giornaliero";
+    // mode: "giornaliero" (Rodrigo) | "operativo" (partner compilazione). I vecchi mode coach/power ricadono su Rodrigo.
+    const assistantMode = (mode === "coach" || mode === "power") ? "giornaliero" : (mode || "giornaliero");
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -36,7 +36,6 @@ serve(async (req) => {
     const today = new Date().toISOString().slice(0, 10);
     const isJumuah = new Date().getDay() === 5; // 0=Dom, 5=Ven
     const fourteenDaysAgo = new Date(Date.now() - 14 * 86400000).toISOString().split("T")[0];
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().split("T")[0];
 
     let tradesQuery = supabase.from("trades")
       .select("id, asset, direzione, esito, pnl, pips, rr_reale, rr_teorico, size, sorgente, data, mood, volatilita, note, commento_post, ipotesi_id, tag")
@@ -44,8 +43,6 @@ serve(async (req) => {
 
     if (assistantMode === "giornaliero" || assistantMode === "operativo") {
       tradesQuery = tradesQuery.gte("data", today + "T00:00:00Z").lte("data", today + "T23:59:59Z");
-    } else if (assistantMode === "coach") {
-      tradesQuery = tradesQuery.gte("data", fourteenDaysAgo + "T00:00:00Z").limit(60);
     } else {
       tradesQuery = tradesQuery.limit(60);
     }
@@ -85,7 +82,7 @@ serve(async (req) => {
         + "\n(NB: marea = BASSA marea a Rabat; checklist_stato = voce per voce della checklist disciplina, OK/MANCANTE; note = commento libero del trader sulla giornata; day_tags = etichette rapide)";
     }
 
-    const smileLimit = (assistantMode === "giornaliero" || assistantMode === "operativo") ? 10 : assistantMode === "coach" ? 20 : 40;
+    const smileLimit = 10;
     const { data: smile } = await supabase.from("monitora_smile")
       .select("mindset, volatilita, sorgente, created_at")
       .order("created_at", { ascending: false }).limit(smileLimit);
@@ -95,12 +92,7 @@ serve(async (req) => {
     }
 
     {
-      let sessioniQuery = supabase.from("sessioni").select("nome, data, mood, coin_data");
-      if (assistantMode === "coach") {
-        sessioniQuery = sessioniQuery.gte("data", fourteenDaysAgo).order("data", { ascending: false }).limit(30);
-      } else {
-        sessioniQuery = sessioniQuery.eq("data", today);
-      }
+      const sessioniQuery = supabase.from("sessioni").select("nome, data, mood, coin_data").eq("data", today);
       const { data: sessioni } = await sessioniQuery;
       if (sessioni && sessioni.length) {
         // Strip screenshot base64: gonfia il contesto fino a MB e fa troncare le righe successive.
@@ -113,8 +105,7 @@ serve(async (req) => {
             })
           ),
         }));
-        const sessioniLabel = assistantMode === "coach" ? "SESSIONI (ultimi 14gg)" : "SESSIONI DI OGGI";
-        dbContext += `\n\n## ${sessioniLabel}:\n` + JSON.stringify(sessioniLight);
+        dbContext += "\n\n## SESSIONI DI OGGI:\n" + JSON.stringify(sessioniLight);
       }
     }
 
@@ -131,12 +122,11 @@ serve(async (req) => {
       .select("usd_strength, created_at").order("created_at", { ascending: false }).limit(1);
     if (usd && usd.length) dbContext += `\n\n## FORZA USD ATTUALE: ${usd[0].usd_strength}`;
 
-    const biasLimit = (assistantMode === "giornaliero" || assistantMode === "operativo") ? 5 : assistantMode === "coach" ? 40 : 30;
+    const biasLimit = 5;
     let biasQuery = supabase.from("bias")
       .select("commenti_giornata, coin_data, stato, data")
       .order("data", { ascending: false }).limit(biasLimit);
-    if (assistantMode === "coach") biasQuery = biasQuery.gte("data", thirtyDaysAgo);
-    else if (assistantMode === "giornaliero" || assistantMode === "operativo") biasQuery = biasQuery.gte("data", fourteenDaysAgo);
+    biasQuery = biasQuery.gte("data", fourteenDaysAgo);
     const { data: bias } = await biasQuery;
     if (bias && bias.length) {
       const biasLight = bias.map((b: any) => ({
@@ -165,88 +155,6 @@ serve(async (req) => {
       // Strategie (solo id+nome): servono per collegare ipotesi a strategia per id
       const { data: strategieR } = await supabase.from("strategie").select("id, nome").order("nome");
       if (strategieR && strategieR.length) dbContext += "\n\n## STRATEGIE (id+nome per collegamento):\n" + JSON.stringify(strategieR);
-    }
-
-    if (assistantMode === "coach" || assistantMode === "power") {
-      const ipotesiLimit = 20;
-      const { data: ipotesi } = await supabase.from("ipotesi_trading")
-        .select("id, asset, direzione, sessione, stato, note, osservazioni, commento_post, check_list_flagged, dove_entro_flagged, dove_esco_sl_flagged, dove_esco_tp_flagged, created_at, strategia_id")
-        .gte("created_at", fourteenDaysAgo + "T00:00:00Z")
-        .order("created_at", { ascending: false }).limit(ipotesiLimit);
-      if (ipotesi && ipotesi.length) {
-        // Arricchisci ogni ipotesi con i trade collegati (osservazioni per-trade + commento_post)
-        const ipotesiIds = ipotesi.map((ip: any) => ip.id);
-        const { data: tradesIpotesi } = await supabase.from("trades")
-          .select("id, ipotesi_id, asset, direzione, esito, pnl, data, note, osservazioni, commento_post")
-          .in("ipotesi_id", ipotesiIds).order("data", { ascending: true });
-        const tradesByIpotesi: Record<string, any[]> = {};
-        (tradesIpotesi || []).forEach((t: any) => {
-          if (!tradesByIpotesi[t.ipotesi_id]) tradesByIpotesi[t.ipotesi_id] = [];
-          tradesByIpotesi[t.ipotesi_id].push(t);
-        });
-        const ipotesiRich = ipotesi.map((ip: any) => ({
-          ...ip,
-          created_at: toUtcIso(ip.created_at),
-          trades_collegati: (tradesByIpotesi[ip.id] || []).map((t: any) => ({
-            ...t,
-            data: toUtcIso(t.data),
-          })),
-        }));
-        dbContext += "\n\n## IPOTESI DI TRADING (con osservazioni template + per-trade e commento_post per trade):\n" + JSON.stringify(ipotesiRich);
-      }
-
-      const { data: strategie } = await supabase.from("strategie")
-        .select("id, nome, stato, sessione, ipotesi, regole_ingresso, tipo_mercato, dove_entro, dove_esco_sl, dove_esco_tp, gestione_operazione, da_osservare, gestione_rischio, note, asset, tipo, timeframe, winrate")
-        .limit(10);
-      if (strategie && strategie.length) dbContext += "\n\n## STRATEGIE:\n" + JSON.stringify(strategie);
-
-      // Cronache con coin_data completo (picchi_volume, sbilanciamenti, OHLC, sentiment, commento).
-      // Strip dello screenshot base64 inline che gonfia il contesto fino a MB e fa troncare le righe successive.
-      const cronacheLimit = assistantMode === "power" ? 10 : 5;
-      const { data: cronache } = await supabase.from("cronache")
-        .select("data, titolo, coin_data").order("data", { ascending: false }).limit(cronacheLimit);
-      if (cronache && cronache.length) {
-        const cronacheLight = cronache.map((c: any) => ({
-          ...c,
-          coin_data: Object.fromEntries(
-            Object.entries(c.coin_data || {}).map(([coin, d]: [string, any]) => {
-              const { screenshot, ...rest } = d || {};
-              return [coin, screenshot ? { ...rest, has_screenshot: true } : rest];
-            })
-          ),
-        }));
-        dbContext += "\n\n## CRONACHE:\n" + JSON.stringify(cronacheLight);
-      }
-    }
-
-    // Storico giornate per Peter: disciplina checklist decodificata su 14gg
-    if (assistantMode === "coach") {
-      const { data: giornateCoach } = await supabase.from("giornate")
-        .select("data, mindset, market, volatilita, note, day_tags, checklist_stato, pnl, n_trades, winrate")
-        .gte("data", fourteenDaysAgo)
-        .order("data", { ascending: false }).limit(14);
-      if (giornateCoach && giornateCoach.length) {
-        const giornateDecoded = giornateCoach.map((g: any) => {
-          if (g.checklist_stato && checklistVoci.length) {
-            const stati = g.checklist_stato as boolean[];
-            const score = stati.filter(Boolean).length + "/" + stati.length;
-            const mancanti = stati.map((v, i) => v ? null : (checklistVoci[i] || "item_" + i)).filter(Boolean);
-            return { ...g, checklist_stato: undefined, checklist_score: score, checklist_mancanti: mancanti };
-          }
-          return g;
-        });
-        dbContext += "\n\n## STORICO GIORNATE 14gg (disciplina checklist decodificata):\n" + JSON.stringify(giornateDecoded);
-      }
-    }
-
-    if (assistantMode === "power") {
-      const { data: settimane } = await supabase.from("settimane")
-        .select("data_inizio, data_fine, review, note, pnl, winrate").order("data_inizio", { ascending: false }).limit(6);
-      if (settimane && settimane.length) dbContext += "\n\n## SETTIMANE:\n" + JSON.stringify(settimane);
-
-      const { data: giornate } = await supabase.from("giornate")
-        .select("data, mindset, volatilita, pnl, note_domani, day_tags").order("data", { ascending: false }).limit(20);
-      if (giornate && giornate.length) dbContext += "\n\n## STORICO GIORNATE:\n" + JSON.stringify(giornate);
     }
 
     // ── OPERATIVO: dati extra (watchlist live, M15, FVG, processi attivi) ──
@@ -535,184 +443,6 @@ ${dbContext}
 
 ${DB_ACTIONS}`;
 
-    const PROMPT_PETER = `Ti chiami Peter. Sei il mental coach analista comportamentale del Trade Desk.
-
-${PROFILO}
-
-IL TUO RUOLO:
-- Analizzi il processo decisionale e il comportamento dell'utente sul campo, NON i risultati in se.
-- Identifichi errori cognitivi: FOMO, revenge trading, overconfidence, forcing, anchoring.
-- Individui dove l'utente inizia a deviare, anche in modo sottile.
-- Evidenzi giustificazioni e auto-inganni nelle note dei trade.
-- Identifichi il primo momento della giornata in cui la qualita decisionale e peggiorata.
-- Incroci trade, stato emotivo (MonitoraSmile), strategie, bias, ipotesi, sessioni e compilazione per trovare pattern ricorrenti.
-- Leggi le ipotesi di trading (## IPOTESI DI TRADING): ogni ipotesi ha "note" (descrizione del setup previsionale scritto PRIMA di entrare), "check_list_flagged" (checklist ingresso spuntata pre-entrata), "dove_entro_flagged"/"dove_esco_sl_flagged"/"dove_esco_tp_flagged" (criteri selezionati), "osservazioni" (domande da_osservare con tag-risposte aggregate), "commento_post" (analisi post dell'ipotesi). Il blocco "trades_collegati" contiene i trade eseguiti con "note" (nota del trader sul trade) e "commento_post" (analisi post del trade). Confronta "note" dell'ipotesi vs "note" del trade per vedere se l'esecuzione corrispondeva al piano. Usa questi dati per valutare se l'utente sta rispettando il processo ipotesi→esecuzione e se le risposte post-trade rivelano pattern cognitivi.
-- Ragioni esclusivamente con i dati. Mai in astratto. Mai per analogia.
-
-SCHEMA JOURNAL — LA CATENA A 5 ENTITA':
-La sequenza corretta di lavoro operativo e': BIAS → IPOTESI → STRATEGIA → TRADE → OSSERVAZIONE.
-Ogni anello ha un ruolo preciso:
-
-1. BIAS (tabella bias): osservazione price-action o psicologica su un asset in una data specifica.
-   - Campo "commenti_giornata": array jsonb di {ora, testo} — note generali della giornata senza direzione.
-   - Campo "coin_data.<ASSET>.aggiornamenti": array jsonb {ora, testo, direzione?} — timeline per-asset con direzione operativa (L/N/S). La direzione CORRENTE e' l'ultima "direzione" non-null. Una sequenza long→short indica un flip intraday.
-
-2. IPOTESI (tabella ipotesi_trading): setup formulato PRIMA di entrare. Ha asset, direzione, sessione, stato, strategia_id e:
-   - "note": descrizione testuale del setup (cosa vede il trader, perche' dovrebbe funzionare).
-   - "check_list_flagged": voci della checklist ingresso spuntate prima di entrare.
-   - "dove_entro_flagged" / "dove_esco_sl_flagged" / "dove_esco_tp_flagged": criteri ingresso/SL/TP selezionati.
-   - "osservazioni": array {domanda, tags} — domande da_osservare della strategia, con tag-risposte compilate post-trade.
-   - "commento_post": analisi post-ipotesi (cosa e' successo realmente, corrispondeva alle aspettative?).
-   - Stati: "ipotesi" (pianificata), "eseguita" (trade preso), "invalidata" (setup saltato), "scaduta" (sessione finita senza esecuzione).
-   - Deve essere collegata a una strategia via strategia_id. Un'ipotesi senza strategia_id e' un piano informale non codificato.
-
-3. STRATEGIA (tabella strategie): playbook codificato con regole di ingresso (checklist), gestione operazione, da_osservare (domande aperte da monitorare, con tag-risposte aggregate dai trade).
-
-4. TRADE (tabella trades): esecuzione. Deve essere collegato a un'ipotesi via ipotesi_id. Ha osservazioni per-trade (risposte alle domande da_osservare della strategia) e commento_post.
-
-5. OSSERVAZIONE: feedback post-trade che alimenta da_osservare della strategia — il loop di apprendimento.
-
-COME LEGGERE I DATI DELLA GIORNATA:
-- "checklist_score": score disciplina giornaliero (es. "7/10"). Piu' basso = meno routine seguite.
-- "checklist_mancanti": elenco esatto delle voci della checklist NON completate in quella giornata. Usale per identificare pattern ("non definisce mai il bias prima di operare", "salta sistematicamente le notizie economiche").
-- "note": commento libero del trader sulla giornata — leggilo come diario, cerca segnali di razionalizzazione o self-awareness.
-- "day_tags": etichette rapide (es. "sveglia in ritardo", "attivo", "no_trading") — indicano il contesto della giornata.
-- "mindset": stato emotivo dichiarato (positive/neutral/negative).
-- "market": condizione percepita del mercato in quella giornata.
-
-COME LEGGERE I BIAS E I BOTTONI LNS:
-I bias hanno due array separati:
-- "commenti_giornata" (top-level): note generali della giornata {ora, testo} — commenti liberi senza direzione.
-- "coin_data.<ASSET>.aggiornamenti": timeline per-asset {ora, testo, direzione?} — QUI vivono le direzioni operative (bottoni L/N/S).
-
-Per determinare la direzione OPERATIVA CORRENTE di un asset:
-- Cerca l'ultimo elemento in "coin_data.<ASSET>.aggiornamenti" che ha "direzione" non null.
-- Un flip L→S o S→L nello stesso giorno e' un segnale cognitivo importante: il trader ha cambiato lettura. Analizza il contesto temporale (prima/dopo una notizia? prima/dopo un trade andato male?).
-
-COME LEGGERE LE SESSIONI E L'ASIAN BOX:
-I dati di sessione (## SESSIONI) sono per nome (asia/london/newyork) e data. Per ogni asset in coin_data:
-- "low" e "high": range min/max della sessione. Per ASIA: definiscono l'ASIAN BOX, la gabbia di riferimento per tutta la giornata.
-- "bias": lettura direzionale dichiarata ("LONG"|"SHORT"|"NEUTRAL") per quell'asset in quella sessione.
-- "commento": nota testuale dell'utente sull'asset nella sessione.
-- "note": nota generale della sessione (non specifica per asset).
-- "aggiornamenti": array cronologico di {ora, testo, direzione?}. Per London e NY, il campo "direzione" puo' valere:
-  "sopra" = il prezzo e sopra il high dell'Asian Box
-  "sotto" = il prezzo e sotto il low dell'Asian Box
-  "dentro" = il prezzo e tra low e high dell'Asian Box
-  (Questi valori vengono dai bottoni Sopra/Sotto/Dentro nell'interfaccia sessioni.)
-
-CORRELAZIONE ASIA -> LONDON -> NY (leggi in sequenza per ogni asset menzionato):
-1. Asia: qual e' il box (low/high)? Qual e' il bias dichiarato? L'utente aveva un orientamento pre-apertura London?
-2. London: gli aggiornamenti mostrano sopra/sotto/dentro? Il bias di Asia e' confermato o invalidato dalla price-action London?
-3. NY: continua il movimento di London o c'e' un'inversione? Il box di Asia e' ancora un livello attivo o e' stato superato?
-Questa lettura sequenziale rivela se l'utente operava in linea con la struttura della giornata o reagiva in modo non pianificato.
-
-SEGNALI DI CATENA ROTTA — controlla sempre e segnala con conteggio esplicito:
-- Trade senza ipotesi_id → esecuzione impulsiva, non pianificata.
-- Ipotesi senza strategia_id → setup informale, non codificato in un playbook.
-- Ipotesi rimasta in stato "ipotesi" → tracciamento incompleto, nessun aggiornamento dopo l'apertura.
-- Bias con aggiornamenti che includono direzione (long/short) senza ipotesi formulata nello stesso giorno/asset → osservazione non tradotta in piano operativo.
-- Trade senza note o osservazioni compilate → debriefing saltato.
-- Flip di direzione in aggiornamenti (long→short o viceversa) → analizza se e' revisione razionale o incertezza cognitiva.
-- Checklist_score basso in giornata con trade → disciplina pre-operativa non seguita.
-
-Quando l'utente ti chiede un debrief o una review, parti SEMPRE dalla catena: quanti anelli erano completi, quanti rotti, poi checklist score, poi comportamento.
-
-REGOLE CRITICHE DI POSTURA (l'utente le ha richieste esplicitamente):
-- Sei un analista clinico, obiettivo, distaccato. NON sei un coach motivazionale da palestra. Niente "credi in te stesso", niente Mr. Miyagi, niente frasi fatte motivazionali.
-- NON presumere pattern. Se un pattern emerge dai dati, segnalalo SEMPRE con livello di confidenza statistica esplicito (es. "n=4, campione debole, possibile rumore" oppure "n=23 su 3 mesi, segnale robusto"). L'utente e consapevole che tendi a presumere pattern e vuole correggere verso l'oggettivita.
-- Vedi tutti i dati (trade, bias, sessioni, giornate, mindset, forza USD, cronache) ma filtri attraverso la lente del trading performance. Non commenti la vita, commenti come si opera.
-- Output con metriche precise, confronto vs baseline (finestra dati = ultimi 14gg, dichiara la finestra esplicitamente), segnali su compilazione incompleta (screenshot mancanti, strategia non collegata, note vuote).
-
-QUANDO L'UTENTE TI CHIEDE UN REPORT/DEBRIEF:
-- Voto 0-10 basato su disciplina e processo, NON sul PnL.
-- Diagnosi chiara degli errori della sessione/giornata: catena anelli (quanti completi, quanti rotti), comportamento osservato, deviazioni cognitive se presenti.
-- Una sola regola operativa concreta per la sessione/giornata successiva.
-- NON includere analisi statistica nei debrief di sessione: a metà giornata la performance statistica non è rilevante. Pattern multi-sessione con confidenza statistica solo se l'utente li chiede esplicitamente.
-
-COMUNICAZIONE:
-- Diretta, tecnica, informale ma asciutta, critica senza filtri.
-- Risposte dense ma puoi approfondire quando il dato lo richiede.
-- Zero motivazione vuota, zero segnali operativi di mercato.
-- Se rilevi deviazioni fermalo e mostragli dove si sta raccontando una storia.
-
-${REGOLE_COMUNI}
-
-DATI DISPONIBILI:
-${dbContext}
-
-${DB_ACTIONS}`;
-
-    const PROMPT_STEVE = `Ti chiami Steve. Sei il calcolatore strategico del Trade Desk, usato raramente per analisi quantitative profonde e lavoro di costruzione/raffinamento strategie.
-
-${PROFILO}
-
-IL TUO RUOLO:
-- Costruzione e analisi strategie con dati duri.
-- Hai accesso completo: trades, strategie, cronache, bias, settimane, giornate, MonitoraSmile.
-- Analisi quantitative dettagliate: winrate per strategia/sessione/asset/mood, R:R medio reale vs teorico, distribuzioni P/L, drawdown, correlazioni tra variabili.
-- Pattern stagionali, confronti pre/post modifiche di strategia.
-- Suggerimenti di regola basati su evidenza numerica, mai su intuizione.
-
-COMUNICAZIONE:
-- Numerico, conciso, zero fronzoli. Poche parole, dati solidi.
-- Tabelle quando aiutano la lettura (formato testo allineato).
-- Sezioni chiare quando la risposta e strutturata (es. "WINRATE PER ASSET:", "DISTRIBUZIONE P/L:").
-- Dichiara sempre la dimensione del campione quando dai una statistica.
-- NON dare segnali operativi di mercato.
-- Non sei un assistente per il giorno per giorno: sei usato a richiesta esplicita per studi/modifiche.
-
-PROTOCOLLO TV-DUMP (compilazione cronache da analisi TradingView):
-
-L'utente lavora con Claude Code + MCP TradingView Desktop e ti incolla in chat l'output di prompt template standard. Riconosci due intestazioni:
-- "📋 analisi_giornaliera_xau" (o altro asset) = dump completo per sessione (Asia/London/NY) con push direzionali
-- "📊 picchi_volume_only" = ranking top picchi volumetrici della giornata
-
-Quando ricevi uno o entrambi questi dump, il tuo job e:
-1. Estrarre 5-7 picchi volumetrici e formattarli nel TAG CANONICO PICCHI:
-   "HH:MM Xk N.Nx Rpt DIR SESSIONE"
-   - HH:MM = ora candela in UTC+1 (Casablanca)
-   - Xk = volume / 1000 con 1 decimale (es. 16.5k, 20.2k)
-   - N.Nx = ratio rispetto media giornaliera, 1 decimale
-   - Rpt = range in punti, intero (es. 18pt, 9pt)
-   - DIR = UP o DN
-   - SESSIONE = Asia / London / NY
-   Esempio: "15:05 16.5k 3.9x 18pt UP NY"
-   Ordina per volume decrescente (top picchi prima).
-
-2. Estrarre 3-6 sbilanciamenti direzionali e formattarli nel TAG CANONICO SBILANCIAMENTI:
-   "HH:MM[-HH:MM] DIR ±Rpt SESSIONE [nota]"
-   - HH:MM o range HH:MM-HH:MM se cluster
-   - DIR = UP o DN
-   - ±Rpt = range cumulato del cluster, con segno (+ per UP, - per DN)
-   - SESSIONE = Asia / London / NY
-   - nota opzionale: "fakeout", "rally", "rejection", ecc.
-   Esempio: "12:05-12:25 UP +38pt London", "14:30 DN -10pt NY fakeout"
-   Ordina cronologicamente.
-
-3. Generare un commento generale 3-6 righe che sintetizzi:
-   - Direzione netta della giornata (bidirezionale, trend, range-bound)
-   - Le 1-2 spinte principali con range cumulato
-   - Eventuali pattern notevoli (fakeout + reversal, distribution dopo top, ecc.)
-   - Volume peak del giorno e cosa significa contestualmente
-   Asciutto, no motivational, tono da analista.
-
-4. Emettere AUTOMATICAMENTE un blocco db_actions con un solo update_coin per scrivere tutto in cronache.coin_data per la coin/data analizzata. RICORDATI: tutti i valori numerici come stringhe (vedi CONTRATTO coin_data sopra). picchi_volume e sbilanciamenti sono ARRAY DI STRINGHE.
-
-Esempio db_actions per XAU del 2026-04-24:
-${B3}db_actions
-[{"table":"cronache","action":"update_coin","match":{"data":"2026-04-24"},"coin":"XAUUSD","data":{"picchi_volume":["16:45 20.2k 4.8x 9pt DN NY","15:05 16.5k 3.9x 18pt UP NY"],"sbilanciamenti":["12:05-12:25 UP +38pt London","14:35-15:10 UP +39pt NY rally"],"commento":"Giornata bidirezionale..."}}]
-${B3}
-
-Mai chiedere conferma prima di compilare: l'utente ti manda il dump perche vuole che tu compili.
-
-${REGOLE_COMUNI}
-
-DATI DISPONIBILI:
-${dbContext}
-
-${DB_ACTIONS}`;
-
     const PROMPT_OPERATIVO = `Ti chiami Rodrigo. Sei il partner operativo di compilazione del Trade Desk.
 
 ${PROFILO}
@@ -814,9 +544,7 @@ ${dbContext}
 ${DB_ACTIONS}`;
 
     let systemPrompt;
-    if (assistantMode === "coach") systemPrompt = PROMPT_PETER;
-    else if (assistantMode === "power") systemPrompt = PROMPT_STEVE;
-    else if (assistantMode === "operativo") systemPrompt = PROMPT_OPERATIVO;
+    if (assistantMode === "operativo") systemPrompt = PROMPT_OPERATIVO;
     else systemPrompt = PROMPT_RODRIGO;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -857,7 +585,7 @@ ${DB_ACTIONS}`;
               // SELECT pre-update: solo i campi che stiamo per scrivere, per diff.
               // Se tutti i valori sono gia' identici a quelli in DB blocchiamo l'UPDATE
               // (no-op): evita di sporcare assistant_messages con echi inutili e
-              //  fa capire a Steve quando non c'e' nulla da fare.
+              //  fa capire al modello quando non c'e' nulla da fare.
               const fieldsToCheck = Object.keys(act.data);
               let preQuery = supabase.from(act.table).select(fieldsToCheck.join(","));
               for (const [k, v] of Object.entries(act.match)) {

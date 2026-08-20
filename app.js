@@ -417,8 +417,8 @@ window.selectVol = function(btn, type) {
 // 8. FLOATING CHAT WIDGET
 // ==========================================
 (function() {
-    // Non mostrare il widget nelle pagine chat dedicate
-    if (window.location.pathname.includes('dede.html') || window.location.pathname.includes('steve.html') || window.location.pathname.includes('login.html')) return;
+    // Non mostrare il widget nella pagina di login
+    if (window.location.pathname.includes('login.html')) return;
 
     var EDGE_URL = 'https://fzxjbxeadiqwfpctiyom.supabase.co/functions/v1/chat-ai';
     var ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6eGpieGVhZGlxd2ZwY3RpeW9tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNDUyNTQsImV4cCI6MjA5MDgyMTI1NH0.WpJjZrHgY33aydqpLyN-Jh9wrQmMLLVsb7lp41_y9Z0';

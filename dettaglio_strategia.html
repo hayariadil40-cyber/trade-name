@@ -129,9 +129,7 @@
 
             <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
 
-            <a href="dede.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Peter</span></a>
 
-            <a href="steve.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Steve</span></a>
 
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
 
@@ -286,6 +284,16 @@
                                             <i data-lucide="plus" class="w-3 h-3"></i>
                                         </button>
                                         <input id="new-asset-input" type="text" placeholder="custom..." class="hidden bg-transparent border-b border-tp-accent/60 outline-none text-xs text-white px-2 py-0.5 w-32" onblur="endAddCustom('new-asset-input','asset-add-btn')" onkeydown="handleAddInputKey(event,'new-asset-input','asset-add-btn',addAsset)">
+                                    </div>
+                                </div>
+                                <!-- Carattere -->
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-2 text-tp-muted/80 text-[10px] uppercase tracking-widest font-bold shrink-0 w-32">
+                                        <i data-lucide="git-branch" class="w-3.5 h-3.5 text-tp-accent/70"></i> Carattere
+                                    </div>
+                                    <div class="flex flex-wrap gap-1.5 items-center flex-1">
+                                        <button id="carattere-operativa" type="button" onclick="setCarattere('operativa')" class="chip-btn off">Operativa</button>
+                                        <button id="carattere-ipotesi" type="button" onclick="setCarattere('ipotesi')" class="chip-btn off">Ipotesi</button>
                                     </div>
                                 </div>
                                 </div><!-- /properties col -->
@@ -573,6 +581,21 @@
             await loadIpotesiCollegate();
         });
 
+        // --- CARATTERE (operativa | ipotesi) ---
+        var carattere = null;
+        window.setCarattere = function(val) {
+            carattere = (carattere === val) ? null : val;
+            renderCarattere();
+        };
+        function renderCarattere() {
+            ['operativa', 'ipotesi'].forEach(function(v) {
+                var btn = document.getElementById('carattere-' + v);
+                if (!btn) return;
+                btn.classList.toggle('on', carattere === v);
+                btn.classList.toggle('off', carattere !== v);
+            });
+        }
+
         // --- LOAD STRATEGY ---
         async function loadStrategy() {
             const { data, error } = await db
@@ -593,6 +616,8 @@
             document.getElementById('page-global-title').textContent = `Playbook: ${data.nome || 'Strategia'}`;
             document.getElementById('strat-ipotesi').value = data.ipotesi || '';
             document.getElementById('strat-gestione-operazione').value = data.gestione_operazione || '';
+            carattere = data.carattere || null;
+            renderCarattere();
 
             // Auto-resize textareas
             document.querySelectorAll('.notion-textarea').forEach(ta => {
@@ -991,6 +1016,7 @@
                 dove_esco_sl: doveEscoSL,
                 dove_esco_tp: doveEscoTP,
                 gestione_operazione: document.getElementById('strat-gestione-operazione').value,
+                carattere: carattere,
                 da_osservare: osservazioni,
                 screenshots: screenshots,
                 updated_at: new Date().toISOString()
