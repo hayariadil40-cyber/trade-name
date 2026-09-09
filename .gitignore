@@ -19,3 +19,6 @@ Thumbs.db
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
 .claude/scheduled_tasks.json
+
+# Export dati locali (dump DB, storico conto, candele)
+export/

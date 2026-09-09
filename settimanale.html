@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trade Desk - Archivio Settimanale</title>
+    <title>Trade Desk - Weekly</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,37 +11,20 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        tp: {
-                            bg: '#0B0E14',
-                            panel: '#161920',
-                            panelHover: '#1c1f26',
-                            border: '#252932',
-                            text: '#f8fafc',
-                            muted: '#848d97',
-                            accent: '#20c997',
-                            loss: '#f43f5e',
-                            warning: '#eab308'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Inter', 'sans-serif']
-                    }
-                }
-            }
-        }
+        tailwind.config = { theme: { extend: { colors: { tp: { bg:'#0B0E14', panel:'#161920', panelHover:'#1c1f26', border:'#252932', text:'#f8fafc', muted:'#848d97', accent:'#20c997', loss:'#f43f5e', warning:'#eab308' }}, fontFamily: { sans:['Inter','sans-serif'], display:['Inter','sans-serif'] }}}}
     </script>
     <style>
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #252932; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3b4252; }
+        .asset-tab.active { color: #20c997 !important; background: rgba(32,201,151,0.1); border-color: rgba(32,201,151,0.4) !important; }
+        .day-tab { background: #0B0E14; border-color: #252932; color: #848d97; }
+        .day-tab.active { background: #161920; color: #fff; border-color: #252932; }
+        .day-pane { display: none; }
+        .day-pane.active { display: block; }
+        .save-flash { animation: flashGreen 0.55s ease; }
+        @keyframes flashGreen { 0%{box-shadow:0 0 0 rgba(32,201,151,0)} 50%{box-shadow:0 0 14px rgba(32,201,151,0.5)} 100%{box-shadow:0 0 0 rgba(32,201,151,0)} }
     </style>
-    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="settings.js"></script>
@@ -49,362 +32,805 @@
 </head>
 <body class="bg-tp-bg text-tp-text font-sans h-screen flex overflow-hidden">
 
-    <!-- Sidebar Universale -->
+    <!-- Sidebar -->
     <aside class="w-16 hover:w-64 border-r border-tp-border flex flex-col flex-shrink-0 bg-tp-bg transition-all duration-300 z-50 absolute h-full lg:relative group">
-        <!-- Logo Area Team Design -->
         <div class="h-24 flex items-center justify-center lg:justify-start px-3 gap-4 border-b border-tp-border/50 overflow-hidden cursor-default w-full">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#161920] to-[#0a0c10] border border-[#20c997]/50 flex items-center justify-center shadow-[0_0_10px_rgba(32,201,151,0.2)] shrink-0 group-hover:rotate-3 transition-transform duration-300 mx-auto group-hover:mx-0">
-                <span class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-[#20c997] to-white tracking-tighter">TD</span>
-            </div>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#161920] to-[#0a0c10] border border-[#20c997]/50 flex items-center justify-center shadow-[0_0_10px_rgba(32,201,151,0.2)] shrink-0 group-hover:rotate-3 transition-transform duration-300 mx-auto group-hover:mx-0"><span class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-[#20c997] to-white tracking-tighter">TD</span></div>
             <span class="text-xl font-extrabold tracking-tighter uppercase font-display select-none opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300">Trade<span class="text-[#20c997] ml-1">Desk</span></span>
         </div>
-
-        <!-- Navigation Links Universali -->
         <nav class="flex-1 overflow-x-hidden overflow-y-auto py-6 space-y-2 flex flex-col w-full group">
-            <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span>
-            </a>
-
-            <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span>
-            </a>
-
-            <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span>
-            </a>
-
-            <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span>
-            </a>
-
-            <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span>
-            </a>
-
+            <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span></a>
+            <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span></a>
+            <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span></a>
+            <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span></a>
+            <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg bg-[#161920] text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0 text-tp-accent"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span></a>
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-
-            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span>
-            </a>
-
-            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span>
-            </a>
-
-            <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span>
-            </a>
-
+            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span></a>
+            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span></a>
+            <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span></a>
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-
-            <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span>
-            </a>
-
-            <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span>
-            </a>
+            <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span></a>
+            <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span></a>
             <a href="ipotesi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Ipotesi</span></a>
-
             <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
-
-
-
             <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
-
-            <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0">
-                <div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div>
-                <span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span>
-            </a>
-
+            <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span></a>
         </nav>
     </aside>
 
     <main class="flex-1 flex flex-col h-full bg-[#0e1116] relative overflow-hidden">
-
-        <!-- HEADER UNIVERSALE -->
+        <!-- Header -->
         <header class="flex justify-between items-center px-4 py-3 lg:px-8 lg:py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
-
-            <!-- 1. LEFT: Page Title & Quick Actions -->
             <div class="flex items-center gap-4 w-auto min-w-max">
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Weekly Review</h1>
+                    <h1 class="text-xl font-bold tracking-tight text-white mb-1" id="page-global-title">Weekly</h1>
                     <div class="flex flex-col gap-1 mt-1"><div class="flex gap-2">
                         <a href="index.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i> Dashboard</a>
                         <a href="tabella_trades.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Tabella Trades</a>
-                        <a href="#" onclick="goToOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Oggi</a></div><div class="flex gap-2"><a href="#" onclick="goToSessioniOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="layers" class="w-3.5 h-3.5"></i> Sessioni</a><a href="#" onclick="goToBiasOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="brain" class="w-3.5 h-3.5"></i> Bias</a><a href="#" onclick="goToIpotesiOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="target" class="w-3.5 h-3.5"></i> Ipotesi</a></div>
+                        <a href="#" onclick="goToOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Oggi</a></div><div class="flex gap-2"><a href="sessioni.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="layers" class="w-3.5 h-3.5"></i> Sessioni</a><a href="#" onclick="goToBiasOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="brain" class="w-3.5 h-3.5"></i> Bias</a><a href="#" onclick="goToIpotesiOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="target" class="w-3.5 h-3.5"></i> Ipotesi</a></div>
                     </div>
                 </div>
             </div>
-
-            <!-- 2. CENTER: Timeline (Cronoprogramma) -->
             <div class="hidden lg:flex items-center flex-1 max-w-3xl mx-8 gap-6">
-                <!-- Digital Clock & TFs -->
                 <div class="flex flex-col items-center justify-center shrink-0">
                     <span id="digital-clock" class="text-xl font-display font-bold text-white tracking-widest tabular-nums leading-none">00:00:00</span>
                     <div class="flex gap-1 mt-1.5">
-                        <span id="tf-5m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">5m</span>
-                        <span id="tf-15m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">15m</span>
-                        <span id="tf-30m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">30m</span>
-                        <span id="tf-1h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">1h</span>
-                        <span id="tf-4h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted transition-colors">4h</span>
+                        <span id="tf-5m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted">5m</span>
+                        <span id="tf-15m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted">15m</span>
+                        <span id="tf-30m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted">30m</span>
+                        <span id="tf-1h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted">1h</span>
+                        <span id="tf-4h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted">4h</span>
                     </div>
                 </div>
-
-                <!-- Timeline Container -->
                 <div class="flex-col flex-1 relative w-full mx-4">
                     <div class="flex justify-between text-[10px] items-end font-bold uppercase tracking-widest mb-2 px-2">
-                        <span class="text-tp-muted opacity-30">Asia</span>
-                        <span class="text-tp-muted opacity-60">London</span>
-                        <span class="text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] scale-110 origin-bottom transition-all">New York (14-17)</span>
-                        <span class="text-tp-muted opacity-30">End</span>
+                        <span class="text-tp-muted opacity-30">Asia</span><span class="text-tp-muted opacity-60">London</span><span class="text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] scale-110 origin-bottom">New York (14-17)</span><span class="text-tp-muted opacity-30">End</span>
                     </div>
                     <div class="h-2 w-full bg-gradient-to-r from-tp-bg via-tp-border to-tp-bg rounded-full border border-tp-border/30 relative shadow-inner">
-                        <div id="timeline-progress" class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-teal-600 via-tp-accent to-[#22d3ee] rounded-full shadow-[0_0_10px_rgba(32,201,151,0.5)]" style="width: 45%;"></div>
-                        <div id="timeline-dot" class="timeline-cursor absolute top-1/2 -ml-2.5 -mt-2.5 w-5 h-5 bg-white rounded-full border-[3px] border-tp-accent shadow-[0_0_15px_rgba(32,201,151,0.9)] z-10" style="left: 45%;"></div>
-                        <div class="absolute left-[30%] top-0 bottom-0 w-px bg-tp-border/50"></div>
-                        <div class="absolute left-[50%] top-0 bottom-0 w-px bg-tp-border/50"></div>
-                        <div class="absolute left-[70%] top-0 bottom-0 w-px bg-tp-border/50"></div>
-                        <div class="absolute left-[45%] -top-1 -bottom-1 w-[2px] bg-tp-text/20 rounded-full blur-[1px]"></div>
+                        <div id="timeline-progress" class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-teal-600 via-tp-accent to-[#22d3ee] rounded-full" style="width:45%"></div>
+                        <div id="timeline-dot" class="absolute top-1/2 -ml-2.5 -mt-2.5 w-5 h-5 bg-white rounded-full border-[3px] border-tp-accent shadow-[0_0_15px_rgba(32,201,151,0.9)] z-10" style="left:45%"></div>
                     </div>
                 </div>
             </div>
-
-            <!-- 3. RIGHT: Indicators + Win Rate -->
             <div class="flex items-center gap-4 w-auto shrink-0 justify-end">
                 <div class="hidden xl:flex items-center gap-6 bg-gradient-to-b from-[#13161c] to-[#0a0c10] border border-tp-border/40 px-6 py-3 rounded-2xl shadow-inner h-16 mr-4">
-                    <div class="flex flex-col items-center gap-1 group relative w-10">
-                        <i id="mindset-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent transition-all duration-300 transform drop-shadow-md"></i>
-                    </div>
-                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div><div id="volatility-coins" class="flex items-center gap-3"></div>
+                    <div class="flex flex-col items-center gap-1 w-10"><i id="mindset-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent drop-shadow-md"></i></div>
+                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
+                    <div id="volatility-coins" class="flex items-center gap-3"></div>
                 </div>
-                <div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem] shadow-[0_0_15px_rgba(32,201,151,0.05)]">
-                    <div class="flex flex-col">
-                        <span class="text-[9px] text-tp-accent font-bold uppercase tracking-widest opacity-80">Win Rate</span>
-                        <span id="header-winrate" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-tp-accent to-white drop-shadow-[0_0_8px_rgba(32,201,151,0.6)] leading-none mt-0.5">--%</span>
-                    </div>
-                    <div class="relative w-10 h-10 flex items-center justify-center">
-                        <svg class="w-[120%] h-[120%] transform -rotate-90 overflow-visible absolute" viewBox="0 0 36 36">
-                            <path class="text-tp-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
-                            <path id="header-winrate-ring" class="text-tp-accent drop-shadow-[0_0_4px_rgba(32,201,151,0.8)]" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" />
-                        </svg>
-                    </div>
+                <div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem]">
+                    <div class="flex flex-col"><span class="text-[9px] text-tp-accent font-bold uppercase tracking-widest opacity-80">Win Rate</span><span id="header-winrate" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-tp-accent to-white leading-none mt-0.5">--%</span></div>
+                    <div class="relative w-10 h-10 flex items-center justify-center"><svg class="w-[120%] h-[120%] transform -rotate-90 overflow-visible absolute" viewBox="0 0 36 36"><path class="text-tp-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"/><path id="header-winrate-ring" class="text-tp-accent" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg></div>
                 </div>
             </div>
         </header>
 
-        <!-- Content: Card Grid -->
-        <div class="flex-1 overflow-y-auto p-3 lg:p-8 scroll-smooth">
-            <div class="max-w-[1200px] mx-auto">
+        <!-- Week nav + Asset tabs -->
+        <div class="flex items-center gap-3 px-4 lg:px-6 py-2.5 border-b border-tp-border bg-tp-panel flex-shrink-0 flex-wrap">
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+                <button onclick="changeWeek(-1)" class="w-7 h-7 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-white hover:border-tp-muted flex items-center justify-center transition-colors">
+                    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                </button>
+                <span id="week-display" class="text-white font-bold text-xs w-64 text-center select-none">—</span>
+                <button onclick="changeWeek(1)" class="w-7 h-7 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-white hover:border-tp-muted flex items-center justify-center transition-colors">
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="goToThisWeek()" class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-tp-accent hover:border-tp-accent/40 transition-colors">Questa sett.</button>
+            </div>
+            <div class="w-px h-5 bg-tp-border flex-shrink-0"></div>
+            <div class="flex gap-1.5 flex-wrap" id="asset-tabs"></div>
+        </div>
 
-                <!-- Top bar with button -->
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-sm font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2">
-                        <i data-lucide="calendar-days" class="w-4 h-4"></i> Archivio Settimane
-                    </h2>
-                    <button onclick="createCurrentWeek()" class="flex items-center gap-2 text-xs font-bold px-4 py-2.5 rounded-lg bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors">
-                        <i data-lucide="plus" class="w-4 h-4"></i> Nuova Settimana
-                    </button>
+        <!-- Main content -->
+        <div class="flex-1 overflow-y-auto p-4 lg:p-6">
+            <div class="w-full flex flex-col gap-5">
+
+                <!-- Grafico settimanale (filo conduttore) -->
+                <div class="bg-tp-panel border border-tp-border rounded-xl overflow-hidden">
+                    <div class="flex items-center justify-between px-4 py-2.5 border-b border-tp-border">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="line-chart" class="w-4 h-4 text-tp-accent"></i>
+                            <span class="text-xs font-bold uppercase tracking-widest text-tp-muted">Filo conduttore · <span id="chart-asset-label" class="text-white">XAUUSD</span> · H1</span>
+                        </div>
+                        <span id="chart-range-label" class="text-[10px] font-bold text-tp-muted uppercase tracking-wider">—</span>
+                    </div>
+                    <canvas id="week-chart" class="block w-full" style="height:440px;background:#0d1117"></canvas>
                 </div>
 
-                <!-- Card Grid -->
-                <div id="weeks-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    <!-- Cards injected by JS -->
+                <!-- Sbilanciamenti — rally direzionali M15, una colonna per giorno -->
+                <div class="bg-tp-panel border border-tp-border rounded-xl overflow-hidden">
+                    <div onclick="toggleSbilWeek()" class="flex items-center justify-between px-4 py-2.5 cursor-pointer select-none hover:bg-white/[.02] transition-colors">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="zap" class="w-4 h-4 text-tp-accent"></i>
+                            <span class="text-xs font-bold uppercase tracking-widest text-tp-muted">Sbilanciamenti — Rally Direzionali · <span id="sbil-asset-label" class="text-white">XAUUSD</span> · M15</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span id="sbil-week-count" class="text-[10px] font-bold text-tp-muted uppercase tracking-wider">—</span>
+                            <i id="sbil-chevron" data-lucide="chevron-down" class="w-4 h-4 text-tp-muted transition-transform"></i>
+                        </div>
+                    </div>
+                    <div id="sbil-week-grid" class="grid grid-cols-5 divide-x divide-tp-border/40 border-t border-tp-border hidden">
+                        <p class="col-span-5 text-[11px] text-tp-muted/40 p-4">Caricamento...</p>
+                    </div>
                 </div>
 
-                <!-- Empty state -->
-                <div id="empty-state" class="hidden text-center py-20">
-                    <i data-lucide="calendar-x" class="w-12 h-12 text-tp-muted mx-auto mb-4"></i>
-                    <p class="text-tp-muted text-sm">Nessuna settimana registrata. Clicca "+ Nuova Settimana" per iniziare.</p>
+                <!-- KPI -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="bg-tp-panel border border-tp-border rounded-xl p-4"><p class="text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-1">Net P/L</p><p id="kpi-pnl" class="text-xl font-black text-white">--</p></div>
+                    <div class="bg-tp-panel border border-tp-border rounded-xl p-4"><p class="text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-1">Win Rate</p><p id="kpi-winrate" class="text-xl font-black text-white">--</p></div>
+                    <div class="bg-tp-panel border border-tp-border rounded-xl p-4"><p class="text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-1">Trades</p><p id="kpi-trades" class="text-xl font-black text-white">--</p></div>
+                    <div class="bg-tp-panel border border-tp-border rounded-xl p-4"><p class="text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-1">Giorni operati</p><p id="kpi-days" class="text-xl font-black text-white">--</p></div>
                 </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                    <!-- LEFT: giornate + lezioni -->
+                    <div class="lg:col-span-5 flex flex-col gap-4">
+                        <h2 class="text-sm font-bold uppercase tracking-widest text-tp-accent border-b border-tp-border pb-2 flex items-center gap-2">
+                            <i data-lucide="calendar" class="w-4 h-4"></i> Giornate
+                        </h2>
+                        <div class="flex flex-col">
+                            <div class="flex gap-1.5 flex-wrap" id="day-tabs"></div>
+                            <div id="day-panes" class="border border-tp-border rounded-b-xl rounded-tr-xl bg-tp-panel min-h-[160px]"></div>
+                        </div>
+
+                        <h2 class="text-sm font-bold uppercase tracking-widest text-tp-accent border-b border-tp-border pb-2 mt-4 flex items-center justify-between gap-2">
+                            <span class="flex items-center gap-2"><i data-lucide="edit-3" class="w-4 h-4"></i> Lezioni e Pianificazione</span>
+                            <button onclick="saveWeek()" id="save-week-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 transition-colors normal-case tracking-normal">
+                                <i data-lucide="save" class="w-3.5 h-3.5"></i> Salva
+                            </button>
+                        </h2>
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                            <div class="bg-tp-panel border border-tp-border rounded-xl p-4 flex flex-col">
+                                <h3 class="text-[11px] font-bold uppercase tracking-widest text-tp-accent mb-3 flex items-center gap-2"><i data-lucide="thumbs-up" class="w-3.5 h-3.5"></i> Cosa ha funzionato</h3>
+                                <textarea id="review" class="flex-1 w-full bg-[#0a0c10] border border-transparent rounded-lg p-3 text-sm text-tp-text/90 resize-none outline-none focus:border-tp-accent/50 transition-colors" style="min-height:120px" placeholder="Pattern, setup, comportamenti che hanno funzionato..."></textarea>
+                            </div>
+                            <div class="bg-[#0a0c10] border border-tp-border rounded-xl p-4 flex flex-col">
+                                <h3 class="text-[11px] font-bold uppercase tracking-widest text-tp-warning mb-3 flex items-center gap-2"><i data-lucide="globe-2" class="w-3.5 h-3.5"></i> Settimana successiva</h3>
+                                <textarea id="next-week" class="flex-1 w-full bg-transparent border-none p-2 text-sm text-tp-text resize-none outline-none focus:ring-0" style="min-height:120px" placeholder="Sentiment, livelli macro, piano operativo..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: diario -->
+                    <div class="lg:col-span-7 flex flex-col gap-4">
+                        <h2 class="text-sm font-bold uppercase tracking-widest text-[#848d97] border-b border-[#252932] pb-2 flex items-center gap-2">
+                            <i data-lucide="book" class="w-4 h-4"></i> Diario
+                        </h2>
+                        <div id="appunti-list" class="space-y-2"></div>
+                        <div class="flex flex-col gap-2 mt-2 bg-tp-panel border border-tp-border rounded-xl p-4">
+                            <div class="flex gap-2 items-start">
+                                <input id="appunto-ora" type="datetime-local" class="bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[190px] flex-shrink-0"/>
+                                <textarea id="appunto-testo" rows="2" class="flex-1 bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Appunto, insight, osservazione..." oninput="this.style.height='';this.style.height=this.scrollHeight+'px'"></textarea>
+                                <button type="button" onclick="addAppunto()" class="px-4 py-2 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 hover:bg-tp-accent/20 uppercase transition-all flex items-center gap-2 flex-shrink-0">
+                                    <i data-lucide="plus" class="w-4 h-4"></i> Aggiorna
+                                </button>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5 items-center">
+                                <span class="text-[10px] text-tp-muted font-bold uppercase tracking-wider mr-1">Tag:</span>
+                                <div id="appunto-tags-row" class="flex flex-wrap gap-1.5 items-center"></div>
+                                <div class="flex items-center gap-1 ml-1">
+                                    <input id="appunto-tag-custom" type="text" placeholder="+ nuovo" maxlength="24"
+                                        class="bg-[#0a0c10] border border-tp-border/60 rounded px-2 py-0.5 text-[11px] text-tp-text/80 outline-none focus:border-tp-accent transition-colors w-[90px]"
+                                        onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomTag();}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>
 
     <script src="app.js"></script>
     <script>
-    (async function() {
-        const grid = document.getElementById('weeks-grid');
-        const emptyState = document.getElementById('empty-state');
+    const ASSETS = ['XAUUSD', 'US30', 'GER30', 'NAS100', 'BTCUSD', 'EURUSD'];
+    const PRESET_TAGS = ['strategia','mindset','claude','io','vantaggio','fvg','bug'];
+    const DAY_NAMES = ['Domenica', 'Lunedi', 'Martedi', 'Mercoledi', 'Giovedi', 'Venerdi', 'Sabato'];
+    const DAY_SHORT = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
 
-        // Get current week boundaries (Monday-Friday)
-        function getCurrentWeekRange() {
-            const now = new Date();
-            const day = now.getDay(); // 0=Sun, 1=Mon...
-            const diffMon = day === 0 ? -6 : 1 - day;
-            const monday = new Date(now);
-            monday.setDate(now.getDate() + diffMon);
-            monday.setHours(0,0,0,0);
-            const friday = new Date(monday);
-            friday.setDate(monday.getDate() + 4);
-            friday.setHours(0,0,0,0);
-            return { monday, friday };
-        }
+    let activeAsset = 'XAUUSD';
+    let currentMonday = null;   // 'YYYY-MM-DD'
+    let weekRow = null;         // riga settimane (o null se non esiste ancora)
+    let weekTrades = [];        // trades della settimana (tutti gli asset)
+    let giornateMap = {};
+    let appunti = [];
+    let newAppuntoTags = [];
 
-        function formatDate(d) {
-            const dt = new Date(d);
-            return dt.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
-        }
+    function casaTodayStr() { return new Date(Date.now() + 60 * 60000).toISOString().split('T')[0]; }
 
-        function formatDateFull(d) {
-            const dt = new Date(d);
-            return dt.toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' });
-        }
+    function mondayOf(dateStr) {
+        const d = new Date(dateStr + 'T00:00:00Z');
+        const dow = d.getUTCDay();
+        d.setUTCDate(d.getUTCDate() + (dow === 0 ? -6 : 1 - dow));
+        return d.toISOString().slice(0, 10);
+    }
+    function addDays(dateStr, n) {
+        const d = new Date(dateStr + 'T00:00:00Z');
+        d.setUTCDate(d.getUTCDate() + n);
+        return d.toISOString().slice(0, 10);
+    }
+    function getWeekNumber(dateStr) {
+        const d = new Date(dateStr);
+        const start = new Date(d.getFullYear(), 0, 1);
+        const diff = (d - start + ((start.getTimezoneOffset() - d.getTimezoneOffset()) * 60000)) / 86400000;
+        return Math.ceil((diff + start.getDay() + 1) / 7);
+    }
+    function formatDate(d) { return new Date(d).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }); }
+    function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function mindsetIcon(mindset) {
+        if (!mindset) return { icon: 'minus', color: 'text-tp-muted' };
+        const m = parseInt(mindset);
+        if (m >= 4) return { icon: 'smile', color: 'text-tp-accent' };
+        if (m >= 2) return { icon: 'meh', color: 'text-tp-warning' };
+        return { icon: 'frown', color: 'text-tp-loss' };
+    }
 
-        function getWeekNumber(dateStr) {
-            const d = new Date(dateStr);
-            const start = new Date(d.getFullYear(), 0, 1);
-            const diff = (d - start + ((start.getTimezoneOffset() - d.getTimezoneOffset()) * 60000)) / 86400000;
-            return Math.ceil((diff + start.getDay() + 1) / 7);
-        }
+    // ─── Init ─────────────────────────────────────────────────────────────
+    const _urlDate = new URLSearchParams(location.search).get('date');
+    currentMonday = mondayOf((_urlDate && /^\d{4}-\d{2}-\d{2}$/.test(_urlDate)) ? _urlDate : casaTodayStr());
 
-        function isSameWeek(dataInizio) {
-            const { monday } = getCurrentWeekRange();
-            const weekStart = new Date(dataInizio);
-            return weekStart.toISOString().slice(0,10) === monday.toISOString().slice(0,10);
-        }
+    document.addEventListener('DOMContentLoaded', async () => {
+        lucide.createIcons();
+        renderAssetTabs();
+        await loadWeek();
+    });
 
-        // Load weeks
-        async function loadWeeks() {
-            const { data: weeks, error } = await db
-                .from('settimane')
-                .select('*')
-                .order('data_inizio', { ascending: false });
+    // ─── Navigazione ──────────────────────────────────────────────────────
+    function changeWeek(delta) { currentMonday = addDays(currentMonday, delta * 7); loadWeek(); }
+    function goToThisWeek() { currentMonday = mondayOf(casaTodayStr()); loadWeek(); }
 
-            if (error) { console.error(error); return; }
-            if (!weeks || weeks.length === 0) {
-                emptyState.classList.remove('hidden');
-                grid.innerHTML = '';
-                return;
+    async function goToOggi(e) {
+        if (e) e.preventDefault();
+        const { data } = await db.from('giornate').select('id').eq('data', casaTodayStr()).maybeSingle();
+        if (data?.id) window.location.href = 'dettaglio_giornata.html?id=' + data.id;
+    }
+    async function goToBiasOggi(e) {
+        if (e) e.preventDefault();
+        const { data } = await db.from('bias').select('id').eq('data', casaTodayStr()).maybeSingle();
+        window.location.href = data?.id ? 'dettaglio_bias.html?id=' + data.id : 'dettaglio_bias.html';
+    }
+    function goToIpotesiOggi(e) {
+        if (e) e.preventDefault();
+        window.location.href = 'ipotesi.html?date=' + casaTodayStr();
+    }
+
+    // ─── Asset tabs ───────────────────────────────────────────────────────
+    function renderAssetTabs() {
+        document.getElementById('asset-tabs').innerHTML = ASSETS.map(a => `
+            <button onclick="setActiveAsset('${a}')" data-asset="${a}"
+                class="asset-tab text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors ${a === activeAsset ? 'active' : ''}">
+                ${a}
+            </button>`).join('');
+    }
+    function setActiveAsset(a) {
+        activeAsset = a;
+        renderAssetTabs();
+        document.getElementById('chart-asset-label').textContent = a;
+        requestAnimationFrame(drawWeekChart);
+    }
+
+    // ─── Load settimana ───────────────────────────────────────────────────
+    async function loadWeek() {
+        const friday = addDays(currentMonday, 4);
+        const weekNum = getWeekNumber(currentMonday);
+        const isCurrent = currentMonday === mondayOf(casaTodayStr());
+        document.getElementById('week-display').textContent =
+            `Settimana ${weekNum} · ${formatDate(currentMonday)} – ${formatDate(friday)}${isCurrent ? ' · in corso' : ''}`;
+        document.getElementById('chart-range-label').textContent = `${formatDate(currentMonday)} – ${formatDate(friday)}`;
+
+        // riga settimane (puo non esistere: si crea al primo salvataggio)
+        const [{ data: weeks }, { data: giornate }, { data: trades }] = await Promise.all([
+            db.from('settimane').select('*').eq('data_inizio', currentMonday).limit(1),
+            db.from('giornate').select('*').gte('data', addDays(currentMonday, -1)).lte('data', friday).order('data', { ascending: true }),
+            db.from('trades').select('data, pnl, esito, asset, direzione')
+                .gte('data', currentMonday + 'T00:00:00')
+                .lte('data', friday + 'T23:59:59')
+        ]);
+
+        weekRow = (weeks && weeks[0]) || null;
+        weekTrades = trades || [];
+        giornateMap = {};
+        (giornate || []).forEach(g => { giornateMap[g.data] = g; });
+
+        document.getElementById('review').value = weekRow?.review || '';
+        document.getElementById('next-week').value = weekRow?.note || '';
+        appunti = Array.isArray(weekRow?.appunti) ? weekRow.appunti.slice() : [];
+        const now = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        document.getElementById('appunto-ora').value = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        newAppuntoTags = [];
+        renderAppunti();
+        renderTagRow();
+
+        renderKpi();
+        renderDays();
+        lucide.createIcons();
+        requestAnimationFrame(drawWeekChart);
+    }
+
+    // ─── KPI ──────────────────────────────────────────────────────────────
+    function renderKpi() {
+        const wins = weekTrades.filter(t => t.esito === 'win').length;
+        const losses = weekTrades.filter(t => t.esito === 'loss').length;
+        const winRate = (wins + losses) > 0 ? Math.round((wins / (wins + losses)) * 100) : null;
+        const net = weekTrades.reduce((s, t) => s + (parseFloat(t.pnl) || 0), 0);
+        const days = new Set(weekTrades.map(t => (t.data || '').slice(0, 10))).size;
+
+        const pnlEl = document.getElementById('kpi-pnl');
+        pnlEl.textContent = weekTrades.length ? `${net > 0 ? '+ ' : net < 0 ? '- ' : ''}$${Math.abs(net).toFixed(2)}` : '--';
+        pnlEl.className = 'text-xl font-black ' + (net > 0 ? 'text-tp-accent' : net < 0 ? 'text-tp-loss' : 'text-white');
+        document.getElementById('kpi-winrate').textContent = winRate !== null ? winRate + '%' : '--';
+        document.getElementById('kpi-trades').textContent = weekTrades.length || '--';
+        document.getElementById('kpi-days').textContent = weekTrades.length ? `${days} / 5` : '--';
+    }
+
+    // ─── Giornate (tabs lun-ven) ──────────────────────────────────────────
+    function renderDays() {
+        const tradesMap = {};
+        weekTrades.forEach(t => {
+            const k = (t.data || '').slice(0, 10);
+            (tradesMap[k] = tradesMap[k] || []).push(t);
+        });
+
+        let tabsHtml = '', panesHtml = '';
+        for (let i = 0; i < 5; i++) {
+            const dateStr = addDays(currentMonday, i);
+            const giornata = giornateMap[dateStr];
+            const dayTrades = tradesMap[dateStr] || [];
+            const dt = new Date(dateStr + 'T00:00:00');
+            const isActive = i === 0;
+
+            const tp = dayTrades.filter(t => t.esito === 'win').length;
+            const sl = dayTrades.filter(t => t.esito === 'loss').length;
+            const dayPnl = dayTrades.reduce((s, t) => s + (parseFloat(t.pnl) || 0), 0);
+
+            let dot = '';
+            if (dayTrades.length > 0) {
+                const dc = dayPnl > 0 ? 'bg-tp-accent' : dayPnl < 0 ? 'bg-tp-loss' : 'bg-tp-muted';
+                dot = `<span class="w-1.5 h-1.5 rounded-full ${dc} inline-block"></span>`;
             }
+            tabsHtml += `<button onclick="switchDayTab('${dateStr}')" id="day-tab-${dateStr}"
+                class="day-tab ${isActive ? 'active' : ''} px-3 py-2 rounded-t-lg text-xs font-bold border border-b-0 uppercase transition-all flex items-center gap-1.5">
+                ${DAY_SHORT[dt.getDay()]} ${dt.getDate()} ${dot}
+            </button>`;
 
-            emptyState.classList.add('hidden');
+            if (giornata) {
+                const ms = mindsetIcon(giornata.mindset);
+                const pnlColor = dayPnl > 0 ? 'text-tp-accent' : dayPnl < 0 ? 'text-tp-loss' : 'text-tp-muted';
+                const pnlText = dayTrades.length > 0 ? `${dayPnl > 0 ? '+ ' : dayPnl < 0 ? '- ' : ''}$${Math.abs(dayPnl).toFixed(2)}` : '--';
+                const prevKey = addDays(dateStr, -1);
+                const commentiIeri = giornateMap[prevKey]?.note_domani || '';
+                const commentiDomani = giornata.note_domani || '';
+                const fajrBadge = giornata.fajr === true
+                    ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-tp-accent/10 border border-tp-accent/30 text-tp-accent text-xs font-bold"><i data-lucide="check" class="w-3 h-3"></i> Fajr</span>`
+                    : giornata.fajr === false
+                    ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-tp-loss/10 border border-tp-loss/30 text-tp-loss text-xs font-bold"><i data-lucide="x" class="w-3 h-3"></i> Fajr</span>`
+                    : `<span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-tp-panel border border-tp-border text-tp-muted text-xs font-bold">-- Fajr</span>`;
 
-            // Fetch all trades to calculate stats per week
-            const { data: allTrades } = await db
-                .from('trades')
-                .select('data, pnl, esito');
-
-            let html = '';
-            for (const w of weeks) {
-                const current = isSameWeek(w.data_inizio);
-                const weekNum = getWeekNumber(w.data_inizio);
-
-                // Calculate stats from trades in date range — confronta solo la parte YYYY-MM-DD del timestamp
-                const weekTrades = (allTrades || []).filter(t => {
-                    const day = (t.data || '').slice(0, 10);
-                    return day >= w.data_inizio && day <= w.data_fine;
-                });
-                const totalTrades = weekTrades.length;
-                const wins = weekTrades.filter(t => t.esito === 'win').length;
-                const losses = weekTrades.filter(t => t.esito === 'loss').length;
-                const winRate = (wins + losses) > 0 ? Math.round((wins / (wins + losses)) * 100) : null;
-                const netProfit = weekTrades.reduce((sum, t) => sum + (parseFloat(t.pnl) || 0), 0);
-
-                const isProfit = netProfit > 0;
-                const isLoss = netProfit < 0;
-
-                let borderClass, hoverClass, titleColorClass, opacityClass;
-                if (current) {
-                    borderClass = 'border-tp-accent border-dashed';
-                    hoverClass = 'hover:bg-[#1c1f26]';
-                    titleColorClass = 'text-tp-accent';
-                    opacityClass = '';
-                } else if (isLoss) {
-                    borderClass = 'border-tp-loss/40';
-                    hoverClass = 'hover:border-tp-loss/50';
-                    titleColorClass = 'text-white group-hover:text-tp-loss';
-                    opacityClass = 'opacity-80';
-                } else if (isProfit) {
-                    borderClass = 'border-tp-accent/40';
-                    hoverClass = 'hover:border-tp-accent/50';
-                    titleColorClass = 'text-white group-hover:text-tp-accent';
-                    opacityClass = '';
-                } else {
-                    borderClass = 'border-tp-border';
-                    hoverClass = 'hover:border-tp-accent/50';
-                    titleColorClass = 'text-white group-hover:text-tp-accent';
-                    opacityClass = '';
-                }
-
-                const profitColor = netProfit > 0 ? 'text-tp-accent' : netProfit < 0 ? 'text-tp-loss' : 'text-tp-muted';
-                const profitSign = netProfit > 0 ? '+ ' : netProfit < 0 ? '- ' : '';
-                const profitDisplay = totalTrades > 0
-                    ? `${profitSign}$${Math.abs(netProfit).toFixed(2)}`
-                    : '--';
-
-                html += `
-                <div onclick="window.location.href='dettaglio_settimana.html?id=${w.id}'"
-                     class="bg-tp-panel border ${borderClass} rounded-xl p-6 ${hoverClass} transition-all cursor-pointer group shadow-lg ${opacityClass} ${current ? "drop-shadow-[0_0_15px_rgba(32,201,151,0.05)]" : "shadow-sm"}">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 class="text-xl font-bold ${titleColorClass} mb-1 transition-colors">Week ${weekNum}${current ? ' (Corrente)' : ''}</h3>
-                            <p class="text-xs text-tp-muted uppercase tracking-wider font-bold">${formatDateFull(w.data_inizio)} - ${formatDateFull(w.data_fine)}</p>
+                panesHtml += `<div id="day-pane-${dateStr}" class="day-pane ${isActive ? 'active' : ''} p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-[#0a0c10] border border-tp-border flex items-center justify-center"><i data-lucide="${ms.icon}" class="w-5 h-5 ${ms.color}"></i></div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">${DAY_NAMES[dt.getDay()]} ${dt.getDate()}</h4>
+                                <span class="text-[10px] text-tp-muted font-bold uppercase tracking-wider">${dateStr}</span>
+                            </div>
                         </div>
-                        ${current
-                            ? `<span class="bg-tp-accent/20 text-tp-accent px-2 py-1 rounded text-[10px] font-bold uppercase border border-tp-accent">In corso</span>`
-                            : ''}
+                        <a href="dettaglio_giornata.html?id=${giornata.id}" class="flex items-center gap-1.5 text-[10px] font-bold px-3 py-1.5 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-white hover:border-tp-accent/50 transition-colors">
+                            <i data-lucide="external-link" class="w-3 h-3"></i> Dettaglio
+                        </a>
                     </div>
-
-                    <div class="space-y-3 mt-6 border-t border-tp-border/50 pt-4">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-tp-muted">Win Rate:</span>
-                            <span class="font-bold text-white">${winRate !== null ? winRate + '%' : '--'}</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-tp-muted">Net Profit:</span>
-                            <span class="font-bold ${profitColor}">${profitDisplay}</span>
-                        </div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        ${fajrBadge}
+                        <span class="${tp > 0 ? 'bg-tp-accent/20 text-tp-accent border-tp-accent/20' : 'bg-tp-bg text-tp-text border-tp-border'} border text-[10px] font-bold px-2 py-1 rounded-lg">${tp} TP</span>
+                        <span class="${sl > 0 ? 'bg-tp-loss/10 text-tp-loss border-tp-loss/20' : 'bg-tp-bg text-tp-text border-tp-border'} border text-[10px] font-bold px-2 py-1 rounded-lg">${sl} SL</span>
+                        <span class="font-bold ${pnlColor} ml-auto text-sm">${pnlText}</span>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-tp-muted font-bold uppercase tracking-wider mb-1">Ieri per oggi</p>
+                        <p class="text-sm text-tp-text/80 leading-relaxed bg-[#0a0c10] rounded-lg px-3 py-2 min-h-[36px]">${escHtml(commentiIeri) || '<span class="text-tp-muted/40 italic">--</span>'}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-tp-muted font-bold uppercase tracking-wider mb-1">Oggi per domani</p>
+                        <p class="text-sm text-tp-text/80 leading-relaxed bg-[#0a0c10] rounded-lg px-3 py-2 min-h-[36px]">${escHtml(commentiDomani) || '<span class="text-tp-muted/40 italic">--</span>'}</p>
+                    </div>
+                </div>`;
+            } else {
+                panesHtml += `<div id="day-pane-${dateStr}" class="day-pane ${isActive ? 'active' : ''} p-5">
+                    <div class="flex flex-col items-center justify-center h-28 text-tp-muted/40">
+                        <i data-lucide="minus" class="w-8 h-8 mb-2"></i>
+                        <span class="text-xs font-bold uppercase tracking-wider">Nessuna giornata</span>
                     </div>
                 </div>`;
             }
-            grid.innerHTML = html;
-            lucide.createIcons();
+        }
+        document.getElementById('day-tabs').innerHTML = tabsHtml;
+        document.getElementById('day-panes').innerHTML = panesHtml;
+    }
+
+    function switchDayTab(dateStr) {
+        document.querySelectorAll('.day-tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.day-pane').forEach(p => p.classList.remove('active'));
+        document.getElementById('day-tab-' + dateStr)?.classList.add('active');
+        document.getElementById('day-pane-' + dateStr)?.classList.add('active');
+    }
+
+    // ─── Grafico settimanale H1 ───────────────────────────────────────────
+    async function drawWeekChart() {
+        const cv = document.getElementById('week-chart');
+        if (!cv) return;
+        const dpr = window.devicePixelRatio || 1;
+        const W = cv.clientWidth, H = cv.clientHeight;
+        if (!W || !H) return;
+        cv.width = W * dpr; cv.height = H * dpr;
+        const ctx = cv.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#0d1117';
+        ctx.fillRect(0, 0, W, H);
+
+        const loadStart = currentMonday + 'T00:00:00Z';
+        const loadEnd = addDays(currentMonday, 5) + 'T00:00:00Z'; // sabato 00:00
+        const coin = activeAsset;
+        const monday = currentMonday; // snapshot per evitare race su navigazione veloce
+
+        const { data: rows } = await db.from('candles_15m')
+            .select('ts, open, high, low, close')
+            .eq('coin', coin)
+            .gte('ts', loadStart)
+            .lt('ts', loadEnd)
+            .order('ts', { ascending: true })
+            .limit(500);
+
+        if (monday !== currentMonday || coin !== activeAsset) return; // risposta obsoleta
+
+        renderWeekSbilanciamenti(rows || [], coin, monday);
+
+        // Aggregazione 15m → 1h
+        const hourMs = 3600000;
+        const buckets = new Map();
+        (rows || []).forEach(r => {
+            const tMs = new Date(r.ts).getTime();
+            const key = Math.floor(tMs / hourMs) * hourMs;
+            const o = parseFloat(r.open), h = parseFloat(r.high), l = parseFloat(r.low), c = parseFloat(r.close);
+            const b = buckets.get(key);
+            if (!b) buckets.set(key, { tMs: key, o, h, l, c });
+            else { b.h = Math.max(b.h, h); b.l = Math.min(b.l, l); b.c = c; }
+        });
+        const candles = [...buckets.values()].sort((a, b) => a.tMs - b.tMs);
+
+        if (candles.length === 0) {
+            ctx.fillStyle = '#454e5a';
+            ctx.font = '13px Inter, sans-serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('Nessun dato · ' + coin, W / 2, H / 2);
+            return;
         }
 
-        // Create current week record
-        window.createCurrentWeek = async function() {
-            const { monday, friday } = getCurrentWeekRange();
-            const mondayStr = monday.toISOString().slice(0,10);
-            const fridayStr = friday.toISOString().slice(0,10);
+        const padL = 56, padR = 8, padT = 22, padB = 26;
+        const x0 = padL, x1 = W - padR, y0 = padT, y1 = H - padB;
+        const t0ms = new Date(loadStart).getTime();
+        const t1ms = new Date(loadEnd).getTime();
+        function pxX(ms) { return x0 + (ms - t0ms) / (t1ms - t0ms) * (x1 - x0); }
 
-            // Check if already exists
-            const { data: existing } = await db
-                .from('settimane')
-                .select('id')
-                .eq('data_inizio', mondayStr)
-                .limit(1);
+        let lo = Infinity, hi = -Infinity;
+        candles.forEach(c => { lo = Math.min(lo, c.l); hi = Math.max(hi, c.h); });
+        const pp = Math.max((hi - lo) * 0.06, 0.0001);
+        const yMin = lo - pp, yMax = hi + pp;
+        function pxY(p) { return y1 - (p - yMin) / (yMax - yMin) * (y1 - y0); }
 
-            if (existing && existing.length > 0) {
-                alert('La settimana corrente esiste gia!');
-                window.location.href = `dettaglio_settimana.html?id=${existing[0].id}`;
-                return;
+        // step Y
+        const rawStep = (yMax - yMin) / 7;
+        const mag = Math.pow(10, Math.floor(Math.log10(rawStep || 1)));
+        const nn = rawStep / mag;
+        const stepY = mag * (nn < 1.5 ? 1 : nn < 3 ? 2 : nn < 7 ? 5 : 10);
+        const dec = stepY < 0.001 ? 5 : stepY < 0.01 ? 4 : stepY < 0.1 ? 3 : stepY < 1 ? 2 : stepY < 10 ? 1 : 0;
+
+        // Y grid
+        ctx.font = '9px Inter, sans-serif';
+        for (let p = Math.ceil(yMin / stepY) * stepY; p <= yMax + stepY * 0.01; p += stepY) {
+            const yg = pxY(p);
+            if (yg < y0 - 1 || yg > y1 + 1) continue;
+            ctx.strokeStyle = 'rgba(255,255,255,.04)'; ctx.lineWidth = 1; ctx.setLineDash([]);
+            ctx.beginPath(); ctx.moveTo(x0, yg); ctx.lineTo(x1, yg); ctx.stroke();
+            ctx.fillStyle = '#4a5568'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+            ctx.fillText(p.toFixed(dec), x0 - 5, yg);
+        }
+
+        // Box giornalieri: separatori, label giorno, % del giorno
+        for (let i = 0; i < 5; i++) {
+            const dStr = addDays(monday, i);
+            const dayStart = t0ms + i * 86400000;
+            const dayEnd = dayStart + 86400000;
+            const xL = pxX(dayStart), xR = pxX(dayEnd);
+
+            if (i > 0) {
+                ctx.strokeStyle = 'rgba(255,255,255,.10)'; ctx.lineWidth = 1; ctx.setLineDash([4, 5]);
+                ctx.beginPath(); ctx.moveTo(xL, y0 - 14); ctx.lineTo(xL, y1); ctx.stroke();
+                ctx.setLineDash([]);
             }
+            const dt = new Date(dStr + 'T00:00:00');
+            ctx.fillStyle = '#5b6572';
+            ctx.font = '600 10px Inter, sans-serif';
+            ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+            ctx.fillText(`${DAY_SHORT[dt.getDay()]} ${dt.getDate()}`, xL + 5, 4);
 
-            const { data, error } = await db
-                .from('settimane')
-                .insert({ data_inizio: mondayStr, data_fine: fridayStr })
-                .select()
-                .single();
+            // % del giorno (open prima candela → close ultima)
+            const dayCdl = candles.filter(c => c.tMs >= dayStart && c.tMs < dayEnd);
+            if (dayCdl.length) {
+                const pct = (dayCdl[dayCdl.length - 1].c - dayCdl[0].o) / dayCdl[0].o * 100;
+                ctx.fillStyle = pct >= 0 ? 'rgba(32,201,151,.85)' : 'rgba(244,63,94,.85)';
+                ctx.textAlign = 'right';
+                ctx.fillText((pct >= 0 ? '+' : '') + pct.toFixed(2) + '%', xR - 5, 4);
+            }
+        }
 
-            if (error) { console.error(error); alert('Errore nella creazione'); return; }
+        // Linee High / Low / avg settimanali (il filo conduttore dei livelli)
+        const wAvg = candles.reduce((s, c) => s + (c.o + c.c) / 2, 0) / candles.length;
+        [
+            { p: hi,   label: 'WH '  + hi.toFixed(dec),   dash: [6, 4], alpha: .55 },
+            { p: lo,   label: 'WL '  + lo.toFixed(dec),   dash: [6, 4], alpha: .55 },
+            { p: wAvg, label: 'avg ' + wAvg.toFixed(dec), dash: [2, 5], alpha: .30 },
+        ].forEach(ln => {
+            const ly = pxY(ln.p);
+            ctx.strokeStyle = 'rgba(32,201,151,' + ln.alpha + ')';
+            ctx.setLineDash(ln.dash); ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(x0, ly); ctx.lineTo(x1, ly); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#20c997';
+            ctx.font = '600 9px Inter, sans-serif';
+            ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+            ctx.fillText(ln.label, x0 + 3, ly - 1);
+        });
 
-            window.location.href = `dettaglio_settimana.html?id=${data.id}`;
-        };
+        // Candele H1
+        const slotPx = (x1 - x0) / ((t1ms - t0ms) / hourMs);
+        const cw = Math.max(1.5, slotPx * 0.65);
+        candles.forEach(c => {
+            const xMid = pxX(c.tMs + hourMs / 2);
+            const bull = c.c >= c.o;
+            ctx.strokeStyle = bull ? '#20c997' : '#f43f5e'; ctx.lineWidth = 1; ctx.setLineDash([]);
+            ctx.beginPath(); ctx.moveTo(xMid, pxY(c.h)); ctx.lineTo(xMid, pxY(c.l)); ctx.stroke();
+            ctx.fillStyle = bull ? 'rgba(32,201,151,0.85)' : 'rgba(244,63,94,0.85)';
+            const bTop = pxY(Math.max(c.o, c.c));
+            ctx.fillRect(xMid - cw / 2, bTop, cw, Math.max(1, pxY(Math.min(c.o, c.c)) - bTop));
+        });
 
-        await loadWeeks();
+        // Marker trade dell'asset attivo (tick sul bordo inferiore, colore per esito)
+        weekTrades.filter(t => t.asset === coin).forEach(t => {
+            const tMs = new Date(t.data).getTime();
+            if (isNaN(tMs) || tMs < t0ms || tMs >= t1ms) return;
+            const x = pxX(tMs);
+            const col = t.esito === 'win' ? '#20c997' : t.esito === 'loss' ? '#f43f5e' : '#848d97';
+            ctx.fillStyle = col;
+            ctx.beginPath();
+            ctx.moveTo(x, y1 + 3); ctx.lineTo(x - 4, y1 + 10); ctx.lineTo(x + 4, y1 + 10);
+            ctx.closePath(); ctx.fill();
+        });
+    }
+
+    // ─── Toggle pannello sbilanciamenti (stato in localStorage, chiuso di default) ───
+    function applySbilWeekState() {
+        const open = localStorage.getItem('td_sbil_week_open') === '1';
+        const grid = document.getElementById('sbil-week-grid');
+        const chev = document.getElementById('sbil-chevron');
+        if (grid) grid.classList.toggle('hidden', !open);
+        if (chev) chev.style.transform = open ? 'rotate(180deg)' : '';
+    }
+    function toggleSbilWeek() {
+        const open = localStorage.getItem('td_sbil_week_open') === '1';
+        localStorage.setItem('td_sbil_week_open', open ? '0' : '1');
+        applySbilWeekState();
+    }
+    document.addEventListener('DOMContentLoaded', applySbilWeekState);
+
+    // ─── Sbilanciamenti: rally direzionali M15 per giorno (stessa logica di grafici.html) ───
+    // Un rally = 3+ candele consecutive stesso senso con movimento cumulativo >= 1.5x body medio del giorno
+    function detectSbilanciamenti(list) {
+        const valid = list.filter(c => c.o !== null && c.c !== null && !isNaN(c.o) && !isNaN(c.c));
+        if (valid.length < 4) return [];
+        const avgBody = valid.reduce((s, c) => s + Math.abs(c.c - c.o), 0) / valid.length;
+        const threshold = avgBody * 1.5;
+        const out = [];
+        let i = 0;
+        while (i < valid.length - 2) {
+            const dir = valid[i].c > valid[i].o ? 'bull' : 'bear';
+            let j = i, cum = 0, lo = Infinity, hi = -Infinity;
+            while (j < valid.length) {
+                const c = valid[j];
+                if ((c.c > c.o ? 'bull' : 'bear') !== dir) break;
+                cum += Math.abs(c.c - c.o);
+                lo = Math.min(lo, c.l); hi = Math.max(hi, c.h);
+                j++;
+            }
+            if (j - i >= 3 && cum >= threshold) {
+                out.push({ tMs: valid[i].tMs, tEndMs: valid[j - 1].tMs, dir, candele: j - i, move: cum, lo, hi });
+                i = j;
+            } else i++;
+        }
+        return out;
+    }
+
+    function renderWeekSbilanciamenti(rows, coin, monday) {
+        const grid = document.getElementById('sbil-week-grid');
+        if (!grid) return;
+        const lbl = document.getElementById('sbil-asset-label');
+        if (lbl) lbl.textContent = coin;
+
+        const m15 = rows.map(r => ({
+            tMs: new Date(r.ts).getTime(),
+            o: parseFloat(r.open), h: parseFloat(r.high), l: parseFloat(r.low), c: parseFloat(r.close)
+        }));
+        const dayMs = 86400000;
+        const t0 = new Date(monday + 'T00:00:00Z').getTime();
+        const hhmm = ms => { const d = new Date(ms); return String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0'); };
+        let total = 0;
+
+        grid.innerHTML = [0, 1, 2, 3, 4].map(i => {
+            const dayStart = t0 + i * dayMs, dayEnd = dayStart + dayMs;
+            const dayCdl = m15.filter(c => c.tMs >= dayStart && c.tMs < dayEnd);
+            const rallies = detectSbilanciamenti(dayCdl);
+            total += rallies.length;
+            const dt = new Date(dayStart);
+            const head = '<div class="flex items-center justify-between mb-2">'
+                + '<span class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">' + DAY_SHORT[dt.getUTCDay()] + ' ' + dt.getUTCDate() + '</span>'
+                + '<span class="text-[9px] font-bold text-tp-muted/50">' + (rallies.length ? rallies.length + ' rally' : '') + '</span>'
+                + '</div>';
+            let body;
+            if (!dayCdl.length) body = '<p class="text-[11px] text-tp-muted/30 italic">Nessun dato</p>';
+            else if (!rallies.length) body = '<p class="text-[11px] text-tp-muted/40">Nessun rally</p>';
+            else {
+                const dec = rallies[0].lo > 100 ? 0 : 2;
+                body = rallies.map(f => {
+                    const col = f.dir === 'bull' ? '#20c997' : '#f43f5e';
+                    return '<div class="py-1.5 border-b border-tp-border/20 last:border-0">'
+                        + '<div class="flex items-center justify-between gap-2">'
+                        + '<span class="text-[11px] font-mono text-tp-muted">' + hhmm(f.tMs) + '–' + hhmm(f.tEndMs) + '</span>'
+                        + '<span class="text-[11px] font-bold" style="color:' + col + '">' + (f.dir === 'bull' ? '↑ Bull' : '↓ Bear') + '</span>'
+                        + '</div>'
+                        + '<div class="flex items-center justify-between gap-2 mt-0.5">'
+                        + '<span class="text-[10px] text-tp-muted/50">' + f.candele + ' cdl · ' + f.move.toFixed(dec === 0 ? 0 : 2) + ' pt</span>'
+                        + '<span class="text-[10px] font-mono" style="color:' + col + '">L ' + f.lo.toFixed(dec) + ' H ' + f.hi.toFixed(dec) + '</span>'
+                        + '</div></div>';
+                }).join('');
+            }
+            return '<div class="p-3 min-w-0">' + head + body + '</div>';
+        }).join('');
+
+        const cnt = document.getElementById('sbil-week-count');
+        if (cnt) cnt.textContent = total ? total + ' rally in settimana' : 'Nessun rally';
+    }
+
+    window.addEventListener('resize', () => requestAnimationFrame(drawWeekChart));
+
+    // ─── Settimane: crea riga se manca ────────────────────────────────────
+    async function ensureWeekRow() {
+        if (weekRow) return weekRow;
+        const { data, error } = await db.from('settimane')
+            .insert({ data_inizio: currentMonday, data_fine: addDays(currentMonday, 4) })
+            .select().single();
+        if (error) { console.error('[ensureWeekRow]', error); return null; }
+        weekRow = data;
+        return weekRow;
+    }
+
+    // ─── Salva review/note + stats ────────────────────────────────────────
+    async function saveWeek() {
+        const row = await ensureWeekRow();
+        if (!row) return;
+        const wins = weekTrades.filter(t => t.esito === 'win').length;
+        const losses = weekTrades.filter(t => t.esito === 'loss').length;
+        const winRate = (wins + losses) > 0 ? Math.round((wins / (wins + losses)) * 100) : null;
+        const netProfit = weekTrades.reduce((s, t) => s + (parseFloat(t.pnl) || 0), 0);
+
+        const { error } = await db.from('settimane').update({
+            review: document.getElementById('review').value,
+            note: document.getElementById('next-week').value,
+            pnl: netProfit,
+            n_trades: weekTrades.length,
+            winrate: winRate
+        }).eq('id', row.id);
+
+        if (error) { console.error('[saveWeek]', error); alert('Errore nel salvataggio'); return; }
+        const btn = document.getElementById('save-week-btn');
+        if (btn) { btn.classList.add('save-flash'); setTimeout(() => btn.classList.remove('save-flash'), 600); }
+    }
+
+    // ─── Diario (appunti) ─────────────────────────────────────────────────
+    function formatAppuntoOra(raw) {
+        if (!raw) return '--';
+        if (raw.includes('T')) {
+            const d = new Date(raw);
+            return d.toLocaleDateString('it-IT', { day: '2-digit', month: 'short' }) + ' ' +
+                   d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', hour12: false });
+        }
+        return raw;
+    }
+
+    function renderAppunti() {
+        const list = document.getElementById('appunti-list');
+        if (!list) return;
+        if (!appunti.length) {
+            list.innerHTML = `<p class="text-xs text-tp-muted/60 italic">Nessun appunto ancora.</p>`;
+            return;
+        }
+        list.innerHTML = appunti.map((a, i) => {
+            const tagsHtml = (a.tags && a.tags.length)
+                ? `<div class="flex flex-wrap gap-1.5 mt-2">${a.tags.map(t => `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-tp-accent/10 border border-tp-accent/30 text-tp-accent text-xs font-bold">${escHtml(t)}</span>`).join('')}</div>`
+                : '';
+            return `
+            <div class="flex items-start gap-3 bg-tp-panel border border-tp-border rounded-lg px-4 py-3">
+                <span class="text-[11px] font-bold text-tp-accent/80 shrink-0 mt-0.5 font-mono whitespace-nowrap">${escHtml(formatAppuntoOra(a.ora))}</span>
+                <div class="flex-1">
+                    <p class="text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escHtml(a.testo)}</p>
+                    ${tagsHtml}
+                </div>
+                <button type="button" onclick="removeAppunto(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors flex-shrink-0 mt-0.5" title="Rimuovi">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+            </div>`;
+        }).join('');
         lucide.createIcons();
-    })();
+    }
+
+    function renderTagRow() {
+        const row = document.getElementById('appunto-tags-row');
+        if (!row) return;
+        const allTags = [...new Set([...PRESET_TAGS, ...newAppuntoTags])];
+        row.innerHTML = allTags.map(t => {
+            const active = newAppuntoTags.includes(t);
+            return `<button type="button" onclick="toggleAppuntoTag('${escHtml(t)}')"
+                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors ${active
+                    ? 'bg-tp-accent/10 border-tp-accent/30 text-tp-accent'
+                    : 'bg-tp-panel border-tp-border text-tp-muted hover:border-tp-accent/40 hover:text-white'}">${escHtml(t)}</button>`;
+        }).join('');
+    }
+
+    function toggleAppuntoTag(tag) {
+        const idx = newAppuntoTags.indexOf(tag);
+        if (idx >= 0) newAppuntoTags.splice(idx, 1);
+        else newAppuntoTags.push(tag);
+        renderTagRow();
+    }
+
+    function addCustomTag() {
+        const el = document.getElementById('appunto-tag-custom');
+        const val = (el.value || '').trim().toLowerCase();
+        if (!val) return;
+        if (!newAppuntoTags.includes(val)) newAppuntoTags.push(val);
+        el.value = '';
+        renderTagRow();
+    }
+
+    async function addAppunto() {
+        const ora = (document.getElementById('appunto-ora').value || '').trim();
+        const testoEl = document.getElementById('appunto-testo');
+        const testo = (testoEl.value || '').trim();
+        if (!testo) return;
+        const row = await ensureWeekRow();
+        if (!row) return;
+        appunti.push({ ora, testo, tags: [...newAppuntoTags] });
+        appunti.sort((a, b) => (a.ora || '').localeCompare(b.ora || ''));
+        testoEl.value = '';
+        testoEl.style.height = '';
+        newAppuntoTags = [];
+        renderTagRow();
+        renderAppunti();
+        const { error } = await db.from('settimane').update({ appunti }).eq('id', row.id);
+        if (error) console.error('[addAppunto]', error);
+    }
+
+    async function removeAppunto(i) {
+        if (!weekRow) return;
+        const removed = appunti.splice(i, 1)[0];
+        renderAppunti();
+        const { error } = await db.from('settimane').update({ appunti }).eq('id', weekRow.id);
+        if (error) {
+            appunti.splice(i, 0, removed);
+            renderAppunti();
+        }
+    }
     </script>
 </body>
 </html>
