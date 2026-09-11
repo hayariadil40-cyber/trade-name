@@ -444,7 +444,7 @@
 
             adaptForm();
             renderBiasAssetTabs();
-            if (activeAsset) renderBiasAssetPanel();
+            if (activeAsset) { renderBiasAssetPanel(); requestAnimationFrame(drawBiasMiniChart); }
 
             if (data.categorizzatori) {
                 setTimeout(() => {
@@ -728,6 +728,7 @@
             activeAsset = asset;
             renderBiasAssetTabs();
             renderBiasAssetPanel();
+            requestAnimationFrame(drawBiasMiniChart);
         }
 
         function renderBiasAssetTabs() {
@@ -777,7 +778,6 @@
                 short:  newBiasAggDir === v ? 'agg-short'  : 'agg-dir-btn flex-1',
                 neutro: newBiasAggDir === v ? 'agg-neutro' : 'agg-dir-btn flex-1'
             })[v] || 'agg-dir-btn flex-1';
-            const shotUrl = d.screenshot || '';
             panel.innerHTML = `
                 <div class="bg-[#0a0c10] border border-tp-border rounded-xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
@@ -786,27 +786,10 @@
                             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
-                    <!-- Screenshot -->
-                    <div class="relative group/shot">
-                        <label class="block cursor-pointer">
-                            <input type="file" accept="image/*" class="hidden" onchange="uploadBiasScreenshotFromFile('${activeAsset}',this)" />
-                            <div id="bias-shot-wrap" class="${shotUrl ? '' : 'hidden'} rounded-lg overflow-hidden border border-tp-border relative" style="aspect-ratio:16/9">
-                                <img id="bias-shot-img" src="${shotUrl}" alt="" class="w-full h-full object-cover block" />
-                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover/shot:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                    <i data-lucide="image" class="w-4 h-4 text-white drop-shadow"></i>
-                                    <span class="text-[10px] text-white font-bold uppercase tracking-wider">Cambia</span>
-                                </div>
-                            </div>
-                            <div id="bias-shot-empty" class="${shotUrl ? 'hidden' : ''} rounded-lg border-2 border-dashed border-tp-border/40 flex flex-col items-center justify-center gap-1.5 hover:border-tp-accent/40 transition-colors" style="aspect-ratio:16/9">
-                                <i data-lucide="image-plus" class="w-5 h-5 text-tp-muted/30"></i>
-                                <span class="text-[9px] font-bold uppercase tracking-wider text-tp-muted/30">Screenshot — Ctrl+V o click</span>
-                            </div>
-                        </label>
-                        <button onclick="deleteBiasScreenshot('${activeAsset}');event.stopPropagation()"
-                            class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/70 text-white ${shotUrl ? 'flex' : 'hidden'} items-center justify-center opacity-0 group-hover/shot:opacity-100 transition-opacity"
-                            id="bias-shot-del">
-                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                        </button>
+                    <!-- Grafico H1 auto (candles_15m aggregate) -->
+                    <div class="rounded-lg overflow-hidden border border-tp-border relative" style="aspect-ratio:16/9;background:#0d1117">
+                        <canvas id="bias-mini-chart" class="block w-full h-full"></canvas>
+                        <span class="absolute top-1.5 left-2 text-[9px] font-bold uppercase tracking-wider text-tp-muted/60 pointer-events-none">${activeAsset} · H1 · UTC</span>
                     </div>
                     <!-- Bias Strutturale H4 -->
                     <div class="rounded-xl border border-tp-border p-3" style="background:rgba(11,14,20,0.9)">
@@ -1013,47 +996,92 @@
             h4LiveTimer = setInterval(() => { if (activeAsset) loadLiveH4Slot(activeAsset); }, 5 * 60 * 1000);
         }
 
-        // --- SCREENSHOT ASSET ---
-        const UPLOAD_FN = 'https://fzxjbxeadiqwfpctiyom.supabase.co/functions/v1/upload-screenshot';
+        // --- GRAFICO H1 AUTO (sostituisce lo screenshot) ---
+        async function drawBiasMiniChart() {
+            const cv = document.getElementById('bias-mini-chart');
+            if (!cv) return;
+            const dpr = window.devicePixelRatio || 1;
+            const W = cv.clientWidth, H = cv.clientHeight;
+            if (!W || !H) return;
+            cv.width = W * dpr; cv.height = H * dpr;
+            const ctx = cv.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, W, H);
+            function msg(t) { ctx.fillStyle = '#454e5a'; ctx.font = '11px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(t, W / 2, H / 2); }
 
-        async function uploadBiasScreenshot(asset, file) {
-            const path = `bias/${biasId}/${asset}_${Date.now()}.jpg`;
-            const reader = new FileReader();
-            const base64 = await new Promise(res => { reader.onload = e => res(e.target.result.split(',')[1]); reader.readAsDataURL(file); });
-            const { data: { session } } = await db.auth.getSession();
-            const fnRes = await fetch(UPLOAD_FN, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
-                body: JSON.stringify({ base64, path, contentType: file.type || 'image/jpeg' })
+            const coin = activeAsset;
+            const day = (biasDataField || '').slice(0, 10);
+            if (!coin || !/^\d{4}-\d{2}-\d{2}$/.test(day)) { msg('Data bias mancante'); return; }
+            const t0ms = new Date(day + 'T00:00:00Z').getTime();
+            const t1ms = t0ms + 86400000;
+
+            const { data: rows } = await db.from('candles_15m')
+                .select('ts, open, high, low, close').eq('coin', coin)
+                .gte('ts', new Date(t0ms).toISOString()).lt('ts', new Date(t1ms).toISOString())
+                .order('ts', { ascending: true });
+            if (coin !== activeAsset) return;
+
+            const hourMs = 3600000, buckets = new Map();
+            (rows || []).forEach(r => {
+                const key = Math.floor(new Date(r.ts).getTime() / hourMs) * hourMs;
+                const o = parseFloat(r.open), h = parseFloat(r.high), l = parseFloat(r.low), c = parseFloat(r.close);
+                const b = buckets.get(key);
+                if (!b) buckets.set(key, { tMs: key, o, h, l, c });
+                else { b.h = Math.max(b.h, h); b.l = Math.min(b.l, l); b.c = c; }
             });
-            const fnData = await fnRes.json();
-            if (!fnRes.ok || !fnData.publicUrl) { console.error('[uploadBiasScreenshot]', fnData); return; }
-            if (!coinData[asset]) coinData[asset] = {};
-            coinData[asset].screenshot = fnData.publicUrl;
-            await db.from('bias').update({ coin_data: JSON.parse(JSON.stringify(coinData)) }).eq('id', biasId);
-            renderBiasAssetPanel();
-        }
+            const candles = [...buckets.values()].sort((a, b) => a.tMs - b.tMs);
+            if (!candles.length) { msg('Nessun dato candele · ' + coin); return; }
 
-        async function deleteBiasScreenshot(asset) {
-            if (!coinData[asset]) return;
-            coinData[asset].screenshot = null;
-            await db.from('bias').update({ coin_data: JSON.parse(JSON.stringify(coinData)) }).eq('id', biasId);
-            renderBiasAssetPanel();
-        }
+            const padL = 6, padR = 50, padT = 18, padB = 16;
+            const x0 = padL, x1 = W - padR, y0 = padT, y1 = H - padB;
+            const pxX = ms => x0 + (ms - t0ms) / (t1ms - t0ms) * (x1 - x0);
+            let lo = Infinity, hi = -Infinity;
+            candles.forEach(c => { lo = Math.min(lo, c.l); hi = Math.max(hi, c.h); });
+            const pp = Math.max((hi - lo) * 0.06, 0.0001), yMin = lo - pp, yMax = hi + pp;
+            const pxY = p => y1 - (p - yMin) / (yMax - yMin) * (y1 - y0);
+            const rawStep = (yMax - yMin) / 5, mag = Math.pow(10, Math.floor(Math.log10(rawStep || 1))), nn = rawStep / mag;
+            const stepY = mag * (nn < 1.5 ? 1 : nn < 3 ? 2 : nn < 7 ? 5 : 10);
+            const dec = stepY < 0.001 ? 5 : stepY < 0.01 ? 4 : stepY < 0.1 ? 3 : stepY < 1 ? 2 : stepY < 10 ? 1 : 0;
 
-        function uploadBiasScreenshotFromFile(asset, input) {
-            const file = input.files[0];
-            if (file) uploadBiasScreenshot(asset, file);
+            ctx.font = '9px Inter, sans-serif';
+            for (let p = Math.ceil(yMin / stepY) * stepY; p <= yMax + stepY * 0.01; p += stepY) {
+                const yg = pxY(p); if (yg < y0 - 1 || yg > y1 + 1) continue;
+                ctx.strokeStyle = 'rgba(255,255,255,.04)'; ctx.lineWidth = 1; ctx.setLineDash([]);
+                ctx.beginPath(); ctx.moveTo(x0, yg); ctx.lineTo(x1, yg); ctx.stroke();
+                ctx.fillStyle = '#4a5568'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                ctx.fillText(p.toFixed(dec), x1 + 4, yg);
+            }
+            // sfondo sessioni (Tokyo 00-07, London 07-13, NY 13-20) + asse X ore UTC ogni 2h
+            [[0, 7, '201,162,39'], [7, 13, '32,201,151'], [13, 20, '155,140,255']].forEach(([a, b, rgb]) => {
+                ctx.fillStyle = 'rgba(' + rgb + ',.05)';
+                ctx.fillRect(pxX(t0ms + a * hourMs), y0, pxX(t0ms + b * hourMs) - pxX(t0ms + a * hourMs), y1 - y0);
+            });
+            ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+            for (let h = 0; h < 24; h += 2) {
+                const xg = pxX(t0ms + h * hourMs);
+                ctx.strokeStyle = 'rgba(255,255,255,.04)'; ctx.beginPath(); ctx.moveTo(xg, y0); ctx.lineTo(xg, y1); ctx.stroke();
+                ctx.fillStyle = '#3a4352'; ctx.fillText(String(h).padStart(2, '0'), xg, y1 + 3);
+            }
+            // H/L del giorno
+            [[hi, 'H ' + hi.toFixed(dec)], [lo, 'L ' + lo.toFixed(dec)]].forEach(([p, lbl]) => {
+                const y = pxY(p);
+                ctx.strokeStyle = 'rgba(32,201,151,.45)'; ctx.setLineDash([5, 4]);
+                ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke(); ctx.setLineDash([]);
+                ctx.fillStyle = '#20c997'; ctx.font = '600 9px Inter, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+                ctx.fillText(lbl, x0 + 3, y - 1);
+            });
+            // candele H1
+            const cw = Math.max(2, (x1 - x0) / 24 * 0.6);
+            candles.forEach(c => {
+                const xMid = pxX(c.tMs + hourMs / 2), bull = c.c >= c.o;
+                ctx.strokeStyle = bull ? '#20c997' : '#f43f5e'; ctx.lineWidth = 1; ctx.setLineDash([]);
+                ctx.beginPath(); ctx.moveTo(xMid, pxY(c.h)); ctx.lineTo(xMid, pxY(c.l)); ctx.stroke();
+                ctx.fillStyle = bull ? 'rgba(32,201,151,.9)' : 'rgba(244,63,94,.9)';
+                const top = pxY(Math.max(c.o, c.c));
+                ctx.fillRect(xMid - cw / 2, top, cw, Math.max(1, pxY(Math.min(c.o, c.c)) - top));
+            });
         }
-
-        window.addEventListener('paste', async (e) => {
-            if (!activeAsset) return;
-            const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
-            if (!item) return;
-            e.preventDefault();
-            const file = item.getAsFile();
-            if (file) await uploadBiasScreenshot(activeAsset, file);
-        });
+        window.addEventListener('resize', () => requestAnimationFrame(drawBiasMiniChart));
 
         // --- ASIAN BOX ---
         const AB_ASSETS = ['XAUUSD','EURUSD','GBPUSD','US30','NAS100','GER30','USDJPY','BTCUSD','GER40'];
