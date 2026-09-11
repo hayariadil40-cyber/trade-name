@@ -444,7 +444,7 @@
 
             adaptForm();
             renderBiasAssetTabs();
-            if (activeAsset) { renderBiasAssetPanel(); requestAnimationFrame(drawBiasMiniChart); renderBiasOhlc(); }
+            if (activeAsset) renderBiasAssetPanel();
 
             if (data.categorizzatori) {
                 setTimeout(() => {
@@ -728,8 +728,6 @@
             activeAsset = asset;
             renderBiasAssetTabs();
             renderBiasAssetPanel();
-            requestAnimationFrame(drawBiasMiniChart);
-            renderBiasOhlc();
         }
 
         function renderBiasAssetTabs() {
@@ -861,6 +859,9 @@
             `;
             if (window.lucide) lucide.createIcons();
             loadLiveH4Slot(activeAsset);
+            // il pannello e' ricostruito da zero: ridisegna sempre grafico H1 e dati OHLC
+            requestAnimationFrame(drawBiasMiniChart);
+            renderBiasOhlc();
         }
 
         function setNewBiasAggDir(dir) {
