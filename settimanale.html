@@ -22,6 +22,8 @@
         .day-tab.active { background: #161920; color: #fff; border-color: #252932; }
         .day-pane { display: none; }
         .day-pane.active { display: block; }
+        .layer-toggle input[type=checkbox]{accent-color:#20c997;width:14px;height:14px;cursor:pointer}
+        .layer-swatch{width:12px;height:12px;border-radius:2px;display:inline-block;flex-shrink:0}
         .save-flash { animation: flashGreen 0.55s ease; }
         @keyframes flashGreen { 0%{box-shadow:0 0 0 rgba(32,201,151,0)} 50%{box-shadow:0 0 14px rgba(32,201,151,0.5)} 100%{box-shadow:0 0 0 rgba(32,201,151,0)} }
     </style>
@@ -134,6 +136,10 @@
                         </div>
                         <span id="chart-range-label" class="text-[10px] font-bold text-tp-muted uppercase tracking-wider">—</span>
                     </div>
+                    <!-- Layer sessioni / zone (UTC) -->
+                    <div id="layer-panel" class="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-4 py-2 border-b border-tp-border bg-[#0a0c10]/40">
+                        <span class="text-[9px] font-bold uppercase tracking-widest text-tp-muted mr-1">Layer</span>
+                    </div>
                     <canvas id="week-chart" class="block w-full" style="height:440px;background:#0d1117"></canvas>
                 </div>
 
@@ -229,6 +235,51 @@
     const DAY_NAMES = ['Domenica', 'Lunedi', 'Martedi', 'Mercoledi', 'Giovedi', 'Venerdi', 'Sabato'];
     const DAY_SHORT = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
 
+    // Layer sessioni / zone — orari UTC, disegnati per ogni giorno della settimana.
+    // type 'box' = rettangolo H/L della finestra; type 'line' = linea verticale + livello open.
+    const LAYERS = [
+        { id: 'tokyo',    label: 'Tokyo 00-07',       from: 0,  to: 7,  rgb: '201,162,39',  type: 'box',  def: true,  group: 0 },
+        { id: 'london',   label: 'London 07-13',      from: 7,  to: 13, rgb: '32,201,151',  type: 'box',  def: true,  group: 0 },
+        { id: 'ny',       label: 'New York 13-20',    from: 13, to: 20, rgb: '155,140,255', type: 'box',  def: true,  group: 0 },
+        { id: 'asiabox',  label: 'Box Asia 00-04',    from: 0,  to: 4,  rgb: '245,158,11',  type: 'box',  def: false, group: 1 },
+        { id: 'midnight', label: 'Midnight Open 04',  from: 4,  to: 4,  rgb: '255,255,255', type: 'line', def: false, group: 1 },
+        { id: 'londonkz', label: 'London KZ 06-09',   from: 6,  to: 9,  rgb: '34,211,238',  type: 'box',  def: false, group: 1 },
+        { id: 'dead',     label: 'Zona morta 09-11',  from: 9,  to: 11, rgb: '120,120,130', type: 'box',  def: false, group: 1 },
+        { id: 'nykz',     label: 'NY KZ 11-14',       from: 11, to: 14, rgb: '244,63,94',   type: 'box',  def: false, group: 1 },
+        { id: 'optional', label: 'Facoltativa 16-18', from: 16, to: 18, rgb: '236,72,153',  type: 'box',  def: false, group: 1 },
+    ];
+    const LAYER_LS = 'td_week_layers';
+    let layerState = {};
+    (function loadLayerState() {
+        let saved = {};
+        try { saved = JSON.parse(localStorage.getItem(LAYER_LS) || '{}') || {}; } catch (e) { saved = {}; }
+        LAYERS.forEach(l => { layerState[l.id] = (l.id in saved) ? !!saved[l.id] : l.def; });
+    })();
+    function layerOn(id) { return !!layerState[id]; }
+    function toggleLayer(id, on) {
+        layerState[id] = !!on;
+        localStorage.setItem(LAYER_LS, JSON.stringify(layerState));
+        requestAnimationFrame(drawWeekChart);
+    }
+    function renderLayerPanel() {
+        const panel = document.getElementById('layer-panel');
+        if (!panel) return;
+        let html = '<span class="text-[9px] font-bold uppercase tracking-widest text-tp-muted mr-1">Layer</span>';
+        let lastGroup = 0;
+        LAYERS.forEach(l => {
+            if (l.group !== lastGroup) { html += '<div class="w-px h-4 bg-tp-border"></div>'; lastGroup = l.group; }
+            const sw = l.type === 'line'
+                ? `background:rgba(${l.rgb},.8);width:2px;height:12px;border-radius:0`
+                : `background:rgba(${l.rgb},.25);border:1px solid rgba(${l.rgb},.7)`;
+            html += `<label class="layer-toggle flex items-center gap-1.5 cursor-pointer select-none">
+                <span class="layer-swatch" style="${sw}"></span>
+                <span class="text-[11px] text-tp-muted font-medium">${l.label}</span>
+                <input type="checkbox" ${layerOn(l.id) ? 'checked' : ''} onchange="toggleLayer('${l.id}', this.checked)">
+            </label>`;
+        });
+        panel.innerHTML = html;
+    }
+
     let activeAsset = 'XAUUSD';
     let currentMonday = null;   // 'YYYY-MM-DD'
     let weekRow = null;         // riga settimane (o null se non esiste ancora)
@@ -273,6 +324,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
         lucide.createIcons();
         renderAssetTabs();
+        renderLayerPanel();
         await loadWeek();
     });
 
@@ -582,6 +634,44 @@
             ctx.font = '600 9px Inter, sans-serif';
             ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
             ctx.fillText(ln.label, x0 + 3, ly - 1);
+        });
+
+        // Layer sessioni / zone (UTC) — un box/linea per ogni giorno
+        const m15 = (rows || []).map(r => ({ tMs: new Date(r.ts).getTime(), o: parseFloat(r.open), h: parseFloat(r.high), l: parseFloat(r.low), c: parseFloat(r.close) }));
+        LAYERS.filter(l => layerOn(l.id)).forEach(l => {
+            for (let i = 0; i < 5; i++) {
+                const dayStart = t0ms + i * 86400000;
+                const zs = dayStart + l.from * hourMs, ze = dayStart + l.to * hourMs;
+                if (l.type === 'line') {
+                    const cdl = m15.find(c => c.tMs >= zs && c.tMs < zs + 15 * 60000);
+                    const x = pxX(zs);
+                    ctx.strokeStyle = 'rgba(' + l.rgb + ',.35)'; ctx.lineWidth = 1; ctx.setLineDash([2, 4]);
+                    ctx.beginPath(); ctx.moveTo(x, y0); ctx.lineTo(x, y1); ctx.stroke();
+                    if (cdl) {
+                        const y = pxY(cdl.o);
+                        ctx.setLineDash([4, 4]); ctx.strokeStyle = 'rgba(' + l.rgb + ',.5)';
+                        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(pxX(dayStart + 86400000), y); ctx.stroke();
+                        ctx.setLineDash([]);
+                        ctx.fillStyle = 'rgba(' + l.rgb + ',.8)'; ctx.font = '9px Inter, sans-serif';
+                        ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+                        ctx.fillText('MO ' + cdl.o.toFixed(dec), x + 3, y - 1);
+                    }
+                    ctx.setLineDash([]);
+                    continue;
+                }
+                const cdl = m15.filter(c => c.tMs >= zs && c.tMs < ze);
+                if (!cdl.length) continue;
+                let zl = Infinity, zh = -Infinity;
+                cdl.forEach(c => { zl = Math.min(zl, c.l); zh = Math.max(zh, c.h); });
+                const xL = pxX(zs), xR = pxX(ze), yT = pxY(zh), yB = pxY(zl);
+                ctx.fillStyle = 'rgba(' + l.rgb + ',.08)';
+                ctx.fillRect(xL, yT, xR - xL, yB - yT);
+                ctx.strokeStyle = 'rgba(' + l.rgb + ',.45)'; ctx.lineWidth = 1; ctx.setLineDash([]);
+                ctx.strokeRect(xL + 0.5, yT + 0.5, xR - xL - 1, yB - yT - 1);
+                ctx.fillStyle = 'rgba(' + l.rgb + ',.85)'; ctx.font = '600 8px Inter, sans-serif';
+                ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+                ctx.fillText(l.label.split(' ')[0] + ' ' + (zh - zl).toFixed(dec), xL + 2, yT + 2);
+            }
         });
 
         // Candele H1
