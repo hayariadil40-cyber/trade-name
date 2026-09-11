@@ -157,7 +157,7 @@
         const ASSETS = ['XAUUSD', 'US30', 'GER30', 'NAS100', 'BTCUSD', 'EURUSD'];
         const SESSION_NAMES  = ['asia', 'london', 'newyork'];
         const SESSION_LABELS = { asia: 'Asia', london: 'London', newyork: 'New York' };
-        const SESSION_TIMES  = { asia: '01:00 – 06:00', london: '08:00 – 12:30', newyork: '14:30 – 18:30' };
+        const SESSION_TIMES  = { asia: '00:00 – 07:00 UTC', london: '07:00 – 13:00 UTC', newyork: '13:00 – 20:00 UTC' };
         const SESSION_COLORS = { asia: '#20c997', london: '#c084fc', newyork: '#f43f5e' };
         const SESSION_ICONS  = { asia: 'sunrise', london: 'landmark', newyork: 'building-2' };
 
@@ -174,9 +174,10 @@
         let aggDirs        = { asia: '', london: '', newyork: '' };
 
         const SESSION_CONFIG = {
-            asia:    { start: '01:00', end: '06:00', ctxStart: '00:00', ctxEnd: '07:30', rgb: '201,162,39'  },
-            london:  { start: '06:00', end: '14:30', ctxStart: '04:45', ctxEnd: '16:00', rgb: '32,201,151'  },
-            newyork: { start: '14:30', end: '22:00', ctxStart: '13:00', ctxEnd: '23:45', rgb: '155,140,255' },
+            // Finestre canoniche UTC (stesse dei layer in settimanale.html e dei cron open/close/hl)
+            asia:    { start: '00:00', end: '07:00', ctxStart: '00:00', ctxEnd: '08:00', rgb: '201,162,39'  },
+            london:  { start: '07:00', end: '13:00', ctxStart: '06:00', ctxEnd: '14:00', rgb: '32,201,151'  },
+            newyork: { start: '13:00', end: '20:00', ctxStart: '12:00', ctxEnd: '21:00', rgb: '155,140,255' },
         };
 
         async function drawSessionMiniChart(nome, date, coin) {
@@ -588,7 +589,7 @@
 
                     <!-- Aggiornamenti -->
                     <div>
-                        <label class="text-[9px] font-bold uppercase tracking-wider text-tp-muted block mb-1.5">Aggiornamenti</label>
+                        <label class="text-[9px] font-bold uppercase tracking-wider text-tp-muted block mb-1.5">Aggiornamenti <span class="opacity-50">· UTC</span></label>
                         <div class="space-y-1 mb-2" id="agg-list-${nome}">${buildAggiornamenti(nome)}</div>
                         <div class="bg-tp-bg border border-tp-border rounded-lg p-2.5 space-y-2">
                             <div class="flex items-center gap-2">
@@ -649,7 +650,7 @@
         // ─── Aggiornamenti ───────────────────────────────────────────────────
 
         function currentTimeStr() {
-            return new Date(Date.now() + 60 * 60000).toISOString().slice(11, 16);
+            return new Date().toISOString().slice(11, 16); // UTC, come tutto il resto della pagina
         }
 
         function buildAggiornamenti(nome) {

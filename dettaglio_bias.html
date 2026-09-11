@@ -444,7 +444,7 @@
 
             adaptForm();
             renderBiasAssetTabs();
-            if (activeAsset) { renderBiasAssetPanel(); requestAnimationFrame(drawBiasMiniChart); }
+            if (activeAsset) { renderBiasAssetPanel(); requestAnimationFrame(drawBiasMiniChart); renderBiasOhlc(); }
 
             if (data.categorizzatori) {
                 setTimeout(() => {
@@ -729,6 +729,7 @@
             renderBiasAssetTabs();
             renderBiasAssetPanel();
             requestAnimationFrame(drawBiasMiniChart);
+            renderBiasOhlc();
         }
 
         function renderBiasAssetTabs() {
@@ -790,6 +791,10 @@
                     <div class="rounded-lg overflow-hidden border border-tp-border relative" style="aspect-ratio:16/9;background:#0d1117">
                         <canvas id="bias-mini-chart" class="block w-full h-full"></canvas>
                         <span class="absolute top-1.5 left-2 text-[9px] font-bold uppercase tracking-wider text-tp-muted/60 pointer-events-none">${activeAsset} · H1 · UTC</span>
+                    </div>
+                    <!-- Dati OHLC (da cronache/EA, fallback candles_15m) -->
+                    <div id="bias-ohlc" class="rounded-xl border border-tp-border p-3" style="background:rgba(11,14,20,0.9)">
+                        <p class="text-[10px] text-tp-muted/40 italic">Caricamento dati...</p>
                     </div>
                     <!-- Bias Strutturale H4 -->
                     <div class="rounded-xl border border-tp-border p-3" style="background:rgba(11,14,20,0.9)">
@@ -994,6 +999,69 @@
         function startH4LiveTimer() {
             if (h4LiveTimer) clearInterval(h4LiveTimer);
             h4LiveTimer = setInterval(() => { if (activeAsset) loadLiveH4Slot(activeAsset); }, 5 * 60 * 1000);
+        }
+
+        // --- DATI OHLC per asset (giorno bias + giorno prima) ---
+        // Fonte primaria: cronache.coin_data[asset] (open/close/low/high/percentuale, stringhe, scritte dall'EA).
+        // Fallback: calcolo da candles_15m se la cronaca manca o ha campi vuoti.
+        const _ohlcCache = {};
+        function _addDaysStr(d, n) { const x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); }
+        async function _ohlcFor(asset, day) {
+            const key = asset + '|' + day;
+            if (_ohlcCache[key]) return _ohlcCache[key];
+            let out = { open: '', close: '', low: '', high: '', percentuale: '', src: '' };
+            const { data: cr } = await db.from('cronache').select('coin_data').eq('data', day).maybeSingle();
+            const cd = cr?.coin_data?.[asset];
+            if (cd && (cd.open || cd.close || cd.low || cd.high)) {
+                const pz = String(cd.percentuale || '').trim();
+                out = { open: cd.open || '', close: cd.close || '', low: cd.low || '', high: cd.high || '', percentuale: pz ? (pz.endsWith('%') ? pz : pz + '%') : '', src: 'EA' };
+            }
+            if (!out.open || !out.close || !out.low || !out.high) {
+                const t0 = new Date(day + 'T00:00:00Z').toISOString(), t1 = new Date(_addDaysStr(day, 1) + 'T00:00:00Z').toISOString();
+                const { data: rows } = await db.from('candles_15m').select('open, high, low, close').eq('coin', asset)
+                    .gte('ts', t0).lt('ts', t1).order('ts', { ascending: true });
+                if (rows && rows.length) {
+                    const o = parseFloat(rows[0].open), c = parseFloat(rows[rows.length - 1].close);
+                    let l = Infinity, h = -Infinity;
+                    rows.forEach(r => { l = Math.min(l, parseFloat(r.low)); h = Math.max(h, parseFloat(r.high)); });
+                    const dec = o > 100 ? 2 : 5;
+                    const pct = (c - o) / o * 100;
+                    out = { open: out.open || o.toFixed(dec), close: out.close || c.toFixed(dec), low: out.low || l.toFixed(dec), high: out.high || h.toFixed(dec),
+                            percentuale: out.percentuale || ((pct >= 0 ? '+' : '') + pct.toFixed(2) + '%'), src: out.src ? 'EA+M15' : 'M15' };
+                }
+            }
+            _ohlcCache[key] = out;
+            return out;
+        }
+        async function renderBiasOhlc() {
+            const box = document.getElementById('bias-ohlc');
+            if (!box || !activeAsset) return;
+            const asset = activeAsset;
+            const day = (biasDataField || '').slice(0, 10);
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) { box.innerHTML = '<p class="text-[10px] text-tp-muted/40 italic">Data bias mancante</p>'; return; }
+            // Solo giorni chiusi: l'EA compila OHLC a chiusura candela daily, quelli di oggi non esistono ancora
+            const d1 = _addDaysStr(day, -1), d2 = _addDaysStr(day, -2);
+            const [prev1, prev2] = await Promise.all([_ohlcFor(asset, d1), _ohlcFor(asset, d2)]);
+            if (asset !== activeAsset) return;
+            const fmtDay = d => { const x = new Date(d + 'T00:00:00Z'); return x.toLocaleDateString('it-IT', { weekday: 'short', day: '2-digit', month: 'short', timeZone: 'UTC' }); };
+            const row = (label, d, o) => {
+                const pctPos = (o.percentuale || '').trim().startsWith('+');
+                const pctCol = !o.percentuale ? 'text-tp-muted/40' : pctPos ? 'text-tp-accent' : 'text-tp-loss';
+                const cell = (lbl, v) => `<div class="min-w-0"><span class="text-[9px] text-tp-muted/60 uppercase font-bold tracking-wide block">${lbl}</span><span class="text-xs text-white font-bold tabular-nums">${v || '—'}</span></div>`;
+                return `<div class="grid items-end gap-2 py-1.5 border-b border-tp-border/30 last:border-0" style="grid-template-columns:78px repeat(4,1fr) 64px">
+                    <div class="min-w-0"><span class="text-[10px] text-white/70 font-bold block">${label}</span><span class="text-[9px] text-tp-muted/50 block">${fmtDay(d)}${o.src ? ' · ' + o.src : ''}</span></div>
+                    ${cell('Apertura', o.open)}${cell('Chiusura', o.close)}${cell('Minimo', o.low)}${cell('Massimo', o.high)}
+                    <div class="text-right"><span class="text-sm font-black ${pctCol} tabular-nums">${o.percentuale || '—'}</span></div>
+                </div>`;
+            };
+            box.innerHTML = `
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-white/60 flex items-center gap-2"><i data-lucide="bar-chart" class="w-3.5 h-3.5 text-tp-accent"></i> Dati daily</span>
+                    <span style="font-size:9px;color:rgba(255,255,255,0.18);font-style:italic">UTC · sola lettura</span>
+                </div>
+                ${row('Ieri', d1, prev1)}
+                ${row('Altro ieri', d2, prev2)}`;
+            lucide.createIcons();
         }
 
         // --- GRAFICO H1 AUTO (sostituisce lo screenshot) ---
