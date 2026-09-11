@@ -392,6 +392,7 @@
         const pad = n => String(n).padStart(2, '0');
         document.getElementById('appunto-ora').value = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
         newAppuntoTags = [];
+        openAppunti.clear();
         renderAppunti();
         renderTagRow();
 
@@ -589,6 +590,26 @@
             ctx.fillStyle = '#4a5568'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
             ctx.fillText(p.toFixed(dec), x0 - 5, yg);
         }
+
+        // Asse X: ore UTC (tick ogni 4h, griglia verticale leggera)
+        const slotHours = (x1 - x0) / ((t1ms - t0ms) / hourMs);
+        const tickEvery = slotHours >= 14 ? 2 : slotHours >= 7 ? 4 : 6;
+        ctx.font = '9px Inter, sans-serif';
+        for (let h = 0; h < 24 * 5; h += tickEvery) {
+            const ms = t0ms + h * hourMs;
+            const xg = pxX(ms);
+            const hour = h % 24;
+            ctx.strokeStyle = hour === 0 ? 'rgba(255,255,255,.0)' : 'rgba(255,255,255,.035)';
+            ctx.lineWidth = 1; ctx.setLineDash([]);
+            ctx.beginPath(); ctx.moveTo(xg, y0); ctx.lineTo(xg, y1); ctx.stroke();
+            ctx.strokeStyle = 'rgba(255,255,255,.18)';
+            ctx.beginPath(); ctx.moveTo(xg, y1); ctx.lineTo(xg, y1 + 3); ctx.stroke();
+            ctx.fillStyle = hour === 0 ? '#848d97' : '#4a5568';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+            ctx.fillText(String(hour).padStart(2, '0'), xg, y1 + 12);
+        }
+        ctx.strokeStyle = 'rgba(255,255,255,.12)';
+        ctx.beginPath(); ctx.moveTo(x0, y1 + 0.5); ctx.lineTo(x1, y1 + 0.5); ctx.stroke();
 
         // Box giornalieri: separatori, label giorno, % del giorno
         for (let i = 0; i < 5; i++) {
@@ -838,6 +859,9 @@
         return raw;
     }
 
+    const openAppunti = new Set();
+    function toggleAppunto(i) { if (openAppunti.has(i)) openAppunti.delete(i); else openAppunti.add(i); renderAppunti(); }
+
     function renderAppunti() {
         const list = document.getElementById('appunti-list');
         if (!list) return;
@@ -849,16 +873,25 @@
             const tagsHtml = (a.tags && a.tags.length)
                 ? `<div class="flex flex-wrap gap-1.5 mt-2">${a.tags.map(t => `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-tp-accent/10 border border-tp-accent/30 text-tp-accent text-xs font-bold">${escHtml(t)}</span>`).join('')}</div>`
                 : '';
+            const full = String(a.testo || '');
+            const firstLine = full.split(String.fromCharCode(10))[0].replace(String.fromCharCode(13), '').trim();
+            const title = firstLine.length > 90 ? firstLine.slice(0, 90).trimEnd() + '…' : firstLine;
+            const hasMore = full.trim().length > title.replace('…', '').length;
+            const open = openAppunti.has(i);
             return `
-            <div class="flex items-start gap-3 bg-tp-panel border border-tp-border rounded-lg px-4 py-3">
-                <span class="text-[11px] font-bold text-tp-accent/80 shrink-0 mt-0.5 font-mono whitespace-nowrap">${escHtml(formatAppuntoOra(a.ora))}</span>
-                <div class="flex-1">
-                    <p class="text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escHtml(a.testo)}</p>
-                    ${tagsHtml}
+            <div class="bg-tp-panel border border-tp-border rounded-lg overflow-hidden">
+                <div onclick="toggleAppunto(${i})" class="flex items-start gap-3 px-4 py-3 ${hasMore ? 'cursor-pointer hover:bg-white/[.02]' : ''} select-none transition-colors">
+                    <span class="text-[11px] font-bold text-tp-accent/80 shrink-0 mt-0.5 font-mono whitespace-nowrap">${escHtml(formatAppuntoOra(a.ora))}</span>
+                    <p class="flex-1 text-sm text-tp-text/90 leading-relaxed min-w-0 ${open ? '' : 'truncate'}">${escHtml(title)}</p>
+                    ${hasMore ? `<i data-lucide="chevron-down" class="w-4 h-4 text-tp-muted shrink-0 mt-0.5 transition-transform" style="${open ? 'transform:rotate(180deg)' : ''}"></i>` : ''}
+                    <button type="button" onclick="event.stopPropagation();removeAppunto(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors flex-shrink-0 mt-0.5" title="Rimuovi">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
                 </div>
-                <button type="button" onclick="removeAppunto(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors flex-shrink-0 mt-0.5" title="Rimuovi">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                </button>
+                ${open ? `<div class="px-4 pb-3 pt-2 border-t border-tp-border/40">
+                    <p class="text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escHtml(full)}</p>
+                    ${tagsHtml}
+                </div>` : (a.tags && a.tags.length ? `<div class="px-4 pb-3 -mt-1">${tagsHtml}</div>` : '')}
             </div>`;
         }).join('');
         lucide.createIcons();
