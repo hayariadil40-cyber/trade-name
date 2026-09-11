@@ -853,7 +853,7 @@
             }
 
             const biasLink = document.getElementById('btn-nuovo-bias');
-            if (biasLink) biasLink.href = `dettaglio_bias.html?date=${giornataDate}&from=giornata&gid=${giornataId}`;
+            if (biasLink) biasLink.href = `bias.html?date=${giornataDate}&from=giornata&gid=${giornataId}`;
 
             // Se completato → readonly
             if (data.stato === 'completato') {
@@ -1423,7 +1423,7 @@
             const btnLink = document.getElementById('btn-nuovo-bias');
             if (btnLink) {
                 if (_biasGiornataId) {
-                    btnLink.href = `dettaglio_bias.html?id=${_biasGiornataId}&from=giornata&gid=${giornataId}`;
+                    btnLink.href = `bias.html?id=${_biasGiornataId}&from=giornata&gid=${giornataId}`;
                     btnLink.classList.remove('hidden');
                 } else {
                     btnLink.classList.add('hidden');
@@ -1549,7 +1549,7 @@
                     if (error) { console.error('gjSaveCoinData INSERT:', error); _gjToast('Errore creazione bias: ' + error.message, false); return; }
                     _biasGiornataId = newB.id;
                     const btnLink = document.getElementById('btn-nuovo-bias');
-                    if (btnLink) { btnLink.href = `dettaglio_bias.html?id=${_biasGiornataId}&from=giornata&gid=${giornataId}`; btnLink.classList.remove('hidden'); }
+                    if (btnLink) { btnLink.href = `bias.html?id=${_biasGiornataId}&from=giornata&gid=${giornataId}`; btnLink.classList.remove('hidden'); }
                     _gjToast('Bias creato', true);
                     return;
                 }

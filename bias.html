@@ -40,12 +40,33 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #252932; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #3b4252; }
+        .save-flash { animation: flashGreen 0.6s ease; }
+        @keyframes flashGreen {
+            0% { box-shadow: 0 0 0 rgba(32,201,151,0); }
+            50% { box-shadow: 0 0 12px rgba(32,201,151,0.4); }
+            100% { box-shadow: 0 0 0 rgba(32,201,151,0); }
+        }
+        .dir-btn.active-long { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
+        .dir-btn.active-short { background: rgba(244,63,94,0.15); border-color: #f43f5e; color: #f43f5e; }
+        .dir-btn.active-neutral { background: rgba(234,179,8,0.15); border-color: #eab308; color: #eab308; }
+        .agg-dir-btn { padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; border: 1px solid rgba(128,128,128,0.3); color: rgba(128,128,128,0.45); text-transform: uppercase; transition: all 0.15s; cursor: pointer; }
+        .agg-dir-btn:hover { opacity: 0.8; }
+        .agg-dir-btn.agg-long  { background: rgba(32,201,151,0.15); border-color: #20c997; color: #20c997; }
+        .agg-dir-btn.agg-short { background: rgba(244,63,94,0.15);  border-color: #f43f5e; color: #f43f5e; }
+        .agg-dir-btn.agg-neutro{ background: rgba(234,179,8,0.15);  border-color: #eab308; color: #eab308; }
+        .cat-tab.active { opacity: 1; }
+        .cat-tab:not(.active) { opacity: 0.5; }
         .stato-badge-aperto { background: rgba(32,201,151,0.1); border: 1px solid rgba(32,201,151,0.4); color: #20c997; }
         .stato-badge-chiuso { background: rgba(132,141,151,0.15); border: 1px solid rgba(132,141,151,0.4); color: #848d97; }
-        .card-chiuso { opacity: 0.7; }
-        .filter-btn { padding:6px 12px; border-radius:8px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; border:1px solid #252932; color:#848d97; cursor:pointer; transition: all .15s; background: transparent; }
-        .filter-btn:hover { color:#fff; border-color: rgba(32,201,151,0.4); }
-        .filter-btn.active { background: rgba(32,201,151,0.10); color:#20c997; border-color: rgba(32,201,151,0.5); }
+        .bias-readonly input, .bias-readonly select, .bias-readonly textarea { pointer-events: none; opacity: 0.65; }
+        .bias-readonly button:not(.cat-tab):not(#back-btn):not([data-allow-readonly]) { pointer-events: none; opacity: 0.4; }
+        .h4-sq { width:100%;height:38px;border-radius:6px;font-size:11px;font-weight:800;border:1px solid rgba(128,128,128,0.25);color:rgba(128,128,128,0.22);background:transparent;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;justify-content:center; }
+        .h4-sq:hover { opacity:0.7; }
+        .h4-sq.h4-long   { background:rgba(32,201,151,0.15); border-color:#20c997; color:#20c997; }
+        .h4-sq.h4-short  { background:rgba(244,63,94,0.15);  border-color:#f43f5e; color:#f43f5e; }
+        .h4-sq.h4-neutro { background:rgba(234,179,8,0.15);  border-color:#eab308; color:#eab308; }
+        .h4-sq.h4-live { border-style: dashed; animation: h4pulse 2s ease-in-out infinite; }
+        @keyframes h4pulse { 0%,100%{ opacity:1 } 50%{ opacity:0.55 } }
     </style>
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -78,7 +99,7 @@
 
             <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span></a>
 
-            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span></a>
+            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg bg-[#161920] text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span></a>
 
             <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span></a>
 
@@ -163,212 +184,1158 @@
         </header>
 
         <!-- ============================================ -->
-        <!-- LISTA BIAS                                -->
+        <!-- CONTENUTO: Dettaglio Bias / Bias          -->
         <!-- ============================================ -->
         <div class="flex-1 overflow-y-auto p-3 lg:p-8 scroll-smooth">
-            <div class="max-w-7xl mx-auto">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                            <i data-lucide="microscope" class="w-5 h-5 text-tp-accent"></i> Archivio Bias
-                        </h2>
-                        <p class="text-sm text-tp-muted mt-1" id="bias-count">Caricamento...</p>
+            <div class="max-w-[1600px] mx-auto">
+
+                <!-- Navigazione per data (un bias per giorno) -->
+                <div class="flex items-center gap-3 mb-6 flex-wrap">
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <button onclick="changeDate(-1)" class="w-7 h-7 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-white hover:border-tp-muted flex items-center justify-center transition-colors">
+                            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <span id="date-display" class="text-white font-bold text-xs w-52 text-center select-none">—</span>
+                        <button onclick="changeDate(1)" class="w-7 h-7 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-white hover:border-tp-muted flex items-center justify-center transition-colors">
+                            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button onclick="goToToday()" class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-tp-accent hover:border-tp-accent/40 transition-colors">Oggi</button>
                     </div>
-                    <button onclick="window.location.href='dettaglio_bias.html'" class="bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] px-4 py-2 text-xs font-bold uppercase rounded-lg flex items-center gap-2 transition-colors shadow-sm">
-                        <i data-lucide="plus" class="w-4 h-4"></i> Nuovo Bias
+                    <a id="back-giornata" href="#" class="hidden flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Torna alla Giornata</a>
+                </div>
+
+                <!-- Stato vuoto: nessun bias per la data -->
+                <div id="bias-empty" class="hidden flex-col items-center justify-center py-24 text-center">
+                    <div class="w-14 h-14 rounded-2xl bg-tp-panel border border-tp-border flex items-center justify-center mb-4">
+                        <i data-lucide="microscope" class="w-7 h-7 text-tp-muted opacity-30"></i>
+                    </div>
+                    <p class="text-sm font-bold text-tp-muted mb-1">Nessun bias per questa data</p>
+                    <p class="text-xs text-tp-muted/50 mb-6">Un bias al giorno, con gli asset dentro. Crealo per iniziare a compilare.</p>
+                    <button onclick="createBiasForDate()" class="bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] px-4 py-2 text-xs font-bold uppercase rounded-lg transition-colors inline-flex items-center gap-2">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> Crea Bias
                     </button>
                 </div>
 
-                <!-- Filtri periodo -->
-                <div class="flex items-center gap-2 mb-4 flex-wrap">
-                    <span class="text-[10px] uppercase tracking-widest font-bold text-tp-muted/70 mr-1">Periodo</span>
-                    <button class="filter-btn active" data-periodo="oggi" onclick="setFilterPeriodo('oggi')">Oggi</button>
-                    <button class="filter-btn" data-periodo="settimana" onclick="setFilterPeriodo('settimana')">Settimana</button>
-                    <button class="filter-btn" data-periodo="mese" onclick="setFilterPeriodo('mese')">Mese</button>
-                    <button class="filter-btn" data-periodo="tutte" onclick="setFilterPeriodo('tutte')">Tutte</button>
-                </div>
+                <div id="bias-content" class="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
 
-                <div id="bias-list" class="space-y-2">
-                    <!-- Caricato dinamicamente -->
-                </div>
+                    <!-- SINISTRA: Dati Bias -->
+                    <div id="bias-canvas" class="flex flex-col gap-6">
 
-                <!-- Empty state -->
-                <div id="empty-state" class="hidden text-center py-16 text-tp-muted">
-                    <i data-lucide="microscope" class="w-12 h-12 mx-auto mb-3 opacity-30"></i>
-                    <p class="text-sm font-bold">Nessun bias archiviato</p>
-                    <p class="text-xs mt-1 opacity-60">Crea il tuo primo bias per iniziare a costruire la memoria del mercato</p>
+                        <!-- Banner readonly (visibile solo se stato=chiuso) -->
+                        <div id="bias-readonly-banner" class="hidden bg-tp-warning/5 border border-tp-warning/30 text-tp-warning rounded-lg px-4 py-3 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                            <i data-lucide="lock" class="w-4 h-4"></i>
+                            Bias chiuso - non modificabile ne eliminabile
+                        </div>
+
+                        <!-- Header Bias -->
+                        <div class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
+                            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-tp-border/50">
+                                <div class="bg-tp-accent/10 p-2.5 rounded-lg border border-tp-accent/20">
+                                    <i data-lucide="microscope" class="w-6 h-6 text-tp-accent"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h2 class="text-xl font-bold text-white" id="bias-title">Bias</h2>
+                                    <span id="bias-id-display" class="text-[10px] font-bold text-tp-muted uppercase tracking-widest"></span>
+                                </div>
+                                <span id="bias-stato-badge" class="stato-badge-aperto text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded">Aperto</span>
+                            </div>
+
+                        </div>
+
+
+                        <!-- Aggiornamenti / Commenti / Note -->
+                        <div id="card-aggiornamenti" class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
+                                <i data-lucide="clock" class="w-4 h-4 text-tp-accent"></i> <span id="aggiornamenti-label">Aggiornamenti</span>
+                                <span class="text-[10px] font-normal text-tp-muted/70 normal-case tracking-normal" id="aggiornamenti-sublabel">(monitoring sviluppo durante la giornata)</span>
+                            </label>
+                            <div id="aggiornamenti-list" class="space-y-2 mb-4"></div>
+                            <div class="flex gap-2 items-start">
+                                <input id="agg-ora" type="time" class="bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[110px] flex-shrink-0 mt-0.5"/>
+                                <div class="flex-1 flex flex-col gap-1.5">
+                                    <textarea id="agg-testo" rows="2" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Es: London ha rispettato 4720, prima reazione long visibile, bias confermato" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'"></textarea>
+                                    <!-- Area tag -->
+                                    <div class="bg-[#0a0c10] border border-tp-border/50 rounded-lg px-2.5 py-2">
+                                        <div id="agg-tags-container" class="flex flex-wrap gap-1.5 mb-2 min-h-[18px]"></div>
+                                        <div class="flex gap-1.5">
+                                            <input id="agg-tag-input" type="text" placeholder="Aggiungi tag…"
+                                                onkeydown="if(event.key==='Enter'){event.preventDefault();addAggTag()}"
+                                                class="flex-1 bg-tp-panel border border-tp-border rounded px-2.5 py-1 text-xs text-tp-text/80 outline-none focus:border-tp-accent transition-colors">
+                                            <button type="button" onclick="addAggTag()" class="px-3 py-1 bg-tp-panel border border-tp-border rounded text-xs font-bold text-tp-muted hover:text-tp-accent hover:border-tp-accent transition-colors">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col justify-center gap-1 mt-0.5">
+                                    <button type="button" onclick="toggleNewMindset('positive')" id="nm-positive" style="padding:2px;background:none;border:none;cursor:pointer;color:rgba(128,128,128,0.35)" title="positivo"><i data-lucide="smile" style="width:14px;height:14px"></i></button>
+                                    <button type="button" onclick="toggleNewMindset('neutral')"  id="nm-neutral"  style="padding:2px;background:none;border:none;cursor:pointer;color:rgba(128,128,128,0.35)" title="neutro"><i data-lucide="meh"   style="width:14px;height:14px"></i></button>
+                                    <button type="button" onclick="toggleNewMindset('negative')" id="nm-negative" style="padding:2px;background:none;border:none;cursor:pointer;color:rgba(128,128,128,0.35)" title="negativo"><i data-lucide="frown" style="width:14px;height:14px"></i></button>
+                                </div>
+                                <button type="button" onclick="addAggiornamento()" id="agg-btn" class="px-4 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 hover:bg-tp-accent/20 uppercase transition-all flex items-center gap-2 mt-0.5">
+                                    <i data-lucide="plus" class="w-4 h-4"></i> Aggiungi
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Categorizzatore Universale -->
+                        <div id="card-categorizzatore" class="bg-tp-panel rounded-xl border border-tp-border p-6 shadow-lg">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-tp-muted mb-3 flex items-center gap-2">
+                                <i data-lucide="link" class="w-4 h-4 text-tp-accent"></i> Categorizzatore Universale
+                            </label>
+
+                            <!-- Tab -->
+                            <div class="flex gap-2 mb-4 flex-wrap">
+                                <button onclick="switchCatTab('cronache')" id="cat-tab-cronache" class="cat-tab active flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 uppercase transition-all">Cronache</button>
+                                <button onclick="switchCatTab('strategie')" id="cat-tab-strategie" class="cat-tab flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-purple-500 text-purple-400 bg-purple-500/10 uppercase transition-all">Strategia</button>
+                                <button onclick="switchCatTab('trades')" id="cat-tab-trades" class="cat-tab flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-blue-500 text-blue-400 bg-blue-500/10 uppercase transition-all">Trade</button>
+                                <button onclick="switchCatTab('ipotesi')" id="cat-tab-ipotesi" class="cat-tab flex-1 px-3 py-2 rounded-lg text-xs font-bold border border-yellow-500 text-yellow-400 bg-yellow-500/10 uppercase transition-all">Ipotesi</button>
+                            </div>
+
+                            <!-- Selettori dinamici -->
+                            <div id="cat-cronache" class="cat-panel">
+                                <select id="sel-cronache" multiple class="w-full bg-[#0a0c10] border border-tp-accent/30 rounded-lg px-3 py-2 text-xs text-tp-accent font-bold outline-none h-[100px]">
+                                    <!-- Caricato da Supabase -->
+                                </select>
+                                <p class="text-[10px] text-tp-muted mt-1">Ctrl+Click per selezione multipla</p>
+                            </div>
+                            <div id="cat-strategie" class="cat-panel hidden">
+                                <select id="sel-strategie" multiple class="w-full bg-[#0a0c10] border border-purple-500/30 rounded-lg px-3 py-2 text-xs text-purple-400 font-bold outline-none h-[100px]">
+                                    <!-- Caricato da Supabase -->
+                                </select>
+                                <p class="text-[10px] text-tp-muted mt-1">Ctrl+Click per selezione multipla</p>
+                            </div>
+                            <div id="cat-trades" class="cat-panel hidden">
+                                <select id="sel-trades" multiple class="w-full bg-[#0a0c10] border border-blue-500/30 rounded-lg px-3 py-2 text-xs text-blue-400 font-bold outline-none h-[100px]">
+                                    <!-- Caricato da Supabase -->
+                                </select>
+                                <p class="text-[10px] text-tp-muted mt-1">Ctrl+Click per selezione multipla</p>
+                            </div>
+                            <div id="cat-ipotesi" class="cat-panel hidden">
+                                <select id="sel-ipotesi" multiple class="w-full bg-[#0a0c10] border border-yellow-500/30 rounded-lg px-3 py-2 text-xs text-yellow-400 font-bold outline-none h-[100px]">
+                                    <!-- Caricato da Supabase -->
+                                </select>
+                                <p class="text-[10px] text-tp-muted mt-1">Ctrl+Click per selezione multipla</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- DESTRA: Azioni + Screenshot -->
+                    <div class="flex flex-col gap-6">
+
+                        <!-- Barra azioni -->
+                        <div class="flex items-center gap-2" id="bias-actions">
+                            <div class="flex-1"></div>
+                            <button id="save-btn" onclick="saveBias()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 transition-colors">
+                                <i data-lucide="save" class="w-3.5 h-3.5"></i> Salva
+                            </button>
+                            <button id="close-btn" onclick="closeBias()" disabled class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border border-tp-warning/30 text-tp-warning bg-tp-warning/10 hover:bg-tp-warning hover:text-[#0a0c10] transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-tp-warning/10 disabled:hover:text-tp-warning">
+                                <i data-lucide="lock" class="w-3.5 h-3.5"></i> Chiudi
+                            </button>
+                            <button id="delete-btn" onclick="deleteBias()" class="p-1.5 rounded-lg border border-tp-loss/30 text-tp-loss hover:bg-tp-loss/10 transition-colors">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+
+                        <!-- Asset tabs bias -->
+                        <div id="field-bias-tabs" class="hidden bg-tp-panel border border-tp-border rounded-xl p-4 shadow-xl flex flex-col gap-3">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <div id="bias-asset-tabs" class="flex gap-1 flex-wrap flex-1"></div>
+                                <button type="button" onclick="openAddAssetMenu()" id="bias-add-asset-btn" class="flex items-center gap-1 text-[10px] font-bold text-tp-accent border border-tp-accent/30 rounded-lg px-3 py-1.5 hover:bg-tp-accent/10 transition-colors whitespace-nowrap">
+                                    <i data-lucide="plus" class="w-3 h-3"></i> Asset
+                                </button>
+                            </div>
+                            <!-- Menu selezione asset -->
+                            <div id="bias-asset-menu" class="hidden bg-[#0a0c10] border border-tp-border rounded-xl p-3 flex flex-wrap gap-2"></div>
+                            <!-- Pannello asset attivo -->
+                            <div id="bias-asset-panel" class="hidden"></div>
+                            <p id="bias-no-asset-msg" class="text-xs text-tp-muted/60 italic">Nessun asset aggiunto. Premi "+ Asset" per iniziare.</p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
     </main>
 
     <!-- Modal Conferma -->
-    <div id="modal-confirm" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeConfirm()"></div>
-        <div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-sm mx-4 relative z-10 shadow-2xl overflow-hidden flex flex-col">
-            <div class="px-6 py-4 border-b border-tp-border bg-tp-panel relative">
-                <div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-warning"></div>
-                <h2 id="confirm-title" class="text-lg font-bold">Conferma</h2>
-            </div>
-            <div class="p-6">
-                <p id="confirm-msg" class="text-sm text-tp-muted">Sei sicuro?</p>
-            </div>
-            <div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel">
-                <button onclick="closeConfirm()" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white border border-tp-border rounded-lg">Annulla</button>
-                <button id="confirm-action" class="bg-tp-warning hover:bg-tp-warning/80 text-[#0a0c10] px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors">Conferma</button>
-            </div>
-        </div>
-    </div>
+    <div id="modal-confirm" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 [&.open]:opacity-100 [&.open]:pointer-events-auto"><div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeConfirm()"></div><div class="bg-[#0a0c10] border border-tp-border rounded-xl w-full max-w-sm mx-4 relative z-10 shadow-2xl overflow-hidden flex flex-col"><div class="px-6 py-4 border-b border-tp-border bg-tp-panel relative"><div class="absolute top-0 bottom-0 left-0 w-1 bg-tp-loss"></div><h2 id="confirm-title" class="text-lg font-bold">Conferma</h2></div><div class="p-6"><p id="confirm-msg" class="text-sm text-tp-muted">Sei sicuro?</p></div><div class="flex justify-end gap-3 px-6 py-4 border-t border-tp-border bg-tp-panel"><button onclick="closeConfirm()" class="px-4 py-2 text-sm font-bold text-tp-muted hover:text-white border border-tp-border rounded-lg">Annulla</button><button id="confirm-action" class="bg-tp-loss hover:bg-tp-loss/80 text-white px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors">Conferma</button></div></div></div>
 
     <script src="app.js"></script>
     <script>
-        let biasAll = [];
-        let filterPeriodo = 'oggi';
+        // ============================================
+        // DETTAGLIO BIAS / BIAS - Supabase Logic
+        // ============================================
+
+        // Un bias per giorno: la pagina si naviga per data. ?id= (link vecchi) viene risolto in data.
+        const _params = new URLSearchParams(window.location.search);
+        const _urlId   = _params.get('id');
+        const _urlDate = _params.get('date');
+        const fromPage = _params.get('from');
+        const fromGid  = _params.get('gid');
+        let biasId = null;
+        let h4LiveTimer = null;
+
+        function casaTodayStr() { return new Date(Date.now() + 60 * 60000).toISOString().split('T')[0]; }
+        let currentDateStr = (_urlDate && /^\d{4}-\d{2}-\d{2}$/.test(_urlDate)) ? _urlDate : casaTodayStr();
+
+        function _addDaysDate(d, n) { const x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); }
+        function changeDate(delta) { currentDateStr = _addDaysDate(currentDateStr, delta); loadBias(); }
+        function goToToday() { currentDateStr = casaTodayStr(); loadBias(); }
+        function renderDateLabel() {
+            const d = new Date(currentDateStr + 'T00:00:00Z');
+            const lbl = d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+            const isToday = currentDateStr === casaTodayStr();
+            document.getElementById('date-display').textContent = lbl.charAt(0).toUpperCase() + lbl.slice(1) + (isToday ? ' · oggi' : '');
+            const url = new URL(window.location.href);
+            url.searchParams.delete('id'); url.searchParams.set('date', currentDateStr);
+            history.replaceState(null, '', url.toString());
+        }
+        if (fromPage === 'giornata' && fromGid) {
+            const bk = document.getElementById('back-giornata');
+            if (bk) { bk.href = 'dettaglio_giornata.html?id=' + fromGid; bk.classList.remove('hidden'); }
+        }
+
+        async function createBiasForDate() {
+            const { data, error } = await db.from('bias').insert({ data: currentDateStr }).select().single();
+            if (error) { alert('Errore creazione: ' + error.message); return; }
+            await loadBias();
+        }
+        let currentDirection = '';
+        let currentStato = 'aperto';
+        let biasDataField = ''; // valore colonna `data`, gestito lato server, non editabile
+        let commentiGiornata = [];
+        let asianboxAssets = [];
+
+        function adaptForm() {
+            const s = (id, v) => { const el = document.getElementById(id); if (el) el.classList.toggle('hidden', !v); };
+            s('field-bias-tabs',      true);
+            s('card-aggiornamenti',   true);
+            s('card-categorizzatore', true);
+            const lbl = document.getElementById('aggiornamenti-label');
+            if (lbl) lbl.textContent = 'Commenti della giornata';
+            const sub = document.getElementById('aggiornamenti-sublabel');
+            if (sub) sub.textContent = '';
+            renderAggiornamenti();
+            updateCloseButton();
+        }
 
         document.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
-            if (!db) return;
-            await loadBiasList();
+
+            if (!db) { alert('Supabase non inizializzato.'); return; }
+
+            // link vecchi con ?id= → risolvo la data del bias
+            if (_urlId && !_urlDate) {
+                const { data: r } = await db.from('bias').select('data').eq('id', _urlId).maybeSingle();
+                if (r?.data) currentDateStr = r.data;
+            }
+            await loadCategorizers();
+            await loadBias();
         });
 
-        function casaTodayStr() {
-            const d = new Date(new Date().getTime() + 60 * 60000);
-            return d.toISOString().split('T')[0];
-        }
-
-        function matchPeriodo(b) {
-            if (filterPeriodo === 'tutte') return true;
-            const bDate = (b.data || '').substring(0, 10);
-            const today = casaTodayStr();
-            if (filterPeriodo === 'oggi') return bDate === today;
-            if (filterPeriodo === 'settimana') {
-                const casaNow = new Date(new Date().getTime() + 60 * 60000);
-                const dow = casaNow.getUTCDay();
-                const monStr = new Date(casaNow.getTime() + (dow === 0 ? -6 : 1 - dow) * 86400000).toISOString().split('T')[0];
-                return bDate >= monStr && bDate <= today;
-            }
-            if (filterPeriodo === 'mese') return bDate >= today.substring(0, 7) + '-01' && bDate <= today;
-            return true;
-        }
-
-        function setFilterPeriodo(periodo) {
-            filterPeriodo = periodo;
-            document.querySelectorAll('.filter-btn[data-periodo]').forEach(b => {
-                b.classList.toggle('active', b.dataset.periodo === periodo);
-            });
-            renderBiasList();
-        }
-
-        async function loadBiasList() {
-            const { data: biasEntries, error } = await db
+        // --- LOAD BIAS ---
+        async function loadBias() {
+            renderDateLabel();
+            if (h4LiveTimer) { clearInterval(h4LiveTimer); h4LiveTimer = null; }
+            const { data, error } = await db
                 .from('bias')
                 .select('*')
-                .order('data', { ascending: false });
-
+                .eq('data', currentDateStr)
+                .order('created_at', { ascending: true })
+                .limit(1)
+                .maybeSingle();
             if (error) { console.error(error); return; }
-            biasAll = biasEntries || [];
-            renderBiasList();
-        }
 
-        function renderBiasList() {
-            const biasEntries = biasAll.filter(matchPeriodo);
-            const list = document.getElementById('bias-list');
-            const empty = document.getElementById('empty-state');
-            const count = document.getElementById('bias-count');
-
-            if (!biasEntries.length) {
-                list.innerHTML = '';
-                empty.classList.remove('hidden');
-                count.textContent = '0 bias';
+            const emptyEl = document.getElementById('bias-empty');
+            const contentEl = document.getElementById('bias-content');
+            if (!data) {
+                biasId = null;
+                coinData = {}; activeAsset = null; commentiGiornata = []; asianboxAssets = [];
+                emptyEl.classList.remove('hidden'); emptyEl.classList.add('flex');
+                contentEl.classList.add('hidden');
                 lucide.createIcons();
                 return;
             }
-            empty.classList.add('hidden');
+            emptyEl.classList.add('hidden'); emptyEl.classList.remove('flex');
+            contentEl.classList.remove('hidden');
 
-            count.textContent = `${biasEntries.length} repert${biasEntries.length === 1 ? 'o' : 'i'} archiviat${biasEntries.length === 1 ? 'o' : 'i'}`;
+            biasId = data.id;
+            biasDataField = data.data || '';
+            const dateLabel = new Date(data.data + 'T00:00:00Z').toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' });
+            document.getElementById('bias-title').textContent = `Bias — ${dateLabel}`;
+            document.getElementById('bias-id-display').textContent = `ID: ${data.id.substring(0, 8)}`;
+            asianboxAssets = [];
+            // coin_data per asset tabs
+            const _raw = (data.coin_data && typeof data.coin_data === 'object' && !Array.isArray(data.coin_data))
+                ? JSON.parse(JSON.stringify(data.coin_data))
+                : {};
+            // Migrazione legacy: asset singolo → coin_data
+            if (!Object.keys(_raw).length && data.asset) {
+                _raw[data.asset] = { aggiornamenti: Array.isArray(data.commenti_giornata) ? data.commenti_giornata : [] };
+            }
+            // Pre-popola i 6 preferiti in ordine fisso, poi appende gli extra
+            const _preferred = ['XAUUSD','US30','GER30','NAS100','BTCUSD','EURUSD'];
+            coinData = {};
+            _preferred.forEach(a => { coinData[a] = _raw[a] || { aggiornamenti: [] }; });
+            Object.keys(_raw).forEach(a => { if (!_preferred.includes(a)) coinData[a] = _raw[a]; });
+            activeAsset = Object.keys(coinData)[0];
 
-            list.innerHTML = biasEntries.map(b => {
-                const isLong = b.direzione === 'LONG';
-                const isShort = b.direzione === 'SHORT';
-                const isChiuso = b.stato === 'chiuso';
-                const barColor = isLong ? 'bg-tp-accent' : isShort ? 'bg-tp-loss' : 'bg-tp-border';
-                const hoverBorder = isLong ? 'hover:border-tp-accent/50' : isShort ? 'hover:border-tp-loss/50' : 'hover:border-white/50';
-                const dirColor = isLong ? 'text-tp-accent bg-[#14231f] border-tp-accent/20' : isShort ? 'text-tp-loss bg-tp-loss/10 border-tp-loss/20' : 'text-tp-muted bg-[#0a0c10] border-tp-border';
-                const dirText = isLong ? 'Long' : isShort ? 'Short' : 'Neutro';
-                const nameColor = isLong ? 'group-hover:text-tp-accent' : isShort ? 'group-hover:text-tp-loss' : 'group-hover:text-white';
-                const dateStr = b.data ? new Date(b.data + 'T00:00:00').toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' }) : '--';
-                const coinDataAssets = Object.keys(b.coin_data || {}).filter(k => {
-                    const d = (b.coin_data || {})[k];
-                    return d && (Object.keys(d).length > 0);
-                });
-                const assetBadges = coinDataAssets.map(a =>
-                    `<span class="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-tp-bg border border-tp-border text-tp-muted">${a}</span>`
-                ).join('');
-                const hasScreens = (b.screenshots || []).length;
-                const comment = b.commento || b.confluenze || '';
-                const preview = comment.length > 80 ? comment.substring(0, 80) + '...' : comment;
-                const statoBadgeClass = isChiuso ? 'stato-badge-chiuso' : 'stato-badge-aperto';
-                const statoLabel = isChiuso ? 'Chiuso' : 'Aperto';
-                const cardOpacity = isChiuso ? 'card-chiuso' : '';
+            currentStato = data.stato || 'aperto';
+            applyStatoUI();
+            updateCloseButton();
 
-                const closeBtn = isChiuso ? '' : `
-                    <button type="button" onclick="event.stopPropagation(); quickClose('${b.id}')" title="Chiudi bias" class="ml-2 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1.5 rounded border border-tp-warning/40 text-tp-warning hover:bg-tp-warning hover:text-[#0a0c10] transition-colors">
-                        <i data-lucide="lock" class="w-3 h-3"></i> Chiudi
-                    </button>`;
+            commentiGiornata = Array.isArray(data.commenti_giornata) ? data.commenti_giornata.slice() : [];
+            const _now = new Date();
+            document.getElementById('agg-ora').value = String(_now.getHours()).padStart(2,'0') + ':' + String(_now.getMinutes()).padStart(2,'0');
 
-                return `
-                    <div onclick="window.location.href='dettaglio_bias.html?id=${b.id}'" class="group ${cardOpacity} bg-tp-panel border border-tp-border ${hoverBorder} rounded-lg transition-all cursor-pointer shadow-sm relative overflow-hidden">
-                        <div class="w-1 absolute left-0 top-0 bottom-0 ${barColor}"></div>
+            adaptForm();
+            renderBiasAssetTabs();
+            if (activeAsset) renderBiasAssetPanel();
 
-                        <!-- Riga 1: info -->
-                        <div class="grid grid-cols-2 gap-y-2 lg:flex lg:items-center p-3 lg:p-4 pl-5">
-                            <div class="flex items-center lg:w-1/3 gap-2 lg:gap-3 min-w-0">
-                                <span class="text-[10px] lg:text-xs font-bold text-tp-muted uppercase tracking-widest bg-tp-bg px-2 py-1 rounded shrink-0">${b.id.substring(0, 8)}</span>
-                                <span class="font-bold text-sm ${nameColor} transition-colors whitespace-nowrap">Bias — ${dateStr}</span>
-                            </div>
+            const cat = data.categorizzatori || {};
+            restoreSelections('sel-cronache', cat.cronache || []);
+            restoreSelections('sel-strategie', cat.strategie || []);
+            restoreSelections('sel-trades', cat.trades || []);
+            restoreSelections('sel-ipotesi', cat.ipotesi || []);
+            startH4LiveTimer();
+        }
 
-                            <div class="lg:w-8 flex items-center justify-end lg:justify-start">
-                                <i data-lucide="chevron-right" class="hidden lg:inline w-5 h-5 text-tp-muted group-hover:text-tp-accent transition-colors"></i>
-                            </div>
+        function restoreSelections(selectId, ids) {
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            Array.from(sel.options).forEach(opt => {
+                opt.selected = ids.includes(opt.value);
+            });
+        }
 
-                            <div class="lg:w-1/5 flex flex-col justify-center">
-                                <div class="flex items-center gap-1.5 flex-wrap">
-                                    ${(isLong || isShort) ? `<span class="text-[10px] font-bold ${dirColor} border px-2 py-0.5 rounded uppercase">${dirText}</span>` : ''}
-                                    ${assetBadges || '<span class="text-[10px] text-tp-muted/40 italic">—</span>'}
-                                </div>
-                            </div>
+        // --- DIRECTION ---
+        function setDirection(dir) {
+            currentDirection = dir;
+            const btnLong = document.getElementById('btn-long');
+            const btnShort = document.getElementById('btn-short');
+            const btnNeutral = document.getElementById('btn-neutral');
 
-                            <div class="col-span-2 lg:flex-1 flex flex-col text-sm text-tp-muted justify-center lg:px-2">
-                                <p class="text-[11px] lg:text-xs text-tp-muted/80 line-clamp-2 lg:line-clamp-1">${preview || 'Nessun commento'}</p>
-                            </div>
+            btnLong.classList.remove('active-long');
+            btnShort.classList.remove('active-short');
+            btnNeutral.classList.remove('active-neutral');
+
+            if (dir === 'LONG') btnLong.classList.add('active-long');
+            if (dir === 'SHORT') btnShort.classList.add('active-short');
+            if (dir === 'NEUTRAL') btnNeutral.classList.add('active-neutral');
+        }
+
+        function updateCloseButton() {
+            const closeBtn = document.getElementById('close-btn');
+            if (!closeBtn) return;
+            closeBtn.disabled = currentStato === 'chiuso';
+        }
+
+        // --- STATO (aperto / chiuso) ---
+        function applyStatoUI() {
+            const badge = document.getElementById('bias-stato-badge');
+            const banner = document.getElementById('bias-readonly-banner');
+            const canvas = document.getElementById('bias-canvas');
+            const closeBtn = document.getElementById('close-btn');
+            const saveBtn = document.getElementById('save-btn');
+            const deleteBtn = document.getElementById('delete-btn');
+
+            if (currentStato === 'chiuso') {
+                badge.textContent = 'Chiuso';
+                badge.className = 'stato-badge-chiuso text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded';
+                banner.classList.remove('hidden');
+                canvas.classList.add('bias-readonly');
+                if (saveBtn) saveBtn.classList.add('hidden');
+                if (closeBtn) closeBtn.classList.add('hidden');
+                if (deleteBtn) deleteBtn.classList.add('hidden');
+            } else {
+                badge.textContent = 'Aperto';
+                badge.className = 'stato-badge-aperto text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded';
+                banner.classList.add('hidden');
+                canvas.classList.remove('bias-readonly');
+                if (saveBtn) saveBtn.classList.remove('hidden');
+                if (closeBtn) closeBtn.classList.remove('hidden');
+                if (deleteBtn) deleteBtn.classList.remove('hidden');
+            }
+        }
+
+        async function closeBias() {
+            showConfirm(
+                'Chiudere il bias?',
+                'Una volta chiuso non sara piu modificabile ne eliminabile. Conferma solo se hai finito di aggiornarlo.',
+                async function() {
+                    const payload = collectPayload();
+                    payload.stato = 'chiuso';
+                    const { error } = await db.from('bias').update(payload).eq('id', biasId);
+                    if (error) { alert('Errore chiusura: ' + error.message); return; }
+                    currentStato = 'chiuso';
+                    applyStatoUI();
+                }
+            );
+        }
+
+        // --- CATEGORIZER TABS ---
+        function switchCatTab(tab) {
+            document.querySelectorAll('.cat-panel').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('cat-' + tab).classList.remove('hidden');
+            document.getElementById('cat-tab-' + tab).classList.add('active');
+        }
+
+        // --- LOAD CATEGORIZERS FROM DB ---
+        async function loadCategorizers() {
+            // Cronache
+            const { data: cronache } = await db.from('cronache').select('id, data, titolo').order('data', { ascending: false }).limit(20);
+            const selCron = document.getElementById('sel-cronache');
+            (cronache || []).forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = `${c.data} - ${c.titolo}`;
+                selCron.appendChild(opt);
+            });
+
+            // Strategie
+            const { data: strategie } = await db.from('strategie').select('id, nome').order('nome');
+            const selStrat = document.getElementById('sel-strategie');
+            (strategie || []).forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = s.nome;
+                selStrat.appendChild(opt);
+            });
+
+            // Trades
+            const { data: trades } = await db.from('trades').select('id, asset, direzione, data').order('data', { ascending: false }).limit(30);
+            const selTrades = document.getElementById('sel-trades');
+            (trades || []).forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                const d = new Date(t.data).toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
+                opt.textContent = `${t.asset} ${t.direzione} - ${d}`;
+                selTrades.appendChild(opt);
+            });
+
+            // Ipotesi (con nome strategia per riconoscibilita)
+            const { data: ipotesi } = await db.from('ipotesi_trading').select('id, asset, sessione, stato, strategia_id, created_at').order('created_at', { ascending: false }).limit(50);
+            const stratNames = {};
+            (strategie || []).forEach(s => { stratNames[s.id] = s.nome; });
+            const selIpotesi = document.getElementById('sel-ipotesi');
+            (ipotesi || []).forEach(i => {
+                const opt = document.createElement('option');
+                opt.value = i.id;
+                const dt = new Date(i.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
+                const stratName = i.strategia_id ? (stratNames[i.strategia_id] || '?') : 'no strategia';
+                const stato = (i.stato || 'ipotesi').replace('_', ' ');
+                opt.textContent = `${dt} · ${stratName} · ${i.asset || '—'} · [${stato}]`;
+                selIpotesi.appendChild(opt);
+            });
+        }
+
+        function getSelectedValues(selectId) {
+            const sel = document.getElementById(selectId);
+            return Array.from(sel.selectedOptions).map(o => o.value);
+        }
+
+        // --- AGGIORNAMENTI ---
+        function escapeAggHtml(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
+        const moodColor = { positive:'#20c997', neutral:'#eab308', negative:'#f43f5e' };
+        const moodIcon  = { positive:'smile',   neutral:'meh',     negative:'frown' };
+        let newCommentoMindset = null;
+
+        function toggleNewMindset(type) {
+            newCommentoMindset = newCommentoMindset === type ? null : type;
+            ['positive','neutral','negative'].forEach(m => {
+                const btn = document.getElementById('nm-' + m);
+                if (btn) btn.style.color = newCommentoMindset === m ? moodColor[m] : 'rgba(128,128,128,0.35)';
+            });
+        }
+
+        function renderAggiornamenti() {
+            const list = document.getElementById('aggiornamenti-list');
+            if (!list) return;
+            if (!commentiGiornata.length) {
+                list.innerHTML = `<p class="text-xs text-tp-muted/60 italic">Nessun commento ancora.</p>`;
+                return;
+            }
+            list.innerHTML = commentiGiornata.map((a, i) => {
+                const moodBadge = a.mindset
+                    ? `<i data-lucide="${moodIcon[a.mindset]}" style="width:13px;height:13px;color:${moodColor[a.mindset]};flex-shrink:0;margin-top:2px"></i>`
+                    : '';
+                const tagsHtml = (a.tags && a.tags.length)
+                    ? `<div class="flex flex-wrap gap-1 mt-1.5">${a.tags.map(t => `<span class="inline-flex items-center px-2 py-0.5 rounded bg-tp-accent/10 border border-tp-accent/25 text-[10px] text-tp-accent font-medium">${escapeAggHtml(t)}</span>`).join('')}</div>`
+                    : '';
+                return `<div class="bg-[#0a0c10] border border-tp-border rounded-lg p-3 flex items-start gap-3">
+                    <span class="text-xs font-bold text-tp-accent tracking-wide whitespace-nowrap mt-0.5">${escapeAggHtml(a.ora)}</span>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escapeAggHtml(a.testo)}</p>
+                        ${tagsHtml}
+                    </div>
+                    ${moodBadge}
+                    <button type="button" onclick="removeAggiornamento(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors flex-shrink-0 mt-0.5" title="Rimuovi">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>`;
+            }).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        async function addAggiornamento() {
+            if (currentStato === 'chiuso') return;
+            const oraEl = document.getElementById('agg-ora');
+            const testoEl = document.getElementById('agg-testo');
+            const ora = (oraEl.value || '').trim();
+            const testo = (testoEl.value || '').trim();
+            if (!ora || !testo) { alert('Compila orario e testo prima di aggiungere'); return; }
+            const mindset = newCommentoMindset;
+            commentiGiornata.push({ ora, testo, mindset: mindset || null, tags: [...newBiasAggTags] });
+            commentiGiornata.sort((a,b) => (a.ora || '').localeCompare(b.ora || ''));
+            testoEl.value = '';
+            newCommentoMindset = null;
+            newBiasAggTags = [];
+            renderAggTagsInput();
+            ['positive','neutral','negative'].forEach(m => { const b = document.getElementById('nm-'+m); if(b) b.style.color='rgba(128,128,128,0.35)'; });
+            if (mindset) {
+                const { error: smErr } = await db.from('monitora_smile').insert({ mindset, sorgente: 'bias_commento' });
+                if (smErr) console.error('monitora_smile insert:', smErr);
+            }
+            renderAggiornamenti();
+            const { error } = await db.from('bias').update({ commenti_giornata: commentiGiornata }).eq('id', biasId);
+            if (error) {
+                alert('Errore salvataggio aggiornamento: ' + error.message);
+                const idx = commentiGiornata.findIndex(x => x.ora === ora && x.testo === testo);
+                if (idx >= 0) commentiGiornata.splice(idx, 1);
+                renderAggiornamenti();
+            }
+        }
+
+        async function removeAggiornamento(i) {
+            if (currentStato === 'chiuso') return;
+            const removed = commentiGiornata.splice(i, 1)[0];
+            renderAggiornamenti();
+            const {error} = await db.from('bias').update({ commenti_giornata: commentiGiornata }).eq('id', biasId);
+            if (error) {
+                alert('Errore rimozione: ' + error.message);
+                commentiGiornata.splice(i, 0, removed);
+                renderAggiornamenti();
+            }
+        }
+
+        // --- BIAS TABBED PER ASSET ---
+        const BIAS_ASSETS = ['XAUUSD','EURUSD','GBPUSD','US30','NAS100','GER30','GER40','USDJPY','BTCUSD','DXY'];
+        let coinData = {};        // { XAUUSD: {aggiornamenti:[{ora,testo,direzione}]} }
+        let activeAsset = null;   // tab attivo
+        let newBiasAggDir  = null; // direzione L/S/N in corso per nuovo aggiornamento
+        let newBiasAggTags = [];  // tag in corso per nuovo aggiornamento
+
+        function buildBiasAssetMenu() {
+            const menu = document.getElementById('bias-asset-menu');
+            if (!menu) return;
+            menu.innerHTML = BIAS_ASSETS.map(a => {
+                const already = Object.keys(coinData).includes(a);
+                return `<button type="button" onclick="addBiasAsset('${a}')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${already ? 'border-tp-accent/30 text-tp-accent/40 cursor-default' : 'border-tp-border text-tp-muted hover:border-tp-accent hover:text-tp-accent'}">
+                    ${a}
+                </button>`;
+            }).join('');
+        }
+
+        function openAddAssetMenu() {
+            const menu = document.getElementById('bias-asset-menu');
+            if (!menu) return;
+            buildBiasAssetMenu();
+            menu.classList.toggle('hidden');
+        }
+
+        function addBiasAsset(asset) {
+            if (coinData[asset]) return;
+            coinData[asset] = { aggiornamenti: [] };
+            document.getElementById('bias-asset-menu').classList.add('hidden');
+            renderBiasAssetTabs();
+            switchBiasAsset(asset);
+        }
+
+        function removeBiasAsset(asset) {
+            if (!coinData[asset]) return;
+            delete coinData[asset];
+            if (activeAsset === asset) {
+                const keys = Object.keys(coinData);
+                activeAsset = keys.length ? keys[0] : null;
+            }
+            renderBiasAssetTabs();
+            if (activeAsset) switchBiasAsset(activeAsset);
+            else document.getElementById('bias-asset-panel').innerHTML = '';
+        }
+
+        function switchBiasAsset(asset) {
+            activeAsset = asset;
+            renderBiasAssetTabs();
+            renderBiasAssetPanel();
+        }
+
+        function renderBiasAssetTabs() {
+            const tabsEl = document.getElementById('bias-asset-tabs');
+            const msgEl  = document.getElementById('bias-no-asset-msg');
+            const panelEl = document.getElementById('bias-asset-panel');
+            const keys = Object.keys(coinData);
+            if (!keys.length) {
+                tabsEl.innerHTML = '';
+                msgEl.classList.remove('hidden');
+                panelEl.classList.add('hidden');
+                return;
+            }
+            msgEl.classList.add('hidden');
+            panelEl.classList.remove('hidden');
+            tabsEl.innerHTML = keys.map(a => {
+                const isActive = a === activeAsset;
+                const aggs = Array.isArray(coinData[a]?.aggiornamenti) ? coinData[a].aggiornamenti : [];
+                const lastDir = aggs.length ? aggs[aggs.length - 1]?.direzione : null;
+                const cls = isActive
+                    ? 'border-tp-accent bg-tp-accent/10 text-white'
+                    : lastDir === 'long'
+                        ? 'border-[#20c997] bg-[rgba(32,201,151,0.12)] text-[#20c997] hover:bg-[rgba(32,201,151,0.2)]'
+                        : lastDir === 'short'
+                            ? 'border-[#f43f5e] bg-[rgba(244,63,94,0.12)] text-[#f43f5e] hover:bg-[rgba(244,63,94,0.2)]'
+                            : lastDir === 'neutro'
+                                ? 'border-[#eab308] bg-[rgba(234,179,8,0.12)] text-[#eab308] hover:bg-[rgba(234,179,8,0.2)]'
+                                : aggs.length
+                                    ? 'border-tp-warning/50 bg-tp-warning/5 text-tp-warning/70 hover:border-tp-warning hover:text-tp-warning'
+                                    : 'border-tp-border text-tp-muted hover:border-tp-accent/50';
+                return `<button type="button" onclick="switchBiasAsset('${a}')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${cls}">
+                    ${a}
+                </button>`;
+            }).join('');
+        }
+
+        function renderBiasAssetPanel() {
+            const panel = document.getElementById('bias-asset-panel');
+            if (!panel || !activeAsset || !coinData[activeAsset]) return;
+            const d = coinData[activeAsset];
+            const aggs = Array.isArray(d.aggiornamenti) ? d.aggiornamenti : [];
+            const nowH = new Date().getHours().toString().padStart(2,'0');
+            const nowM = new Date().getMinutes().toString().padStart(2,'0');
+            const dirClass = (v) => ({
+                long:   newBiasAggDir === v ? 'agg-long'   : 'agg-dir-btn flex-1',
+                short:  newBiasAggDir === v ? 'agg-short'  : 'agg-dir-btn flex-1',
+                neutro: newBiasAggDir === v ? 'agg-neutro' : 'agg-dir-btn flex-1'
+            })[v] || 'agg-dir-btn flex-1';
+            panel.innerHTML = `
+                <div class="bg-[#0a0c10] border border-tp-border rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-tp-muted">${activeAsset}</label>
+                        <button onclick="removeBiasAsset('${activeAsset}')" class="text-tp-muted/50 hover:text-tp-loss transition-colors" title="Rimuovi asset">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                    <!-- Grafico H1 auto (candles_15m aggregate) -->
+                    <div class="rounded-lg overflow-hidden border border-tp-border relative" style="aspect-ratio:16/9;background:#0d1117">
+                        <canvas id="bias-mini-chart" class="block w-full h-full"></canvas>
+                        <span class="absolute top-1.5 left-2 text-[9px] font-bold uppercase tracking-wider text-tp-muted/60 pointer-events-none">${activeAsset} · H1 · UTC</span>
+                    </div>
+                    <!-- Dati OHLC (da cronache/EA, fallback candles_15m) -->
+                    <div id="bias-ohlc" class="rounded-xl border border-tp-border p-3" style="background:rgba(11,14,20,0.9)">
+                        <p class="text-[10px] text-tp-muted/40 italic">Caricamento dati...</p>
+                    </div>
+                    <!-- Bias Strutturale H4 -->
+                    <div class="rounded-xl border border-tp-border p-3" style="background:rgba(11,14,20,0.9)">
+                        <div class="flex items-center justify-between mb-2.5">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-white/60 flex items-center gap-2"
+                                title="LONG → chiude sopra ultimo max H4 rilevante&#10;SHORT → chiude sotto ultimo min H4 rilevante&#10;NEUTRO → oscilla / 2+ chiuse senza nuovi estremi&#10;&#10;Cambio direzione SOLO su rottura del livello opposto.&#10;Una candela singola contraria NON cambia il bias.">
+                                Bias Strutturale
+                                <span style="color:#20c997;font-size:8px;letter-spacing:0.12em;background:rgba(32,201,151,0.1);border:1px solid rgba(32,201,151,0.3);padding:1px 6px;border-radius:4px;font-weight:900">H4</span>
+                            </span>
+                            <span style="font-size:9px;color:rgba(255,255,255,0.18);font-style:italic">candela 1 → 6</span>
                         </div>
-
-                        <!-- Riga 2: azioni inline (chiudi + stato) -->
-                        <div class="flex items-center gap-2 px-5 pb-3 pt-1 border-t border-tp-border/40">
-                            ${closeBtn}
-                            <span class="ml-auto ${statoBadgeClass} text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded">${statoLabel}</span>
+                        <div class="grid gap-1.5" style="grid-template-columns:repeat(6,1fr)">
+                            ${['22:00','02:00','06:00','10:00','14:00','18:00'].map((time,qi) => {
+                                const val = Array.isArray(d.bias_h4) ? (d.bias_h4[qi] || null) : null;
+                                const cls = val === 'long' ? 'h4-long' : val === 'short' ? 'h4-short' : val === 'neutro' ? 'h4-neutro' : '';
+                                const innerLbl = val === 'long' ? 'L' : val === 'short' ? 'S' : val === 'neutro' ? 'N' : `<span style="font-size:8px;opacity:0.22">${qi+1}</span>`;
+                                const timeCol = val === 'long' ? '#20c997' : val === 'short' ? '#f43f5e' : val === 'neutro' ? '#eab308' : 'rgba(255,255,255,0.22)';
+                                return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                                    <span data-h4-time-slot="${qi}" style="font-size:8px;font-weight:700;color:${timeCol};letter-spacing:0.02em;transition:color 0.15s">${time}</span>
+                                    <button type="button" onclick="toggleH4Square('${activeAsset}',${qi})" class="h4-sq ${cls}" data-h4-slot="${qi}" title="H4 ${time}: ${val || 'vuoto'} — click per cambiare">${innerLbl}</button>
+                                </div>`;
+                            }).join('')}
                         </div>
                     </div>
-                `;
-            }).join('');
+                    <!-- Lista aggiornamenti -->
+                    <div id="bias-panel-agg-list" class="space-y-2">
+                        ${aggs.length ? aggs.map((a,i) => {
+                            const tagsHtml = (a.tags && a.tags.length)
+                                ? `<div class="flex flex-wrap gap-1 mt-1.5">${a.tags.map(t => `<span class="inline-flex items-center px-2 py-0.5 rounded bg-tp-accent/10 border border-tp-accent/25 text-[10px] text-tp-accent font-medium">${escapeAggHtml(t)}</span>`).join('')}</div>`
+                                : '';
+                            return `<div class="bg-tp-panel border border-tp-border rounded-lg p-2.5 flex items-start gap-2">
+                                <span class="text-xs font-bold text-tp-accent whitespace-nowrap mt-0.5">${escapeAggHtml(a.ora)}</span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-tp-text/90 whitespace-pre-wrap leading-relaxed">${escapeAggHtml(a.testo)}</p>
+                                    ${tagsHtml}
+                                </div>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <button type="button" onclick="setBiasAggDir(${i},'long')"   class="agg-dir-btn ${a.direzione==='long'  ?'agg-long':''}">L</button>
+                                    <button type="button" onclick="setBiasAggDir(${i},'short')"  class="agg-dir-btn ${a.direzione==='short' ?'agg-short':''}">S</button>
+                                    <button type="button" onclick="setBiasAggDir(${i},'neutro')" class="agg-dir-btn ${a.direzione==='neutro'?'agg-neutro':''}">N</button>
+                                    <button type="button" onclick="removeBiasAgg(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors ml-1">
+                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                            </div>`;
+                        }).join('') : '<p class="text-xs text-tp-muted/60 italic">Nessun aggiornamento ancora.</p>'}
+                    </div>
+                    <!-- Input nuovo aggiornamento -->
+                    <div class="flex gap-2 items-start">
+                        <div class="flex flex-col gap-1 shrink-0">
+                            <input id="bias-agg-ora" type="time" value="${nowH}:${nowM}" class="bg-tp-panel border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none focus:border-tp-accent transition-colors w-[100px]"/>
+                            <div class="flex gap-1">
+                                <button type="button" onclick="setNewBiasAggDir('long')"   id="bnagg-long"   class="agg-dir-btn flex-1 ${newBiasAggDir==='long'  ?'agg-long':''}">L</button>
+                                <button type="button" onclick="setNewBiasAggDir('short')"  id="bnagg-short"  class="agg-dir-btn flex-1 ${newBiasAggDir==='short' ?'agg-short':''}">S</button>
+                                <button type="button" onclick="setNewBiasAggDir('neutro')" id="bnagg-neutro" class="agg-dir-btn flex-1 ${newBiasAggDir==='neutro'?'agg-neutro':''}">N</button>
+                            </div>
+                        </div>
+                        <textarea id="bias-agg-testo" rows="2" class="flex-1 bg-tp-panel border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent transition-colors" placeholder="Es: 4H ha rotto struttura, daily 4720 tenuto..."></textarea>
+                        <button type="button" onclick="addBiasAgg()" class="px-4 rounded-lg text-xs font-bold border border-tp-accent text-tp-accent bg-tp-accent/10 hover:bg-tp-accent/20 uppercase transition-all flex items-center gap-1.5 shrink-0">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Add
+                        </button>
+                    </div>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+            loadLiveH4Slot(activeAsset);
+            // il pannello e' ricostruito da zero: ridisegna sempre grafico H1 e dati OHLC
+            requestAnimationFrame(drawBiasMiniChart);
+            renderBiasOhlc();
+        }
 
+        function setNewBiasAggDir(dir) {
+            newBiasAggDir = newBiasAggDir === dir ? null : dir;
+            const clsMap = { long: 'agg-long', short: 'agg-short', neutro: 'agg-neutro' };
+            ['long','short','neutro'].forEach(d => {
+                const btn = document.getElementById('bnagg-' + d);
+                if (btn) btn.className = 'agg-dir-btn flex-1' + (newBiasAggDir === d ? ' ' + clsMap[d] : '');
+            });
+        }
+
+        function renderAggTagsInput() {
+            var c = document.getElementById('agg-tags-container');
+            if (!c) return;
+            c.innerHTML = newBiasAggTags.map(function(t, i) {
+                return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-tp-accent/10 border border-tp-accent/30 text-[10px] text-tp-accent font-medium">'
+                    + t
+                    + '<button type="button" onclick="removeAggTag(' + i + ')" class="opacity-60 hover:opacity-100 leading-none ml-0.5">×</button>'
+                    + '</span>';
+            }).join('');
+        }
+
+        function addAggTag() {
+            var input = document.getElementById('agg-tag-input');
+            var val = (input ? input.value : '').trim();
+            if (!val) return;
+            if (!newBiasAggTags.includes(val)) newBiasAggTags.push(val);
+            input.value = '';
+            renderAggTagsInput();
+        }
+
+        function removeAggTag(i) {
+            newBiasAggTags.splice(i, 1);
+            renderAggTagsInput();
+        }
+
+        function _biasToast(msg, ok) {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;color:#fff;pointer-events:none;transition:opacity .4s;background:${ok ? '#20c997' : '#f43f5e'}`;
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 2000);
+        }
+
+        async function saveCoinDataQuick() {
+            if (!biasId) return;
+            try {
+                const snapshot = JSON.parse(JSON.stringify(coinData));
+                const { error } = await db.from('bias').update({ coin_data: snapshot }).eq('id', biasId);
+                if (error) { console.error('saveCoinDataQuick:', error); _biasToast('Errore: ' + error.message, false); }
+                else _biasToast('Salvato', true);
+            } catch(e) { console.error('saveCoinDataQuick:', e); _biasToast('Errore: ' + e.message, false); }
+        }
+
+        async function setBiasAggDir(i, dir) {
+            if (!activeAsset || !coinData[activeAsset]) return;
+            const aggs = coinData[activeAsset].aggiornamenti;
+            aggs[i].direzione = aggs[i].direzione === dir ? null : dir;
+            renderBiasAssetPanel();
+            saveCoinDataQuick();
+        }
+
+        async function addBiasAgg() {
+            if (!activeAsset || !coinData[activeAsset]) return;
+            const ora   = (document.getElementById('bias-agg-ora').value   || '').trim();
+            const testo = (document.getElementById('bias-agg-testo').value || '').trim();
+            if (!ora || !testo) { alert('Compila orario e testo.'); return; }
+            if (!Array.isArray(coinData[activeAsset].aggiornamenti)) coinData[activeAsset].aggiornamenti = [];
+            coinData[activeAsset].aggiornamenti.push({ ora, testo, direzione: newBiasAggDir });
+            coinData[activeAsset].aggiornamenti.sort((a,b) => (a.ora||'').localeCompare(b.ora||''));
+            document.getElementById('bias-agg-testo').value = '';
+            newBiasAggDir = null;
+            renderBiasAssetPanel();
+            saveCoinDataQuick();
+        }
+
+        async function removeBiasAgg(i) {
+            if (!activeAsset || !coinData[activeAsset]) return;
+            coinData[activeAsset].aggiornamenti.splice(i, 1);
+            renderBiasAssetPanel();
+            saveCoinDataQuick();
+        }
+
+        async function toggleH4Square(asset, idx) {
+            if (!coinData[asset]) return;
+            if (!Array.isArray(coinData[asset].bias_h4)) coinData[asset].bias_h4 = Array(6).fill(null);
+            const cycle = [null, 'long', 'short', 'neutro'];
+            const cur = coinData[asset].bias_h4[idx];
+            const next = cycle[(cycle.indexOf(cur) + 1) % cycle.length];
+            coinData[asset].bias_h4[idx] = next;
+            renderBiasAssetPanel();
+            if (biasId) await db.from('bias').update({ coin_data: coinData }).eq('id', biasId);
+        }
+
+        // --- LIVE H4 SLOT (candela in corso) ---
+        function getCurrentH4LiveSlot() {
+            const now = new Date();
+            const totalMin = now.getUTCHours() * 60 + now.getUTCMinutes();
+            const closes = [120, 360, 600, 840, 1080, 1320]; // 02:00..22:00 UTC in minuti
+            for (let i = 0; i < closes.length; i++) {
+                if (totalMin < closes[i]) return i;
+            }
+            return 0; // dopo le 22:00 UTC → prossima chiusura è 02:00 (slot 0)
+        }
+
+        async function loadLiveH4Slot(asset) {
+            if (!asset) return;
+            const { data } = await db
+                .from('watchlist')
+                .select('prezzo, h4_high, h4_low')
+                .eq('simbolo', asset)
+                .eq('active', true)
+                .maybeSingle();
+            if (!data || !data.prezzo || !data.h4_high || !data.h4_low) return;
+            const price = parseFloat(data.prezzo);
+            const h4h   = parseFloat(data.h4_high);
+            const h4l   = parseFloat(data.h4_low);
+            if (!price || !h4h || !h4l) return;
+            const slot   = getCurrentH4LiveSlot();
+            const btn    = document.querySelector('[data-h4-slot="' + slot + '"]');
+            const timeLbl = document.querySelector('[data-h4-time-slot="' + slot + '"]');
+            if (!btn) return;
+            const liveVal   = price > h4h ? 'long' : price < h4l ? 'short' : 'neutro';
+            const liveClass = liveVal === 'long' ? 'h4-long' : liveVal === 'short' ? 'h4-short' : 'h4-neutro';
+            const liveCol   = liveVal === 'long' ? '#20c997' : liveVal === 'short' ? '#f43f5e' : '#eab308';
+            btn.className   = 'h4-sq h4-live ' + liveClass;
+            btn.innerHTML   = liveVal === 'long' ? 'L' : liveVal === 'short' ? 'S' : 'N';
+            if (timeLbl) {
+                timeLbl.style.color      = liveCol;
+                timeLbl.style.fontWeight = '900';
+                timeLbl.style.opacity    = '1';
+            }
+        }
+
+        function startH4LiveTimer() {
+            if (h4LiveTimer) clearInterval(h4LiveTimer);
+            h4LiveTimer = setInterval(() => { if (activeAsset) loadLiveH4Slot(activeAsset); }, 5 * 60 * 1000);
+        }
+
+        // --- DATI OHLC per asset (giorno bias + giorno prima) ---
+        // Fonte primaria: cronache.coin_data[asset] (open/close/low/high/percentuale, stringhe, scritte dall'EA).
+        // Fallback: calcolo da candles_15m se la cronaca manca o ha campi vuoti.
+        const _ohlcCache = {};
+        function _addDaysStr(d, n) { const x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); }
+        async function _ohlcFor(asset, day) {
+            const key = asset + '|' + day;
+            if (_ohlcCache[key]) return _ohlcCache[key];
+            let out = { open: '', close: '', low: '', high: '', percentuale: '', src: '' };
+            const { data: cr } = await db.from('cronache').select('coin_data').eq('data', day).maybeSingle();
+            const cd = cr?.coin_data?.[asset];
+            if (cd && (cd.open || cd.close || cd.low || cd.high)) {
+                const pz = String(cd.percentuale || '').trim();
+                out = { open: cd.open || '', close: cd.close || '', low: cd.low || '', high: cd.high || '', percentuale: pz ? (pz.endsWith('%') ? pz : pz + '%') : '', src: 'EA' };
+            }
+            if (!out.open || !out.close || !out.low || !out.high) {
+                const t0 = new Date(day + 'T00:00:00Z').toISOString(), t1 = new Date(_addDaysStr(day, 1) + 'T00:00:00Z').toISOString();
+                const { data: rows } = await db.from('candles_15m').select('open, high, low, close').eq('coin', asset)
+                    .gte('ts', t0).lt('ts', t1).order('ts', { ascending: true });
+                if (rows && rows.length) {
+                    const o = parseFloat(rows[0].open), c = parseFloat(rows[rows.length - 1].close);
+                    let l = Infinity, h = -Infinity;
+                    rows.forEach(r => { l = Math.min(l, parseFloat(r.low)); h = Math.max(h, parseFloat(r.high)); });
+                    const dec = o > 100 ? 2 : 5;
+                    const pct = (c - o) / o * 100;
+                    out = { open: out.open || o.toFixed(dec), close: out.close || c.toFixed(dec), low: out.low || l.toFixed(dec), high: out.high || h.toFixed(dec),
+                            percentuale: out.percentuale || ((pct >= 0 ? '+' : '') + pct.toFixed(2) + '%'), src: out.src ? 'EA+M15' : 'M15' };
+                }
+            }
+            _ohlcCache[key] = out;
+            return out;
+        }
+        async function renderBiasOhlc() {
+            const box = document.getElementById('bias-ohlc');
+            if (!box || !activeAsset) return;
+            const asset = activeAsset;
+            const day = (biasDataField || '').slice(0, 10);
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) { box.innerHTML = '<p class="text-[10px] text-tp-muted/40 italic">Data bias mancante</p>'; return; }
+            // Solo giorni chiusi: l'EA compila OHLC a chiusura candela daily, quelli di oggi non esistono ancora
+            const d1 = _addDaysStr(day, -1), d2 = _addDaysStr(day, -2);
+            const [prev1, prev2] = await Promise.all([_ohlcFor(asset, d1), _ohlcFor(asset, d2)]);
+            if (asset !== activeAsset) return;
+            const fmtDay = d => { const x = new Date(d + 'T00:00:00Z'); return x.toLocaleDateString('it-IT', { weekday: 'short', day: '2-digit', month: 'short', timeZone: 'UTC' }); };
+            const row = (label, d, o) => {
+                const pctPos = (o.percentuale || '').trim().startsWith('+');
+                const pctCol = !o.percentuale ? 'text-tp-muted/40' : pctPos ? 'text-tp-accent' : 'text-tp-loss';
+                const cell = (lbl, v) => `<div class="min-w-0"><span class="text-[9px] text-tp-muted/60 uppercase font-bold tracking-wide block">${lbl}</span><span class="text-xs text-white font-bold tabular-nums">${v || '—'}</span></div>`;
+                return `<div class="grid items-end gap-2 py-1.5 border-b border-tp-border/30 last:border-0" style="grid-template-columns:78px repeat(4,1fr) 64px">
+                    <div class="min-w-0"><span class="text-[10px] text-white/70 font-bold block">${label}</span><span class="text-[9px] text-tp-muted/50 block">${fmtDay(d)}${o.src ? ' · ' + o.src : ''}</span></div>
+                    ${cell('Apertura', o.open)}${cell('Chiusura', o.close)}${cell('Minimo', o.low)}${cell('Massimo', o.high)}
+                    <div class="text-right"><span class="text-sm font-black ${pctCol} tabular-nums">${o.percentuale || '—'}</span></div>
+                </div>`;
+            };
+            box.innerHTML = `
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-white/60 flex items-center gap-2"><i data-lucide="bar-chart" class="w-3.5 h-3.5 text-tp-accent"></i> Dati daily</span>
+                    <span style="font-size:9px;color:rgba(255,255,255,0.18);font-style:italic">UTC · sola lettura</span>
+                </div>
+                ${row('Ieri', d1, prev1)}
+                ${row('Altro ieri', d2, prev2)}`;
             lucide.createIcons();
         }
 
-        // --- QUICK ACTIONS (inline sulla card) ---
-        async function quickClose(id) {
-            const { data: cur } = await db.from('bias').select('stato').eq('id', id).single();
-            if (!cur) return;
-            if (cur.stato === 'chiuso') return;
-            showConfirm(
-                'Chiudere il bias?',
-                'Una volta chiuso non sara piu modificabile ne eliminabile.',
-                async function() {
-                    const { error } = await db.from('bias').update({ stato: 'chiuso' }).eq('id', id);
-                    if (error) { alert('Errore chiusura: ' + error.message); return; }
-                    await loadBiasList();
+        // --- GRAFICO H1 AUTO (sostituisce lo screenshot) ---
+        async function drawBiasMiniChart() {
+            const cv = document.getElementById('bias-mini-chart');
+            if (!cv) return;
+            const dpr = window.devicePixelRatio || 1;
+            const W = cv.clientWidth, H = cv.clientHeight;
+            if (!W || !H) return;
+            cv.width = W * dpr; cv.height = H * dpr;
+            const ctx = cv.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, W, H);
+            function msg(t) { ctx.fillStyle = '#454e5a'; ctx.font = '11px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(t, W / 2, H / 2); }
+
+            const coin = activeAsset;
+            const day = (biasDataField || '').slice(0, 10);
+            if (!coin || !/^\d{4}-\d{2}-\d{2}$/.test(day)) { msg('Data bias mancante'); return; }
+            const t0ms = new Date(day + 'T00:00:00Z').getTime();
+            const t1ms = t0ms + 86400000;
+
+            const { data: rows } = await db.from('candles_15m')
+                .select('ts, open, high, low, close').eq('coin', coin)
+                .gte('ts', new Date(t0ms).toISOString()).lt('ts', new Date(t1ms).toISOString())
+                .order('ts', { ascending: true });
+            if (coin !== activeAsset) return;
+
+            const hourMs = 3600000, buckets = new Map();
+            (rows || []).forEach(r => {
+                const key = Math.floor(new Date(r.ts).getTime() / hourMs) * hourMs;
+                const o = parseFloat(r.open), h = parseFloat(r.high), l = parseFloat(r.low), c = parseFloat(r.close);
+                const b = buckets.get(key);
+                if (!b) buckets.set(key, { tMs: key, o, h, l, c });
+                else { b.h = Math.max(b.h, h); b.l = Math.min(b.l, l); b.c = c; }
+            });
+            const candles = [...buckets.values()].sort((a, b) => a.tMs - b.tMs);
+            if (!candles.length) { msg('Nessun dato candele · ' + coin); return; }
+
+            const padL = 6, padR = 50, padT = 18, padB = 16;
+            const x0 = padL, x1 = W - padR, y0 = padT, y1 = H - padB;
+            const pxX = ms => x0 + (ms - t0ms) / (t1ms - t0ms) * (x1 - x0);
+            let lo = Infinity, hi = -Infinity;
+            candles.forEach(c => { lo = Math.min(lo, c.l); hi = Math.max(hi, c.h); });
+            const pp = Math.max((hi - lo) * 0.06, 0.0001), yMin = lo - pp, yMax = hi + pp;
+            const pxY = p => y1 - (p - yMin) / (yMax - yMin) * (y1 - y0);
+            const rawStep = (yMax - yMin) / 5, mag = Math.pow(10, Math.floor(Math.log10(rawStep || 1))), nn = rawStep / mag;
+            const stepY = mag * (nn < 1.5 ? 1 : nn < 3 ? 2 : nn < 7 ? 5 : 10);
+            const dec = stepY < 0.001 ? 5 : stepY < 0.01 ? 4 : stepY < 0.1 ? 3 : stepY < 1 ? 2 : stepY < 10 ? 1 : 0;
+
+            ctx.font = '9px Inter, sans-serif';
+            for (let p = Math.ceil(yMin / stepY) * stepY; p <= yMax + stepY * 0.01; p += stepY) {
+                const yg = pxY(p); if (yg < y0 - 1 || yg > y1 + 1) continue;
+                ctx.strokeStyle = 'rgba(255,255,255,.04)'; ctx.lineWidth = 1; ctx.setLineDash([]);
+                ctx.beginPath(); ctx.moveTo(x0, yg); ctx.lineTo(x1, yg); ctx.stroke();
+                ctx.fillStyle = '#4a5568'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                ctx.fillText(p.toFixed(dec), x1 + 4, yg);
+            }
+            // sfondo sessioni (Tokyo 00-07, London 07-13, NY 13-20) + asse X ore UTC ogni 2h
+            [[0, 7, '201,162,39'], [7, 13, '32,201,151'], [13, 20, '155,140,255']].forEach(([a, b, rgb]) => {
+                ctx.fillStyle = 'rgba(' + rgb + ',.05)';
+                ctx.fillRect(pxX(t0ms + a * hourMs), y0, pxX(t0ms + b * hourMs) - pxX(t0ms + a * hourMs), y1 - y0);
+            });
+            ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+            for (let h = 0; h < 24; h += 2) {
+                const xg = pxX(t0ms + h * hourMs);
+                ctx.strokeStyle = 'rgba(255,255,255,.04)'; ctx.beginPath(); ctx.moveTo(xg, y0); ctx.lineTo(xg, y1); ctx.stroke();
+                ctx.fillStyle = '#3a4352'; ctx.fillText(String(h).padStart(2, '0'), xg, y1 + 3);
+            }
+            // H/L del giorno
+            [[hi, 'H ' + hi.toFixed(dec)], [lo, 'L ' + lo.toFixed(dec)]].forEach(([p, lbl]) => {
+                const y = pxY(p);
+                ctx.strokeStyle = 'rgba(32,201,151,.45)'; ctx.setLineDash([5, 4]);
+                ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke(); ctx.setLineDash([]);
+                ctx.fillStyle = '#20c997'; ctx.font = '600 9px Inter, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+                ctx.fillText(lbl, x0 + 3, y - 1);
+            });
+            // candele H1
+            const cw = Math.max(2, (x1 - x0) / 24 * 0.6);
+            candles.forEach(c => {
+                const xMid = pxX(c.tMs + hourMs / 2), bull = c.c >= c.o;
+                ctx.strokeStyle = bull ? '#20c997' : '#f43f5e'; ctx.lineWidth = 1; ctx.setLineDash([]);
+                ctx.beginPath(); ctx.moveTo(xMid, pxY(c.h)); ctx.lineTo(xMid, pxY(c.l)); ctx.stroke();
+                ctx.fillStyle = bull ? 'rgba(32,201,151,.9)' : 'rgba(244,63,94,.9)';
+                const top = pxY(Math.max(c.o, c.c));
+                ctx.fillRect(xMid - cw / 2, top, cw, Math.max(1, pxY(Math.min(c.o, c.c)) - top));
+            });
+        }
+        window.addEventListener('resize', () => requestAnimationFrame(drawBiasMiniChart));
+
+        // --- ASIAN BOX ---
+        const AB_ASSETS = ['XAUUSD','EURUSD','GBPUSD','US30','NAS100','GER30','USDJPY','BTCUSD','GER40'];
+
+        function renderAsianboxAssets() {
+            const container = document.getElementById('asianbox-assets');
+            if (!container) return;
+            if (!asianboxAssets.length) {
+                container.innerHTML = '<p class="text-xs text-tp-muted/60 italic">Nessun asset. Clicca "Aggiungi Asset".</p>';
+                return;
+            }
+            const posColor = { sopra: 'text-tp-accent border-tp-accent bg-tp-accent/10', dentro: 'text-tp-warning border-tp-warning bg-tp-warning/10', sotto: 'text-tp-loss border-tp-loss bg-tp-loss/10' };
+            const posNeutral = 'text-tp-muted border-tp-border bg-transparent';
+            container.innerHTML = asianboxAssets.map((a, i) => `
+                <div class="bg-[#0a0c10] border border-tp-border rounded-xl p-4">
+                    <div class="flex items-center gap-3 mb-4">
+                        <select onchange="updateABField(${i},'asset',this.value)" class="bg-tp-panel border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent flex-1">
+                            <option value="">Asset...</option>
+                            ${AB_ASSETS.map(opt => `<option value="${opt}" ${a.asset===opt?'selected':''}>${opt}</option>`).join('')}
+                        </select>
+                        <button type="button" onclick="removeABAsset(${i})" class="text-tp-muted/60 hover:text-tp-loss transition-colors p-1">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <!-- Asian Range -->
+                    <div class="mb-3">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-2">Asian Range</p>
+                        <div class="flex gap-2 flex-wrap">
+                            <button type="button" onclick="updateABField(${i},'compressione',${!a.compressione})"
+                                class="px-3 py-2 rounded-lg text-xs font-bold border transition-all ${a.compressione ? 'border-purple-400 bg-purple-400/10 text-purple-400' : 'border-tp-border text-tp-muted'}">
+                                Compressione: ${a.compressione ? 'Si' : 'No'}
+                            </button>
+                            ${['sopra','dentro','sotto'].map(v => `
+                            <button type="button" onclick="updateABField(${i},'trade','${v === a.trade ? '' : v}')"
+                                class="flex-1 px-3 py-2 rounded-lg text-xs font-bold border transition-all ${a.trade===v ? posColor[v] : posNeutral}">
+                                Trade ${v}
+                            </button>`).join('')}
+                        </div>
+                    </div>
+                    <!-- London / New York -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-2">London</p>
+                            <div class="flex gap-1">
+                                ${['sopra','dentro','sotto'].map(v => `
+                                <button type="button" onclick="updateABField(${i},'london','${v === a.london ? '' : v}')"
+                                    class="flex-1 px-2 py-2 rounded-lg text-xs font-bold border transition-all ${a.london===v ? posColor[v] : posNeutral}">
+                                    ${v}
+                                </button>`).join('')}
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-tp-muted mb-2">New York</p>
+                            <div class="flex gap-1">
+                                ${['sopra','dentro','sotto'].map(v => `
+                                <button type="button" onclick="updateABField(${i},'newyork','${v === a.newyork ? '' : v}')"
+                                    class="flex-1 px-2 py-2 rounded-lg text-xs font-bold border transition-all ${a.newyork===v ? posColor[v] : posNeutral}">
+                                    ${v}
+                                </button>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function addAsianboxAsset() {
+            asianboxAssets.push({ asset: '', compressione: false, trade: '', london: '', newyork: '' });
+            renderAsianboxAssets();
+        }
+
+        function removeABAsset(i) {
+            asianboxAssets.splice(i, 1);
+            renderAsianboxAssets();
+        }
+
+        function updateABField(i, field, value) {
+            asianboxAssets[i][field] = value;
+            renderAsianboxAssets();
+        }
+
+        // --- COLLECT PAYLOAD (riusato da save e close) ---
+        function collectPayload() {
+            const payload = {
+                data: biasDataField,
+                categorizzatori: {
+                    cronache: getSelectedValues('sel-cronache'),
+                    strategie: getSelectedValues('sel-strategie'),
+                    trades: getSelectedValues('sel-trades'),
+                    ipotesi: getSelectedValues('sel-ipotesi')
                 }
-            );
+            };
+            payload.coin_data = coinData;
+            payload.commenti_giornata = commentiGiornata;
+            return payload;
+        }
+
+        // --- SAVE (NON tocca stato) ---
+        async function saveBias() {
+            if (currentStato === 'chiuso' || !biasId) return;
+            const btn = document.getElementById('save-btn');
+            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvando...';
+            btn.disabled = true;
+
+            const payload = collectPayload();
+
+            const { error } = await db
+                .from('bias')
+                .update(payload)
+                .eq('id', biasId);
+
+            if (error) {
+                btn.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4"></i> Errore!';
+                btn.classList.replace('bg-tp-accent', 'bg-tp-loss');
+                setTimeout(() => {
+                    btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Salva Bias';
+                    btn.classList.replace('bg-tp-loss', 'bg-tp-accent');
+                    btn.disabled = false;
+                    lucide.createIcons();
+                }, 2000);
+                alert('Errore: ' + error.message);
+                return;
+            }
+
+            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Salvato!';
+            const canvas = document.getElementById('bias-canvas');
+            canvas.classList.add('save-flash');
+            setTimeout(() => canvas.classList.remove('save-flash'), 600);
+            setTimeout(() => {
+                btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Salva Bias';
+                btn.disabled = false;
+                lucide.createIcons();
+            }, 1500);
+        }
+
+        // --- DELETE ---
+        async function deleteBias() {
+            if (currentStato === 'chiuso') return;
+            showConfirm('Eliminare questo bias?','Questa azione non puo essere annullata.',async function(){
+            const { error } = await db.from('bias').delete().eq('id', biasId);
+            if(!error) await loadBias();});
         }
 
         // --- MODAL CONFIRM ---

@@ -1187,7 +1187,7 @@
                 var dirColor = b.direzione === 'LONG' ? 'text-tp-accent' : b.direzione === 'SHORT' ? 'text-tp-loss' : 'text-tp-muted';
                 var barColor = b.direzione === 'LONG' ? 'bg-tp-accent' : b.direzione === 'SHORT' ? 'bg-tp-loss' : 'bg-tp-border';
                 var dateStr = b.data || '';
-                return '<div onclick="window.location.href=\'dettaglio_bias.html?id=' + b.id + '\'" class="bg-[#0a0c10] border border-l-4 border-l-' + (b.direzione === 'LONG' ? 'tp-accent' : 'tp-loss') + ' border-r-tp-border border-t-tp-border border-b-tp-border rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all">' +
+                return '<div onclick="window.location.href=\'bias.html?id=' + b.id + '\'" class="bg-[#0a0c10] border border-l-4 border-l-' + (b.direzione === 'LONG' ? 'tp-accent' : 'tp-loss') + ' border-r-tp-border border-t-tp-border border-b-tp-border rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all">' +
                     '<div class="flex items-center justify-between mb-1">' +
                     '<span class="text-xs font-bold text-white">' + (b.asset || '--') + '</span>' +
                     '<span class="text-[9px] text-tp-muted font-bold">' + dateStr + '</span>' +

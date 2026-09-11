@@ -362,7 +362,6 @@ function initNavActiveState() {
     if (page === 'dettaglio_settimana.html') page = 'settimanale.html';
     if (page === 'dettaglio_trade.html') page = 'tabella_trades.html';
     if (page === 'dettaglio_sessione.html') page = 'sessioni.html';
-    if (page === 'dettaglio_bias.html') page = 'bias.html';
     if (page === 'dettaglio_allert.html') page = 'allert.html';
 
     var navLinks = document.querySelectorAll('nav a');
@@ -999,13 +998,7 @@ window.goToBiasOggi = async function(ev) {
     if (ev && ev.preventDefault) ev.preventDefault();
     if (typeof db === 'undefined' || !db) return;
     try {
-        var today = new Date().toISOString().slice(0, 10);
-        var existing = await db.from('bias').select('id').eq('data', today).order('created_at', { ascending: true }).limit(1).maybeSingle();
-        if (existing.data && existing.data.id) {
-            window.location.href = 'dettaglio_bias.html?id=' + existing.data.id;
-        } else {
-            window.location.href = 'bias.html';
-        }
+        window.location.href = 'bias.html?date=' + new Date(Date.now() + 60 * 60000).toISOString().slice(0, 10);
     } catch(e) {
         console.error('goToBiasOggi:', e);
     }

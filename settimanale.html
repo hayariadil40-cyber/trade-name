@@ -337,10 +337,9 @@
         const { data } = await db.from('giornate').select('id').eq('data', casaTodayStr()).maybeSingle();
         if (data?.id) window.location.href = 'dettaglio_giornata.html?id=' + data.id;
     }
-    async function goToBiasOggi(e) {
+    function goToBiasOggi(e) {
         if (e) e.preventDefault();
-        const { data } = await db.from('bias').select('id').eq('data', casaTodayStr()).maybeSingle();
-        window.location.href = data?.id ? 'dettaglio_bias.html?id=' + data.id : 'dettaglio_bias.html';
+        window.location.href = 'bias.html?date=' + casaTodayStr();
     }
     function goToIpotesiOggi(e) {
         if (e) e.preventDefault();

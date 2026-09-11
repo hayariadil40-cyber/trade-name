@@ -70,7 +70,7 @@ Dal **sidebar** sinistro si accede a tutto. La sidebar è collassata di default 
 
 ### Pagine di dettaglio
 
-Ogni entità ha un suo `dettaglio_*.html` con il pattern: URL param `?id=...` → form di edit → bottoni Salva / Cancella. Sono `dettaglio_trade`, `dettaglio_giornata`, `dettaglio_settimana`, `dettaglio_sessione`, `dettaglio_strategia`, `dettaglio_bias`, `dettaglio_allert`, `dettaglio_cronaca`.
+Ogni entità ha un suo `dettaglio_*.html` con il pattern: URL param `?id=...` → form di edit → bottoni Salva / Cancella. Bias, Sessioni e Weekly non hanno dettaglio: si navigano per data nella pagina stessa. Sono `dettaglio_trade`, `dettaglio_giornata`, `dettaglio_settimana`, `dettaglio_sessione`, `dettaglio_strategia`, `dettaglio_allert`, `dettaglio_cronaca`.
 
 ---
 

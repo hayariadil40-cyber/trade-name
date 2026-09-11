@@ -1187,7 +1187,7 @@
             } else {
                 wrapBias.innerHTML = linkedBias.map(b => {
                     const dirColor = b.direzione === 'LONG' ? 'tp-accent' : b.direzione === 'SHORT' ? 'tp-loss' : 'tp-muted';
-                    return `<div onclick="window.location.href='dettaglio_bias.html?id=${b.id}'" class="bg-tp-panel border border-l-4 border-l-${dirColor} border-r-tp-border border-t-tp-border border-b-tp-border rounded-lg p-3 cursor-pointer hover:border-r-tp-warning/50 transition-all">
+                    return `<div onclick="window.location.href='bias.html?id=${b.id}'" class="bg-tp-panel border border-l-4 border-l-${dirColor} border-r-tp-border border-t-tp-border border-b-tp-border rounded-lg p-3 cursor-pointer hover:border-r-tp-warning/50 transition-all">
                         <div class="flex justify-between items-center">
                             <span class="text-xs font-bold text-white">${escHtml(b.asset || '--')} <span class="text-[10px] text-${dirColor}">${escHtml(b.direzione || '')}</span></span>
                             <span class="text-[9px] text-tp-muted font-bold">${escHtml(b.data || '')}</span>
