@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Desk - Scenari</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { tp: { bg:'#0B0E14', panel:'#161920', panelHover:'#1c1f26', border:'#252932', text:'#f8fafc', muted:'#848d97', accent:'#20c997', loss:'#f43f5e', warning:'#eab308' }}, fontFamily: { sans:['Inter','sans-serif'], display:['Inter','sans-serif'] }}}}
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #252932; border-radius: 4px; }
+        .asset-tab.active { color: #20c997 !important; background: rgba(32,201,151,0.1); border-color: rgba(32,201,151,0.4) !important; }
+        .save-flash { animation: flashGreen 0.55s ease; }
+        .h4-btn { padding:6px 0; border-radius:8px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; border:1px solid #252932; color:#848d97; background:#0a0c10; transition:all .15s }
+        .h4-btn:hover { color:#fff; border-color:#3a4352 }
+        @keyframes flashGreen { 0%{box-shadow:0 0 0 rgba(32,201,151,0)} 50%{box-shadow:0 0 14px rgba(32,201,151,0.5)} 100%{box-shadow:0 0 0 rgba(32,201,151,0)} }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="settings.js"></script>
+    <script src="auth.js"></script>
+</head>
+<body class="bg-tp-bg text-tp-text font-sans h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-16 hover:w-64 border-r border-tp-border flex flex-col flex-shrink-0 bg-tp-bg transition-all duration-300 z-50 absolute h-full lg:relative group">
+        <div class="h-24 flex items-center justify-center lg:justify-start px-3 gap-4 border-b border-tp-border/50 overflow-hidden cursor-default w-full">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#161920] to-[#0a0c10] border border-[#20c997]/50 flex items-center justify-center shadow-[0_0_10px_rgba(32,201,151,0.2)] shrink-0 group-hover:rotate-3 transition-transform duration-300 mx-auto group-hover:mx-0"><span class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-[#20c997] to-white tracking-tighter">TD</span></div>
+            <span class="text-xl font-extrabold tracking-tighter uppercase font-display select-none opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300">Trade<span class="text-[#20c997] ml-1">Desk</span></span>
+        </div>
+        <nav class="flex-1 overflow-x-hidden overflow-y-auto py-6 space-y-2 flex flex-col w-full group">
+            <a href="index.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Dashboard</span></a>
+            <a href="giornaliero.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Giornaliero</span></a>
+            <a href="tabella_trades.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="crosshair" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Tab Trade</span></a>
+            <a href="cronache.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Cronache</span></a>
+            <a href="settimanale.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="calendar-days" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Weekly</span></a>
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+            <a href="sessioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="sun" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Sessioni</span></a>
+            <a href="bias.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="brain" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Bias</span></a>
+            <a href="allert.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bell" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Eventi</span></a>
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+            <a href="analisi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="bar-chart-2" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Analisi</span></a>
+            <a href="strategie.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="target" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Strategie</span></a>
+            <a href="ipotesi.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="zap" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Ipotesi</span></a>
+            <a href="scenari.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg bg-[#161920] text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="route" class="w-5 h-5 shrink-0 text-tp-accent"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Scenari</span></a>
+            <a href="grafici.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="line-chart" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Grafici</span></a>
+            <div class="w-8 group-hover:w-[calc(100%-3rem)] border-t border-[#252932]/50 my-2 mx-auto transition-all duration-300"></div>
+            <a href="impostazioni.html" class="flex items-center gap-4 px-0 lg:px-4 py-3 rounded-lg text-[#848d97] hover:bg-[#161920] hover:text-white transition-colors w-12 group-hover:w-[calc(100%-2rem)] mx-auto relative overflow-hidden flex-shrink-0"><div class="w-12 h-full absolute left-0 flex items-center justify-center z-10"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i></div><span class="opacity-0 group-hover:opacity-100 font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300 absolute left-14">Impostazioni</span></a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full bg-[#0e1116] relative overflow-hidden">
+        <!-- Header -->
+        <header class="flex justify-between items-center px-4 py-3 lg:px-8 lg:py-5 border-b border-tp-border bg-tp-panel shadow-md z-10 flex-shrink-0 w-full relative">
+            <div class="flex items-center gap-4 w-auto min-w-max">
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white mb-1">Scenari</h1>
+                    <div class="flex flex-col gap-1 mt-1"><div class="flex gap-2">
+                        <a href="index.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-accent/10 border border-tp-accent/50 text-tp-accent hover:bg-tp-accent hover:text-[#0a0c10] transition-colors"><i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i> Dashboard</a>
+                        <a href="tabella_trades.html" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Tabella Trades</a>
+                        <a href="#" onclick="goToOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Oggi</a></div><div class="flex gap-2"><a href="#" onclick="goToSessioniOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="layers" class="w-3.5 h-3.5"></i> Sessioni</a><a href="#" onclick="goToBiasOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="brain" class="w-3.5 h-3.5"></i> Bias</a><a href="#" onclick="goToIpotesiOggi(event)" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded bg-tp-bg text-tp-muted border border-tp-border hover:bg-tp-border hover:text-white transition-colors"><i data-lucide="target" class="w-3.5 h-3.5"></i> Ipotesi</a></div>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden lg:flex items-center flex-1 max-w-3xl mx-8 gap-6">
+                <div class="flex flex-col items-center justify-center shrink-0">
+                    <span id="digital-clock" class="text-xl font-display font-bold text-white tracking-widest tabular-nums leading-none">00:00:00</span>
+                    <div class="flex gap-1 mt-1.5">
+                        <span id="tf-5m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted">5m</span>
+                        <span id="tf-15m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted">15m</span>
+                        <span id="tf-30m" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted">30m</span>
+                        <span id="tf-1h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted">1h</span>
+                        <span id="tf-4h" class="px-1.5 py-0.5 text-[9px] font-bold bg-tp-panel rounded text-tp-muted">4h</span>
+                    </div>
+                </div>
+                <div class="flex-col flex-1 relative w-full mx-4">
+                    <div class="flex justify-between text-[10px] items-end font-bold uppercase tracking-widest mb-2 px-2">
+                        <span class="text-tp-muted opacity-30">Asia</span><span class="text-tp-muted opacity-60">London</span><span class="text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] scale-110 origin-bottom">New York (14-17)</span><span class="text-tp-muted opacity-30">End</span>
+                    </div>
+                    <div class="h-2 w-full bg-gradient-to-r from-tp-bg via-tp-border to-tp-bg rounded-full border border-tp-border/30 relative shadow-inner">
+                        <div id="timeline-progress" class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-teal-600 via-tp-accent to-[#22d3ee] rounded-full" style="width:45%"></div>
+                        <div id="timeline-dot" class="absolute top-1/2 -ml-2.5 -mt-2.5 w-5 h-5 bg-white rounded-full border-[3px] border-tp-accent shadow-[0_0_15px_rgba(32,201,151,0.9)] z-10" style="left:45%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 w-auto shrink-0 justify-end">
+                <div class="hidden xl:flex items-center gap-6 bg-gradient-to-b from-[#13161c] to-[#0a0c10] border border-tp-border/40 px-6 py-3 rounded-2xl shadow-inner h-16 mr-4">
+                    <div class="flex flex-col items-center gap-1 w-10"><i id="mindset-icon-wrapper" data-lucide="smile" class="w-7 h-7 text-tp-accent drop-shadow-md"></i></div>
+                    <div class="w-px h-8 bg-gradient-to-b from-transparent via-tp-border to-transparent"></div>
+                    <div id="volatility-coins" class="flex items-center gap-3"></div>
+                </div>
+                <div class="flex items-center gap-3 text-right bg-[#0a0c10]/50 px-4 py-2 border border-tp-accent/20 rounded-[1.25rem]">
+                    <div class="flex flex-col"><span class="text-[9px] text-tp-accent font-bold uppercase tracking-widest opacity-80">Win Rate</span><span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-tp-accent to-white leading-none mt-0.5">67%</span></div>
+                    <div class="relative w-10 h-10 flex items-center justify-center"><svg class="w-[120%] h-[120%] transform -rotate-90 overflow-visible absolute" viewBox="0 0 36 36"><path class="text-tp-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"/><path class="text-tp-accent" stroke-dasharray="67, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg></div>
+                </div>
+            </div>
+        </header>
+        <!-- Barra data + asset -->
+        <div class="flex items-center gap-3 px-4 lg:px-6 py-2.5 border-b border-tp-border bg-tp-panel flex-shrink-0 flex-wrap">
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+                <button onclick="changeDate(-1)" class="w-7 h-7 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-white hover:border-tp-muted flex items-center justify-center transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
+                <span id="date-display" class="text-white font-bold text-xs w-56 text-center select-none">—</span>
+                <button onclick="changeDate(1)" class="w-7 h-7 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-white hover:border-tp-muted flex items-center justify-center transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+                <button onclick="goToToday()" class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-lg bg-tp-bg border border-tp-border text-tp-muted hover:text-tp-accent hover:border-tp-accent/40 transition-colors">Oggi</button>
+            </div>
+            <div class="w-px h-5 bg-tp-border flex-shrink-0"></div>
+            <div class="flex gap-1.5 flex-wrap" id="asset-tabs"></div>
+            <span class="ml-auto text-[10px] font-bold uppercase tracking-widest text-tp-muted/50">Tappa 1 · 07:00 UTC · livelli + fascia</span>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 lg:p-6">
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+
+                <!-- SINISTRA: grafico + livelli -->
+                <div class="xl:col-span-8 flex flex-col gap-5">
+                    <div class="bg-tp-panel border border-tp-border rounded-xl overflow-hidden">
+                        <div class="flex items-center justify-between px-4 py-2.5 border-b border-tp-border">
+                            <span class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2"><i data-lucide="line-chart" class="w-4 h-4 text-tp-accent"></i> <span id="chart-asset-label" class="text-white">XAUUSD</span> · H1 · UTC</span>
+                            <span class="text-[10px] font-bold text-tp-muted/60 uppercase tracking-wider">box Asia 00–04 · midnight open 04 · ieri H/L · fascia</span>
+                        </div>
+                        <canvas id="sc-chart" class="block w-full" style="height:400px;background:#0d1117"></canvas>
+                    </div>
+
+                    <div class="bg-tp-panel border border-tp-border rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-tp-accent"></i> Livelli calcolati</span>
+                            <span class="text-[10px] text-tp-muted/50 italic">da candles_15m e forza_usd · ricalcolati a ogni apertura</span>
+                        </div>
+                        <div id="livelli-table" class="grid grid-cols-2 md:grid-cols-4 gap-2"></div>
+                    </div>
+                </div>
+
+                <!-- DESTRA: fascia sensibile + bias H4 -->
+                <div class="xl:col-span-4 flex flex-col gap-5">
+                    <div class="bg-tp-panel border border-tp-border rounded-xl p-4 flex flex-col gap-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-widest text-tp-accent flex items-center gap-2"><i data-lucide="target" class="w-4 h-4"></i> Fascia sensibile</span>
+                            <span id="saved-badge" class="text-[9px] font-bold uppercase tracking-widest text-tp-muted/50">—</span>
+                        </div>
+                        <p class="text-[11px] text-tp-muted/70 leading-relaxed">La zona ad alta probabilità di reazione, disegnata a mano. Una fascia, non una cifra al pip. Si disegna sul grafico in ambra.</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div><span class="text-[10px] text-tp-muted uppercase font-bold tracking-wide block mb-1">Alto</span><input id="fascia-high" type="text" inputmode="decimal" placeholder="4412.70" oninput="requestAnimationFrame(drawChart)" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent tabular-nums"></div>
+                            <div><span class="text-[10px] text-tp-muted uppercase font-bold tracking-wide block mb-1">Basso</span><input id="fascia-low" type="text" inputmode="decimal" placeholder="4405.00" oninput="requestAnimationFrame(drawChart)" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent tabular-nums"></div>
+                        </div>
+                        <div><span class="text-[10px] text-tp-muted uppercase font-bold tracking-wide block mb-1">Perché qui</span><textarea id="fascia-nota" rows="3" placeholder="Es: minimo Asia + media London ieri + 4 rifiuti M15 tra le 02 e le 05" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent"></textarea></div>
+                        <div>
+                            <span class="text-[10px] text-tp-muted uppercase font-bold tracking-wide block mb-1.5">Bias strutturale H4</span>
+                            <div class="grid grid-cols-3 gap-1.5">
+                                <button type="button" onclick="setH4('long')"   id="h4-long"   class="h4-btn">Long</button>
+                                <button type="button" onclick="setH4('short')"  id="h4-short"  class="h4-btn">Short</button>
+                                <button type="button" onclick="setH4('neutro')" id="h4-neutro" class="h4-btn">Neutro</button>
+                            </div>
+                        </div>
+                        <button onclick="saveScenario()" id="save-btn" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 transition-colors"><i data-lucide="save" class="w-3.5 h-3.5"></i> Salva tappa 1</button>
+                    </div>
+
+                    <div class="bg-tp-panel border border-tp-border/60 rounded-xl p-4 opacity-50">
+                        <span class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i> Tappa 2 · 13:00 · chiusura London</span>
+                        <p class="text-[11px] text-tp-muted/60 mt-2 leading-relaxed">Chiusura London vs box Asia, ha respirato o linea retta, media London, firma dollaro. Scenario A o B proposto dal sistema. In costruzione.</p>
+                    </div>
+                    <div class="bg-tp-panel border border-tp-border/60 rounded-xl p-4 opacity-50">
+                        <span class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i> Tappa 3 · sera · esito NY</span>
+                        <p class="text-[11px] text-tp-muted/60 mt-2 leading-relaxed">Continuazione o inversione, ritraccio massimo sul perno, livello che ha tenuto. In costruzione.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+    // ─── Costanti del piano (modificabili quando il campione grande dice altro) ───
+    const ASSETS = ['XAUUSD', 'US30', 'GER30', 'NAS100', 'BTCUSD', 'EURUSD'];
+    const BOX_ASIA_FROM = 0, BOX_ASIA_TO = 4;     // ore UTC del box Asia
+    const MIDNIGHT_OPEN_H = 4;                    // apertura candela 04:00 UTC
+    const USD_NIGHT_TO = 7;                       // forza dollaro letta 00:00–07:00
+    const LONDON_LINEA_RETTA = 0.30;              // tappa 2: chiusura nel 30% estremo del range
+    const LONDON_HA_RESPIRATO = 0.45;             // tappa 2: chiusura oltre il 45% dopo l'estremo
+
+    let currentDateStr = null, activeAsset = 'XAUUSD';
+    let rowsByAsset = {};   // righe scenari del giorno, per asset
+    let candlesDay = [];    // m15 del giorno (asset attivo)
+    let candlesPrev = [];   // m15 del giorno precedente con dati
+    let prevDayStr = null;
+    let usdNight = null;    // { first, last, delta }
+    let h4 = null;
+
+    function casaTodayStr() { return new Date(Date.now() + 60 * 60000).toISOString().split('T')[0]; }
+    function addDays(d, n) { const x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); }
+    function fmt(v, dec) { return (v === null || v === undefined || isNaN(v)) ? '—' : Number(v).toFixed(dec); }
+    function decFor(p) { return p > 1000 ? 2 : p > 100 ? 2 : p > 10 ? 3 : 5; }
+
+    const _urlDate = new URLSearchParams(location.search).get('date');
+    currentDateStr = (_urlDate && /^\d{4}-\d{2}-\d{2}$/.test(_urlDate)) ? _urlDate : casaTodayStr();
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        lucide.createIcons();
+        renderAssetTabs();
+        await loadDay();
+    });
+    window.addEventListener('resize', () => requestAnimationFrame(drawChart));
+
+    // ─── Navigazione ─────────────────────────────────────────────────────
+    function changeDate(d) { currentDateStr = addDays(currentDateStr, d); loadDay(); }
+    function goToToday() { currentDateStr = casaTodayStr(); loadDay(); }
+    function renderDateLabel() {
+        const d = new Date(currentDateStr + 'T00:00:00Z');
+        const s = d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+        document.getElementById('date-display').textContent = s.charAt(0).toUpperCase() + s.slice(1) + (currentDateStr === casaTodayStr() ? ' · oggi' : '');
+        const url = new URL(location.href); url.searchParams.set('date', currentDateStr); history.replaceState(null, '', url);
+    }
+    async function goToOggi(e) { if (e) e.preventDefault(); const { data } = await db.from('giornate').select('id').eq('data', casaTodayStr()).maybeSingle(); if (data?.id) location.href = 'dettaglio_giornata.html?id=' + data.id; }
+    function goToSessioniOggi(e) { if (e) e.preventDefault(); location.href = 'sessioni.html?date=' + casaTodayStr(); }
+    function goToBiasOggi(e) { if (e) e.preventDefault(); location.href = 'bias.html?date=' + casaTodayStr(); }
+    function goToIpotesiOggi(e) { if (e) e.preventDefault(); location.href = 'ipotesi.html?date=' + casaTodayStr(); }
+
+    function renderAssetTabs() {
+        document.getElementById('asset-tabs').innerHTML = ASSETS.map(a => `
+            <button onclick="setActiveAsset('${a}')" class="asset-tab text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-lg border border-tp-border text-tp-muted hover:text-white transition-colors ${a === activeAsset ? 'active' : ''}">${a}</button>`).join('');
+    }
+    async function setActiveAsset(a) { activeAsset = a; renderAssetTabs(); document.getElementById('chart-asset-label').textContent = a; await loadAsset(); }
+
+    // ─── Load ────────────────────────────────────────────────────────────
+    async function loadDay() {
+        renderDateLabel();
+        const { data } = await db.from('scenari').select('*').eq('data', currentDateStr);
+        rowsByAsset = {}; (data || []).forEach(r => { rowsByAsset[r.asset] = r; });
+        await loadAsset();
+    }
+
+    async function loadAsset() {
+        const day = currentDateStr, asset = activeAsset;
+        // giorno precedente con dati: cerco fino a 4 giorni indietro (weekend)
+        const t0 = day + 'T00:00:00Z', t1 = addDays(day, 1) + 'T00:00:00Z';
+        const pFrom = addDays(day, -4) + 'T00:00:00Z';
+        const [{ data: cd }, { data: cp }, { data: usd }] = await Promise.all([
+            db.from('candles_15m').select('ts, open, high, low, close').eq('coin', asset).gte('ts', t0).lt('ts', t1).order('ts', { ascending: true }),
+            db.from('candles_15m').select('ts, open, high, low, close').eq('coin', asset).gte('ts', pFrom).lt('ts', t0).order('ts', { ascending: true }),
+            db.from('forza_usd').select('usd_strength, created_at').gte('created_at', t0).lt('created_at', day + 'T' + String(USD_NIGHT_TO).padStart(2, '0') + ':00:00Z').order('created_at', { ascending: true })
+        ]);
+        if (day !== currentDateStr || asset !== activeAsset) return;
+        const mk = r => ({ tMs: new Date(r.ts).getTime(), o: +r.open, h: +r.high, l: +r.low, c: +r.close });
+        candlesDay = (cd || []).map(mk);
+        const prevAll = (cp || []).map(mk);
+        if (prevAll.length) {
+            prevDayStr = new Date(prevAll[prevAll.length - 1].tMs).toISOString().slice(0, 10);
+            const p0 = new Date(prevDayStr + 'T00:00:00Z').getTime();
+            candlesPrev = prevAll.filter(c => c.tMs >= p0);
+        } else { prevDayStr = null; candlesPrev = []; }
+        usdNight = null;
+        if (usd && usd.length) {
+            const f = +usd[0].usd_strength, l = +usd[usd.length - 1].usd_strength;
+            usdNight = { first: f, last: l, delta: l - f, n: usd.length };
+        }
+        // form
+        const r = rowsByAsset[asset];
+        document.getElementById('fascia-high').value = r?.fascia_high || '';
+        document.getElementById('fascia-low').value = r?.fascia_low || '';
+        document.getElementById('fascia-nota').value = r?.fascia_nota || '';
+        setH4(r?.bias_h4 || null, true);
+        document.getElementById('saved-badge').textContent = r ? 'salvato ' + new Date(r.updated_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC' : 'non salvato';
+        renderLivelli();
+        requestAnimationFrame(drawChart);
+    }
+
+    // ─── Livelli ─────────────────────────────────────────────────────────
+    function computeLivelli() {
+        const t0 = new Date(currentDateStr + 'T00:00:00Z').getTime(), H = 3600000;
+        const box = candlesDay.filter(c => c.tMs >= t0 + BOX_ASIA_FROM * H && c.tMs < t0 + BOX_ASIA_TO * H);
+        const L = {};
+        if (box.length) {
+            L.asia_high = Math.max(...box.map(c => c.h));
+            L.asia_low = Math.min(...box.map(c => c.l));
+            L.asia_avg = box.reduce((s, c) => s + c.c, 0) / box.length;
+        }
+        const mo = candlesDay.find(c => c.tMs >= t0 + MIDNIGHT_OPEN_H * H && c.tMs < t0 + MIDNIGHT_OPEN_H * H + 15 * 60000);
+        if (mo) L.midnight_open = mo.o;
+        if (candlesPrev.length) {
+            L.prev_high = Math.max(...candlesPrev.map(c => c.h));
+            L.prev_low = Math.min(...candlesPrev.map(c => c.l));
+            L.prev_close = candlesPrev[candlesPrev.length - 1].c;
+            L.prev_day = prevDayStr;
+        }
+        if (usdNight) { L.usd_last = usdNight.last; L.usd_delta = usdNight.delta; }
+        return L;
+    }
+
+    function renderLivelli() {
+        const L = computeLivelli();
+        const ref = L.asia_high || L.prev_high || 100;
+        const d = decFor(ref);
+        const cell = (lbl, v, col, sub) => `<div class="bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 min-w-0">
+            <span class="text-[9px] text-tp-muted/60 uppercase font-bold tracking-wide block">${lbl}</span>
+            <span class="text-sm font-black tabular-nums" style="color:${col}">${v}</span>
+            ${sub ? `<span class="text-[9px] text-tp-muted/50 block">${sub}</span>` : ''}</div>`;
+        const usdCol = usdNight ? (usdNight.delta > 0 ? '#20c997' : usdNight.delta < 0 ? '#f43f5e' : '#848d97') : '#848d97';
+        document.getElementById('livelli-table').innerHTML =
+            cell('Box Asia max', fmt(L.asia_high, d), '#c9a227', '00–04 UTC') +
+            cell('Box Asia min', fmt(L.asia_low, d), '#c9a227', 'perno NY') +
+            cell('Media Asia', fmt(L.asia_avg, d), '#c9a227', 'media chiusure · muro') +
+            cell('Midnight open', fmt(L.midnight_open, d), '#ffffff', 'candela 04:00') +
+            cell('Ieri max', fmt(L.prev_high, d), '#9b8cff', L.prev_day || '—') +
+            cell('Ieri min', fmt(L.prev_low, d), '#9b8cff', L.prev_day || '—') +
+            cell('Ieri close', fmt(L.prev_close, d), '#9b8cff', '') +
+            cell('USD notte', usdNight ? (usdNight.delta >= 0 ? '+' : '') + fmt(usdNight.delta * 100, 2) : '—', usdCol, usdNight ? 'ultimo ' + fmt(usdNight.last * 100, 2) + ' · n=' + usdNight.n : '00–07 UTC');
+    }
+
+    // ─── Bias H4 ─────────────────────────────────────────────────────────
+    function setH4(v, silent) {
+        h4 = (h4 === v && !silent) ? null : v;
+        const map = { long: ['#20c997', 'rgba(32,201,151,.15)'], short: ['#f43f5e', 'rgba(244,63,94,.15)'], neutro: ['#eab308', 'rgba(234,179,8,.15)'] };
+        ['long', 'short', 'neutro'].forEach(k => {
+            const b = document.getElementById('h4-' + k);
+            if (h4 === k) { b.style.color = map[k][0]; b.style.background = map[k][1]; b.style.borderColor = map[k][0]; }
+            else { b.style.color = ''; b.style.background = ''; b.style.borderColor = ''; }
+        });
+    }
+
+    // ─── Save ────────────────────────────────────────────────────────────
+    async function saveScenario() {
+        const L = computeLivelli();
+        const snap = {}; Object.keys(L).forEach(k => { snap[k] = (typeof L[k] === 'number') ? String(L[k]) : L[k]; });
+        const payload = {
+            data: currentDateStr, asset: activeAsset,
+            livelli: snap,
+            fascia_high: document.getElementById('fascia-high').value.trim() || null,
+            fascia_low: document.getElementById('fascia-low').value.trim() || null,
+            fascia_nota: document.getElementById('fascia-nota').value.trim() || null,
+            bias_h4: h4
+        };
+        const { data, error } = await db.from('scenari').upsert(payload, { onConflict: 'data,asset' }).select().single();
+        const btn = document.getElementById('save-btn');
+        if (error) { console.error('[saveScenario]', error); alert('Errore salvataggio: ' + error.message); return; }
+        rowsByAsset[activeAsset] = data;
+        document.getElementById('saved-badge').textContent = 'salvato ora';
+        btn.classList.add('save-flash'); setTimeout(() => btn.classList.remove('save-flash'), 600);
+    }
+
+    // ─── Canvas H1 con livelli e fascia ──────────────────────────────────
+    function drawChart() {
+        const cv = document.getElementById('sc-chart');
+        if (!cv) return;
+        const dpr = window.devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+        if (!W || !H) return;
+        cv.width = W * dpr; cv.height = H * dpr;
+        const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, W, H);
+        const msg = t => { ctx.fillStyle = '#454e5a'; ctx.font = '13px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(t, W / 2, H / 2); };
+
+        // H1 dal giorno prima (dalle 12:00) + giorno corrente, così ieri H/L hanno contesto
+        const hourMs = 3600000;
+        const t0 = new Date(currentDateStr + 'T00:00:00Z').getTime();
+        const tStart = t0 - 12 * hourMs, tEnd = t0 + 24 * hourMs;
+        const src = [...candlesPrev.filter(c => c.tMs >= tStart), ...candlesDay];
+        const buckets = new Map();
+        src.forEach(c => { const k = Math.floor(c.tMs / hourMs) * hourMs; const b = buckets.get(k); if (!b) buckets.set(k, { tMs: k, o: c.o, h: c.h, l: c.l, c: c.c }); else { b.h = Math.max(b.h, c.h); b.l = Math.min(b.l, c.l); b.c = c.c; } });
+        const candles = [...buckets.values()].sort((a, b) => a.tMs - b.tMs);
+        if (!candles.length) { msg('Nessun dato candele · ' + activeAsset); return; }
+
+        const L = computeLivelli();
+        const fh = parseFloat(document.getElementById('fascia-high').value), fl = parseFloat(document.getElementById('fascia-low').value);
+
+        const padL = 8, padR = 60, padT = 22, padB = 24;
+        const x0 = padL, x1 = W - padR, y0 = padT, y1 = H - padB;
+        const pxX = ms => x0 + (ms - tStart) / (tEnd - tStart) * (x1 - x0);
+        let lo = Infinity, hi = -Infinity;
+        candles.forEach(c => { lo = Math.min(lo, c.l); hi = Math.max(hi, c.h); });
+        [L.prev_high, L.prev_low, fh, fl].forEach(p => { if (isFinite(p)) { lo = Math.min(lo, p); hi = Math.max(hi, p); } });
+        const pp = Math.max((hi - lo) * 0.06, 0.0001), yMin = lo - pp, yMax = hi + pp;
+        const pxY = p => y1 - (p - yMin) / (yMax - yMin) * (y1 - y0);
+        const rawStep = (yMax - yMin) / 7, mag = Math.pow(10, Math.floor(Math.log10(rawStep || 1))), nn = rawStep / mag;
+        const stepY = mag * (nn < 1.5 ? 1 : nn < 3 ? 2 : nn < 7 ? 5 : 10);
+        const dec = stepY < 0.001 ? 5 : stepY < 0.01 ? 4 : stepY < 0.1 ? 3 : stepY < 1 ? 2 : stepY < 10 ? 1 : 0;
+
+        // Y grid
+        ctx.font = '9px Inter, sans-serif';
+        for (let p = Math.ceil(yMin / stepY) * stepY; p <= yMax + stepY * 0.01; p += stepY) {
+            const yg = pxY(p); if (yg < y0 - 1 || yg > y1 + 1) continue;
+            ctx.strokeStyle = 'rgba(255,255,255,.04)'; ctx.lineWidth = 1; ctx.setLineDash([]);
+            ctx.beginPath(); ctx.moveTo(x0, yg); ctx.lineTo(x1, yg); ctx.stroke();
+            ctx.fillStyle = '#4a5568'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(p.toFixed(dec), x1 + 5, yg);
+        }
+        // sessioni sfondo + X axis ogni 2h
+        const sess = [[0, 7, '201,162,39'], [7, 13, '32,201,151'], [13, 20, '155,140,255']];
+        [-1, 0].forEach(dd => sess.forEach(([a, b, rgb]) => {
+            const s = t0 + dd * 24 * hourMs + a * hourMs, e = t0 + dd * 24 * hourMs + b * hourMs;
+            if (e <= tStart) return;
+            ctx.fillStyle = 'rgba(' + rgb + ',.045)'; ctx.fillRect(pxX(Math.max(s, tStart)), y0, pxX(e) - pxX(Math.max(s, tStart)), y1 - y0);
+        }));
+        ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+        for (let ms = tStart; ms <= tEnd; ms += 2 * hourMs) {
+            const xg = pxX(ms), hh = new Date(ms).getUTCHours();
+            ctx.strokeStyle = hh === 0 ? 'rgba(255,255,255,.14)' : 'rgba(255,255,255,.035)'; ctx.setLineDash(hh === 0 ? [4, 5] : []);
+            ctx.beginPath(); ctx.moveTo(xg, y0 - 12); ctx.lineTo(xg, y1); ctx.stroke(); ctx.setLineDash([]);
+            ctx.fillStyle = hh === 0 ? '#848d97' : '#4a5568'; ctx.fillText(String(hh).padStart(2, '0'), xg, y1 + 6);
+        }
+        ctx.fillStyle = '#5b6572'; ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'left';
+        if (prevDayStr) ctx.fillText('ieri ' + prevDayStr.slice(5), pxX(tStart) + 5, 4);
+        ctx.fillText(currentDateStr.slice(5), pxX(t0) + 5, 4);
+
+        // box Asia 00–04 + linee H/L/avg
+        if (L.asia_high) {
+            const bx0 = pxX(t0 + BOX_ASIA_FROM * hourMs), bx1 = pxX(t0 + BOX_ASIA_TO * hourMs);
+            ctx.fillStyle = 'rgba(201,162,39,.10)'; ctx.fillRect(bx0, pxY(L.asia_high), bx1 - bx0, pxY(L.asia_low) - pxY(L.asia_high));
+            ctx.strokeStyle = 'rgba(201,162,39,.6)'; ctx.setLineDash([]); ctx.lineWidth = 1;
+            ctx.strokeRect(bx0 + .5, pxY(L.asia_high) + .5, bx1 - bx0 - 1, pxY(L.asia_low) - pxY(L.asia_high) - 1);
+            [[L.asia_high, 'Asia H ', [6, 4], .6], [L.asia_low, 'Asia L ', [6, 4], .6], [L.asia_avg, 'media Asia ', [2, 5], .4]].forEach(([p, lbl, dash, al]) => {
+                const y = pxY(p); ctx.strokeStyle = 'rgba(201,162,39,' + al + ')'; ctx.setLineDash(dash);
+                ctx.beginPath(); ctx.moveTo(bx0, y); ctx.lineTo(x1, y); ctx.stroke(); ctx.setLineDash([]);
+                ctx.fillStyle = '#c9a227'; ctx.font = '600 9px Inter, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.fillText(lbl + p.toFixed(dec), bx0 + 3, y - 1);
+            });
+        }
+        // midnight open
+        if (L.midnight_open) {
+            const xm = pxX(t0 + MIDNIGHT_OPEN_H * hourMs), ym = pxY(L.midnight_open);
+            ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.setLineDash([2, 4]); ctx.beginPath(); ctx.moveTo(xm, y0); ctx.lineTo(xm, y1); ctx.stroke();
+            ctx.strokeStyle = 'rgba(255,255,255,.5)'; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(xm, ym); ctx.lineTo(tEnd ? pxX(tEnd) : x1, ym); ctx.stroke(); ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.font = '600 9px Inter, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.fillText('MO ' + L.midnight_open.toFixed(dec), xm + 3, ym - 1);
+        }
+        // ieri H/L
+        if (L.prev_high) {
+            [[L.prev_high, 'ieri H '], [L.prev_low, 'ieri L ']].forEach(([p, lbl]) => {
+                const y = pxY(p); ctx.strokeStyle = 'rgba(155,140,255,.55)'; ctx.setLineDash([8, 4]); ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke(); ctx.setLineDash([]);
+                ctx.fillStyle = '#9b8cff'; ctx.font = '600 9px Inter, sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; ctx.fillText(lbl + p.toFixed(dec), x1 - 3, y - 1);
+            });
+        }
+        // fascia sensibile (ambra)
+        if (isFinite(fh) && isFinite(fl) && fh > fl) {
+            ctx.fillStyle = 'rgba(240,180,41,.16)'; ctx.fillRect(x0, pxY(fh), x1 - x0, pxY(fl) - pxY(fh));
+            ctx.strokeStyle = 'rgba(240,180,41,.8)'; ctx.setLineDash([]); ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(x0, pxY(fh)); ctx.lineTo(x1, pxY(fh)); ctx.moveTo(x0, pxY(fl)); ctx.lineTo(x1, pxY(fl)); ctx.stroke();
+            ctx.fillStyle = '#f0b429'; ctx.font = '700 9px Inter, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+            ctx.fillText('FASCIA ' + fl.toFixed(dec) + ' – ' + fh.toFixed(dec), x0 + 4, pxY(fh) + 2);
+        }
+        // candele H1
+        const cw = Math.max(2, (x1 - x0) / 36 * 0.6);
+        candles.forEach(c => {
+            const xMid = pxX(c.tMs + hourMs / 2), bull = c.c >= c.o, prev = c.tMs < t0;
+            ctx.globalAlpha = prev ? .55 : 1;
+            ctx.strokeStyle = bull ? '#20c997' : '#f43f5e'; ctx.lineWidth = 1; ctx.setLineDash([]);
+            ctx.beginPath(); ctx.moveTo(xMid, pxY(c.h)); ctx.lineTo(xMid, pxY(c.l)); ctx.stroke();
+            ctx.fillStyle = bull ? 'rgba(32,201,151,.9)' : 'rgba(244,63,94,.9)';
+            const top = pxY(Math.max(c.o, c.c)); ctx.fillRect(xMid - cw / 2, top, cw, Math.max(1, pxY(Math.min(c.o, c.c)) - top));
+        });
+        ctx.globalAlpha = 1;
+    }
+    </script>
+</body>
+</html>
