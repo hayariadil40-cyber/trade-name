@@ -750,7 +750,6 @@
                 return;
             }
             await loadGiornata();
-            checkFajrAuto();
             await Promise.all([
                 loadAllertOggi(),
                 loadAllertEAGiornata(),
@@ -915,39 +914,8 @@
             }
         }
 
-        async function checkFajrAuto() {
-            if (!giornataId || !giornataDate) return;
-            if (fajrState !== null) return;
-
-            // Solo per la giornata di oggi
-            const casaToday = new Date().toISOString().slice(0, 10);
-            if (giornataDate !== casaToday) return;
-
-            // Ora corrente in Casablanca
-            const parts = new Intl.DateTimeFormat('en-US', {
-                hour: '2-digit', minute: '2-digit', hour12: false
-            }).formatToParts(new Date());
-            const h = parseInt(parts.find(p => p.type === 'hour').value);
-            const m = parseInt(parts.find(p => p.type === 'minute').value);
-            if (h * 60 + m < 6 * 60 + 40) return; // prima delle 06:40
-
-            // Auto-flag: fajr non eseguito
-            fajrState = false;
-            renderFajr();
-            await db.from('giornate').update({ fajr: false }).eq('id', giornataId);
-            _gjToast('Fajr segnato come non eseguito', false);
-
-            // Rodrigo manda la ramanzina (fire-and-forget)
-            fetch(SUPABASE_URL + '/functions/v1/fajr-reminder', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
-                },
-                body: JSON.stringify({ date: casaToday })
-            }).catch(() => {});
-        }
+        // Fajr: la domanda con bottoni Si/No arriva su Telegram (edge fajr-reminder + telegram-webhook).
+        // Nessun auto-flag lato frontend.
 
         // ============================================
         // DATA HIJRI
@@ -2173,10 +2141,6 @@
                 ((allerts || []).filter(a => { if (!a.data_evento) return false; if (a.data_evento < today) return true; const ora = (a.ora_evento || '').substring(0,5); return !ora || ora <= nowHHMM; })).forEach(a => tickets.push({ type: 'allert', label: 'Notizia Da Validare', title: a.titolo || 'Notizia', desc: "L'orario e scattato. Inserire dati per archiviare.", id: a.id, link: 'allert.html?openNews=' + a.id, color: 'purple', table: 'allert' }));
                 const { data: allertPrezzo } = await db.from('allert_prezzo').select('id, coin, prezzo, descrizione, created_at').eq('stato', 'nuovo');
                 ((allertPrezzo || []).filter(ap => !isEaAllert(ap))).forEach(ap => { const oraStr = ap.created_at ? new Date(ap.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : ''; tickets.push({ type: 'allert_prezzo', label: 'Allert Da Validare', title: (ap.coin || '') + ' @ ' + (ap.prezzo || ''), desc: (ap.descrizione || 'Alert prezzo triggerato') + (oraStr ? ' - ' + oraStr : ''), id: ap.id, link: 'allert.html?openAllert=' + ap.id, color: 'tp-warning', table: 'allert_prezzo' }); });
-                try {
-                    const { data: cronache } = await db.from('cronache').select('id, titolo').eq('stato', 'nuovo');
-                    if (cronache) cronache.forEach(c => tickets.push({ type: 'cronaca', label: 'Cronaca Da Compilare', title: c.titolo || 'Cronaca', desc: 'Cronaca da compilare con dettagli e analisi.', id: c.id, link: 'dettaglio_cronaca.html?id=' + c.id, color: 'teal', table: 'cronache' }));
-                } catch(e) {}
             } catch(err) { console.error('Errore caricamento processi:', err); }
             if (countEl) countEl.textContent = tickets.length;
             if (tickets.length === 0) {

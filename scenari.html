@@ -124,7 +124,7 @@
                     <div class="bg-tp-panel border border-tp-border rounded-xl overflow-hidden">
                         <div class="flex items-center justify-between px-4 py-2.5 border-b border-tp-border">
                             <span class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2"><i data-lucide="line-chart" class="w-4 h-4 text-tp-accent"></i> <span id="chart-asset-label" class="text-white">XAUUSD</span> · H1 · UTC</span>
-                            <span class="text-[10px] font-bold text-tp-muted/60 uppercase tracking-wider">box Asia 00–04 · midnight open 04 · ieri H/L · fascia</span>
+                            <span class="text-[10px] font-bold text-tp-muted/60 uppercase tracking-wider">box Asia 00–04 · midnight open 04 · KZ London 06–09 · KZ NY 11–14 · ieri H/L · fascia</span>
                         </div>
                         <canvas id="sc-chart" class="block w-full" style="height:400px;background:#0d1117"></canvas>
                     </div>
@@ -181,6 +181,10 @@
     const ASSETS = ['XAUUSD', 'US30', 'GER30', 'NAS100', 'BTCUSD', 'EURUSD'];
     const BOX_ASIA_FROM = 0, BOX_ASIA_TO = 4;     // ore UTC del box Asia
     const MIDNIGHT_OPEN_H = 4;                    // apertura candela 04:00 UTC
+    const KILL_ZONES = [                          // stesse finestre UTC del Weekly
+        { label: 'London KZ', from: 6,  to: 9,  rgb: '34,211,238' },
+        { label: 'NY KZ',     from: 11, to: 14, rgb: '244,63,94' },
+    ];
     const USD_NIGHT_TO = 7;                       // forza dollaro letta 00:00–07:00
     const LONDON_LINEA_RETTA = 0.30;              // tappa 2: chiusura nel 30% estremo del range
     const LONDON_HA_RESPIRATO = 0.45;             // tappa 2: chiusura oltre il 45% dopo l'estremo
@@ -418,6 +422,19 @@
                 ctx.fillStyle = '#c9a227'; ctx.font = '600 9px Inter, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.fillText(lbl + p.toFixed(dec), bx0 + 3, y - 1);
             });
         }
+        // kill zone: rettangolo H/L delle m15 della finestra (solo se ci sono candele)
+        KILL_ZONES.forEach(kz => {
+            const ks = t0 + kz.from * hourMs, ke = t0 + kz.to * hourMs;
+            const inKz = candlesDay.filter(c => c.tMs >= ks && c.tMs < ke);
+            if (!inKz.length) return;
+            const kh = Math.max(...inKz.map(c => c.h)), kl = Math.min(...inKz.map(c => c.l));
+            const kx0 = pxX(ks), kx1 = pxX(ke), ky0 = pxY(kh), ky1 = pxY(kl);
+            ctx.fillStyle = 'rgba(' + kz.rgb + ',.10)'; ctx.fillRect(kx0, ky0, kx1 - kx0, ky1 - ky0);
+            ctx.strokeStyle = 'rgba(' + kz.rgb + ',.6)'; ctx.setLineDash([3, 3]); ctx.lineWidth = 1;
+            ctx.strokeRect(kx0 + .5, ky0 + .5, kx1 - kx0 - 1, ky1 - ky0 - 1); ctx.setLineDash([]);
+            ctx.fillStyle = 'rgb(' + kz.rgb + ')'; ctx.font = '600 9px Inter, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+            ctx.fillText(kz.label + ' ' + kl.toFixed(dec) + '–' + kh.toFixed(dec), kx0 + 3, ky0 - 1);
+        });
         // midnight open
         if (L.midnight_open) {
             const xm = pxX(t0 + MIDNIGHT_OPEN_H * hourMs), ym = pxY(L.midnight_open);

@@ -745,15 +745,6 @@
                 });
             });
 
-            // Cronache da compilare
-            try {
-                const { data: cronache } = await db.from('cronache').select('id, titolo').eq('stato', 'nuovo');
-                if (cronache) cronache.forEach(c => tickets.push({
-                    type: 'cronaca', label: 'Cronaca Da Compilare', title: c.titolo || 'Cronaca',
-                    desc: 'Cronaca da compilare con dettagli e analisi.', id: c.id,
-                    link: 'dettaglio_cronaca.html?id=' + c.id, color: 'teal', table: 'cronache'
-                }));
-            } catch(e) { console.warn('cronache.stato non esiste ancora'); }
 
         } catch (err) {
             console.error('Errore caricamento processi:', err);
