@@ -19,8 +19,6 @@
         ::-webkit-scrollbar-thumb { background: #252932; border-radius: 4px; }
         .asset-tab.active { color: #20c997 !important; background: rgba(32,201,151,0.1); border-color: rgba(32,201,151,0.4) !important; }
         .save-flash { animation: flashGreen 0.55s ease; }
-        .h4-btn { padding:6px 0; border-radius:8px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; border:1px solid #252932; color:#848d97; background:#0a0c10; transition:all .15s }
-        .h4-btn:hover { color:#fff; border-color:#3a4352 }
         @keyframes flashGreen { 0%{box-shadow:0 0 0 rgba(32,201,151,0)} 50%{box-shadow:0 0 14px rgba(32,201,151,0.5)} 100%{box-shadow:0 0 0 rgba(32,201,151,0)} }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -113,62 +111,68 @@
             </div>
             <div class="w-px h-5 bg-tp-border flex-shrink-0"></div>
             <div class="flex gap-1.5 flex-wrap" id="asset-tabs"></div>
-            <span class="ml-auto text-[10px] font-bold uppercase tracking-widest text-tp-muted/50">Tappa 1 · 07:00 UTC · livelli + fascia</span>
+            <span class="ml-auto text-[10px] font-bold uppercase tracking-widest text-tp-muted/50">07:00 UTC · livelli + livello sensibile</span>
         </div>
 
         <div class="flex-1 overflow-y-auto p-4 lg:p-6">
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
 
-                <!-- SINISTRA: grafico + livelli -->
+                <!-- SINISTRA: grafico + step sessione -->
                 <div class="xl:col-span-8 flex flex-col gap-5">
                     <div class="bg-tp-panel border border-tp-border rounded-xl overflow-hidden">
                         <div class="flex items-center justify-between px-4 py-2.5 border-b border-tp-border">
                             <span class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2"><i data-lucide="line-chart" class="w-4 h-4 text-tp-accent"></i> <span id="chart-asset-label" class="text-white">XAUUSD</span> · H1 · UTC</span>
-                            <span class="text-[10px] font-bold text-tp-muted/60 uppercase tracking-wider">box Asia 00–04 · midnight open 04 · KZ London 06–09 · KZ NY 11–14 · ieri H/L · fascia</span>
+                            <span class="text-[10px] font-bold text-tp-muted/60 uppercase tracking-wider">box Asia 00–04 · midnight open 04 · KZ London 06–09 · KZ NY 11–14 · ieri H/L · livello sensibile</span>
                         </div>
                         <canvas id="sc-chart" class="block w-full" style="height:400px;background:#0d1117"></canvas>
                     </div>
 
-                    <div class="bg-tp-panel border border-tp-border rounded-xl p-4">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-tp-accent"></i> Livelli calcolati</span>
-                            <span class="text-[10px] text-tp-muted/50 italic">da candles_15m e forza_usd · ricalcolati a ogni apertura</span>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-tp-panel border border-tp-border rounded-xl p-4 flex flex-col gap-3">
+                            <span class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2"><i data-lucide="moon" class="w-4 h-4 text-tp-accent"></i> Asia <span class="ml-auto text-[10px] text-tp-muted/50 font-bold">00–07 UTC · box 00–04</span></span>
+                            <div id="step-asia"></div>
                         </div>
-                        <div id="livelli-table" class="grid grid-cols-2 md:grid-cols-4 gap-2"></div>
+                        <div class="bg-tp-panel border border-tp-border rounded-xl p-4 flex flex-col gap-3">
+                            <span class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2"><i data-lucide="sun" class="w-4 h-4 text-tp-accent"></i> London <span class="ml-auto text-[10px] text-tp-muted/50 font-bold">07–13 UTC</span></span>
+                            <div id="step-london"></div>
+                        </div>
+                        <div class="bg-tp-panel border border-tp-border rounded-xl p-4 flex flex-col gap-3">
+                            <span class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2"><i data-lucide="building-2" class="w-4 h-4 text-tp-accent"></i> New York <span class="ml-auto text-[10px] text-tp-muted/50 font-bold">13–20 UTC</span></span>
+                            <div id="step-newyork"></div>
+                        </div>
+                    </div>
+                        <div class="bg-tp-panel border border-tp-border rounded-xl p-4 flex flex-col gap-2">
+                            <span class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2"><i data-lucide="sun" class="w-4 h-4 text-tp-accent"></i> London <span class="ml-auto text-[10px] text-tp-muted/50 font-bold">07–13 UTC</span></span>
+                            <p class="text-[11px] text-tp-muted/50 italic">In costruzione.</p>
+                        </div>
+                        <div class="bg-tp-panel border border-tp-border rounded-xl p-4 flex flex-col gap-2">
+                            <span class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2"><i data-lucide="building-2" class="w-4 h-4 text-tp-accent"></i> New York <span class="ml-auto text-[10px] text-tp-muted/50 font-bold">13–20 UTC</span></span>
+                            <p class="text-[11px] text-tp-muted/50 italic">In costruzione.</p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- DESTRA: fascia sensibile + bias H4 -->
+                <!-- DESTRA: livello sensibile + livelli calcolati -->
                 <div class="xl:col-span-4 flex flex-col gap-5">
                     <div class="bg-tp-panel border border-tp-border rounded-xl p-4 flex flex-col gap-4">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold uppercase tracking-widest text-tp-accent flex items-center gap-2"><i data-lucide="target" class="w-4 h-4"></i> Fascia sensibile</span>
+                            <span class="text-xs font-bold uppercase tracking-widest text-tp-accent flex items-center gap-2"><i data-lucide="target" class="w-4 h-4"></i> Livello sensibile</span>
                             <span id="saved-badge" class="text-[9px] font-bold uppercase tracking-widest text-tp-muted/50">—</span>
                         </div>
-                        <p class="text-[11px] text-tp-muted/70 leading-relaxed">La zona ad alta probabilità di reazione, disegnata a mano. Una fascia, non una cifra al pip. Si disegna sul grafico in ambra.</p>
+                        <p class="text-[11px] text-tp-muted/70 leading-relaxed">Il livello ad alta probabilità di reazione, segnato a mano. Alto e basso, non una cifra al pip. Si disegna sul grafico in ambra.</p>
                         <div class="grid grid-cols-2 gap-3">
                             <div><span class="text-[10px] text-tp-muted uppercase font-bold tracking-wide block mb-1">Alto</span><input id="fascia-high" type="text" inputmode="decimal" placeholder="4412.70" oninput="requestAnimationFrame(drawChart)" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent tabular-nums"></div>
                             <div><span class="text-[10px] text-tp-muted uppercase font-bold tracking-wide block mb-1">Basso</span><input id="fascia-low" type="text" inputmode="decimal" placeholder="4405.00" oninput="requestAnimationFrame(drawChart)" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-white font-bold outline-none focus:border-tp-accent tabular-nums"></div>
                         </div>
                         <div><span class="text-[10px] text-tp-muted uppercase font-bold tracking-wide block mb-1">Perché qui</span><textarea id="fascia-nota" rows="3" placeholder="Es: minimo Asia + media London ieri + 4 rifiuti M15 tra le 02 e le 05" class="w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-sm text-tp-text/90 outline-none resize-none focus:border-tp-accent"></textarea></div>
-                        <div>
-                            <span class="text-[10px] text-tp-muted uppercase font-bold tracking-wide block mb-1.5">Bias strutturale H4</span>
-                            <div class="grid grid-cols-3 gap-1.5">
-                                <button type="button" onclick="setH4('long')"   id="h4-long"   class="h4-btn">Long</button>
-                                <button type="button" onclick="setH4('short')"  id="h4-short"  class="h4-btn">Short</button>
-                                <button type="button" onclick="setH4('neutro')" id="h4-neutro" class="h4-btn">Neutro</button>
-                            </div>
+                        <button onclick="saveScenario()" id="save-btn" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 transition-colors"><i data-lucide="save" class="w-3.5 h-3.5"></i> Salva</button>
+                    </div>
+                    <div class="bg-tp-panel border border-tp-border rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-tp-accent"></i> Livelli calcolati</span>
+                            <span class="text-[10px] text-tp-muted/50 italic">da candles_15m e forza_usd</span>
                         </div>
-                        <button onclick="saveScenario()" id="save-btn" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 transition-colors"><i data-lucide="save" class="w-3.5 h-3.5"></i> Salva tappa 1</button>
-                    </div>
-
-                    <div class="bg-tp-panel border border-tp-border/60 rounded-xl p-4 opacity-50">
-                        <span class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i> Tappa 2 · 13:00 · chiusura London</span>
-                        <p class="text-[11px] text-tp-muted/60 mt-2 leading-relaxed">Chiusura London vs box Asia, ha respirato o linea retta, media London, firma dollaro. Scenario A o B proposto dal sistema. In costruzione.</p>
-                    </div>
-                    <div class="bg-tp-panel border border-tp-border/60 rounded-xl p-4 opacity-50">
-                        <span class="text-xs font-bold uppercase tracking-widest text-tp-muted flex items-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i> Tappa 3 · sera · esito NY</span>
-                        <p class="text-[11px] text-tp-muted/60 mt-2 leading-relaxed">Continuazione o inversione, ritraccio massimo sul perno, livello che ha tenuto. In costruzione.</p>
+                        <div id="livelli-table" class="grid grid-cols-2 gap-2"></div>
                     </div>
                 </div>
             </div>
@@ -186,8 +190,8 @@
         { label: 'NY KZ',     from: 11, to: 14, rgb: '244,63,94' },
     ];
     const USD_NIGHT_TO = 7;                       // forza dollaro letta 00:00–07:00
-    const LONDON_LINEA_RETTA = 0.30;              // tappa 2: chiusura nel 30% estremo del range
-    const LONDON_HA_RESPIRATO = 0.45;             // tappa 2: chiusura oltre il 45% dopo l'estremo
+    const LONDON_LINEA_RETTA = 0.30;              // London: chiusura nel 30% estremo del range
+    const LONDON_HA_RESPIRATO = 0.45;             // London: chiusura oltre il 45% dopo l'estremo
 
     let currentDateStr = null, activeAsset = 'XAUUSD';
     let rowsByAsset = {};   // righe scenari del giorno, per asset
@@ -195,7 +199,6 @@
     let candlesPrev = [];   // m15 del giorno precedente con dati
     let prevDayStr = null;
     let usdNight = null;    // { first, last, delta }
-    let h4 = null;
 
     function casaTodayStr() { return new Date(Date.now() + 60 * 60000).toISOString().split('T')[0]; }
     function addDays(d, n) { const x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); }
@@ -269,9 +272,9 @@
         document.getElementById('fascia-high').value = r?.fascia_high || '';
         document.getElementById('fascia-low').value = r?.fascia_low || '';
         document.getElementById('fascia-nota').value = r?.fascia_nota || '';
-        setH4(r?.bias_h4 || null, true);
         document.getElementById('saved-badge').textContent = r ? 'salvato ' + new Date(r.updated_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC' : 'non salvato';
         renderLivelli();
+        renderSteps();
         requestAnimationFrame(drawChart);
     }
 
@@ -317,15 +320,167 @@
             cell('USD notte', usdNight ? (usdNight.delta >= 0 ? '+' : '') + fmt(usdNight.delta * 100, 2) : '—', usdCol, usdNight ? 'ultimo ' + fmt(usdNight.last * 100, 2) + ' · n=' + usdNight.n : '00–07 UTC');
     }
 
-    // ─── Bias H4 ─────────────────────────────────────────────────────────
-    function setH4(v, silent) {
-        h4 = (h4 === v && !silent) ? null : v;
-        const map = { long: ['#20c997', 'rgba(32,201,151,.15)'], short: ['#f43f5e', 'rgba(244,63,94,.15)'], neutro: ['#eab308', 'rgba(234,179,8,.15)'] };
-        ['long', 'short', 'neutro'].forEach(k => {
-            const b = document.getElementById('h4-' + k);
-            if (h4 === k) { b.style.color = map[k][0]; b.style.background = map[k][1]; b.style.borderColor = map[k][0]; }
-            else { b.style.color = ''; b.style.background = ''; b.style.borderColor = ''; }
+
+
+    // ─── Step sessione (Asia / London / NY) ──────────────────────────────
+    // Soglie dalle schede sessione v1 (XAU, 74 gg giu–set 2026). Per gli altri asset solo numeri, niente ampiezza.
+    const SESS = {
+        asia:    { from: 0,  to: 7,  label: 'Asia' },
+        london:  { from: 7,  to: 13, label: 'London' },
+        newyork: { from: 13, to: 20, label: 'New York' },
+    };
+    const SOGLIE = { XAUUSD: { asia: [34, 51], london: [29, 58], newyork: [41, 70] } };
+    const NATURA_SOGLIA = 0.45;                   // corpo/range: sotto = compresso, da qui in su = sbilanciato
+    const NY_ESTREMO_ENTRO_H = 16;                // ora UTC entro cui l'estremo NY "arriva presto"
+
+    function sessionClosed(key) {
+        const end = new Date(currentDateStr + 'T00:00:00Z').getTime() + SESS[key].to * 3600000;
+        return Date.now() >= end;
+    }
+    function slice(from, to) {
+        const t0 = new Date(currentDateStr + 'T00:00:00Z').getTime(), H = 3600000;
+        return candlesDay.filter(c => c.tMs >= t0 + from * H && c.tMs < t0 + to * H);
+    }
+    function ohlc(cs) {
+        if (!cs.length) return null;
+        const o = cs[0].o, c = cs[cs.length - 1].c, h = Math.max(...cs.map(x => x.h)), l = Math.min(...cs.map(x => x.l));
+        const range = h - l, corpo = Math.abs(c - o);
+        const avg = cs.reduce((a, x) => a + x.c, 0) / cs.length;
+        return { o, h, l, c, range, corpo_range: range ? corpo / range : null, avg, avg_pos: range ? (avg - l) / range : null,
+                 t_high: cs.reduce((a, x) => x.h > a.h ? x : a, cs[0]).tMs, t_low: cs.reduce((a, x) => x.l < a.l ? x : a, cs[0]).tMs };
+    }
+    function hhmm(ms) { return new Date(ms).toISOString().slice(11, 16); }
+    function ampiezza(key, range) {
+        const s = SOGLIE[activeAsset]?.[key]; if (!s || range == null) return null;
+        return range < s[0] ? 'stretto' : range > s[1] ? 'largo' : 'normale';
+    }
+    function natura(cr) { return cr == null ? null : cr < NATURA_SOGLIA ? 'compresso' : 'sbilanciato'; }
+
+    function computeAsia() {
+        const box = ohlc(slice(BOX_ASIA_FROM, BOX_ASIA_TO)), sess = ohlc(slice(0, 7));
+        if (!box || !sess) return null;
+        const r = {
+            box_range: box.range, box_corpo_range: box.corpo_range, media_pos: box.avg_pos,
+            sess_range: sess.range,
+            ampiezza: ampiezza('asia', box.range), natura: natura(box.corpo_range),
+        };
+        // terra di nessuno 04–06: estremo del box violato? come si risolve alle 06?
+        const tn = slice(4, 6);
+        const up = tn.some(c => c.h > box.h), dn = tn.some(c => c.l < box.l);
+        r.violazione_04_06 = up && dn ? 'entrambi' : up ? 'alto' : dn ? 'basso' : 'nessuna';
+        if (tn.length && (up || dn)) { const last = tn[tn.length - 1].c; r.risoluzione_06 = (last > box.h || last < box.l) ? 'estensione' : 'rientro'; }
+        // attesa London dalle schede
+        if (r.ampiezza) r.london_rompe_atteso = r.ampiezza !== 'largo' ? '67–93%' : r.natura === 'sbilanciato' ? '42%' : '17%';
+        return r;
+    }
+
+    function computeLondon() {
+        const L = computeLivelli(), cs = slice(7, 13), s = ohlc(cs);
+        if (!s || L.asia_high == null) return null;
+        const r = { range: s.range, corpo_range: s.corpo_range, media_pos: s.avg_pos, ampiezza: ampiezza('london', s.range), natura: natura(s.corpo_range), open: s.o, close: s.c, high: s.h, low: s.l };
+        r.chiusura_vs_box = s.c > L.asia_high ? 'sopra' : s.c < L.asia_low ? 'sotto' : 'dentro';
+        const first = cs.find(c => c.h > L.asia_high || c.l < L.asia_low);
+        if (first) { r.primo_tocco = first.h > L.asia_high && first.l < L.asia_low ? 'entrambi' : first.h > L.asia_high ? 'alto' : 'basso'; r.primo_tocco_ora = hhmm(first.tMs); }
+        r.categoria = r.chiusura_vs_box !== 'dentro' ? 'breakout' : first ? 'sweep' : 'compressione';
+        r.direzione = r.categoria === 'breakout' ? (r.chiusura_vs_box === 'sopra' ? 'long' : 'short')
+                    : r.categoria === 'sweep' ? (r.primo_tocco === 'alto' ? 'short' : r.primo_tocco === 'basso' ? 'long' : null)
+                    : null;
+        if (r.categoria === 'breakout') {
+            const up = r.direzione === 'long';
+            const bk = cs.find(c => up ? c.c > L.asia_high : c.c < L.asia_low);
+            const after = bk ? cs.filter(c => c.tMs > bk.tMs) : [];
+            if (after.length) {
+                const ext = up ? Math.min(...after.map(c => c.l)) : Math.max(...after.map(c => c.h));
+                r.respiro_prezzo = ext;
+                r.respiro = up ? (ext <= L.asia_low ? 'lato opposto' : ext <= L.asia_avg ? 'media Asia' : ext <= L.asia_high ? 'bordo' : 'nessuno')
+                              : (ext >= L.asia_high ? 'lato opposto' : ext >= L.asia_avg ? 'media Asia' : ext >= L.asia_low ? 'bordo' : 'nessuno');
+            }
+            const distEstremo = s.range ? (up ? (s.h - s.c) : (s.c - s.l)) / s.range : null;
+            r.chiusura_dall_estremo = distEstremo;
+            r.filtro = distEstremo == null ? null : distEstremo <= LONDON_LINEA_RETTA ? 'linea retta' : distEstremo >= LONDON_HA_RESPIRATO ? 'ha respirato' : 'intermedio';
+        }
+        return r;
+    }
+
+    function computeNY() {
+        const L = computeLivelli(), lon = computeLondon(), cs = slice(13, 20), s = ohlc(cs);
+        if (!s || !lon) return null;
+        const r = { range: s.range, corpo_range: s.corpo_range, media_pos: s.avg_pos, ampiezza: ampiezza('newyork', s.range), natura: natura(s.corpo_range), close: s.c, high: s.h, low: s.l, london_categoria: lon.categoria, london_direzione: lon.direzione };
+        const dir = lon.direzione || (lon.close >= lon.open ? 'long' : 'short');
+        const up = dir === 'long';
+        r.estende = up ? s.h > lon.high : s.l < lon.low;
+        r.estremo_ora = hhmm(up ? s.t_high : s.t_low);
+        r.estremo_entro_16 = (up ? s.t_high : s.t_low) < new Date(currentDateStr + 'T00:00:00Z').getTime() + NY_ESTREMO_ENTRO_H * 3600000;
+        r.mfe = up ? s.h - lon.close : lon.close - s.l;
+        r.mae = up ? lon.close - s.l : s.h - lon.close;
+        // ritraccio 12:00–13:30 sul bordo rotto (solo se London in breakout)
+        if (lon.categoria === 'breakout') {
+            const rt = slice(12, 13.5);
+            if (rt.length) {
+                const ext = up ? Math.min(...rt.map(c => c.l)) : Math.max(...rt.map(c => c.h));
+                r.ritraccio_prezzo = ext;
+                r.ritraccio_buca_bordo = up ? ext < L.asia_high : ext > L.asia_low;
+                r.ritraccio_rientra_box = ext < L.asia_high && ext > L.asia_low;
+            }
+        }
+        const closeDir = up ? s.c - lon.close : lon.close - s.c;   // chiusura NY vs chiusura London, nel verso di London
+        r.chiusura_vs_london = closeDir;
+        r.categoria = r.estende ? (closeDir > 0 ? 'continuazione' : 'riassorbimento') : (closeDir < 0 ? 'inversione' : 'dentro');
+        return r;
+    }
+
+    // ─── Render step ─────────────────────────────────────────────────────
+    const COL = { long: '#20c997', short: '#f43f5e', breakout: '#20c997', sweep: '#f0b429', compressione: '#848d97', continuazione: '#20c997', riassorbimento: '#f0b429', inversione: '#f43f5e', dentro: '#848d97', 'ha respirato': '#20c997', 'linea retta': '#f43f5e', intermedio: '#f0b429', stretto: '#9b8cff', normale: '#848d97', largo: '#f0b429', compresso: '#848d97', sbilanciato: '#20c997' };
+    function badge(v) { return v ? `<span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded border" style="color:${COL[v] || '#fff'};border-color:${COL[v] || '#fff'}40;background:${COL[v] || '#fff'}14">${v}</span>` : ''; }
+    function kv(lbl, v) { return `<div class="flex justify-between gap-2 text-[11px] border-b border-tp-border/40 py-1"><span class="text-tp-muted/70">${lbl}</span><span class="text-white font-bold tabular-nums text-right">${v ?? '—'}</span></div>`; }
+    function pct(v) { return v == null ? '—' : Math.round(v * 100) + '%'; }
+    function F(v) { return fmt(v, decFor(computeLivelli().asia_high || 100)); }
+
+    function renderSteps() {
+        ['asia', 'london', 'newyork'].forEach(key => {
+            const el = document.getElementById('step-' + key), saved = rowsByAsset[activeAsset]?.[key];
+            if (!sessionClosed(key)) { el.innerHTML = `<p class="text-[11px] text-tp-muted/50 italic">Si compila alla chiusura delle ${String(SESS[key].to).padStart(2, '0')}:00 UTC.</p>`; return; }
+            const st = key === 'asia' ? computeAsia() : key === 'london' ? computeLondon() : computeNY();
+            if (!st) { el.innerHTML = `<p class="text-[11px] text-tp-muted/50 italic">Nessuna candela per questa sessione.</p>`; return; }
+            let body = '';
+            if (key === 'asia') body =
+                `<div class="flex flex-wrap gap-1.5 mb-2">${badge(st.ampiezza)}${badge(st.natura)}</div>` +
+                kv('Range box 00–04', F(st.box_range)) + kv('Corpo / range', fmt(st.box_corpo_range, 2)) + kv('Media nel range', pct(st.media_pos)) +
+                kv('Range sessione 00–07', F(st.sess_range)) + kv('Violazione 04–06', st.violazione_04_06) + kv('Alle 06', st.risoluzione_06) +
+                kv('London rompe (atteso)', st.london_rompe_atteso);
+            if (key === 'london') body =
+                `<div class="flex flex-wrap gap-1.5 mb-2">${badge(st.categoria)}${badge(st.direzione)}${badge(st.filtro)}${badge(st.ampiezza)}</div>` +
+                kv('Range', F(st.range)) + kv('Corpo / range', fmt(st.corpo_range, 2)) + kv('Chiusura vs box', st.chiusura_vs_box) +
+                kv('Primo tocco', st.primo_tocco ? st.primo_tocco + ' · ' + st.primo_tocco_ora : 'nessuno') +
+                (st.categoria === 'breakout' ? kv('Respiro fino a', st.respiro ? st.respiro + ' · ' + F(st.respiro_prezzo) : '—') + kv("Chiusura dall'estremo", pct(st.chiusura_dall_estremo)) : '');
+            if (key === 'newyork') body =
+                `<div class="flex flex-wrap gap-1.5 mb-2">${badge(st.categoria)}${badge(st.ampiezza)}</div>` +
+                kv('Range', F(st.range)) + kv('Corpo / range', fmt(st.corpo_range, 2)) + kv('Dopo London', (st.london_categoria || '—') + (st.london_direzione ? ' ' + st.london_direzione : '')) +
+                kv('Estende oltre London', st.estende ? 'sì · ' + st.estremo_ora + (st.estremo_entro_16 ? ' · entro le 16' : ' · dopo le 16') : 'no') +
+                kv('MFE / MAE vs close London', F(st.mfe) + ' / ' + F(st.mae)) +
+                (st.london_categoria === 'breakout' ? kv('Ritraccio 12–13:30', st.ritraccio_prezzo != null ? F(st.ritraccio_prezzo) + (st.ritraccio_buca_bordo ? ' · buca il bordo' : ' · tiene il bordo') : '—') : '') +
+                kv('Chiusura vs close London', (st.chiusura_vs_london >= 0 ? '+' : '') + F(st.chiusura_vs_london));
+            el.innerHTML = body +
+                `<textarea id="nota-${key}" rows="3" placeholder="Commento ${SESS[key].label}" class="mt-2 w-full bg-[#0a0c10] border border-tp-border rounded-lg px-3 py-2 text-[12px] text-tp-text/90 outline-none resize-none focus:border-tp-accent">${saved?.commento || ''}</textarea>
+                 <div class="flex items-center justify-between mt-2"><span id="saved-${key}" class="text-[9px] font-bold uppercase tracking-widest text-tp-muted/50">${saved ? 'salvato' : 'non salvato'}</span>
+                 <button onclick="saveStep('${key}')" id="save-${key}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-tp-accent text-[#0a0c10] hover:bg-tp-accent/80 transition-colors"><i data-lucide="save" class="w-3 h-3"></i> Salva</button></div>`;
+            el.dataset.stats = JSON.stringify(st);
         });
+        lucide.createIcons();
+    }
+
+    async function saveStep(key) {
+        const el = document.getElementById('step-' + key);
+        const stats = JSON.parse(el.dataset.stats || '{}');
+        Object.keys(stats).forEach(k => { if (typeof stats[k] === 'number') stats[k] = String(+stats[k].toFixed(5)); });
+        stats.commento = document.getElementById('nota-' + key).value.trim() || null;
+        stats.compilato_at = new Date().toISOString();
+        const payload = { data: currentDateStr, asset: activeAsset, [key]: stats };
+        const { data, error } = await db.from('scenari').upsert(payload, { onConflict: 'data,asset' }).select().single();
+        if (error) { console.error('[saveStep]', error); alert('Errore salvataggio: ' + error.message); return; }
+        rowsByAsset[activeAsset] = data;
+        document.getElementById('saved-' + key).textContent = 'salvato ora';
+        const btn = document.getElementById('save-' + key); btn.classList.add('save-flash'); setTimeout(() => btn.classList.remove('save-flash'), 600);
     }
 
     // ─── Save ────────────────────────────────────────────────────────────
@@ -337,8 +492,7 @@
             livelli: snap,
             fascia_high: document.getElementById('fascia-high').value.trim() || null,
             fascia_low: document.getElementById('fascia-low').value.trim() || null,
-            fascia_nota: document.getElementById('fascia-nota').value.trim() || null,
-            bias_h4: h4
+            fascia_nota: document.getElementById('fascia-nota').value.trim() || null
         };
         const { data, error } = await db.from('scenari').upsert(payload, { onConflict: 'data,asset' }).select().single();
         const btn = document.getElementById('save-btn');
@@ -450,13 +604,13 @@
                 ctx.fillStyle = '#9b8cff'; ctx.font = '600 9px Inter, sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; ctx.fillText(lbl + p.toFixed(dec), x1 - 3, y - 1);
             });
         }
-        // fascia sensibile (ambra)
+        // livello sensibile (ambra)
         if (isFinite(fh) && isFinite(fl) && fh > fl) {
             ctx.fillStyle = 'rgba(240,180,41,.16)'; ctx.fillRect(x0, pxY(fh), x1 - x0, pxY(fl) - pxY(fh));
             ctx.strokeStyle = 'rgba(240,180,41,.8)'; ctx.setLineDash([]); ctx.lineWidth = 1;
             ctx.beginPath(); ctx.moveTo(x0, pxY(fh)); ctx.lineTo(x1, pxY(fh)); ctx.moveTo(x0, pxY(fl)); ctx.lineTo(x1, pxY(fl)); ctx.stroke();
             ctx.fillStyle = '#f0b429'; ctx.font = '700 9px Inter, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-            ctx.fillText('FASCIA ' + fl.toFixed(dec) + ' – ' + fh.toFixed(dec), x0 + 4, pxY(fh) + 2);
+            ctx.fillText('LIVELLO ' + fl.toFixed(dec) + ' – ' + fh.toFixed(dec), x0 + 4, pxY(fh) + 2);
         }
         // candele H1
         const cw = Math.max(2, (x1 - x0) / 36 * 0.6);
