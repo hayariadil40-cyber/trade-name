@@ -1,8 +1,8 @@
 // Candle 4H Reminder - Edge Function
 // Invia messaggio Telegram da Rodrigo 5 minuti prima della chiusura candela 4H.
 //
-// pg_cron (UTC): `55 1,5,9,13,17 * * 1-5`
-// = 01:55, 05:55, 09:55, 13:55, 17:55 UTC — solo lun-ven (H4 chiude alle 02,06,10,14,18 UTC)
+// pg_cron (UTC): `55 0,4,8,12,16 * * 1-5`
+// = 00:55, 04:55, 08:55, 12:55, 16:55 UTC — solo lun-ven (broker UTC+3: H4 chiude alle 01,05,09,13,17 UTC)
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 
@@ -12,7 +12,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const CLOSE_HOURS_UTC = [2, 6, 10, 14, 18];
+const CLOSE_HOURS_UTC = [1, 5, 9, 13, 17];
 
 async function sendTelegram(text: string, botToken: string, chatId: string) {
   const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {

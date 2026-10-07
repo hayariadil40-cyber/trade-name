@@ -1638,7 +1638,7 @@
 
             const _h4Slots = gjCoinData[gjActiveAsset]?.bias_h4 || Array(6).fill(null);
             const h4Html = `<div class="mt-1"><label class="text-[9px] font-bold uppercase tracking-widest text-tp-muted/50 mb-1.5 block">Bias Strutturale H4</label><div class="grid grid-cols-6 gap-1">${
-                ['23:00','03:00','07:00','11:00','15:00','19:00'].map((time, qi) => {
+                ['21:00','01:00','05:00','09:00','13:00','17:00'].map((time, qi) => {
                     const b = _h4Slots[qi];
                     const cls = b === 'long' ? 'h4-long' : b === 'short' ? 'h4-short' : b === 'neutro' ? 'h4-neutro' : '';
                     return `<button type="button" class="h4-sq ${cls}" data-h4-slot="${qi}" data-h4-time-slot="${time}" onclick="gjToggleH4Square('${gjActiveAsset}',${qi})">${time}</button>`;

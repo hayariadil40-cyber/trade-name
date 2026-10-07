@@ -850,7 +850,7 @@
                             <span style="font-size:9px;color:rgba(255,255,255,0.18);font-style:italic">candela 1 → 6</span>
                         </div>
                         <div class="grid gap-1.5" style="grid-template-columns:repeat(6,1fr)">
-                            ${['22:00','02:00','06:00','10:00','14:00','18:00'].map((time,qi) => {
+                            ${['21:00','01:00','05:00','09:00','13:00','17:00'].map((time,qi) => {
                                 const val = Array.isArray(d.bias_h4) ? (d.bias_h4[qi] || null) : null;
                                 const cls = val === 'long' ? 'h4-long' : val === 'short' ? 'h4-short' : val === 'neutro' ? 'h4-neutro' : '';
                                 const innerLbl = val === 'long' ? 'L' : val === 'short' ? 'S' : val === 'neutro' ? 'N' : `<span style="font-size:8px;opacity:0.22">${qi+1}</span>`;
@@ -1005,11 +1005,11 @@
         function getCurrentH4LiveSlot() {
             const now = new Date();
             const totalMin = now.getUTCHours() * 60 + now.getUTCMinutes();
-            const closes = [120, 360, 600, 840, 1080, 1320]; // 02:00..22:00 UTC in minuti
+            const closes = [60, 300, 540, 780, 1020, 1260]; // 01:00..21:00 UTC in minuti (broker UTC+3)
             for (let i = 0; i < closes.length; i++) {
                 if (totalMin < closes[i]) return i;
             }
-            return 0; // dopo le 22:00 UTC → prossima chiusura è 02:00 (slot 0)
+            return 0; // dopo le 21:00 UTC → prossima chiusura è 01:00 (slot 0)
         }
 
         async function loadLiveH4Slot(asset) {
@@ -1145,12 +1145,20 @@
             const candles = [...buckets.values()].sort((a, b) => a.tMs - b.tMs);
             if (!candles.length) { msg('Nessun dato candele · ' + coin); return; }
 
+            // Massimo/minimo del giorno precedente: stessa fonte della lista "Dati daily"
+            const prevDay = await _ohlcFor(coin, _addDaysStr(day, -1));
+            if (coin !== activeAsset) return;
+            const pdh = parseFloat(prevDay?.high), pdl = parseFloat(prevDay?.low);
+
             const padL = 6, padR = 50, padT = 18, padB = 16;
             const x0 = padL, x1 = W - padR, y0 = padT, y1 = H - padB;
             const pxX = ms => x0 + (ms - t0ms) / (t1ms - t0ms) * (x1 - x0);
             let lo = Infinity, hi = -Infinity;
             candles.forEach(c => { lo = Math.min(lo, c.l); hi = Math.max(hi, c.h); });
-            const pp = Math.max((hi - lo) * 0.06, 0.0001), yMin = lo - pp, yMax = hi + pp;
+            let rLo = lo, rHi = hi;
+            if (isFinite(pdh)) rHi = Math.max(rHi, pdh);
+            if (isFinite(pdl)) rLo = Math.min(rLo, pdl);
+            const pp = Math.max((rHi - rLo) * 0.06, 0.0001), yMin = rLo - pp, yMax = rHi + pp;
             const pxY = p => y1 - (p - yMin) / (yMax - yMin) * (y1 - y0);
             const rawStep = (yMax - yMin) / 5, mag = Math.pow(10, Math.floor(Math.log10(rawStep || 1))), nn = rawStep / mag;
             const stepY = mag * (nn < 1.5 ? 1 : nn < 3 ? 2 : nn < 7 ? 5 : 10);
@@ -1182,6 +1190,15 @@
                 ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke(); ctx.setLineDash([]);
                 ctx.fillStyle = '#20c997'; ctx.font = '600 9px Inter, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
                 ctx.fillText(lbl, x0 + 3, y - 1);
+            });
+            // Massimo/minimo di ieri (tratteggio giallo, etichetta a destra)
+            [[pdh, 'H ieri '], [pdl, 'L ieri ']].forEach(([p, lbl]) => {
+                if (!isFinite(p)) return;
+                const y = pxY(p);
+                ctx.strokeStyle = 'rgba(234,179,8,.6)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+                ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke(); ctx.setLineDash([]);
+                ctx.fillStyle = '#eab308'; ctx.font = '600 9px Inter, sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+                ctx.fillText(lbl + p.toFixed(dec), x1 - 3, y - 1);
             });
             // candele H1
             const cw = Math.max(2, (x1 - x0) / 24 * 0.6);

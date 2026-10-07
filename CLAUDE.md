@@ -6,7 +6,7 @@ Benvenuto. Questo file ti racconta cos'è il Trade Desk, perché esiste, come è
 
 ## Chi è l'utente e perché esiste questo progetto
 
-Il proprietario è uno **scalper retail con base a Casablanca** (timezone Africa/Casablanca, UTC+1, niente ora legale). Lavora principalmente sulle sessioni di **Londra e New York**, con asset preferiti **XAU/USD, US30, NASDAQ, GER40** e in subordine **EUR/USD, USD/JPY**. La sua giornata operativa è scandita da regole di rischio precise: massimo 2-3 stop loss per sessione, 0.5% di perdita massima per sessione, 0.75-1% rischio massimo giornaliero.
+Il proprietario è uno **scalper retail** che vive e ragiona **solo in UTC** (tutti i suoi dispositivi sono in UTC; il broker è a UTC+3). Lavora principalmente sulle sessioni di **Londra e New York**, con asset preferiti **XAU/USD, US30, NASDAQ, GER40** e in subordine **EUR/USD, USD/JPY**. La sua giornata operativa è scandita da regole di rischio precise: massimo 2-3 stop loss per sessione, 0.5% di perdita massima per sessione, 0.75-1% rischio massimo giornaliero.
 
 Il Trade Desk è il suo **diario di trading personale**, evoluto in qualcosa di più: una dashboard operativa che lo accompagna **prima**, **durante** e **dopo** ogni sessione. Tre layer convivono nel sistema: la **registrazione manuale** dei trade e degli stati emotivi, le **routine automatiche** che gli mandano ordine del giorno e debrief su Telegram, e un set di **assistenti AI** dedicati (Rodrigo operativo giornaliero e notizie macro, Peter per la disciplina, Steve per le strategie) ognuno con personalità e dati a disposizione diversi.
 
@@ -92,7 +92,7 @@ Tutti gli assistenti vivono dietro la stessa edge function — `chat-ai` in `sup
 
 È la parte **più recentemente ricostruita** del sistema. Il flusso è interamente cloud, niente PC dell'utente coinvolto.
 
-**Lunedì alle 05:30 Casablanca** parte un cron job (`pg_cron`) che invoca la edge function `news-weekly-fetch`. La function scarica il calendario settimanale da `https://nfs.faireconomy.media/ff_calendar_thisweek.json`, filtra solo gli eventi a impatto **alto/medio** delle valute **USD ed EUR**, e per ognuno:
+**Lunedì alle 04:30 UTC** parte un cron job (`pg_cron`) che invoca la edge function `news-weekly-fetch`. La function scarica il calendario settimanale da `https://nfs.faireconomy.media/ff_calendar_thisweek.json`, filtra solo gli eventi a impatto **alto/medio** delle valute **USD ed EUR**, e per ognuno:
 1. Verifica con `ff_id` se è già in tabella (dedup).
 2. Chiama Claude in stile Rodrigo per generare l'**analisi pre-evento** ("cos'è il dato, quanto influenza i mercati, scenari sopra/sotto attese").
 3. Inserisce la riga nella tabella `allert` con `note` popolato dall'analisi.
@@ -105,7 +105,7 @@ Tutti gli assistenti vivono dietro la stessa edge function — `chat-ai` in `sup
 
 ![Modale validazione post-notizia](docs/images/07-allert-modal.png)
 
-Le tabelle e le colonne chiave: `allert.ff_id` (UNIQUE, dedup ForexFactory), `allert.note` (analisi pre), `allert.commento_rodrigo` (analisi post), `allert.reminder_sent` (BOOL, dedup notifiche Telegram), `allert.valore_atteso/precedente/effettivo`, `allert.impatto` (`alto`/`medio`/`basso`), `allert.data_evento` (DATE), `allert.ora_evento` (TIME, **in fuso Casablanca**).
+Le tabelle e le colonne chiave: `allert.ff_id` (UNIQUE, dedup ForexFactory), `allert.note` (analisi pre), `allert.commento_rodrigo` (analisi post), `allert.reminder_sent` (BOOL, dedup notifiche Telegram), `allert.valore_atteso/precedente/effettivo`, `allert.impatto` (`alto`/`medio`/`basso`), `allert.data_evento` (DATE), `allert.ora_evento` (TIME, **in UTC**).
 
 **Limitazione nota**: il JSON ForexFactory che usiamo **non contiene il valore effettivo** — è solo calendario forward. Per questo l'utente compila l'attuale a mano dal modale. Per automatizzarlo del tutto serve scraping HTML (fase 2 non ancora prioritaria).
 
@@ -115,15 +115,15 @@ Le tabelle e le colonne chiave: `allert.ff_id` (UNIQUE, dedup ForexFactory), `al
 
 Le routine sono i **messaggi pianificati** che arrivano sul Telegram dell'utente nei momenti critici della giornata. Oggi alcune sono PowerShell (in `scripts/`), altre sono già edge function Supabase. La direzione è migrare tutto su cloud.
 
-**07:00 Casablanca — `ordine-del-giorno.ps1`** raccoglie macro del giorno, bias aperti da rivalutare, ultimi 5 trade, forza USD calcolata sui movimenti DXY. Salva in `giornate.ordine_del_giorno` (JSONB) e manda Telegram con header "Ordine del Giorno".
+**06:30 UTC — `ordine-del-giorno`** raccoglie macro del giorno, bias aperti da rivalutare, ultimi 5 trade, forza USD calcolata sui movimenti DXY. Salva in `giornate.ordine_del_giorno` (JSONB) e manda Telegram con header "Ordine del Giorno".
 
-**07:30 Casablanca — `routine-rodrigo-morning.ps1`** legge stato giornata, checklist, ordine del giorno, bias, allert ad alto impatto del giorno, e produce un messaggio operativo firmato Rodrigo.
+**06:35 UTC — `rodrigo-morning`** legge stato giornata, checklist, ordine del giorno, bias, allert ad alto impatto del giorno, e produce un messaggio operativo firmato Rodrigo.
 
-**11:15 e 16:45 Casablanca — `routine-peter-session-debrief.ps1`** debrief di fine sessione (Londra alle 11:15, NY alle 16:45). Conta trade, calcola win rate di sessione, P/L, dà un voto disciplina. Firmato Peter.
+**`routine-peter-session-debrief`** debrief di fine sessione Londra e NY. Conta trade, calcola win rate di sessione, P/L, dà un voto disciplina. Firmato Peter.
 
-**17:15 Casablanca — `routine-peter-eod.ps1`** digest completo di fine giornata: metriche, confronto vs baseline 30gg, voto, una sola regola per domani. Firmato Peter.
+**`routine-peter-eod`** digest completo di fine giornata: metriche, confronto vs baseline 30gg, voto, una sola regola per domani. Firmato Peter.
 
-**21:00 Casablanca — `routine-rodrigo-domani.ps1`** preparazione del giorno dopo: calendario news USD/EUR, bias ancora aperti.
+**20:00 UTC — `rodrigo-domani`** preparazione del giorno dopo: calendario news USD/EUR, bias ancora aperti.
 
 Ogni esecuzione viene loggata in `routine_events` con `slot`, `tipo`, `payload`, `telegram_sent`, `telegram_message_id`. I messaggi Claude vengono salvati in `assistant_messages` per poterli rileggere.
 
@@ -157,7 +157,7 @@ Lo schema completo iniziale è in `supabase_schema.sql` ma è **datato** — il 
 
 ## Convenzioni e regole di lavoro
 
-**Timezone**: tutto è in **UTC**. DB, UI, edge functions e pg_cron usano UTC direttamente. Le ore mostrate in UI sono UTC. Mai usare Europe/Rome o Africa/Casablanca.
+**Timezone**: tutto è in **UTC**. DB, UI, edge functions e pg_cron usano UTC direttamente. Le ore mostrate in UI sono UTC. Mai usare Europe/Rome o Africa/Casablanca, e non nominarli nemmeno in conversazione: anche le ore lette dal DB si riportano in UTC così come sono.
 
 **Lingua**: tutto in italiano — UI, prompt assistenti, commenti dei messaggi Telegram. Mai parolacce in nessun output AI.
 
@@ -199,7 +199,7 @@ Non modificare lo schema `allert` senza una migration documentata; ci sono trigg
 
 Non scrivere nei prompt degli assistenti niente che possa suonare come **coach motivazionale da palestra** — Peter è un **analista**, non un Mr. Miyagi. Niente frasi tipo "credi in te stesso". Anche per Sofi e Rodrigo: tono asciutto, operativo.
 
-Non usare Europe/Rome o UTC come timezone di default.
+Non usare Africa/Casablanca né Europe/Rome, mai. Tutto è UTC. Le candele H4 del broker chiudono alle 01, 05, 09, 13, 17, 21 UTC.
 
 Non fare commit a metà giornata. Niente push senza richiesta esplicita.
 
