@@ -593,11 +593,11 @@
         function getCurrentH4LiveSlot() {
             var now = new Date();
             var totalMin = now.getUTCHours() * 60 + now.getUTCMinutes();
-            var closes = [60, 300, 540, 780, 1020, 1260]; // 01,05,09,13,17,21 UTC in minuti (broker UTC+3)
+            var closes = [120, 360, 600, 840, 1080, 1320]; // 02,06,10,14,18,22 UTC in minuti
             for (var i = 0; i < closes.length; i++) {
                 if (totalMin < closes[i]) return i;
             }
-            return 0; // dopo le 21:00 UTC → prossima chiusura è 01:00 (slot 0)
+            return 0; // dopo le 23:00 → prossima chiusura è 03:00 (slot 0)
         }
 
         // ==========================================
@@ -1283,9 +1283,9 @@
             var currentSlot = (currentDate === _todayStr) ? getCurrentH4LiveSlot() : -1;
 
             if (layerOn('biasstr')) {
-                // H4 closes 01,05,09,13,17,21 UTC (broker UTC+3); slot 0 = 21:00 del giorno prima, tagliato a mezzanotte
-                var H4_STARTS = ['00:00','01:00','05:00','09:00','13:00','17:00'];
-                var H4_ENDS   = ['01:00','05:00','09:00','13:00','17:00','21:00'];
+                // H4 closes 02,06,10,14,18,22 UTC
+                var H4_STARTS = ['00:00','02:00','06:00','10:00','14:00','18:00'];
+                var H4_ENDS   = ['02:00','06:00','10:00','14:00','18:00','22:00'];
 
                 // disegna tutti gli slot: slot corrente usa liveH4Val da watchlist
                 var slotsToRender = [0,1,2,3,4,5];

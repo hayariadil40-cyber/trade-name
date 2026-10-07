@@ -1,8 +1,8 @@
 // h4-bias-snap — scatta 10 min dopo ogni chiusura H4
 // Calcola L/S/N per ogni asset e scrive in bias di oggi + h4_snaps.
 //
-// pg_cron (UTC): h4-bias-0110/0510/0910/1310/1710/2110
-// = 01:10, 05:10, 09:10, 13:10, 17:10, 21:10 UTC (broker UTC+3: H4 chiude 01,05,09,13,17,21 UTC)
+// pg_cron (UTC): h4-bias-0210/0610/1010/1410/1810/2210
+// = 02:10, 06:10, 10:10, 14:10, 18:10, 22:10 UTC
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -14,7 +14,7 @@ const corsHeaders = {
 };
 
 // Chiusure H4 in minuti da mezzanotte UTC
-const H4_CLOSE_MINS = [60, 300, 540, 780, 1020, 1260]; // 01,05,09,13,17,21 UTC
+const H4_CLOSE_MINS = [120, 360, 600, 840, 1080, 1320]; // 02,06,10,14,18,22 UTC
 
 function getUtcMinutes(): number {
   const now = new Date();
@@ -32,6 +32,8 @@ function getJustClosedSlot(): number {
     const diff = totalMin - H4_CLOSE_MINS[i];
     if (diff >= 0 && diff <= 20) return i;
   }
+  // 00:00-00:20: lo slot 5 (23:00) ha appena chiuso
+  if (totalMin < 20) return 5;
   return -1;
 }
 
@@ -135,7 +137,7 @@ serve(async (req) => {
     if (biasRecord) {
       await db.from("bias").update({ coin_data: coinData }).eq("id", biasRecord.id);
     } else {
-      // Crea il record bias del giorno se non esiste ancora (es. snap 01:10 e 05:10 quando utente dorme)
+      // Crea il record bias del giorno se non esiste ancora (es. snap 02:10 e 06:10 quando utente dorme)
       await db.from("bias").insert({ data: todayDate, stato: "aperto", coin_data: coinData });
     }
 

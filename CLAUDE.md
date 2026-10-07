@@ -199,7 +199,7 @@ Non modificare lo schema `allert` senza una migration documentata; ci sono trigg
 
 Non scrivere nei prompt degli assistenti niente che possa suonare come **coach motivazionale da palestra** — Peter è un **analista**, non un Mr. Miyagi. Niente frasi tipo "credi in te stesso". Anche per Sofi e Rodrigo: tono asciutto, operativo.
 
-Non usare Africa/Casablanca né Europe/Rome, mai. Tutto è UTC. Le candele H4 del broker chiudono alle 01, 05, 09, 13, 17, 21 UTC.
+Non usare Africa/Casablanca né Europe/Rome, mai. Tutto è UTC. Le candele H4 chiudono alle 02, 06, 10, 14, 18, 22 UTC (broker UTC+3: sono le 05, 09, 13… dell'ora broker).
 
 Non fare commit a metà giornata. Niente push senza richiesta esplicita.
 
