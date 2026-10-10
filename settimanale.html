@@ -528,13 +528,22 @@
         const coin = activeAsset;
         const monday = currentMonday; // snapshot per evitare race su navigazione veloce
 
-        const { data: rows } = await db.from('candles_15m')
-            .select('ts, open, high, low, close')
-            .eq('coin', coin)
-            .gte('ts', loadStart)
-            .lt('ts', loadEnd)
-            .order('ts', { ascending: true })
-            .limit(500);
+        const [{ data: rows }, { data: prevRows }] = await Promise.all([
+            db.from('candles_15m')
+                .select('ts, open, high, low, close')
+                .eq('coin', coin)
+                .gte('ts', loadStart)
+                .lt('ts', loadEnd)
+                .order('ts', { ascending: true })
+                .limit(500),
+            // Settimana precedente (lun 00:00 → sab 00:00 UTC) per max/min PWH/PWL
+            db.from('candles_15m')
+                .select('high, low')
+                .eq('coin', coin)
+                .gte('ts', addDays(currentMonday, -7) + 'T00:00:00Z')
+                .lt('ts', addDays(currentMonday, -2) + 'T00:00:00Z')
+                .limit(1000),
+        ]);
 
         if (monday !== currentMonday || coin !== activeAsset) return; // risposta obsoleta
 
@@ -569,8 +578,14 @@
 
         let lo = Infinity, hi = -Infinity;
         candles.forEach(c => { lo = Math.min(lo, c.l); hi = Math.max(hi, c.h); });
-        const pp = Math.max((hi - lo) * 0.06, 0.0001);
-        const yMin = lo - pp, yMax = hi + pp;
+
+        // Max/min settimana precedente (inclusi nella scala Y così restano visibili)
+        let pwh = -Infinity, pwl = Infinity;
+        (prevRows || []).forEach(r => { pwh = Math.max(pwh, parseFloat(r.high)); pwl = Math.min(pwl, parseFloat(r.low)); });
+        const hasPrev = isFinite(pwh) && isFinite(pwl);
+        const sLo = hasPrev ? Math.min(lo, pwl) : lo, sHi = hasPrev ? Math.max(hi, pwh) : hi;
+        const pp = Math.max((sHi - sLo) * 0.06, 0.0001);
+        const yMin = sLo - pp, yMax = sHi + pp;
         function pxY(p) { return y1 - (p - yMin) / (yMax - yMin) * (y1 - y0); }
 
         // step Y
@@ -656,6 +671,24 @@
             ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
             ctx.fillText(ln.label, x0 + 3, ly - 1);
         });
+
+        // Linee High / Low della settimana precedente
+        if (hasPrev) {
+            [
+                { p: pwh, label: 'PWH ' + pwh.toFixed(dec) },
+                { p: pwl, label: 'PWL ' + pwl.toFixed(dec) },
+            ].forEach(ln => {
+                const ly = pxY(ln.p);
+                ctx.strokeStyle = 'rgba(245,158,11,.7)';
+                ctx.setLineDash([8, 4]); ctx.lineWidth = 1.2;
+                ctx.beginPath(); ctx.moveTo(x0, ly); ctx.lineTo(x1, ly); ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#f59e0b';
+                ctx.font = '600 9px Inter, sans-serif';
+                ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+                ctx.fillText(ln.label, x1 - 3, ly - 1);
+            });
+        }
 
         // Layer sessioni / zone (UTC) — un box/linea per ogni giorno
         const m15 = (rows || []).map(r => ({ tMs: new Date(r.ts).getTime(), o: parseFloat(r.open), h: parseFloat(r.high), l: parseFloat(r.low), c: parseFloat(r.close) }));
